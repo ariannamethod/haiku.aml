@@ -1,0 +1,80 @@
+# Python lineage: rae_recursive.py at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+# CPython 3.12 str.split() whitespace, measured across all Unicode codepoints.
+# No normalization or case conversion happens at this boundary.
+def haiku_space(cp):
+    if cp >= 9 and cp <= 13:
+        return 1
+    if cp >= 28 and cp <= 32:
+        return 1
+    if cp == 133 or cp == 160 or cp == 5760:
+        return 1
+    if cp >= 8192 and cp <= 8202:
+        return 1
+    if cp == 8232 or cp == 8233 or cp == 8239:
+        return 1
+    if cp == 8287 or cp == 12288:
+        return 1
+    return 0
+
+# len(text.split()): runs of whitespace separate words, including at the ends.
+def haiku_word_count(source):
+    count = 0
+    inside = 0
+    cursor = 0
+    size = text_len(source)
+    while cursor < size:
+        if haiku_space(text_codepoint(source, cursor)):
+            inside = 0
+        else:
+            if inside == 0:
+                count = count + 1
+            inside = 1
+        cursor = cursor + 1
+    return count
+
+# len(text.split('\n')): empty text is one line; a final LF adds an empty line.
+def haiku_line_count(source):
+    count = 1
+    cursor = 0
+    size = text_len(source)
+    while cursor < size:
+        if text_codepoint(source, cursor) == 10:
+            count = count + 1
+        cursor = cursor + 1
+    return count
+
+# Literal LF boundaries, preserving CR and every other codepoint in each line.
+# Integer indexes count from zero; negative indexes count from the end.
+# Out-of-range indexes return empty text.
+def haiku_line(source, index):
+    count = haiku_line_count(source)
+    if index < 0:
+        index = index + count
+    if index < 0 or index >= count:
+        return ""
+    current = 0
+    start = 0
+    cursor = 0
+    size = text_len(source)
+    while cursor < size:
+        if text_codepoint(source, cursor) == 10:
+            if current == index:
+                return text_slice(source, start, cursor)
+            current = current + 1
+            start = cursor + 1
+        cursor = cursor + 1
+    return text_slice(source, start, size)
+
+# RecursiveRAESelector.extract_features()[4]: three-line word-count variance.
+def haiku_line_coherence(source):
+    if haiku_line_count(source) != 3:
+        return 0
+    first = haiku_word_count(haiku_line(source, 0))
+    second = haiku_word_count(haiku_line(source, 1))
+    third = haiku_word_count(haiku_line(source, 2))
+    average = (first + second + third) / 3
+    first = first - average
+    second = second - average
+    third = third - average
+    variance = (first * first + second * second + third * third) / 3
+    return 1 / (1 + variance)

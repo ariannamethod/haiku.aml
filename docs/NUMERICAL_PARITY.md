@@ -28,9 +28,12 @@ their original range.
 
 ## Run it
 
-Build the sibling AML runner, scalar `libaml.a`, and `amlc` with `--scalar`
-support from [AML PR #26](https://github.com/ariannamethod/ariannamethod.ai/pull/26),
-tested commit `11b54b8efff41310b1a1f9bd578960bd71e438ef`, then:
+Build the sibling AML v5.2.0 runner, scalar `libaml.a`, and `amlc` with native
+`IMPORT` and UTF-8 values, then:
+
+Toolchain pin: [AML PR #27](https://github.com/ariannamethod/ariannamethod.ai/pull/27),
+`d7e695fdcfd3b5fe0ec02c5776d8f2560f94b995` (v5.2.0). Rebuild the library and
+runner together against that header.
 
 ```sh
 make -C ../ariannamethod.ai all
@@ -38,12 +41,10 @@ make test
 ```
 
 Override locations with `AML_ROOT`, or with `AML`, `AMLC`, and `AML_LIB`.
-`tests/run_numerical.sh` concatenates `src/harmonix.aml`, `src/bridges.aml`, and
-the fixture into one source, preserving function scope. This is explicit source
-assembly. AML's current `INCLUDE` executes its own context; shared module exports
-are a subsequent language task.
-
-The test runs that source through the interpreter and through `amlc --scalar`.
+`tests/fixtures/numerical.aml` imports `src/harmonix.aml` and `src/bridges.aml`
+directly. `IMPORT` shares their function definitions in one prepared program.
+`tests/run_numerical.sh` runs that fixture through the interpreter and through
+`amlc --scalar`; the imported AML files remain runtime inputs of the executable.
 It stages the selected `libaml.a` in a temporary installation prefix, compares
 both outputs with the success receipt, and deletes generated files on exit.
 The numerical modules and ordinary test command execute AML throughout.
@@ -59,9 +60,9 @@ tolerance **0.000002** against Python's recorded values.
   words, disjoint words, repeated trigrams, thresholds below/at/above 0.7 and
   0.6, arousal above one, all boosts before discount, final clamping, temperature
   mapping inside and outside `[0,1]`, bridge bounds and combined penalties.
-- Four organism functions plus one fixture helper; **491 physical lines** in
-  the assembled source, longest line **135 bytes**. The test enforces the initial
-  compiler source budget.
+- Four organism functions plus one fixture helper, loaded through native
+  modules. The shell gate checks the root fixture budget; AML validates the
+  expanded source and rejects overlong executable lines.
 - Interpreter and compiled success output agree exactly:
 
 ```text
@@ -125,6 +126,7 @@ print(f'PASS: {checked} fixture values match direct pinned Python calls')
 PY
 ```
 
-Text/set extraction, state storage, asynchronous scheduling, MathBrain, and RAE
-remain the next organs in the [migration map](MIGRATION.md). The
+The [text boundary module](TEXT_PARITY.md) now covers words, lines, and RAE
+coherence. Set extraction, state storage, asynchronous scheduling, MathBrain,
+and the rest of RAE remain the next organs in the [migration map](MIGRATION.md). The
 [RAE experiments](RAE_RESEARCH.md) keep their separate research status.

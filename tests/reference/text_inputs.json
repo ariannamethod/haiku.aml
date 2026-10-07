@@ -1,0 +1,901 @@
+{
+  "source_commit": "abb878c52d763b73e5ad7a4d6a68a9ea7a248a39",
+  "python_version": "3.12.14",
+  "unicode_version": "15.0.0",
+  "whitespace_codepoints": [
+    9,
+    10,
+    11,
+    12,
+    13,
+    28,
+    29,
+    30,
+    31,
+    32,
+    133,
+    160,
+    5760,
+    8192,
+    8193,
+    8194,
+    8195,
+    8196,
+    8197,
+    8198,
+    8199,
+    8200,
+    8201,
+    8202,
+    8232,
+    8233,
+    8239,
+    8287,
+    12288
+  ],
+  "space_cases": [
+    {
+      "codepoint": 0,
+      "space": 0
+    },
+    {
+      "codepoint": 8,
+      "space": 0
+    },
+    {
+      "codepoint": 9,
+      "space": 1
+    },
+    {
+      "codepoint": 10,
+      "space": 1
+    },
+    {
+      "codepoint": 11,
+      "space": 1
+    },
+    {
+      "codepoint": 12,
+      "space": 1
+    },
+    {
+      "codepoint": 13,
+      "space": 1
+    },
+    {
+      "codepoint": 14,
+      "space": 0
+    },
+    {
+      "codepoint": 27,
+      "space": 0
+    },
+    {
+      "codepoint": 28,
+      "space": 1
+    },
+    {
+      "codepoint": 29,
+      "space": 1
+    },
+    {
+      "codepoint": 30,
+      "space": 1
+    },
+    {
+      "codepoint": 31,
+      "space": 1
+    },
+    {
+      "codepoint": 32,
+      "space": 1
+    },
+    {
+      "codepoint": 33,
+      "space": 0
+    },
+    {
+      "codepoint": 35,
+      "space": 0
+    },
+    {
+      "codepoint": 65,
+      "space": 0
+    },
+    {
+      "codepoint": 132,
+      "space": 0
+    },
+    {
+      "codepoint": 133,
+      "space": 1
+    },
+    {
+      "codepoint": 134,
+      "space": 0
+    },
+    {
+      "codepoint": 159,
+      "space": 0
+    },
+    {
+      "codepoint": 160,
+      "space": 1
+    },
+    {
+      "codepoint": 161,
+      "space": 0
+    },
+    {
+      "codepoint": 5759,
+      "space": 0
+    },
+    {
+      "codepoint": 5760,
+      "space": 1
+    },
+    {
+      "codepoint": 5761,
+      "space": 0
+    },
+    {
+      "codepoint": 6158,
+      "space": 0
+    },
+    {
+      "codepoint": 8191,
+      "space": 0
+    },
+    {
+      "codepoint": 8192,
+      "space": 1
+    },
+    {
+      "codepoint": 8193,
+      "space": 1
+    },
+    {
+      "codepoint": 8194,
+      "space": 1
+    },
+    {
+      "codepoint": 8195,
+      "space": 1
+    },
+    {
+      "codepoint": 8196,
+      "space": 1
+    },
+    {
+      "codepoint": 8197,
+      "space": 1
+    },
+    {
+      "codepoint": 8198,
+      "space": 1
+    },
+    {
+      "codepoint": 8199,
+      "space": 1
+    },
+    {
+      "codepoint": 8200,
+      "space": 1
+    },
+    {
+      "codepoint": 8201,
+      "space": 1
+    },
+    {
+      "codepoint": 8202,
+      "space": 1
+    },
+    {
+      "codepoint": 8203,
+      "space": 0
+    },
+    {
+      "codepoint": 8204,
+      "space": 0
+    },
+    {
+      "codepoint": 8205,
+      "space": 0
+    },
+    {
+      "codepoint": 8231,
+      "space": 0
+    },
+    {
+      "codepoint": 8232,
+      "space": 1
+    },
+    {
+      "codepoint": 8233,
+      "space": 1
+    },
+    {
+      "codepoint": 8234,
+      "space": 0
+    },
+    {
+      "codepoint": 8238,
+      "space": 0
+    },
+    {
+      "codepoint": 8239,
+      "space": 1
+    },
+    {
+      "codepoint": 8240,
+      "space": 0
+    },
+    {
+      "codepoint": 8286,
+      "space": 0
+    },
+    {
+      "codepoint": 8287,
+      "space": 1
+    },
+    {
+      "codepoint": 8288,
+      "space": 0
+    },
+    {
+      "codepoint": 12287,
+      "space": 0
+    },
+    {
+      "codepoint": 12288,
+      "space": 1
+    },
+    {
+      "codepoint": 12289,
+      "space": 0
+    },
+    {
+      "codepoint": 65279,
+      "space": 0
+    },
+    {
+      "codepoint": 129417,
+      "space": 0
+    },
+    {
+      "codepoint": 1114111,
+      "space": 0
+    }
+  ],
+  "text_cases": [
+    {
+      "name": "empty",
+      "text": "",
+      "words": 0,
+      "lines": 1,
+      "coherence": 0.0
+    },
+    {
+      "name": "one_space",
+      "text": " ",
+      "words": 0,
+      "lines": 1,
+      "coherence": 0.0
+    },
+    {
+      "name": "spaces_tabs",
+      "text": " \t \t ",
+      "words": 0,
+      "lines": 1,
+      "coherence": 0.0
+    },
+    {
+      "name": "one_word",
+      "text": "owl",
+      "words": 1,
+      "lines": 1,
+      "coherence": 0.0
+    },
+    {
+      "name": "two_words",
+      "text": "owl friend",
+      "words": 2,
+      "lines": 1,
+      "coherence": 0.0
+    },
+    {
+      "name": "one_lf",
+      "text": "\n",
+      "words": 0,
+      "lines": 2,
+      "coherence": 0.0
+    },
+    {
+      "name": "two_lf",
+      "text": "\n\n",
+      "words": 0,
+      "lines": 3,
+      "coherence": 1.0
+    },
+    {
+      "name": "three_lf",
+      "text": "\n\n\n",
+      "words": 0,
+      "lines": 4,
+      "coherence": 0.0
+    },
+    {
+      "name": "two_lines",
+      "text": "one\ntwo",
+      "words": 2,
+      "lines": 2,
+      "coherence": 0.0
+    },
+    {
+      "name": "four_lines",
+      "text": "one\ntwo\nthree\nfour",
+      "words": 4,
+      "lines": 4,
+      "coherence": 0.0
+    },
+    {
+      "name": "balanced",
+      "text": "one two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0
+    },
+    {
+      "name": "unequal",
+      "text": "one\ntwo three four\nfive six seven eight nine",
+      "words": 9,
+      "lines": 3,
+      "coherence": 0.27272727272727276
+    },
+    {
+      "name": "empty_first",
+      "text": "\none two\nthree",
+      "words": 3,
+      "lines": 3,
+      "coherence": 0.6000000000000001
+    },
+    {
+      "name": "empty_middle",
+      "text": "one two\n\nthree four five",
+      "words": 5,
+      "lines": 3,
+      "coherence": 0.391304347826087
+    },
+    {
+      "name": "empty_last",
+      "text": "one two\nthree\n",
+      "words": 3,
+      "lines": 3,
+      "coherence": 0.6000000000000001
+    },
+    {
+      "name": "all_blank",
+      "text": " \n\t\n  ",
+      "words": 0,
+      "lines": 3,
+      "coherence": 1.0
+    },
+    {
+      "name": "trailing_lf",
+      "text": "one\ntwo\nthree\n",
+      "words": 3,
+      "lines": 4,
+      "coherence": 0.0
+    },
+    {
+      "name": "leading_lf",
+      "text": "\none\ntwo\nthree",
+      "words": 3,
+      "lines": 4,
+      "coherence": 0.0
+    },
+    {
+      "name": "crlf",
+      "text": "one two\r\nthree\r\nfour five six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 0.6000000000000001
+    },
+    {
+      "name": "cr_only",
+      "text": "one\rtwo\rthree",
+      "words": 3,
+      "lines": 1,
+      "coherence": 0.0
+    },
+    {
+      "name": "mixed_crlf",
+      "text": "one\r\ntwo three\nfour\r",
+      "words": 4,
+      "lines": 3,
+      "coherence": 0.8181818181818181
+    },
+    {
+      "name": "tabs",
+      "text": "\tone\ttwo\nthree\t four\nfive\t",
+      "words": 5,
+      "lines": 3,
+      "coherence": 0.8181818181818181
+    },
+    {
+      "name": "cyrillic",
+      "text": "\u0441\u043e\u0432\u0430 \u0440\u044f\u0434\u043e\u043c\n\u0441\u043b\u043e\u0432\u0430 \u0441\u043b\u0443\u0448\u0430\u044e\u0442 \u0432\u0435\u0442\u0435\u0440\n\u0434\u0440\u0443\u0433 \u0437\u0434\u0435\u0441\u044c",
+      "words": 7,
+      "lines": 3,
+      "coherence": 0.8181818181818181
+    },
+    {
+      "name": "hebrew",
+      "text": "\u05d9\u05e0\u05e9\u05d5\u05e3 \u05db\u05d0\u05df\n\u05d7\u05d1\u05e8 \u05de\u05e7\u05e9\u05d9\u05d1 \u05d1\u05e9\u05e7\u05d8\n\u05e9\u05ea\u05d9 \u05e2\u05d9\u05e0\u05d9\u05d9\u05dd",
+      "words": 7,
+      "lines": 3,
+      "coherence": 0.8181818181818181
+    },
+    {
+      "name": "french",
+      "text": "\u00e9t\u00e9 lumi\u00e8re\nune voix r\u00e9pond\npr\u00e8s de toi",
+      "words": 8,
+      "lines": 3,
+      "coherence": 0.8181818181818181
+    },
+    {
+      "name": "mixed_scripts",
+      "text": "\u0441\u043e\u0432\u0430 owl \u05d9\u05e0\u05e9\u05d5\u05e3\n\u00e9t\u00e9 \u0434\u0440\u0443\u0433\n\ud83e\udd89",
+      "words": 6,
+      "lines": 3,
+      "coherence": 0.6000000000000001
+    },
+    {
+      "name": "emoji",
+      "text": "\ud83e\udd89 \ud83c\udf12\n\ud83e\udef6\ud83c\udffd\n\ud83d\udc69\u200d\ud83d\udcbb \u2728",
+      "words": 5,
+      "lines": 3,
+      "coherence": 0.8181818181818181
+    },
+    {
+      "name": "combining_marks",
+      "text": "e\u0301 a\u0308\n\u05e9\u05b8\u05c1\u05dc\u05d5\u05b9\u05dd\n\u0438\u0306",
+      "words": 4,
+      "lines": 3,
+      "coherence": 0.8181818181818181
+    },
+    {
+      "name": "hashes",
+      "text": "one#two #three\nfour # five\n#six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 0.6000000000000001
+    },
+    {
+      "name": "quotes",
+      "text": "\"owl\" 'friend'\nhe said \"hello\"\n'yes'",
+      "words": 6,
+      "lines": 3,
+      "coherence": 0.6000000000000001
+    },
+    {
+      "name": "backslashes",
+      "text": "owl\\friend\none \\ two\nend\\",
+      "words": 5,
+      "lines": 3,
+      "coherence": 0.5294117647058824
+    },
+    {
+      "name": "nbsp",
+      "text": "one\u00a0two\nthree\u202ffour\nfive",
+      "words": 5,
+      "lines": 3,
+      "coherence": 0.8181818181818181
+    },
+    {
+      "name": "unicode_separators",
+      "text": "one\u2028two\u2029three",
+      "words": 3,
+      "lines": 1,
+      "coherence": 0.0
+    },
+    {
+      "name": "separator_three_lines",
+      "text": "one\u2028two\nthree\u2029four\nfive",
+      "words": 5,
+      "lines": 3,
+      "coherence": 0.8181818181818181
+    },
+    {
+      "name": "zero_width",
+      "text": "one\u200btwo\nthree\u200dfour\nfive\u2060six",
+      "words": 3,
+      "lines": 3,
+      "coherence": 1.0
+    },
+    {
+      "name": "bom",
+      "text": "\ufeffone two\nthree\n\ufefffour",
+      "words": 4,
+      "lines": 3,
+      "coherence": 0.8181818181818181
+    },
+    {
+      "name": "punctuation",
+      "text": "one,two;three\nfour-five\nsix\u2014seven",
+      "words": 3,
+      "lines": 3,
+      "coherence": 1.0
+    },
+    {
+      "name": "python_rae_test",
+      "text": "words dance in cloud\nresonance finds its own path\nconstraint births form",
+      "words": 12,
+      "lines": 3,
+      "coherence": 0.6000000000000001
+    },
+    {
+      "name": "long_first",
+      "text": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\none\n",
+      "words": 43,
+      "lines": 3,
+      "coherence": 0.002604920405209841
+    }
+  ],
+  "separator_cases": [
+    {
+      "name": "separator_0009",
+      "text": "one\ttwo\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 9
+    },
+    {
+      "name": "separator_000a",
+      "text": "one\ntwo\nthree four\nfive six",
+      "words": 6,
+      "lines": 4,
+      "coherence": 0.0,
+      "codepoint": 10
+    },
+    {
+      "name": "separator_000b",
+      "text": "one\u000btwo\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 11
+    },
+    {
+      "name": "separator_000c",
+      "text": "one\ftwo\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 12
+    },
+    {
+      "name": "separator_000d",
+      "text": "one\rtwo\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 13
+    },
+    {
+      "name": "separator_001c",
+      "text": "one\u001ctwo\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 28
+    },
+    {
+      "name": "separator_001d",
+      "text": "one\u001dtwo\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 29
+    },
+    {
+      "name": "separator_001e",
+      "text": "one\u001etwo\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 30
+    },
+    {
+      "name": "separator_001f",
+      "text": "one\u001ftwo\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 31
+    },
+    {
+      "name": "separator_0020",
+      "text": "one two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 32
+    },
+    {
+      "name": "separator_0085",
+      "text": "one\u0085two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 133
+    },
+    {
+      "name": "separator_00a0",
+      "text": "one\u00a0two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 160
+    },
+    {
+      "name": "separator_1680",
+      "text": "one\u1680two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 5760
+    },
+    {
+      "name": "separator_2000",
+      "text": "one\u2000two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8192
+    },
+    {
+      "name": "separator_2001",
+      "text": "one\u2001two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8193
+    },
+    {
+      "name": "separator_2002",
+      "text": "one\u2002two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8194
+    },
+    {
+      "name": "separator_2003",
+      "text": "one\u2003two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8195
+    },
+    {
+      "name": "separator_2004",
+      "text": "one\u2004two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8196
+    },
+    {
+      "name": "separator_2005",
+      "text": "one\u2005two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8197
+    },
+    {
+      "name": "separator_2006",
+      "text": "one\u2006two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8198
+    },
+    {
+      "name": "separator_2007",
+      "text": "one\u2007two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8199
+    },
+    {
+      "name": "separator_2008",
+      "text": "one\u2008two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8200
+    },
+    {
+      "name": "separator_2009",
+      "text": "one\u2009two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8201
+    },
+    {
+      "name": "separator_200a",
+      "text": "one\u200atwo\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8202
+    },
+    {
+      "name": "separator_2028",
+      "text": "one\u2028two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8232
+    },
+    {
+      "name": "separator_2029",
+      "text": "one\u2029two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8233
+    },
+    {
+      "name": "separator_202f",
+      "text": "one\u202ftwo\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8239
+    },
+    {
+      "name": "separator_205f",
+      "text": "one\u205ftwo\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 8287
+    },
+    {
+      "name": "separator_3000",
+      "text": "one\u3000two\nthree four\nfive six",
+      "words": 6,
+      "lines": 3,
+      "coherence": 1.0,
+      "codepoint": 12288
+    }
+  ],
+  "line_cases": [
+    {
+      "name": "empty",
+      "text": "",
+      "index": 0,
+      "expected": ""
+    },
+    {
+      "name": "empty_last",
+      "text": "",
+      "index": -1,
+      "expected": ""
+    },
+    {
+      "name": "empty_outside",
+      "text": "",
+      "index": 1,
+      "expected": ""
+    },
+    {
+      "name": "first",
+      "text": "one\ntwo\nthree",
+      "index": 0,
+      "expected": "one"
+    },
+    {
+      "name": "middle",
+      "text": "one\ntwo\nthree",
+      "index": 1,
+      "expected": "two"
+    },
+    {
+      "name": "last",
+      "text": "one\ntwo\nthree",
+      "index": 2,
+      "expected": "three"
+    },
+    {
+      "name": "negative_last",
+      "text": "one\ntwo\nthree",
+      "index": -1,
+      "expected": "three"
+    },
+    {
+      "name": "negative_first",
+      "text": "one\ntwo\nthree",
+      "index": -3,
+      "expected": "one"
+    },
+    {
+      "name": "past_end",
+      "text": "one\ntwo\nthree",
+      "index": 3,
+      "expected": ""
+    },
+    {
+      "name": "before_start",
+      "text": "one\ntwo\nthree",
+      "index": -4,
+      "expected": ""
+    },
+    {
+      "name": "empty_middle",
+      "text": "one\n\nthree",
+      "index": 1,
+      "expected": ""
+    },
+    {
+      "name": "trailing_empty",
+      "text": "one\ntwo\n",
+      "index": 2,
+      "expected": ""
+    },
+    {
+      "name": "crlf_middle",
+      "text": "one\r\ntwo\r\nthree",
+      "index": 1,
+      "expected": "two\r"
+    },
+    {
+      "name": "cyrillic",
+      "text": "\u0441\u043e\u0432\u0430\n\u0434\u0440\u0443\u0433 \u0440\u044f\u0434\u043e\u043c\n\u0442\u0438\u0448\u0438\u043d\u0430",
+      "index": 1,
+      "expected": "\u0434\u0440\u0443\u0433 \u0440\u044f\u0434\u043e\u043c"
+    },
+    {
+      "name": "hebrew",
+      "text": "\u05d9\u05e0\u05e9\u05d5\u05e3\n\u05d7\u05d1\u05e8 \u05db\u05d0\u05df\n\u05e9\u05e7\u05d8",
+      "index": 1,
+      "expected": "\u05d7\u05d1\u05e8 \u05db\u05d0\u05df"
+    },
+    {
+      "name": "emoji",
+      "text": "\ud83e\udd89\n\ud83d\udc69\u200d\ud83d\udcbb\n\ud83c\udf12",
+      "index": 1,
+      "expected": "\ud83d\udc69\u200d\ud83d\udcbb"
+    },
+    {
+      "name": "combining",
+      "text": "\u00e9t\u00e9\ne\u0301\n\u0438\u0306",
+      "index": 1,
+      "expected": "e\u0301"
+    },
+    {
+      "name": "hashes",
+      "text": "first\n#second\nthird",
+      "index": 1,
+      "expected": "#second"
+    },
+    {
+      "name": "spaces",
+      "text": "a\n  b \t\nc",
+      "index": 1,
+      "expected": "  b \t"
+    },
+    {
+      "name": "unicode_separator",
+      "text": "a\nb\u2028c\nd",
+      "index": 1,
+      "expected": "b\u2028c"
+    }
+  ]
+}

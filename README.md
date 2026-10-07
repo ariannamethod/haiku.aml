@@ -94,22 +94,29 @@ when the interface work begins.
 
 ## Right now
 
-The owl has its first pulse. Four functions now run in pure AML:
-`haiku_pulse`, `haiku_observe`, `haiku_temperatures`, and `haiku_bridge_score`.
-They preserve the original pulse, dissonance, temperature mapping, and transition
-score. The text organ will supply their word/trigram counts; the speaking loop,
-learners, memory, and dreams are still in the migration queue.
+The owl has a pulse and can find the edges of words. Nine functions now run in
+pure AML across three native modules. Pulse, dissonance, temperatures, and
+transition scores preserve the Python formulas. The new text organ counts
+Unicode-delimited words, preserves line contents, and computes the original
+RAE three-line coherence feature.
 
-Build the sibling AML toolchain with
-[the source-origin/scalar-build repair](https://github.com/ariannamethod/ariannamethod.ai/pull/26),
-then run `make test`. See [numerical parity](docs/NUMERICAL_PARITY.md) for build
-paths, the exact input boundary, and reproduction of the reference values.
+The speaking loop, learners, word cloud, and dreams are next in the migration
+queue. New dialogue examples will come from that running AML organism.
+
+Build the sibling AML **v5.2.0 modules-and-text toolchain** from
+[AML PR #27](https://github.com/ariannamethod/ariannamethod.ai/pull/27), then run
+`make test`.
+The fixtures use native `IMPORT`, typed UTF-8 arguments, and string returns.
+See [numerical parity](docs/NUMERICAL_PARITY.md) and
+[text parity](docs/TEXT_PARITY.md) for exact boundaries and Python reference
+reproduction.
 
 Reference checks completed on 2026-10-07:
 
 - Python HAiKU: **161 tests passed**.
-- Haiku AML: **49 cases / 130 reference values** pass in the interpreter and
-  compiled scalar executable, at an absolute tolerance of 0.000002.
+- Haiku AML: **195 cases / 412 reference values** pass in the interpreter and
+  compiled scalar executable: 130 numerical values and 282 text values. Counts
+  and returned strings compare exactly; float tolerance is 0.000002.
 - AML runtime: **550 tests passed**.
 - AML compiler: scope, source origins, nested failures, worker branches and
   errors, scalar builds, and literal program arguments are covered by regressions.
@@ -119,6 +126,11 @@ Reference checks completed on 2026-10-07:
 
 The [RAE research](docs/RAE_RESEARCH.md) records the original recursion's measured
 behavior and proposes learned feedback, small replay memory, and Hebbian traces.
+Two more cousins joined the workshop:
+[Subjectivity](https://github.com/ariannamethod/subjectivity), whose form changes
+with its state, and [Brodsky](https://github.com/ariannamethod/brodsky), with a sea
+of remembered poems and two sampling voices. Their [family audit](docs/FAMILY.md)
+records useful organs and the experiments that will tell us what they add.
 See [the audit and implementation order](docs/MIGRATION.md).
 
 ## Lineage
@@ -127,7 +139,9 @@ See [the audit and implementation order](docs/MIGRATION.md).
 [haiku.c](https://github.com/ariannamethod/haiku.c) ·
 [haiku](https://github.com/ariannamethod/haiku) ·
 [Klaus](https://github.com/ariannamethod/klaus.c) ·
-[Yent AML](https://github.com/ariannamethod/yent.aml)
+[Yent AML](https://github.com/ariannamethod/yent.aml) ·
+[Subjectivity](https://github.com/ariannamethod/subjectivity) ·
+[Brodsky](https://github.com/ariannamethod/brodsky)
 
 GNU GPL v3 — see [LICENSE](LICENSE).
 
