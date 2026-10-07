@@ -1,0 +1,222 @@
+# Direct CPython / RecursiveRAESelector references: tests/reference/text_inputs.json.
+# Source: harmonix abb878c52d763b73e5ad7a4d6a68a9ea7a248a39; coherence tolerance 0.000002.
+IMPORT "../../src/text.aml"
+
+def haiku_text_check(name, source, words, lines, coherence):
+    errors = 0
+    if haiku_word_count(source) != words:
+        ECHO WORD_COUNT_MISMATCH
+        errors = errors + 1
+    if haiku_line_count(source) != lines:
+        ECHO LINE_COUNT_MISMATCH
+        errors = errors + 1
+    if abs(haiku_line_coherence(source) - coherence) > 0.000002:
+        ECHO COHERENCE_MISMATCH
+        errors = errors + 1
+    if errors > 0:
+        PRINT name
+    return errors
+
+def haiku_space_check(cp, expected):
+    if haiku_space(cp) == expected:
+        return 0
+    ECHO SPACE_MISMATCH
+    PRINT cp
+    return 1
+
+def haiku_line_check(name, source, index, expected):
+    if text_equal(haiku_line(source, index), expected):
+        return 0
+    ECHO LINE_CONTENT_MISMATCH
+    PRINT name
+    return 1
+
+failures = 0
+failures = failures + haiku_text_check("empty", "", 0, 1, 0)
+failures = failures + haiku_text_check("one_space", " ", 0, 1, 0)
+failures = failures + haiku_text_check("spaces_tabs", " \t \t ", 0, 1, 0)
+failures = failures + haiku_text_check("one_word", "owl", 1, 1, 0)
+failures = failures + haiku_text_check("two_words", "owl friend", 2, 1, 0)
+failures = failures + haiku_text_check("one_lf", "\n", 0, 2, 0)
+failures = failures + haiku_text_check("two_lf", "\n\n", 0, 3, 1)
+failures = failures + haiku_text_check("three_lf", "\n\n\n", 0, 4, 0)
+failures = failures + haiku_text_check("two_lines", "one\ntwo", 2, 2, 0)
+failures = failures + haiku_text_check("four_lines", "one\ntwo\nthree\nfour", 4, 4, 0)
+failures = failures + haiku_text_check("balanced", "one two\nthree four\nfive six", 6, 3, 1)
+failures = failures + haiku_text_check("unequal", "one\ntwo three four\nfive six seven eight nine", 9, 3, 0.27272727272727276)
+failures = failures + haiku_text_check("empty_first", "\none two\nthree", 3, 3, 0.60000000000000009)
+failures = failures + haiku_text_check("empty_middle", "one two\n\nthree four five", 5, 3, 0.39130434782608697)
+failures = failures + haiku_text_check("empty_last", "one two\nthree\n", 3, 3, 0.60000000000000009)
+failures = failures + haiku_text_check("all_blank", " \n\t\n  ", 0, 3, 1)
+failures = failures + haiku_text_check("trailing_lf", "one\ntwo\nthree\n", 3, 4, 0)
+failures = failures + haiku_text_check("leading_lf", "\none\ntwo\nthree", 3, 4, 0)
+failures = failures + haiku_text_check("crlf", "one two\r\nthree\r\nfour five six", 6, 3, 0.60000000000000009)
+failures = failures + haiku_text_check("cr_only", "one\rtwo\rthree", 3, 1, 0)
+failures = failures + haiku_text_check("mixed_crlf", "one\r\ntwo three\nfour\r", 4, 3, 0.81818181818181812)
+failures = failures + haiku_text_check("tabs", "\tone\ttwo\nthree\t four\nfive\t", 5, 3, 0.81818181818181812)
+failures = failures + haiku_text_check("cyrillic", "сова рядом\nслова слушают ветер\nдруг здесь", 7, 3, 0.81818181818181812)
+failures = failures + haiku_text_check("hebrew", "ינשוף כאן\nחבר מקשיב בשקט\nשתי עיניים", 7, 3, 0.81818181818181812)
+failures = failures + haiku_text_check("french", "été lumière\nune voix répond\nprès de toi", 8, 3, 0.81818181818181812)
+failures = failures + haiku_text_check("mixed_scripts", "сова owl ינשוף\nété друг\n🦉", 6, 3, 0.60000000000000009)
+failures = failures + haiku_text_check("emoji", "🦉 🌒\n🫶🏽\n👩‍💻 ✨", 5, 3, 0.81818181818181812)
+failures = failures + haiku_text_check("combining_marks", "é ä\nשָׁלוֹם\nй", 4, 3, 0.81818181818181812)
+failures = failures + haiku_text_check("hashes", "one#two #three\nfour # five\n#six", 6, 3, 0.60000000000000009)
+failures = failures + haiku_text_check("quotes", "\"owl\" 'friend'\nhe said \"hello\"\n'yes'", 6, 3, 0.60000000000000009)
+failures = failures + haiku_text_check("backslashes", "owl\\friend\none \\ two\nend\\", 5, 3, 0.52941176470588236)
+failures = failures + haiku_text_check("nbsp", "one two\nthree four\nfive", 5, 3, 0.81818181818181812)
+failures = failures + haiku_text_check("unicode_separators", "one two three", 3, 1, 0)
+failures = failures + haiku_text_check("separator_three_lines", "one two\nthree four\nfive", 5, 3, 0.81818181818181812)
+failures = failures + haiku_text_check("zero_width", "one​two\nthree‍four\nfive⁠six", 3, 3, 1)
+failures = failures + haiku_text_check("bom", "﻿one two\nthree\n﻿four", 4, 3, 0.81818181818181812)
+failures = failures + haiku_text_check("punctuation", "one,two;three\nfour-five\nsix—seven", 3, 3, 1)
+failures = failures + haiku_text_check("python_rae_test", "words dance in cloud\nresonance finds its own path\nconstraint births form", 12, 3, 0.60000000000000009)
+source = "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\none\n"
+failures = failures + haiku_text_check("long_first", source, 43, 3, 0.0026049204052098411)
+
+# Every CPython whitespace codepoint, plus neighbours and non-space controls.
+failures = failures + haiku_space_check(0, 0)
+failures = failures + haiku_space_check(8, 0)
+failures = failures + haiku_space_check(9, 1)
+failures = failures + haiku_space_check(10, 1)
+failures = failures + haiku_space_check(11, 1)
+failures = failures + haiku_space_check(12, 1)
+failures = failures + haiku_space_check(13, 1)
+failures = failures + haiku_space_check(14, 0)
+failures = failures + haiku_space_check(27, 0)
+failures = failures + haiku_space_check(28, 1)
+failures = failures + haiku_space_check(29, 1)
+failures = failures + haiku_space_check(30, 1)
+failures = failures + haiku_space_check(31, 1)
+failures = failures + haiku_space_check(32, 1)
+failures = failures + haiku_space_check(33, 0)
+failures = failures + haiku_space_check(35, 0)
+failures = failures + haiku_space_check(65, 0)
+failures = failures + haiku_space_check(132, 0)
+failures = failures + haiku_space_check(133, 1)
+failures = failures + haiku_space_check(134, 0)
+failures = failures + haiku_space_check(159, 0)
+failures = failures + haiku_space_check(160, 1)
+failures = failures + haiku_space_check(161, 0)
+failures = failures + haiku_space_check(5759, 0)
+failures = failures + haiku_space_check(5760, 1)
+failures = failures + haiku_space_check(5761, 0)
+failures = failures + haiku_space_check(6158, 0)
+failures = failures + haiku_space_check(8191, 0)
+failures = failures + haiku_space_check(8192, 1)
+failures = failures + haiku_space_check(8193, 1)
+failures = failures + haiku_space_check(8194, 1)
+failures = failures + haiku_space_check(8195, 1)
+failures = failures + haiku_space_check(8196, 1)
+failures = failures + haiku_space_check(8197, 1)
+failures = failures + haiku_space_check(8198, 1)
+failures = failures + haiku_space_check(8199, 1)
+failures = failures + haiku_space_check(8200, 1)
+failures = failures + haiku_space_check(8201, 1)
+failures = failures + haiku_space_check(8202, 1)
+failures = failures + haiku_space_check(8203, 0)
+failures = failures + haiku_space_check(8204, 0)
+failures = failures + haiku_space_check(8205, 0)
+failures = failures + haiku_space_check(8231, 0)
+failures = failures + haiku_space_check(8232, 1)
+failures = failures + haiku_space_check(8233, 1)
+failures = failures + haiku_space_check(8234, 0)
+failures = failures + haiku_space_check(8238, 0)
+failures = failures + haiku_space_check(8239, 1)
+failures = failures + haiku_space_check(8240, 0)
+failures = failures + haiku_space_check(8286, 0)
+failures = failures + haiku_space_check(8287, 1)
+failures = failures + haiku_space_check(8288, 0)
+failures = failures + haiku_space_check(12287, 0)
+failures = failures + haiku_space_check(12288, 1)
+failures = failures + haiku_space_check(12289, 0)
+failures = failures + haiku_space_check(65279, 0)
+failures = failures + haiku_space_check(129417, 0)
+failures = failures + haiku_space_check(1114111, 0)
+
+# Construct control characters through native Unicode codepoint conversion.
+source = text_concat(text_concat("one", text_from_codepoint(9)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_0009", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(10)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_000a", source, 6, 4, 0)
+source = text_concat(text_concat("one", text_from_codepoint(11)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_000b", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(12)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_000c", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(13)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_000d", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(28)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_001c", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(29)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_001d", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(30)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_001e", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(31)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_001f", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(32)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_0020", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(133)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_0085", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(160)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_00a0", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(5760)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_1680", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8192)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_2000", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8193)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_2001", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8194)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_2002", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8195)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_2003", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8196)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_2004", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8197)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_2005", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8198)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_2006", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8199)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_2007", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8200)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_2008", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8201)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_2009", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8202)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_200a", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8232)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_2028", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8233)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_2029", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8239)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_202f", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(8287)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_205f", source, 6, 3, 1)
+source = text_concat(text_concat("one", text_from_codepoint(12288)), "two\nthree four\nfive six")
+failures = failures + haiku_text_check("separator_3000", source, 6, 3, 1)
+
+# Exact returned line contents, including CR, combining marks, and empty lines.
+failures = failures + haiku_line_check("empty", "", 0, "")
+failures = failures + haiku_line_check("empty_last", "", -1, "")
+failures = failures + haiku_line_check("empty_outside", "", 1, "")
+failures = failures + haiku_line_check("first", "one\ntwo\nthree", 0, "one")
+failures = failures + haiku_line_check("middle", "one\ntwo\nthree", 1, "two")
+failures = failures + haiku_line_check("last", "one\ntwo\nthree", 2, "three")
+failures = failures + haiku_line_check("negative_last", "one\ntwo\nthree", -1, "three")
+failures = failures + haiku_line_check("negative_first", "one\ntwo\nthree", -3, "one")
+failures = failures + haiku_line_check("past_end", "one\ntwo\nthree", 3, "")
+failures = failures + haiku_line_check("before_start", "one\ntwo\nthree", -4, "")
+failures = failures + haiku_line_check("empty_middle", "one\n\nthree", 1, "")
+failures = failures + haiku_line_check("trailing_empty", "one\ntwo\n", 2, "")
+failures = failures + haiku_line_check("crlf_middle", "one\r\ntwo\r\nthree", 1, "two\r")
+failures = failures + haiku_line_check("cyrillic", "сова\nдруг рядом\nтишина", 1, "друг рядом")
+failures = failures + haiku_line_check("hebrew", "ינשוף\nחבר כאן\nשקט", 1, "חבר כאן")
+failures = failures + haiku_line_check("emoji", "🦉\n👩‍💻\n🌒", 1, "👩‍💻")
+failures = failures + haiku_line_check("combining", "été\né\nй", 1, "é")
+failures = failures + haiku_line_check("hashes", "first\n#second\nthird", 1, "#second")
+failures = failures + haiku_line_check("spaces", "a\n  b \t\nc", 1, "  b \t")
+failures = failures + haiku_line_check("unicode_separator", "a\nb c\nd", 1, "b c")
+
+# Reference values: 282
+if failures == 0:
+    ECHO HAIKU_TEXT_PARITY_OK
+else:
+    ECHO HAIKU_TEXT_PARITY_FAIL

@@ -1,6 +1,8 @@
 # Generated from direct Python calls; inputs: tests/reference/numerical_inputs.json.
 # Reference: ariannamethod/harmonix abb878c52d763b73e5ad7a4d6a68a9ea7a248a39
 # AML uses float32; absolute numerical tolerance is 0.000002.
+IMPORT "../../src/harmonix.aml"
+IMPORT "../../src/bridges.aml"
 def haiku_check(actual, expected):
     if abs(actual - expected) <= 0.000002:
         return 0

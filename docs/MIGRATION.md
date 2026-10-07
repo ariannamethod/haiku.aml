@@ -2,8 +2,8 @@
 
 2026-10-07. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 This document records the inspected sources, current behavior, and implementation
-order. The first numerical functions are implemented; the status below marks
-the boundary between those functions and the remaining organism.
+order. The first numerical and text functions are implemented; the status below
+marks the boundary between those functions and the remaining organism.
 
 ## Source bodies
 
@@ -17,11 +17,17 @@ the boundary between those functions and the remaining organism.
 | [klaus.c](https://github.com/ariannamethod/klaus.c/tree/6fad88329538f0a820d5266796d456c9133559c6) | `6fad88329538f0a820d5266796d456c9133559c6` | Language packs, incoming/outgoing vocabularies, cross-language affinity |
 | [yent.aml](https://github.com/ariannamethod/yent.aml/tree/28baf3199b649a0b8cad6e03045b979cbead1684) | `28baf3199b649a0b8cad6e03045b979cbead1684` | Working AML/BLOOD + libaml + NoTorch integration |
 
+The later [family audit](FAMILY.md) adds two source bodies supplied by Oleg:
+Subjectivity `221157935d84d5037768f34c4661b11ca6865f91` and Brodsky
+`501d617d5da8f9f00ff194ce6765d6749647bda8`. It maps variable form, preserved
+foreground state during reflection, episodic recall, sampling mixtures, rhyme
+reservation, and rendering independence to measured future extensions.
+
 The manifesto is copied byte-for-byte from the pinned NoTorch source.
 SHA-256: `c8288157c8e2a63cec307510534a3da5415a5d44f3c0a089c8d7f6bbde07b906`.
 
-Follow-up bases: AML `feaeb724fc1fccd2cefae1f5f3fd712658c5ee0a` includes merged
-PR #25. NoTorch `c92e915f2e533372073cc95df9c22bdaf014188b` includes merged
+Follow-up bases: AML `355a0345a432d61c35f7e45327ba3ae0bea0b8e6` includes merged
+PRs #25 and #26. NoTorch `c92e915f2e533372073cc95df9c22bdaf014188b` includes merged
 [PR #159](https://github.com/ariannamethod/notorch/pull/159), adding native tanh
 and plain SGD. The original audit and manifesto pins above remain their sources.
 
@@ -29,13 +35,18 @@ and plain SGD. The original audit and manifesto pins above remain their sources.
 
 `src/harmonix.aml` implements pulse, count-based dissonance, and the two
 temperatures. `src/bridges.aml` implements the aggregate transition score.
-Text extraction, cloud storage, cosine/state aggregation, and learning remain
-separate work. [NUMERICAL_PARITY.md](NUMERICAL_PARITY.md) records **49 cases /
+Cloud storage, trigram/set extraction, cosine/state aggregation, and learning
+remain separate work. [NUMERICAL_PARITY.md](NUMERICAL_PARITY.md) records **49 cases /
 130 scalar values** obtained by direct calls to the pinned Python implementation.
 Both interpreted and compiled AML pass with tolerance 0.000002.
 
-The test assembles one source explicitly while native shared module exports
-are pending. No Python or BLOOD C implements the organism in this repository.
+`src/text.aml` now implements the 29-codepoint Python whitespace table, word
+counts, literal LF line counts, exact line extraction, and the original RAE
+coherence feature. [TEXT_PARITY.md](TEXT_PARITY.md) records **146 cases / 282
+reference values**, including Cyrillic, Hebrew, combining marks, and emoji.
+
+Both suites use native `IMPORT`. Their 412 combined reference values pass in
+the interpreter and scalar executable. The organism modules are all AML.
 
 ## Preserve the organism
 
@@ -111,18 +122,16 @@ the two projects' scalar archives without BLAS. The numerical test uses it.
 
 ## Language work comes first
 
-The current AML runtime has scalar/float-array variables, functions, return
-values, numeric operations, field persistence, threads, and float channels.
-Haiku needs:
+AML v5.2.0 adds UTF-8 values, typed function arguments/returns, `PRINT`, and
+shared `IMPORT` to the scalar/array runtime, field persistence, threads, and
+float channels. Haiku still needs:
 
-1. UTF-8 strings, token lists, dictionary/set operations, integer counts and
-   indices, and predictable ownership.
-2. Module imports that share exported definitions. Current `INCLUDE` calls
-   `am_exec_file()` in a separate context; module export semantics need work.
-3. Text/array event payloads and worker lifetime handling. Existing channels
+1. Token lists, dictionary/set operations, and count/index behavior for growing
+   collections. Immutable strings already have explicit reference ownership.
+2. Text/array event payloads and worker lifetime handling. Existing channels
    carry floats; the default slot limits are 16 spawns and 16 channels.
-4. General file/record storage and a small local HTTP/event interface.
-5. A NoTorch binding with a defined training owner. Both inspected runtimes
+3. General file/record storage and a small local HTTP/event interface.
+4. A NoTorch binding with a defined training owner. Both inspected runtimes
    use global tape state; serialize learning and publish completed snapshots.
 
 Yent demonstrates the compiled/library connection through C-bodied BLOOD
@@ -165,6 +174,23 @@ and carries worker diagnostics through AWAIT. `--run` passes literal arguments
 and reports the program's status. These repairs are required by Haiku's future
 module and background-learning paths.
 
+### Native modules and text
+
+The v5.2.0 language follow-up is [AML PR #27](https://github.com/ariannamethod/ariannamethod.ai/pull/27),
+tested source tree published as `d7e695fdcfd3b5fe0ec02c5776d8f2560f94b995`.
+It supplies shared module preparation, canonical
+file deduplication, cycle/collision/budget diagnostics, and source origins for
+imported functions and workers. Resumable and bytecode programs retain their
+prepared sources. `amlc` embeds the root; imports are runtime source inputs.
+
+UTF-8 strings now travel through variables, typed parameters and returns,
+`PRINT`, and persistent host values. Eight general text intrinsics provide
+codepoint operations. Workers receive a snapshot of globals with copied arrays
+and atomic string references; their persistent tables belong to each thread.
+Haiku's Python whitespace and line-coherence rules live
+in `src/text.aml`. Loops retain a 10,000-iteration budget and fail explicitly
+instead of silently truncating a longer text scan.
+
 ### RAE development
 
 [RAE_RESEARCH.md](RAE_RESEARCH.md) records a 96-case probe of the original
@@ -175,8 +201,9 @@ metrics, and explicit asynchronous publication order.
 
 ## Implementation order
 
-1. Finish native text/collections/module contracts in AML, building on the
-   compiler and scalar-linking repairs. Exercise Cyrillic, Hebrew, accents, and empty input.
+1. Extend the working strings/modules with token lists, dictionaries, and sets,
+   then connect word overlap and the growing cloud. Unicode boundary fixtures
+   already cover Cyrillic, Hebrew, accents, emoji, whitespace, and empty input.
 2. Bind the merged NoTorch primitives into AML. Compare MathBrain/RAE
    forward values, gradients, and parameter trajectories to Python fixtures.
 3. Port the English cloud, tokenizer, generator, Harmonix, and foreground
