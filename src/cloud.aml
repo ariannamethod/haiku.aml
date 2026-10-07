@@ -1,0 +1,127 @@
+# In-memory word cloud. Python Haiku reference: abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+# Columns share word keys; sources follows map_keys(weights) insertion order.
+IMPORT "lexicon.aml"
+
+def haiku_clock_check(clock):
+    floor(clock)
+    assert(clock == clock and clock >= 0 and clock <= 16777216, "Haiku clock must be relative seconds in [0, 2^24]")
+    return clock
+
+# Return staged counts after every occurrence. Never mutate the supplied map.
+def haiku_count_check(counts, keys):
+    assert(map_len(counts) <= 10000 and list_len(keys) <= 10000, "Haiku count/batch limit is 10000")
+    pending = map_clone(counts)
+    names = map_keys(counts)
+    cursor = 0
+    while cursor < list_len(names):
+        count = map_get(counts, list_get(names, cursor))
+        assert(count >= 0 and count <= 16777216 and count == floor(count), "Haiku counts must be integers in [0, 2^24]")
+        cursor = cursor + 1
+    cursor = 0
+    while cursor < list_len(keys):
+        key = list_get(keys, cursor)
+        count = 0
+        if map_has(pending, key):
+            count = map_get(pending, key)
+        assert(count < 16777216, "Haiku count increment exceeds 2^24")
+        map_set(pending, key, count + 1)
+        cursor = cursor + 1
+    assert(map_len(pending) <= 10000, "Haiku record limit is 10000")
+    return pending
+
+def haiku_cloud_check(weights, freq, used, sources):
+    size = map_len(weights)
+    assert(size <= 10000, "Haiku cloud limit is 10000 words")
+    assert(size == map_len(freq) and size == map_len(used) and size == list_len(sources), "Haiku cloud column lengths differ")
+    words = map_keys(weights)
+    cursor = 0
+    while cursor < size:
+        word = list_get(words, cursor)
+        assert(map_has(freq, word) and map_has(used, word), "Haiku cloud column keys differ")
+        assert(map_get(weights, word) >= 0, "Haiku cloud weight must be nonnegative")
+        count = map_get(freq, word)
+        assert(count >= 0 and count <= 16777216 and count == floor(count), "Haiku frequency must be an integer in [0, 2^24]")
+        haiku_clock_check(map_get(used, word))
+        cursor = cursor + 1
+    return size
+
+# Internal helper: staged state is a checked continuation of the current state.
+# Allocation failure during publication is a runtime error, not a transaction.
+def haiku_cloud_publish(weights, freq, used, sources, nw, nf, nu, ns):
+    words = map_keys(nw)
+    cursor = 0
+    while cursor < list_len(words):
+        word = list_get(words, cursor)
+        map_set(weights, word, map_get(nw, word))
+        map_set(freq, word, map_get(nf, word))
+        map_set(used, word, map_get(nu, word))
+        if cursor >= list_len(sources):
+            list_push(sources, list_get(ns, cursor))
+        cursor = cursor + 1
+    return list_len(words)
+
+# INSERT OR IGNORE, including the seed/ring convention of initial frequency 0.
+def haiku_cloud_add(weights, freq, used, sources, word, weight, clock, source):
+    size = haiku_cloud_check(weights, freq, used, sources)
+    haiku_clock_check(clock)
+    text_bytes(source)
+    floor(weight)
+    assert(weight == weight and weight >= 0 and weight <= 3.402823466e38, "Haiku initial weight must be finite and nonnegative")
+    if map_has(weights, word):
+        return 0
+    assert(size < 10000, "Haiku cloud limit is 10000 words")
+    map_set(weights, word, weight)
+    map_set(freq, word, 0)
+    map_set(used, word, clock)
+    list_push(sources, source)
+    return 1
+
+# Match chat.init_database: seed only an empty cloud, ignoring repeated words.
+def haiku_cloud_seed(weights, freq, used, sources, seeds, clock):
+    size = haiku_cloud_check(weights, freq, used, sources)
+    haiku_clock_check(clock)
+    assert(list_len(seeds) <= 10000, "Haiku seed batch limit is 10000")
+    if size > 0:
+        return 0
+    words = haiku_unique(seeds)
+    cursor = 0
+    while cursor < list_len(words):
+        word = list_get(words, cursor)
+        map_set(weights, word, 1)
+        map_set(freq, word, 0)
+        map_set(used, word, clock)
+        list_push(sources, "seed")
+        cursor = cursor + 1
+    return list_len(words)
+
+# Each occurrence boosts an existing word by 1.1; a first occurrence starts at 1.
+# Dormant words decay once by 0.99. Empty input is the async Python no-op.
+def haiku_cloud_morph(weights, freq, used, sources, active, clock):
+    size = haiku_cloud_check(weights, freq, used, sources)
+    haiku_clock_check(clock)
+    nf = haiku_count_check(freq, active)
+    if list_len(active) == 0:
+        return size
+    nw = map_clone(weights)
+    nu = map_clone(used)
+    ns = list_clone(sources)
+    present = map_new()
+    cursor = 0
+    while cursor < list_len(active):
+        word = list_get(active, cursor)
+        if map_has(nw, word):
+            map_set(nw, word, map_get(nw, word) * 1.1)
+        else:
+            map_set(nw, word, 1)
+            list_push(ns, "user")
+        map_set(nu, word, clock)
+        map_set(present, word, 1)
+        cursor = cursor + 1
+    words = map_keys(nw)
+    cursor = 0
+    while cursor < list_len(words):
+        word = list_get(words, cursor)
+        if map_has(present, word) == 0:
+            map_set(nw, word, map_get(nw, word) * 0.99)
+        cursor = cursor + 1
+    return haiku_cloud_publish(weights, freq, used, sources, nw, nf, nu, ns)

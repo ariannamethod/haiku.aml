@@ -1,0 +1,49 @@
+# Three explicit token events. This is the living memory organ, before generation.
+IMPORT "../src/memory.aml"
+
+weights = map_new()
+frequency = map_new()
+last_used = map_new()
+sources = list_new()
+observed = list_new()
+observed_counts = map_new()
+resonance = map_new()
+edges = list_new()
+counts = map_new()
+vocab = list_new()
+recent = list_new()
+seeds = haiku_words("rain cloud rain light")
+haiku_cloud_seed(weights, frequency, last_used, sources, seeds, 0)
+haiku_chain_seed(edges, counts, vocab, seeds)
+
+words = haiku_words("rain cloud rain")
+triples = haiku_trigrams(words)
+haiku_cloud_morph(weights, frequency, last_used, sources, words, 1)
+haiku_store_trigrams(observed, observed_counts, resonance, triples)
+recent = haiku_chain_update(edges, counts, vocab, recent, triples)
+ECHO AFTER_FIRST_EVENT
+PRINT map_get(weights, "rain")
+PRINT haiku_chain_count(counts, "rain", "cloud", "rain")
+
+# Two tokens enter the cloud, but supply no trigram to generator vocabulary.
+words = haiku_words("new voice")
+triples = haiku_trigrams(words)
+haiku_cloud_morph(weights, frequency, last_used, sources, words, 2)
+haiku_store_trigrams(observed, observed_counts, resonance, triples)
+recent = haiku_chain_update(edges, counts, vocab, recent, triples)
+ECHO AFTER_SHORT_EVENT_CLOUD_AND_VOCAB
+PRINT map_len(weights)
+PRINT list_len(vocab)
+
+before = list_clone(recent)
+words = haiku_words("new voice returns")
+triples = haiku_trigrams(words)
+haiku_cloud_morph(weights, frequency, last_used, sources, words, 3)
+haiku_store_trigrams(observed, observed_counts, resonance, triples)
+recent = haiku_chain_update(edges, counts, vocab, recent, triples)
+ECHO AFTER_THIRD_EVENT_RECENT_AND_PREVIOUS
+PRINT recent
+PRINT before
+ECHO OBSERVATION_AFTER_UPDATE
+observation = haiku_observe_trigrams(triples, recent)
+PRINT observation

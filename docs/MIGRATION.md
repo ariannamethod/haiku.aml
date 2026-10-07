@@ -2,7 +2,7 @@
 
 2026-10-07. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 This document records the inspected sources, current behavior, and implementation
-order. The first numerical and text functions are implemented; the status below
+order. Numerical, text, lexical, cloud, and memory organs are implemented; the status below
 marks the boundary between those functions and the remaining organism.
 
 ## Source bodies
@@ -23,6 +23,11 @@ Subjectivity `221157935d84d5037768f34c4661b11ca6865f91` and Brodsky
 foreground state during reflection, episodic recall, sampling mixtures, rhyme
 reservation, and rendering independence to measured future extensions.
 
+[Q](Q.md), inspected at `f5d00a36ecfcdb5e655e1576770f03d06d900e04`, adds
+weightless field generation, aging expectations, candidate experience, and
+slow Hebbian consolidation to the research queue. Its audit records concrete
+activation and persistence findings before proposing Haiku experiments.
+
 The manifesto is copied byte-for-byte from the pinned NoTorch source.
 SHA-256: `c8288157c8e2a63cec307510534a3da5415a5d44f3c0a089c8d7f6bbde07b906`.
 
@@ -35,7 +40,7 @@ and plain SGD. The original audit and manifesto pins above remain their sources.
 
 `src/harmonix.aml` implements pulse, count-based dissonance, and the two
 temperatures. `src/bridges.aml` implements the aggregate transition score.
-Cloud storage, cosine/state aggregation, and learning
+Durable cloud storage, cosine/state aggregation, and learning
 remain separate work. [NUMERICAL_PARITY.md](NUMERICAL_PARITY.md) records **49 cases /
 130 scalar values** obtained by direct calls to the pinned Python implementation.
 Both interpreted and compiled AML pass with tolerance 0.000002.
@@ -56,6 +61,14 @@ still contribute to arousal through the original list lengths. The
 [lexical parity record](LEXICAL_PARITY.md) defines this boundary and its fixtures.
 The input to the observer is already tokenized; SentencePiece and the original
 lowercasing/regex fallback remain in the tokenizer migration.
+
+`src/cloud.aml` now carries ordered word weights, frequencies, last-use clocks,
+and exact origin labels. Each active occurrence boosts its word; dormant words
+decay once per nonempty update. `src/memory.aml` keeps observer trigrams,
+generator transition counts/vocabulary, and recent-ten snapshots separate.
+The [cloud parity record](CLOUD_PARITY.md) specifies event order, the original
+seed corpus, float32 bounds, and the explicit empty-input and snapshot repairs.
+These states live in memory; native file persistence remains a later step.
 
 ## Preserve the organism
 
@@ -133,12 +146,13 @@ the two projects' scalar archives without BLAS. The numerical test uses it.
 
 AML v5.2.0 adds UTF-8 values, typed function arguments/returns, `PRINT`, and
 shared `IMPORT`; v5.3.0 adds mutable string lists with copied assignment and
-worker containers. These extend the scalar/array runtime, field persistence,
-threads, and float channels. Haiku still needs:
+worker containers. AML v5.4.0 adds ordered numeric maps, exact composite keys,
+assertions, and scalar floor. These extend the scalar/array runtime, field
+persistence, threads, and float channels. Haiku still needs:
 
-1. Word-cloud records with frequencies, weights, and persistent order.
-   Token lists and exact word/trigram set operations now run in AML; larger
-   collections will need indexed lookup with measured performance.
+1. Durable word-cloud and transition records. Token lists, indexed numeric
+   lookup, ordered words, frequencies, weights, and in-memory updates now run
+   in AML. Their native save/restart format must preserve every state owner.
 2. Text/array event payloads and worker lifetime handling. Existing channels
    carry floats; the default slot limits are 16 spawns and 16 channels.
 3. General file/record storage and a small local HTTP/event interface.
@@ -219,6 +233,29 @@ lexical suite checks 324 numerical values and 92 ordered lists against Python,
 plus six explicit malformed-triple failures. All four organism modules together
 pass **323 cases / 828 reference results** interpreted and compiled.
 
+### Numeric maps and living memory
+
+AML v5.4.0, [PR #29](https://github.com/ariannamethod/ariannamethod.ai/pull/29),
+tested source `7411864d699f88e3dff3367f84611b0ff5d85133`, adds ordered maps
+from UTF-8 strings to finite scalars. Hashed lookup supports growing word
+weights and counts. `list_key` preserves complete token tuples with byte-length
+prefixes; empty tokens and embedded delimiters remain distinct. `assert` and
+`floor` supply typed application preconditions and exact-integer checks.
+
+Haiku keeps four separate state owners: word-cloud columns, observer
+trigrams, generator transitions/vocabulary, and the last-ten snapshot. Seeds
+initialize the generator without becoming recent interaction memory. Short
+inputs can enter the cloud before they form any generator transition. These
+boundaries and the copied recent snapshot prepare the foreground/dream handoff.
+
+Cloud and transition updates prevalidate input shape and counts. Word boosts
+and dormant decay are staged before publication. The application currently
+limits each state/batch to 10,000 records, matching AML's loop budget; its
+counter domain is the exact float32 integer interval through 2^24. Last-use
+time is supplied as relative seconds. Allocation failure during publication
+across separate columns remains an explicit error; durable atomic exchange
+records and epoch timestamps belong to the persistence step.
+
 ### RAE development
 
 [RAE_RESEARCH.md](RAE_RESEARCH.md) records a 96-case probe of the original
@@ -229,20 +266,20 @@ metrics, and explicit asynchronous publication order.
 
 ## Implementation order
 
-1. Connect the working lexical observer to word-cloud records and native
-   tokenization. Unicode boundary fixtures already cover Cyrillic, Hebrew,
-   accents, emoji, whitespace, and empty input; tuple fixtures preserve exact
-   token identity and duplicate counts.
+1. Connect native tokenization to the working lexical observer, word cloud,
+   and transition memory. Unicode boundary fixtures already cover Cyrillic,
+   Hebrew, accents, emoji, whitespace, and empty input; tuple fixtures preserve
+   exact token identity and duplicate counts.
 2. Bind the merged NoTorch primitives into AML. Compare MathBrain/RAE
    forward values, gradients, and parameter trajectories to Python fixtures.
-3. Port the English cloud, tokenizer, generator, Harmonix, and foreground
-   exchange. Pin tokenizer mode, word ordering, both Python RNG streams,
+3. Complete the English tokenizer, generator, and foreground exchange around
+   the working cloud and Harmonix. Pin tokenizer mode, word ordering, both Python RNG streams,
    initial state, and event order when producing reference fixtures.
 4. Port learning, bridges, reflection, rings, and dreams; connect the
    integration tasks above. Verify save/restart continuity and worker shutdown.
 5. Add Klaus-inspired language packs with haiku-specific vocabulary and
    syllable behavior; preserve each language's own cloud.
-6. Add the local owl interface, conversation, and event-driven animation.
+6. Add the local character interface, conversation, and event-driven animation.
    [TODO](../TODO.md) records the future visible conversation with the inner friend.
 
 ## Verification receipt

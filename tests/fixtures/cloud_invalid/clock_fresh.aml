@@ -1,0 +1,17 @@
+# EXPECT: floor requires a finite scalar
+IMPORT "../../../src/memory.aml"
+weights = map_new()
+frequency = map_new()
+last_used = map_new()
+observed_counts = map_new()
+resonance = map_new()
+counts = map_new()
+sources = list_new()
+observed = list_new()
+edges = list_new()
+vocab = list_new()
+recent = list_new()
+bad = [1]
+# INVALID_CALL
+haiku_cloud_add(weights, frequency, last_used, sources, "new", 1, bad, "user")
+ECHO HAIKU_INVALID_ACCEPTED

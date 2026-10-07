@@ -19,12 +19,14 @@ resonance, recursion, memory, and continuity throughout code and documentation.
   numerical operations in NoTorch. Keep Haiku's behavior in `.aml` modules.
 - Account for every removed Python dependency, including persistence and
   tokenization. Data files and browser assets are part of the project.
-- Learn from `haiku.c`, `haiku`, `klaus.c`, `yent.aml`, `subjectivity`, and
-  `brodsky` while preserving the
+- Learn from `haiku.c`, `haiku`, `klaus.c`, `yent.aml`, `subjectivity`,
+  `brodsky`, and `q` while preserving the
   Python organism's lineage. Multilingual growth follows Klaus's useful ideas;
   each language needs its own text and syllable behavior.
-- Build the local HTML interface after the core. Its owl responds to actual
-  organism events. Keep presentation and numerical work in their own layers.
+- Build the local HTML interface after the core. Its character responds to
+  actual organism events. Choose an original visual identity at that stage;
+  the earlier owl idea is retired. Keep presentation and numerical work in
+  their own layers.
 
 ## Engineering
 

@@ -1,0 +1,42 @@
+# Python reference: abb878c52d763b73e5ad7a4d6a68a9ea7a248a39
+# Numeric reference values: 10
+# List reference results: 4
+IMPORT "cloud_support.aml"
+weights = map_new()
+frequency = map_new()
+last_used = map_new()
+sources = list_new()
+seeds = list_new()
+cloud_words_add(seeds, "count")
+haiku_cloud_seed(weights, frequency, last_used, sources, seeds, 0.5)
+map_set(weights, "count", 1)
+map_set(frequency, "count", 16777215)
+map_set(last_used, "count", 1)
+wanted = list_new()
+cloud_words_add(wanted, "count")
+cloud_list_check("integer_edge seed words", map_keys(weights), wanted)
+wanted = list_new()
+cloud_words_add(wanted, "seed")
+cloud_list_check("integer_edge seed sources", sources, wanted)
+cloud_number_check("integer_edge seed frequency size", map_len(frequency), 1)
+cloud_number_check("integer_edge seed time size", map_len(last_used), 1)
+group = list_new()
+cloud_words_add(group, "count")
+values = [1, 16777215, 1]
+cloud_word_group("integer_edge seed", weights, frequency, last_used, group, values)
+active = list_new()
+cloud_words_add(active, "count")
+haiku_cloud_morph(weights, frequency, last_used, sources, active, 2)
+wanted = list_new()
+cloud_words_add(wanted, "count")
+cloud_list_check("integer_edge event 0 words", map_keys(weights), wanted)
+wanted = list_new()
+cloud_words_add(wanted, "seed")
+cloud_list_check("integer_edge event 0 sources", sources, wanted)
+cloud_number_check("integer_edge event 0 frequency size", map_len(frequency), 1)
+cloud_number_check("integer_edge event 0 time size", map_len(last_used), 1)
+group = list_new()
+cloud_words_add(group, "count")
+values = [1.1000000000000001, 16777216, 2]
+cloud_word_group("integer_edge event 0", weights, frequency, last_used, group, values)
+ECHO HAIKU_CLOUD_PARITY_OK

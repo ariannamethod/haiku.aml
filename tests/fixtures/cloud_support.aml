@@ -1,0 +1,61 @@
+# Shared checks against complete ordered snapshots of the pinned Python state.
+IMPORT "../../src/memory.aml"
+
+# Compact corpus data consists only of known ASCII words without whitespace.
+def cloud_words_add(target, source):
+    words = haiku_words(source)
+    cursor = 0
+    while cursor < list_len(words):
+        list_push(target, list_get(words, cursor))
+        cursor = cursor + 1
+    return list_len(target)
+
+def cloud_list_check(name, actual, expected):
+    assert(list_len(actual) == list_len(expected), name)
+    cursor = 0
+    while cursor < list_len(expected):
+        if text_equal(list_get(actual, cursor), list_get(expected, cursor)) == 0:
+            PRINT name
+            PRINT cursor
+            PRINT list_get(actual, cursor)
+            PRINT list_get(expected, cursor)
+            assert(0, "Haiku list reference mismatch")
+        cursor = cursor + 1
+    return 1
+
+def cloud_number_check(name, actual, expected):
+    if actual != actual or abs(actual - expected) > 0.000002:
+        PRINT name
+        PRINT actual
+        PRINT expected
+        assert(0, "Haiku numerical reference mismatch")
+    return 1
+
+def cloud_word_group(name, weights, frequency, used, words, expected):
+    cursor = 0
+    while cursor < list_len(words):
+        word = list_get(words, cursor)
+        cloud_number_check(name, map_get(weights, word), expected[0])
+        cloud_number_check(name, map_get(frequency, word), expected[1])
+        cloud_number_check(name, map_get(used, word), expected[2])
+        cursor = cursor + 1
+    return list_len(words)
+
+def cloud_observer_group(name, counts, resonance, triples, expected):
+    cursor = 0
+    while cursor < list_len(triples):
+        key = list_key(list_slice(triples, cursor, cursor + 3))
+        cloud_number_check(name, map_get(counts, key), expected[0])
+        cloud_number_check(name, map_get(resonance, key), expected[1])
+        cursor = cursor + 3
+    return list_len(triples) / 3
+
+def cloud_chain_group(name, counts, triples, expected):
+    cursor = 0
+    while cursor < list_len(triples):
+        first = list_get(triples, cursor)
+        second = list_get(triples, cursor + 1)
+        third = list_get(triples, cursor + 2)
+        cloud_number_check(name, haiku_chain_count(counts, first, second, third), expected)
+        cursor = cursor + 3
+    return list_len(triples) / 3
