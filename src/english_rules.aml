@@ -1,0 +1,19 @@
+# Rule data adapted from python-syllables 1.1.5 by David L. Day, GPL-3.0.
+# AML adaptation: 2026-10-07. See THIRD_PARTY.md and LICENSE.
+# Suffixes follow exactly one non-LF codepoint; ^mc remains duplicated.
+IMPORT "lexicon.aml"
+
+haiku_en_rule_text = "cial tia cius cious uiet gious geous priest giu dge ion iou"
+haiku_en_sub_prefixes = haiku_words(haiku_en_rule_text)
+
+haiku_en_rule_text = "che ched abe ace ade age aged ake ale aled ales ane ame ape are ase ashed asque ate ave azed awe aze aped athe athes ece ese esque esques eze gue ibe ice "
+haiku_en_rule_text = text_concat(haiku_en_rule_text, "ide ife ike ile ime ine ipe iped ire ise ished ite ive ize obe ode oke ole ome one ope oque ore ose osque osques ote ove pped sse ssed ste ube uce ude uge ")
+haiku_en_rule_text = text_concat(haiku_en_rule_text, "uke ule ules uled ume une upe ure use ushed ute ved we wes wed yse yze rse red rce rde ily ely des gged kes ced ked med mes ned nce rles nes pes tes res ")
+haiku_en_rule_text = text_concat(haiku_en_rule_text, "ves")
+haiku_en_sub_suffixes = haiku_words(haiku_en_rule_text)
+
+haiku_en_rule_text = "ia riet dien ien iet iu iest io ii ily mc ism mc asm"
+haiku_en_add_prefixes = haiku_words(haiku_en_rule_text)
+
+haiku_en_rule_text = "oala iara ying eate eation"
+haiku_en_add_suffixes = haiku_words(haiku_en_rule_text)

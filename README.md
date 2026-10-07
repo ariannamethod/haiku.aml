@@ -96,7 +96,7 @@ first; our little presence will find another shape.
 ## Right now
 
 Haiku has a pulse, finds words, and lets each encounter change its memory.
-Thirty-three functions now run in pure AML across six native modules. Pulse,
+Forty-nine functions now run in pure AML across ten native modules. Pulse,
 dissonance, temperatures, and transition scores preserve the Python formulas.
 The text organ counts Unicode-delimited words, preserves line contents, and
 computes the original RAE three-line coherence feature. The lexical organ
@@ -108,30 +108,52 @@ origin. Repeated words gain weight; dormant words fade. Observer trigrams and
 the generator's Markov transitions have separate counts. The last ten triples
 form a copied snapshot, ready for the next observation.
 
+The English generator now gives that memory three lines: **5–7–5 by the original
+English estimator**. It keeps
+the Python voice's Markov choices and its peculiar first-word leap, with the
+original syllable rules carried into AML. Every accepted word leaves room to
+finish the line. NoTorch owns the weighted draw; each voice keeps its own
+replayable random state. Seventeen syllables, and a little room for chance.
+
 Try `../ariannamethod.ai/runner/aml examples/observe.aml`: one voice brings
 `the / owl / listens`, the other `the / owl / dreams`. Their shared words give
 dissonance **0.5**, novelty **0.5**, arousal **0**, entropy **0.2**, and the next
 haiku temperature **0.9**. The example supplies token boundaries explicitly;
-native SentencePiece and the English generator are still in the migration queue.
+native SentencePiece is still in the migration queue.
 
 Try `../ariannamethod.ai/runner/aml examples/cloud.aml` for three successive
 events. Two occurrences of `rain` raise its seeded weight to **1.21**. A short
 two-word input grows the cloud; a later complete triple enters the generator's
 vocabulary. The previous recent-memory snapshot keeps its original contents.
 
+Try `../ariannamethod.ai/runner/aml-notorch examples/generator.aml` for candidates
+grown from the original seed vocabulary. These are the new AML generator's
+lines; candidate scoring and the full conversation are the next organs.
+
 The speaking loop, learners, native tokenization, durable storage, and dreams
 are next in the migration queue. New dialogue examples will come from that
 running AML organism.
 
-Build the sibling AML **v5.4.0 numeric-map toolchain** from
-[AML PR #29](https://github.com/ariannamethod/ariannamethod.ai/pull/29), then run
-`make test`.
+Build the sibling **AML v5.5.0** toolchain and NoTorch with its owned sampling
+API ([AML #30](https://github.com/ariannamethod/ariannamethod.ai/pull/30),
+[NoTorch #161](https://github.com/ariannamethod/notorch/pull/161)), then run the
+organism's checks:
+
+```sh
+make -C ../notorch lib BLAS_FLAGS= BLAS_LIBS= X86_SIMD=0 ARM_SIMD=0
+make -C ../ariannamethod.ai notorch NOTORCH_ROOT=../notorch
+make test
+../ariannamethod.ai/runner/aml-notorch examples/generator.aml
+```
+
 The fixtures use native `IMPORT`, UTF-8 values, string lists, and numeric maps.
 See [numerical parity](docs/NUMERICAL_PARITY.md) and
-[text parity](docs/TEXT_PARITY.md), plus the new
+[text parity](docs/TEXT_PARITY.md),
 [lexical parity](docs/LEXICAL_PARITY.md) and
-[cloud parity](docs/CLOUD_PARITY.md), for exact boundaries and Python reference
-reproduction.
+[cloud parity](docs/CLOUD_PARITY.md), plus
+[English form](docs/FORM_PARITY.md) and
+[generator parity](docs/GENERATOR_PARITY.md), for exact boundaries and Python
+reference reproduction.
 
 Reference checks completed on 2026-10-07:
 
@@ -143,6 +165,12 @@ Reference checks completed on 2026-10-07:
   exactly; float tolerance is 0.000002. Six malformed triple lists and 38
   invalid state updates fail explicitly. Host inspection verifies that all
   eleven state containers retain their contents after each rejected update.
+- English form adds **1,966 direct Python reference results**, six accepted
+  boundary checks, and ten invalid-input rejections through both execution paths.
+- Generator checks cover **22 scripted cases**: 16 preserved Python draw paths
+  and six explicit repair baselines. Native checks cover replay, independent
+  state, batch order, the complete seed corpus, temperatures, and exact text
+  limits. **36 invalid generations** fail with model and random state inspected.
 - AML runtime: **550 tests passed**.
 - AML compiler: scope, source origins, nested failures, worker branches and
   errors, scalar builds, and literal program arguments are covered by regressions.

@@ -1,0 +1,19 @@
+# Build boundary-sized values without exceeding AML's source-line budget.
+IMPORT "../../src/form.aml"
+def form_repeat(piece, count):
+    value = ""
+    cursor = 0
+    while cursor < count:
+        value = text_concat(value, piece)
+        cursor = cursor + 1
+    return value
+
+def form_exact_sum():
+    words = list_new()
+    word = form_repeat("ab", 5000)
+    cursor = 0
+    while cursor < 3355:
+        list_push(words, word)
+        cursor = cursor + 1
+    list_push(words, form_repeat("ab", 2216))
+    return words

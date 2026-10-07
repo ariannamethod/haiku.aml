@@ -1,0 +1,4 @@
+# Expected error: Haiku form requires exactly three lines
+IMPORT "../../../src/form.aml"
+haiku_form("a\nb")
+ECHO INVALID_FORM_ACCEPTED

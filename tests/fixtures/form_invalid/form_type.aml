@@ -1,0 +1,4 @@
+# Expected error: text operation requires a string
+IMPORT "../../../src/form.aml"
+haiku_form(list_new())
+ECHO INVALID_FORM_ACCEPTED

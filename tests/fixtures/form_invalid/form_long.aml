@@ -1,0 +1,5 @@
+# Expected error: Haiku form limit is 10000 codepoints
+IMPORT "../form_limits_support.aml"
+source = text_concat(form_repeat("b", 9999), "\n\n")
+haiku_form(source)
+ECHO INVALID_FORM_ACCEPTED

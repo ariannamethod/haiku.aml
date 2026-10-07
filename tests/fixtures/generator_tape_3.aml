@@ -1,0 +1,197 @@
+# Direct pinned Python traces: tests/reference/generator_inputs.json.
+# Generator cases: 6
+# Result checks: 14
+IMPORT "../../src/generator.aml"
+# singleton_weighted (preserved)
+rows = list_new()
+counts = map_new()
+vocab = list_new()
+syllables = map_new()
+list_push(vocab, "one")
+map_set(syllables, "one", 1)
+triple = list_new()
+list_push(triple, "one")
+list_push(triple, "one")
+list_push(triple, "one")
+haiku_chain_learn(rows, counts, vocab, triple)
+map_set(counts, list_key(triple), 1)
+tape = zeros(6)
+tape[1] = 0
+tape[2] = 0
+tape[3] = 0
+tape[4] = 0
+tape[5] = 0
+rng = map_new()
+map_set(rng, "scripted", 73)
+actual = haiku_generate_line(rows, counts, vocab, syllables, 5, 1, rng, tape)
+assert(text_equal(actual, "one one one one one"), "singleton_weighted: line")
+assert(tape[0] == 5, "singleton_weighted: consumed draws")
+assert(map_len(rng) == 1 and map_get(rng, "scripted") == 73, "Scripted sampling changed rng")
+# target_fifty (preserved)
+rows = list_new()
+counts = map_new()
+vocab = list_new()
+syllables = map_new()
+list_push(vocab, "one")
+map_set(syllables, "one", 1)
+tape = zeros(51)
+tape[1] = 0
+tape[2] = 0
+tape[3] = 0
+tape[4] = 0
+tape[5] = 0
+tape[6] = 0
+tape[7] = 0
+tape[8] = 0
+tape[9] = 0
+tape[10] = 0
+tape[11] = 0
+tape[12] = 0
+tape[13] = 0
+tape[14] = 0
+tape[15] = 0
+tape[16] = 0
+tape[17] = 0
+tape[18] = 0
+tape[19] = 0
+tape[20] = 0
+tape[21] = 0
+tape[22] = 0
+tape[23] = 0
+tape[24] = 0
+tape[25] = 0
+tape[26] = 0
+tape[27] = 0
+tape[28] = 0
+tape[29] = 0
+tape[30] = 0
+tape[31] = 0
+tape[32] = 0
+tape[33] = 0
+tape[34] = 0
+tape[35] = 0
+tape[36] = 0
+tape[37] = 0
+tape[38] = 0
+tape[39] = 0
+tape[40] = 0
+tape[41] = 0
+tape[42] = 0
+tape[43] = 0
+tape[44] = 0
+tape[45] = 0
+tape[46] = 0
+tape[47] = 0
+tape[48] = 0
+tape[49] = 0
+tape[50] = 0
+rng = map_new()
+map_set(rng, "scripted", 73)
+actual = haiku_generate_line(rows, counts, vocab, syllables, 50, 1, rng, tape)
+assert(text_equal(actual, "one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one"), "target_fifty: line")
+assert(tape[0] == 50, "target_fifty: consumed draws")
+assert(map_len(rng) == 1 and map_get(rng, "scripted") == 73, "Scripted sampling changed rng")
+# two_candidates (preserved)
+rows = list_new()
+counts = map_new()
+vocab = list_new()
+syllables = map_new()
+list_push(vocab, "rain")
+map_set(syllables, "rain", 1)
+list_push(vocab, "wind")
+map_set(syllables, "wind", 1)
+tape = zeros(35)
+tape[1] = 0
+tape[2] = 0.75
+tape[3] = 0
+tape[4] = 0.75
+tape[5] = 0
+tape[6] = 0.75
+tape[7] = 0
+tape[8] = 0.75
+tape[9] = 0
+tape[10] = 0.75
+tape[11] = 0
+tape[12] = 0.75
+tape[13] = 0
+tape[14] = 0.75
+tape[15] = 0
+tape[16] = 0.75
+tape[17] = 0
+tape[18] = 0.75
+tape[19] = 0
+tape[20] = 0.75
+tape[21] = 0
+tape[22] = 0.75
+tape[23] = 0
+tape[24] = 0.75
+tape[25] = 0
+tape[26] = 0.75
+tape[27] = 0
+tape[28] = 0.75
+tape[29] = 0
+tape[30] = 0.75
+tape[31] = 0
+tape[32] = 0.75
+tape[33] = 0
+tape[34] = 0.75
+rng = map_new()
+map_set(rng, "scripted", 73)
+actual = haiku_generate_candidates(rows, counts, vocab, syllables, 2, 1, rng, tape)
+assert(list_len(actual) == 2, "two_candidates: candidate count")
+assert(text_equal(list_get(actual, 0), "rain wind rain wind rain\nwind rain wind rain wind rain wind\nrain wind rain wind rain"), "two_candidates: candidate 0")
+assert(text_equal(list_get(actual, 1), "wind rain wind rain wind\nrain wind rain wind rain wind rain\nwind rain wind rain wind"), "two_candidates: candidate 1")
+assert(tape[0] == 34, "two_candidates: consumed draws")
+assert(map_len(rng) == 1 and map_get(rng, "scripted") == 73, "Scripted sampling changed rng")
+# zero_candidates (preserved)
+rows = list_new()
+counts = map_new()
+vocab = list_new()
+syllables = map_new()
+tape = zeros(1)
+rng = map_new()
+map_set(rng, "scripted", 73)
+actual = haiku_generate_candidates(rows, counts, vocab, syllables, 0, 1, rng, tape)
+assert(list_len(actual) == 0, "zero_candidates: candidate count")
+assert(tape[0] == 0, "zero_candidates: consumed draws")
+assert(map_len(rng) == 1 and map_get(rng, "scripted") == 73, "Scripted sampling changed rng")
+# initial_overrun (repair)
+rows = list_new()
+counts = map_new()
+vocab = list_new()
+syllables = map_new()
+list_push(vocab, "long")
+map_set(syllables, "long", 6)
+list_push(vocab, "whole")
+map_set(syllables, "whole", 5)
+tape = zeros(3)
+tape[1] = 0
+tape[2] = 0.4
+rng = map_new()
+map_set(rng, "scripted", 73)
+actual = haiku_generate_line(rows, counts, vocab, syllables, 5, 1, rng, tape)
+assert(text_equal(actual, "whole"), "initial_overrun: line")
+assert(tape[0] == 2, "initial_overrun: consumed draws")
+assert(map_len(rng) == 1 and map_get(rng, "scripted") == 73, "Scripted sampling changed rng")
+# first_fallback_overrun (repair)
+rows = list_new()
+counts = map_new()
+vocab = list_new()
+syllables = map_new()
+list_push(vocab, "first")
+map_set(syllables, "first", 3)
+list_push(vocab, "big")
+map_set(syllables, "big", 3)
+list_push(vocab, "end")
+map_set(syllables, "end", 2)
+tape = zeros(4)
+tape[1] = 0
+tape[2] = 0.4
+tape[3] = 0.8
+rng = map_new()
+map_set(rng, "scripted", 73)
+actual = haiku_generate_line(rows, counts, vocab, syllables, 5, 1, rng, tape)
+assert(text_equal(actual, "first end"), "first_fallback_overrun: line")
+assert(tape[0] == 3, "first_fallback_overrun: consumed draws")
+assert(map_len(rng) == 1 and map_get(rng, "scripted") == 73, "Scripted sampling changed rng")
+ECHO HAIKU_GENERATOR_OK

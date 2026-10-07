@@ -1,0 +1,21 @@
+IMPORT "../../src/generator.aml"
+
+def haiku_gen_test_maps(left, right):
+    assert(map_len(left) == map_len(right), "Generator mutated map size")
+    names = map_keys(left)
+    other = map_keys(right)
+    cursor = 0
+    while cursor < list_len(names):
+        key = list_get(names, cursor)
+        assert(text_equal(key, list_get(other, cursor)), "Generator mutated map order")
+        assert(map_get(left, key) == map_get(right, key), "Generator mutated map value")
+        cursor = cursor + 1
+    return 1
+
+def haiku_gen_test_lists(left, right):
+    assert(list_len(left) == list_len(right), "Generator changed list size")
+    cursor = 0
+    while cursor < list_len(left):
+        assert(text_equal(list_get(left, cursor), list_get(right, cursor)), "Generator changed list contents")
+        cursor = cursor + 1
+    return 1

@@ -1,0 +1,37 @@
+# Exact rendering boundaries, checked before drawing on the rejection side.
+# Native checks: 7
+IMPORT "generator_support.aml"
+rows = list_new()
+counts = map_new()
+vocab = list_new()
+word = "baba"
+cursor = 0
+while cursor < 1422:
+    word = text_concat(word, "b")
+    cursor = cursor + 1
+list_push(vocab, word)
+list_push(vocab, "sky")
+syllables = haiku_syllable_cache(vocab)
+assert(map_get(syllables, word) == 2, "Boundary long word needs two syllables")
+assert(map_get(syllables, "sky") == 1, "Boundary short word needs one syllable")
+tape = zeros(14)
+rng = map_new()
+result = haiku_generate_candidates(rows, counts, vocab, syllables, 1, 1, rng, tape)
+assert(text_len(list_get(result, 0)) == 10000, "Exact haiku rendering boundary")
+assert(haiku_is_haiku(list_get(result, 0)), "Boundary result remains consumable by form")
+assert(tape[0] == 13, "Boundary draw count")
+# A one-word line at the exact per-line codepoint boundary is also valid.
+word = "b"
+cursor = 0
+while cursor < 13:
+    word = text_concat(word, word)
+    cursor = cursor + 1
+word = text_concat(word, text_slice(word, 0, 1808))
+vocab = list_new()
+list_push(vocab, word)
+syllables = haiku_syllable_cache(vocab)
+tape = zeros(2)
+line = haiku_generate_line(rows, counts, vocab, syllables, 1, 1, rng, tape)
+assert(text_len(line) == 10000, "Exact line rendering boundary")
+assert(tape[0] == 1, "Exact line draws once")
+ECHO HAIKU_GENERATOR_OK

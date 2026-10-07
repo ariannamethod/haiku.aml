@@ -1,0 +1,19 @@
+# Five new candidates from the original seed corpus, generated entirely in AML.
+# This is the generator organ; scoring, input tokenization, and chat come next.
+IMPORT "../src/generator.aml"
+IMPORT "../src/english_seeds.aml"
+edges = list_new()
+counts = map_new()
+vocab = list_new()
+haiku_chain_seed(edges, counts, vocab, haiku_seed_words)
+syllables = haiku_syllable_cache(vocab)
+rng = rng_new(575)
+native = zeros(1)
+native[0] = -1
+candidates = haiku_generate_candidates(edges, counts, vocab, syllables, 5, 0.9, rng, native)
+cursor = 0
+while cursor < list_len(candidates):
+    candidate = list_get(candidates, cursor)
+    assert(haiku_is_haiku(candidate), "Seeded candidate missed 5-7-5")
+    PRINT candidate
+    cursor = cursor + 1

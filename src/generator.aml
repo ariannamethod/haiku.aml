@@ -1,0 +1,221 @@
+# The Python Markov voice, with attainable 5-7-5 form and explicit randomness.
+# Reference: harmonix/haiku.py at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+IMPORT "memory.aml"
+IMPORT "form.aml"
+
+# Joining words preserves their boundaries only when each token is one word.
+def haiku_gen_word(word):
+    size = text_len(word)
+    assert(size > 0 and size <= 10000, "Haiku generator words need 1..10000 codepoints")
+    cursor = 0
+    while cursor < size:
+        assert(haiku_space(text_codepoint(word, cursor)) == 0, "Haiku generator words cannot contain whitespace")
+        cursor = cursor + 1
+    return word
+
+def haiku_syllable_cache(vocab):
+    assert(list_len(vocab) <= 10000, "Haiku vocabulary limit is 10000")
+    cache = map_new()
+    cursor = 0
+    while cursor < list_len(vocab):
+        word = haiku_gen_word(list_get(vocab, cursor))
+        assert(map_has(cache, word) == 0, "Haiku vocabulary contains duplicate words")
+        map_set(cache, word, haiku_syllables(word))
+        cursor = cursor + 1
+    return cache
+
+# A supplied cache can carry a language pack's counts. It covers exactly vocab.
+def haiku_gen_check(rows, counts, vocab, syllables):
+    haiku_chain_check(rows, counts, vocab)
+    assert(map_len(syllables) == list_len(vocab), "Haiku syllable cache/vocabulary lengths differ")
+    cursor = 0
+    while cursor < list_len(vocab):
+        word = haiku_gen_word(list_get(vocab, cursor))
+        assert(map_has(syllables, word), "Haiku syllable cache is missing a word")
+        count = map_get(syllables, word)
+        assert(count >= 1 and count <= 16777216 and count == floor(count), "Haiku syllable counts must be integers in [1, 2^24]")
+        cursor = cursor + 1
+    return list_len(vocab)
+
+# [-1] selects native randomness. A scripted tape is [cursor, u0, u1, ...].
+# Arrays are mutable test state; passing an alias shares the cursor.
+def haiku_gen_tape(tape):
+    size = len(tape)
+    assert(size >= 1 and size <= 10001, "Haiku draw tape requires 1..10001 values")
+    if tape[0] == -1:
+        assert(size == 1, "Haiku native draw tape must contain only -1")
+        return 0
+    cursor = tape[0]
+    assert(cursor >= 0 and cursor <= size - 1 and cursor == floor(cursor), "Haiku draw cursor is invalid")
+    cursor = 1
+    while cursor < size:
+        draw = tape[cursor]
+        assert(draw >= 0 and draw < 1, "Haiku scripted draws must be finite in [0, 1)")
+        cursor = cursor + 1
+    return 1
+
+# Plan starts [target, temperature, reachable(0), ..., reachable(limit)].
+# The second segment stores maximum sum(word codepoints + 1) for each amount.
+# Repetition is allowed. This bounds every possible output before random draws.
+def haiku_gen_plan(vocab, syllables, limit, temperature):
+    floor(temperature)
+    assert(temperature > 0, "Haiku temperature must be finite and positive")
+    plan = zeros(2 * limit + 4)
+    plan[0] = limit
+    plan[1] = temperature
+    plan[2] = 1
+    available = zeros(limit + 1)
+    cursor = 0
+    while cursor < list_len(vocab):
+        count = map_get(syllables, list_get(vocab, cursor))
+        if count <= limit:
+            available[count] = max(available[count], text_len(list_get(vocab, cursor)) + 1)
+        cursor = cursor + 1
+    amount = 1
+    while amount <= limit:
+        count = 1
+        while count <= amount:
+            if available[count] > 0 and plan[2 + amount - count] == 1:
+                plan[2 + amount] = 1
+                cost = available[count] + plan[limit + 3 + amount - count]
+                plan[limit + 3 + amount] = max(plan[limit + 3 + amount], cost)
+            count = count + 1
+        amount = amount + 1
+    return plan
+
+# A negative first weight selects uniform choice; real edge weights are >=1.
+# Even a singleton is a sampling event. A failed categorical call keeps cursor.
+def haiku_gen_pick(size, weights, temperature, rng, tape):
+    if tape[0] == -1:
+        if weights[0] < 0:
+            return rng_index(rng, size)
+        return rng_categorical(rng, weights, temperature)
+    cursor = tape[0] + 1
+    assert(cursor < len(tape), "Haiku scripted draw tape exhausted")
+    draw = tape[cursor]
+    if weights[0] < 0:
+        index = floor(draw * size)
+    else:
+        index = categorical_at(weights, temperature, draw)
+    tape[0] = cursor
+    return index
+
+# At one word, retain the first matching bigram and sample its THIRD word.
+# This is the original voice's unusual start, including its skipped middle.
+def haiku_gen_propose(rows, counts, vocab, line, temperature, rng, tape):
+    weights = zeros(1)
+    weights[0] = -1
+    if list_len(line) == 0:
+        return list_get(vocab, haiku_gen_pick(list_len(vocab), weights, temperature, rng, tape))
+    first = list_get(line, list_len(line) - 1)
+    second = ""
+    found = 0
+    if list_len(line) == 1:
+        cursor = 0
+        while cursor < list_len(rows) and found == 0:
+            if text_equal(first, list_get(rows, cursor)):
+                second = list_get(rows, cursor + 1)
+                found = 1
+            cursor = cursor + 3
+    else:
+        first = list_get(line, list_len(line) - 2)
+        second = list_get(line, list_len(line) - 1)
+        found = 1
+    words = list_new()
+    keys = list_new()
+    if found:
+        cursor = 0
+        while cursor < list_len(rows):
+            same = text_equal(first, list_get(rows, cursor))
+            same = same and text_equal(second, list_get(rows, cursor + 1))
+            if same:
+                list_push(words, list_get(rows, cursor + 2))
+                list_push(keys, list_key(list_slice(rows, cursor, cursor + 3)))
+            cursor = cursor + 3
+    if list_len(words) == 0:
+        return list_get(vocab, haiku_gen_pick(list_len(vocab), weights, temperature, rng, tape))
+    weights = zeros(list_len(words))
+    cursor = 0
+    while cursor < list_len(words):
+        weights[cursor] = map_get(counts, list_get(keys, cursor))
+        cursor = cursor + 1
+    return list_get(words, haiku_gen_pick(list_len(words), weights, temperature, rng, tape))
+
+# Preserve the exact-remainder preference, then allow a multiword completion.
+def haiku_gen_repair(vocab, syllables, remaining, plan, rng, tape):
+    exact = list_new()
+    feasible = list_new()
+    cursor = 0
+    while cursor < list_len(vocab):
+        word = list_get(vocab, cursor)
+        count = map_get(syllables, word)
+        if count == remaining:
+            list_push(exact, word)
+        if count <= remaining:
+            if plan[2 + remaining - count]:
+                list_push(feasible, word)
+        cursor = cursor + 1
+    options = feasible
+    if list_len(exact) > 0:
+        options = exact
+    assert(list_len(options) > 0, "Haiku has no attainable continuation")
+    weights = zeros(1)
+    weights[0] = -1
+    return list_get(options, haiku_gen_pick(list_len(options), weights, plan[1], rng, tape))
+
+# Internal entry: the caller already checked the model, tape, and target.
+def haiku_gen_ready(rows, counts, vocab, syllables, plan, rng, tape):
+    line = list_new()
+    result = ""
+    remaining = plan[0]
+    while remaining > 0:
+        word = haiku_gen_propose(rows, counts, vocab, line, plan[1], rng, tape)
+        count = map_get(syllables, word)
+        fits = 0
+        if count <= remaining:
+            fits = plan[2 + remaining - count]
+        if fits == 0:
+            word = haiku_gen_repair(vocab, syllables, remaining, plan, rng, tape)
+            count = map_get(syllables, word)
+        if list_len(line) > 0:
+            result = text_concat(result, " ")
+        result = text_concat(result, word)
+        list_push(line, word)
+        remaining = remaining - count
+    return result
+
+def haiku_generate_line(rows, counts, vocab, syllables, target, temperature, rng, tape):
+    size = haiku_gen_check(rows, counts, vocab, syllables)
+    assert(size > 0, "Haiku generator vocabulary is empty")
+    assert(target >= 1 and target <= 50 and target == floor(target), "Haiku line target must be an integer in [1, 50]")
+    haiku_gen_tape(tape)
+    plan = haiku_gen_plan(vocab, syllables, target, temperature)
+    assert(plan[2 + target], "Haiku target is unreachable from vocabulary syllables")
+    assert(plan[2 * target + 3] - 1 <= 10000, "Haiku vocabulary can exceed the 10000-codepoint line limit")
+    return haiku_gen_ready(rows, counts, vocab, syllables, plan, rng, tape)
+
+def haiku_generate_candidates(rows, counts, vocab, syllables, n, temperature, rng, tape):
+    size = haiku_gen_check(rows, counts, vocab, syllables)
+    assert(n >= 0 and n <= 100 and n == floor(n), "Haiku candidate count must be an integer in [0, 100]")
+    haiku_gen_tape(tape)
+    plan = haiku_gen_plan(vocab, syllables, 7, temperature)
+    result = list_new()
+    if n == 0:
+        return result
+    assert(size > 0, "Haiku generator vocabulary is empty")
+    assert(plan[7] and plan[9], "Haiku 5-7-5 form is unreachable from vocabulary syllables")
+    maximum = 2 * (plan[15] - 1) + plan[17] - 1 + 2
+    assert(maximum <= 10000, "Haiku vocabulary can exceed the 10000-codepoint haiku limit")
+    cursor = 0
+    while cursor < n:
+        plan[0] = 5
+        first = haiku_gen_ready(rows, counts, vocab, syllables, plan, rng, tape)
+        plan[0] = 7
+        second = haiku_gen_ready(rows, counts, vocab, syllables, plan, rng, tape)
+        plan[0] = 5
+        third = haiku_gen_ready(rows, counts, vocab, syllables, plan, rng, tape)
+        candidate = text_concat(text_concat(first, "\n"), second)
+        candidate = text_concat(text_concat(candidate, "\n"), third)
+        list_push(result, candidate)
+        cursor = cursor + 1
+    return result

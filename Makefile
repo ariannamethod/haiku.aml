@@ -1,12 +1,15 @@
 AML_ROOT ?= ../ariannamethod.ai
-AML ?= $(AML_ROOT)/runner/aml
+AML ?= $(AML_ROOT)/runner/aml-notorch
 AMLC ?= $(AML_ROOT)/tools/amlc
 AML_LIB ?= $(AML_ROOT)/libaml.a
 AML_INCLUDE ?= $(AML_ROOT)/core
+AML_BRIDGE_LIB ?= $(AML_ROOT)/libaml_notorch.a
+NOTORCH_ROOT ?= ../notorch
+NOTORCH_LIB ?= $(NOTORCH_ROOT)/libnotorch.a
 
-.PHONY: test test-numerical test-text test-lexical test-cloud
+.PHONY: test test-numerical test-text test-lexical test-cloud test-form test-generator
 
-test: test-numerical test-text test-lexical test-cloud
+test: test-numerical test-text test-lexical test-cloud test-form test-generator
 
 test-numerical:
 	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" bash tests/run_numerical.sh
@@ -19,3 +22,9 @@ test-lexical:
 
 test-cloud:
 	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" HAIKU_AML_INCLUDE="$(abspath $(AML_INCLUDE))" bash tests/run_cloud.sh
+
+test-form:
+	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" bash tests/run_form.sh
+
+test-generator:
+	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" HAIKU_AML_INCLUDE="$(abspath $(AML_INCLUDE))" HAIKU_AML_BRIDGE_LIB="$(abspath $(AML_BRIDGE_LIB))" HAIKU_NOTORCH_LIB="$(abspath $(NOTORCH_LIB))" bash tests/run_generator.sh

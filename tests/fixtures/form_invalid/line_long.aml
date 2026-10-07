@@ -1,0 +1,10 @@
+# Expected error: Haiku English line limit is 10000 words
+IMPORT "../../../src/form.aml"
+words = list_new()
+cursor = 0
+while cursor < 10000:
+    list_push(words, "a")
+    cursor = cursor + 1
+list_push(words, "a")
+haiku_line_syllables(words)
+ECHO INVALID_FORM_ACCEPTED
