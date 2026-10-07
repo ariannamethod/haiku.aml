@@ -1,0 +1,38 @@
+# Native PCG32 stream v1, seed575, T=.9: full original corpus regression.
+# These are measured AML outputs; Python draw-tape parity is a separate gate.
+IMPORT "generator_support.aml"
+IMPORT "../../src/english_seeds.aml"
+rows = list_new()
+counts = map_new()
+vocab = list_new()
+haiku_chain_seed(rows, counts, vocab, haiku_seed_words)
+assert(list_len(haiku_seed_words) == 587 and list_len(vocab) == 576, "Original seed corpus sizes")
+syllables = haiku_syllable_cache(vocab)
+old_rows = list_clone(rows)
+old_counts = map_clone(counts)
+old_vocab = list_clone(vocab)
+old_syllables = map_clone(syllables)
+rng = rng_new(575)
+replay = map_clone(rng)
+native = zeros(1)
+native[0] = -1
+actual = haiku_generate_candidates(rows, counts, vocab, syllables, 5, 0.9, rng, native)
+again = haiku_generate_candidates(rows, counts, vocab, syllables, 5, 0.9, replay, native)
+haiku_gen_test_lists(actual, again)
+haiku_gen_test_maps(rng, replay)
+expected = list_new()
+list_push(expected, "will one rest warm\nthey say subtle his could a\nmaintain protect lose")
+list_push(expected, "no him huge whole\nsudden delayed word prove\nselect value cloud")
+list_push(expected, "perceive within\nconceal disguise attend\ncertainly instant")
+list_push(expected, "probably clearly\nperform behave morph match\nmask uncover more")
+list_push(expected, "portion same share\nand in end among this us\nday us become")
+haiku_gen_test_lists(actual, expected)
+cursor = 0
+while cursor < list_len(actual):
+    assert(haiku_is_haiku(list_get(actual, cursor)), "Real corpus candidate missed English 5-7-5")
+    cursor = cursor + 1
+haiku_gen_test_lists(rows, old_rows)
+haiku_gen_test_maps(counts, old_counts)
+haiku_gen_test_lists(vocab, old_vocab)
+haiku_gen_test_maps(syllables, old_syllables)
+ECHO HAIKU_GENERATOR_OK

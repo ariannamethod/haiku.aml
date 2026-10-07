@@ -1,0 +1,19 @@
+# EXPECT: Haiku generator words cannot contain whitespace
+IMPORT "../../../src/generator.aml"
+rows = list_new()
+counts = map_new()
+vocab = haiku_words("rain wind cloud")
+haiku_chain_learn(rows, counts, vocab, vocab)
+syllables = haiku_syllable_cache(vocab)
+rng = rng_new(73)
+tape = zeros(1)
+tape[0] = -1
+rows = list_new()
+counts = map_new()
+vocab = list_new()
+list_push(vocab, "rain cloud")
+syllables = map_new()
+map_set(syllables, "rain cloud", 2)
+# INVALID_CALL
+haiku_generate_line(rows, counts, vocab, syllables, 5, 1, rng, tape)
+ECHO HAIKU_INVALID_ACCEPTED

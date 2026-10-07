@@ -1,0 +1,2175 @@
+{
+  "source": "abb878c52d763b73e5ad7a4d6a68a9ea7a248a39",
+  "numpy": "2.3.5",
+  "cases": [
+    {
+      "name": "first_key_skips_middle",
+      "vocab": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f"
+      ],
+      "syllables": {
+        "a": 1,
+        "b": 1,
+        "c": 1,
+        "d": 1,
+        "e": 1,
+        "f": 1
+      },
+      "edges": [
+        [
+          "a",
+          "b",
+          "c",
+          1
+        ],
+        [
+          "a",
+          "d",
+          "e",
+          9
+        ],
+        [
+          "a",
+          "c",
+          "f",
+          1
+        ]
+      ],
+      "target": 3,
+      "temperature": 1,
+      "draws": [
+        0,
+        0.25,
+        0.75
+      ],
+      "original": {
+        "result": "a c f",
+        "cursor": 3,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "c",
+              "d",
+              "e",
+              "f"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "c"
+            ],
+            "probabilities": [
+              1.0
+            ],
+            "draw": 0.25,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "f"
+            ],
+            "probabilities": [
+              1.0
+            ],
+            "draw": 0.75,
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "a c f",
+        "cursor": 3
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "successor_insertion_order",
+      "vocab": [
+        "a",
+        "b",
+        "z",
+        "y",
+        "x"
+      ],
+      "syllables": {
+        "a": 1,
+        "b": 1,
+        "z": 1,
+        "y": 1,
+        "x": 1
+      },
+      "edges": [
+        [
+          "a",
+          "b",
+          "z",
+          2
+        ],
+        [
+          "a",
+          "b",
+          "y",
+          1
+        ],
+        [
+          "a",
+          "b",
+          "x",
+          3
+        ]
+      ],
+      "target": 2,
+      "temperature": 1,
+      "draws": [
+        0,
+        0.4
+      ],
+      "original": {
+        "result": "a y",
+        "cursor": 2,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "z",
+              "y",
+              "x"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "z",
+              "y",
+              "x"
+            ],
+            "probabilities": [
+              0.3333333333333333,
+              0.16666666666666666,
+              0.5
+            ],
+            "draw": 0.4,
+            "index": 1
+          }
+        ]
+      },
+      "expected": {
+        "result": "a y",
+        "cursor": 2
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "temperature_1",
+      "vocab": [
+        "a",
+        "b",
+        "x",
+        "y"
+      ],
+      "syllables": {
+        "a": 1,
+        "b": 1,
+        "x": 1,
+        "y": 1
+      },
+      "edges": [
+        [
+          "a",
+          "b",
+          "x",
+          1
+        ],
+        [
+          "a",
+          "b",
+          "y",
+          3
+        ]
+      ],
+      "target": 2,
+      "temperature": 1,
+      "draws": [
+        0,
+        0.2
+      ],
+      "original": {
+        "result": "a x",
+        "cursor": 2,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "x",
+              "y"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "x",
+              "y"
+            ],
+            "probabilities": [
+              0.25,
+              0.75
+            ],
+            "draw": 0.2,
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "a x",
+        "cursor": 2
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "temperature_0_5",
+      "vocab": [
+        "a",
+        "b",
+        "x",
+        "y"
+      ],
+      "syllables": {
+        "a": 1,
+        "b": 1,
+        "x": 1,
+        "y": 1
+      },
+      "edges": [
+        [
+          "a",
+          "b",
+          "x",
+          1
+        ],
+        [
+          "a",
+          "b",
+          "y",
+          3
+        ]
+      ],
+      "target": 2,
+      "temperature": 0.5,
+      "draws": [
+        0,
+        0.2
+      ],
+      "original": {
+        "result": "a y",
+        "cursor": 2,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "x",
+              "y"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "x",
+              "y"
+            ],
+            "probabilities": [
+              0.1,
+              0.9
+            ],
+            "draw": 0.2,
+            "index": 1
+          }
+        ]
+      },
+      "expected": {
+        "result": "a y",
+        "cursor": 2
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "temperature_2",
+      "vocab": [
+        "a",
+        "b",
+        "x",
+        "y"
+      ],
+      "syllables": {
+        "a": 1,
+        "b": 1,
+        "x": 1,
+        "y": 1
+      },
+      "edges": [
+        [
+          "a",
+          "b",
+          "x",
+          1
+        ],
+        [
+          "a",
+          "b",
+          "y",
+          3
+        ]
+      ],
+      "target": 2,
+      "temperature": 2,
+      "draws": [
+        0,
+        0.15
+      ],
+      "original": {
+        "result": "a x",
+        "cursor": 2,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "x",
+              "y"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "x",
+              "y"
+            ],
+            "probabilities": [
+              0.36602540378443865,
+              0.6339745962155613
+            ],
+            "draw": 0.15,
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "a x",
+        "cursor": 2
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "temperature_0_3",
+      "vocab": [
+        "a",
+        "b",
+        "x",
+        "y"
+      ],
+      "syllables": {
+        "a": 1,
+        "b": 1,
+        "x": 1,
+        "y": 1
+      },
+      "edges": [
+        [
+          "a",
+          "b",
+          "x",
+          1
+        ],
+        [
+          "a",
+          "b",
+          "y",
+          3
+        ]
+      ],
+      "target": 2,
+      "temperature": 0.3,
+      "draws": [
+        0,
+        0.9
+      ],
+      "original": {
+        "result": "a y",
+        "cursor": 2,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "x",
+              "y"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "x",
+              "y"
+            ],
+            "probabilities": [
+              0.025037093456503602,
+              0.9749629065434964
+            ],
+            "draw": 0.9,
+            "index": 1
+          }
+        ]
+      },
+      "expected": {
+        "result": "a y",
+        "cursor": 2
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "temperature_1_5",
+      "vocab": [
+        "a",
+        "b",
+        "x",
+        "y"
+      ],
+      "syllables": {
+        "a": 1,
+        "b": 1,
+        "x": 1,
+        "y": 1
+      },
+      "edges": [
+        [
+          "a",
+          "b",
+          "x",
+          1
+        ],
+        [
+          "a",
+          "b",
+          "y",
+          3
+        ]
+      ],
+      "target": 2,
+      "temperature": 1.5,
+      "draws": [
+        0,
+        0.4
+      ],
+      "original": {
+        "result": "a y",
+        "cursor": 2,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "x",
+              "y"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "x",
+              "y"
+            ],
+            "probabilities": [
+              0.3246664887870321,
+              0.6753335112129679
+            ],
+            "draw": 0.4,
+            "index": 1
+          }
+        ]
+      },
+      "expected": {
+        "result": "a y",
+        "cursor": 2
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "uniform_no_start_key",
+      "vocab": [
+        "a",
+        "b",
+        "c"
+      ],
+      "syllables": {
+        "a": 1,
+        "b": 1,
+        "c": 1
+      },
+      "edges": [],
+      "target": 3,
+      "temperature": 1,
+      "draws": [
+        0,
+        0.6,
+        0.99
+      ],
+      "original": {
+        "result": "a b c",
+        "cursor": 3,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "c"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "c"
+            ],
+            "draw": 0.6,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "c"
+            ],
+            "draw": 0.99,
+            "index": 2
+          }
+        ]
+      },
+      "expected": {
+        "result": "a b c",
+        "cursor": 3
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "uniform_missing_actual_pair",
+      "vocab": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "syllables": {
+        "a": 1,
+        "b": 1,
+        "c": 1,
+        "d": 1
+      },
+      "edges": [
+        [
+          "a",
+          "b",
+          "c",
+          1
+        ]
+      ],
+      "target": 3,
+      "temperature": 1,
+      "draws": [
+        0,
+        0,
+        0.8
+      ],
+      "original": {
+        "result": "a c d",
+        "cursor": 3,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "c",
+              "d"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "c"
+            ],
+            "probabilities": [
+              1.0
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "c",
+              "d"
+            ],
+            "draw": 0.8,
+            "index": 3
+          }
+        ]
+      },
+      "expected": {
+        "result": "a c d",
+        "cursor": 3
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "exact_remainder",
+      "vocab": [
+        "a",
+        "b",
+        "x",
+        "long",
+        "whole"
+      ],
+      "syllables": {
+        "a": 1,
+        "b": 1,
+        "x": 1,
+        "long": 5,
+        "whole": 3
+      },
+      "edges": [
+        [
+          "a",
+          "b",
+          "x",
+          1
+        ]
+      ],
+      "target": 5,
+      "temperature": 1,
+      "draws": [
+        0,
+        0,
+        0.7,
+        0
+      ],
+      "original": {
+        "result": "a x whole",
+        "cursor": 4,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "x",
+              "long",
+              "whole"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "x"
+            ],
+            "probabilities": [
+              1.0
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "x",
+              "long",
+              "whole"
+            ],
+            "draw": 0.7,
+            "index": 3
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "whole"
+            ],
+            "draw": 0,
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "a x whole",
+        "cursor": 4
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "case_punctuation_unicode",
+      "vocab": [
+        "Écho",
+        "привет",
+        "?"
+      ],
+      "syllables": {
+        "Écho": 1,
+        "привет": 1,
+        "?": 1
+      },
+      "edges": [],
+      "target": 3,
+      "temperature": 1,
+      "draws": [
+        0,
+        0.5,
+        0.99
+      ],
+      "original": {
+        "result": "Écho привет ?",
+        "cursor": 3,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "Écho",
+              "привет",
+              "?"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "Écho",
+              "привет",
+              "?"
+            ],
+            "draw": 0.5,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "Écho",
+              "привет",
+              "?"
+            ],
+            "draw": 0.99,
+            "index": 2
+          }
+        ]
+      },
+      "expected": {
+        "result": "Écho привет ?",
+        "cursor": 3
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "singleton_uniform",
+      "vocab": [
+        "one"
+      ],
+      "syllables": {
+        "one": 1
+      },
+      "edges": [],
+      "target": 5,
+      "temperature": 1,
+      "draws": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original": {
+        "result": "one one one one one",
+        "cursor": 5,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "one one one one one",
+        "cursor": 5
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "singleton_weighted",
+      "vocab": [
+        "one"
+      ],
+      "syllables": {
+        "one": 1
+      },
+      "edges": [
+        [
+          "one",
+          "one",
+          "one",
+          1
+        ]
+      ],
+      "target": 5,
+      "temperature": 1,
+      "draws": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original": {
+        "result": "one one one one one",
+        "cursor": 5,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "one"
+            ],
+            "probabilities": [
+              1.0
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "one"
+            ],
+            "probabilities": [
+              1.0
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "one"
+            ],
+            "probabilities": [
+              1.0
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "one"
+            ],
+            "probabilities": [
+              1.0
+            ],
+            "draw": 0,
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "one one one one one",
+        "cursor": 5
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "target_fifty",
+      "vocab": [
+        "one"
+      ],
+      "syllables": {
+        "one": 1
+      },
+      "edges": [],
+      "target": 50,
+      "temperature": 1,
+      "draws": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original": {
+        "result": "one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one",
+        "cursor": 50,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "one"
+            ],
+            "draw": 0,
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one one",
+        "cursor": 50
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "two_candidates",
+      "vocab": [
+        "rain",
+        "wind"
+      ],
+      "syllables": {
+        "rain": 1,
+        "wind": 1
+      },
+      "edges": [],
+      "target": 0,
+      "temperature": 1,
+      "draws": [
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75,
+        0,
+        0.75
+      ],
+      "n": 2,
+      "original": {
+        "result": [
+          "rain wind rain wind rain\nwind rain wind rain wind rain wind\nrain wind rain wind rain",
+          "wind rain wind rain wind\nrain wind rain wind rain wind rain\nwind rain wind rain wind"
+        ],
+        "cursor": 34,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "rain",
+              "wind"
+            ],
+            "draw": 0.75,
+            "index": 1
+          }
+        ]
+      },
+      "expected": {
+        "result": [
+          "rain wind rain wind rain\nwind rain wind rain wind rain wind\nrain wind rain wind rain",
+          "wind rain wind rain wind\nrain wind rain wind rain wind rain\nwind rain wind rain wind"
+        ],
+        "cursor": 34
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "zero_candidates",
+      "vocab": [],
+      "syllables": {},
+      "edges": [],
+      "target": 0,
+      "temperature": 1,
+      "draws": [],
+      "n": 0,
+      "original": {
+        "result": [],
+        "cursor": 0,
+        "events": []
+      },
+      "expected": {
+        "result": [],
+        "cursor": 0
+      },
+      "decision": "preserved"
+    },
+    {
+      "name": "initial_overrun",
+      "vocab": [
+        "long",
+        "whole"
+      ],
+      "syllables": {
+        "long": 6,
+        "whole": 5
+      },
+      "edges": [],
+      "target": 5,
+      "temperature": 1,
+      "draws": [
+        0,
+        0.4
+      ],
+      "original": {
+        "result": "long",
+        "cursor": 1,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "long",
+              "whole"
+            ],
+            "draw": 0,
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "whole",
+        "cursor": 2
+      },
+      "decision": "repair"
+    },
+    {
+      "name": "first_fallback_overrun",
+      "vocab": [
+        "first",
+        "big",
+        "end"
+      ],
+      "syllables": {
+        "first": 3,
+        "big": 3,
+        "end": 2
+      },
+      "edges": [],
+      "target": 5,
+      "temperature": 1,
+      "draws": [
+        0,
+        0.4,
+        0.8
+      ],
+      "original": {
+        "result": "first big",
+        "cursor": 2,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "first",
+              "big",
+              "end"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "first",
+              "big",
+              "end"
+            ],
+            "draw": 0.4,
+            "index": 1
+          }
+        ]
+      },
+      "expected": {
+        "result": "first end",
+        "cursor": 3
+      },
+      "decision": "repair"
+    },
+    {
+      "name": "multiword_remainder",
+      "vocab": [
+        "a",
+        "one",
+        "big"
+      ],
+      "syllables": {
+        "a": 2,
+        "one": 1,
+        "big": 4
+      },
+      "edges": [],
+      "target": 7,
+      "temperature": 1,
+      "draws": [
+        0,
+        0,
+        0.99,
+        0,
+        0,
+        0.9
+      ],
+      "original": {
+        "result": "a a",
+        "cursor": 3,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "one",
+              "big"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "one",
+              "big"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "one",
+              "big"
+            ],
+            "draw": 0.99,
+            "index": 2
+          }
+        ]
+      },
+      "expected": {
+        "result": "a a a one",
+        "cursor": 6
+      },
+      "decision": "repair"
+    },
+    {
+      "name": "stranded_remainder",
+      "vocab": [
+        "a",
+        "b"
+      ],
+      "syllables": {
+        "a": 2,
+        "b": 3
+      },
+      "edges": [
+        [
+          "a",
+          "a",
+          "a",
+          1
+        ]
+      ],
+      "target": 5,
+      "temperature": 1,
+      "draws": [
+        0,
+        0,
+        0
+      ],
+      "original": {
+        "result": "a a",
+        "cursor": 3,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "a"
+            ],
+            "probabilities": [
+              1.0
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "weighted",
+            "words": [
+              "a"
+            ],
+            "probabilities": [
+              1.0
+            ],
+            "draw": 0,
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "a b",
+        "cursor": 3
+      },
+      "decision": "repair"
+    },
+    {
+      "name": "initial_stranded_remainder",
+      "vocab": [
+        "a",
+        "b",
+        "c"
+      ],
+      "syllables": {
+        "a": 4,
+        "b": 2,
+        "c": 3
+      },
+      "edges": [],
+      "target": 5,
+      "temperature": 1,
+      "draws": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "original": {
+        "result": "a a",
+        "cursor": 2,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "c"
+            ],
+            "draw": 0,
+            "index": 0
+          },
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "c"
+            ],
+            "draw": 0,
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "b c",
+        "cursor": 4
+      },
+      "decision": "repair"
+    },
+    {
+      "name": "cold_temperature_stability",
+      "vocab": [
+        "a",
+        "b",
+        "x",
+        "y"
+      ],
+      "syllables": {
+        "a": 1,
+        "b": 1,
+        "x": 1,
+        "y": 1
+      },
+      "edges": [
+        [
+          "a",
+          "b",
+          "x",
+          1
+        ],
+        [
+          "a",
+          "b",
+          "y",
+          3
+        ]
+      ],
+      "target": 2,
+      "temperature": 0.001,
+      "draws": [
+        0,
+        0.99
+      ],
+      "original": {
+        "error": "ValueError: probabilities contain NaN",
+        "cursor": 1,
+        "events": [
+          {
+            "kind": "uniform",
+            "words": [
+              "a",
+              "b",
+              "x",
+              "y"
+            ],
+            "draw": 0,
+            "index": 0
+          }
+        ]
+      },
+      "expected": {
+        "result": "a y",
+        "cursor": 2
+      },
+      "decision": "repair"
+    }
+  ]
+}

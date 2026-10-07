@@ -1,0 +1,4 @@
+# Expected error: list operation requires a list
+IMPORT "../../../src/form.aml"
+haiku_line_syllables("a")
+ECHO INVALID_FORM_ACCEPTED

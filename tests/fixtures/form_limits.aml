@@ -1,0 +1,18 @@
+IMPORT "form_limits_support.aml"
+word = form_repeat("ab", 5000)
+assert(haiku_syllables(word) == 5000, "word_at_10000_codepoints")
+words = list_new()
+cursor = 0
+while cursor < 10000:
+    list_push(words, "")
+    cursor = cursor + 1
+assert(haiku_line_syllables(words) == 10000, "line_at_10000_words")
+words = form_exact_sum()
+assert(haiku_line_syllables(words) == 16777216, "exact_integer_limit")
+source = text_concat(form_repeat("b", 9998), "\n\n")
+counts = haiku_form(source)
+assert(counts[0] == 1, "form_at_10000_first")
+assert(counts[1] == 0, "form_at_10000_second")
+assert(counts[2] == 0, "form_at_10000_third")
+ECHO HAIKU_FORM_PARITY_OK
+# Boundary values: 6

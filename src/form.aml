@@ -1,0 +1,140 @@
+# English form, adapted to AML on 2026-10-07 from David L. Day's
+# python-syllables 1.1.5, GPL-3.0. See THIRD_PARTY.md and LICENSE.
+# Python Haiku: abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+IMPORT "lexicon.aml"
+IMPORT "english_rules.aml"
+
+# The regex classes use these LOWERCASE ASCII vowels, including y.
+def haiku_en_vowel(cp):
+    return cp == 97 or cp == 101 or cp == 105 or cp == 111 or cp == 117 or cp == 121
+
+# The reference lowercases only the vowel scan. Its regex rules match the raw
+# word from the beginning. Preserve their case, anchors, and duplicate ^mc.
+def haiku_syllables(word):
+    size = text_len(word)
+    assert(size <= 10000, "Haiku English word limit is 10000 codepoints")
+    count = 0
+    previous = 0
+    cursor = 0
+    while cursor < size:
+        cp = text_codepoint(word, cursor)
+        if cp >= 65 and cp <= 90:
+            cp = cp + 32
+        vowel = haiku_en_vowel(cp)
+        if cp == 304:
+            vowel = 1
+        if vowel and previous == 0:
+            count = count + 1
+        previous = vowel
+        # U+0130 lowercases to i + combining dot, ending the vowel group.
+        if cp == 304:
+            previous = 0
+        cursor = cursor + 1
+    if size == 0:
+        return 1
+    cursor = 0
+    while cursor < list_len(haiku_en_sub_prefixes):
+        if text_find(word, list_get(haiku_en_sub_prefixes, cursor)) == 0:
+            count = count - 1
+        cursor = cursor + 1
+    cursor = 0
+    while cursor < list_len(haiku_en_add_prefixes):
+        if text_find(word, list_get(haiku_en_add_prefixes, cursor)) == 0:
+            count = count + 1
+        cursor = cursor + 1
+
+    # Python's $ also matches immediately before one final LF.
+    ending = size
+    if text_codepoint(word, size - 1) == 10:
+        ending = ending - 1
+    anchored = text_slice(word, 0, ending)
+    if text_equal(anchored, "sia") or text_equal(anchored, "ere"):
+        count = count - 1
+    if text_equal(anchored, "dnt"):
+        count = count + 1
+    first = text_codepoint(word, 0)
+    if first != 10:
+        tail = text_slice(word, 1, ending)
+        if list_find(haiku_en_sub_suffixes, tail) >= 0:
+            count = count - 1
+        if list_find(haiku_en_add_suffixes, tail) >= 0:
+            count = count + 1
+        if text_equal(tail, "sed") or text_equal(tail, "zed"):
+            count = count - 1
+        rest = text_slice(word, 1, size)
+        if text_find(rest, "earest") == 0:
+            count = count + 1
+        if text_find(rest, "arer") == 0:
+            count = count + 1
+        if text_find(rest, "aress") == 0:
+            count = count + 1
+
+    # [aeiouym]bl$ and ([^aeiouy])1l$: the latter has a literal digit 1.
+    if ending == 3:
+        tail = text_slice(word, 1, ending)
+        if haiku_en_vowel(first) or first == 109:
+            if text_equal(tail, "bl"):
+                count = count + 1
+        if haiku_en_vowel(first) == 0:
+            if text_equal(tail, "1l"):
+                count = count + 1
+    # [aeiou]{3}: this class excludes y, unlike the vowel-group scan.
+    if size >= 3:
+        second = text_codepoint(word, 1)
+        third = text_codepoint(word, 2)
+        if haiku_en_vowel(first) and first != 121:
+            if haiku_en_vowel(second) and second != 121:
+                if haiku_en_vowel(third) and third != 121:
+                    count = count + 1
+    # Negated character classes include LF. Dot, above and below, excludes it.
+    if size >= 5:
+        if first != 108:
+            if text_equal(text_slice(word, 1, 5), "lien"):
+                count = count + 1
+        if text_equal(text_slice(word, 0, 3), "coa"):
+            fourth = text_codepoint(word, 3)
+            if fourth == 100 or fourth == 103 or fourth == 108 or fourth == 120:
+                if text_codepoint(word, 4) != 10:
+                    count = count + 1
+    if size >= 4:
+        if first != 103 and first != 113:
+            if text_equal(text_slice(word, 1, 3), "ua"):
+                fourth = text_codepoint(word, 3)
+                if haiku_en_vowel(fourth) == 0 or fourth == 121:
+                    count = count + 1
+    return max(1, count)
+
+# Sum exactly over token boundaries. Empty tokens still have one syllable.
+def haiku_line_syllables(words):
+    size = list_len(words)
+    assert(size <= 10000, "Haiku English line limit is 10000 words")
+    total = 0
+    cursor = 0
+    cache = map_new()
+    while cursor < size:
+        word = list_get(words, cursor)
+        if map_has(cache, word) == 0:
+            map_set(cache, word, haiku_syllables(word))
+        count = map_get(cache, word)
+        assert(count <= 16777216 - total, "Haiku syllable sum exceeds 2^24")
+        total = total + count
+        cursor = cursor + 1
+    return total
+
+# Literal LF defines lines; Python whitespace rules split words within each.
+def haiku_form(source):
+    assert(text_len(source) <= 10000, "Haiku form limit is 10000 codepoints")
+    assert(haiku_line_count(source) == 3, "Haiku form requires exactly three lines")
+    counts = zeros(3)
+    cursor = 0
+    while cursor < 3:
+        counts[cursor] = haiku_line_syllables(haiku_words(haiku_line(source, cursor)))
+        cursor = cursor + 1
+    return counts
+
+def haiku_is_haiku(source):
+    assert(text_len(source) <= 10000, "Haiku form limit is 10000 codepoints")
+    if haiku_line_count(source) != 3:
+        return 0
+    counts = haiku_form(source)
+    return counts[0] == 5 and counts[1] == 7 and counts[2] == 5

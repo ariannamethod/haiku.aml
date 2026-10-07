@@ -1,0 +1,5 @@
+# Expected error: Haiku English word limit is 10000 codepoints
+IMPORT "../form_limits_support.aml"
+word = text_concat(form_repeat("ab", 5000), "a")
+haiku_syllables(word)
+ECHO INVALID_FORM_ACCEPTED

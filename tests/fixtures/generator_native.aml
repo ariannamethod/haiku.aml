@@ -1,0 +1,53 @@
+# Native ownership, batch/line draw order, stable temperatures, form bounds.
+# Native checks: 19
+IMPORT "generator_support.aml"
+rows = list_new()
+counts = map_new()
+vocab = list_new()
+seeds = haiku_words("rain cloud rain wind cloud wind rain")
+haiku_chain_seed(rows, counts, vocab, seeds)
+syllables = haiku_syllable_cache(vocab)
+old_rows = list_clone(rows)
+old_counts = map_clone(counts)
+old_vocab = list_clone(vocab)
+old_syllables = map_clone(syllables)
+native = zeros(1)
+native[0] = -1
+rng = rng_new(575)
+replay = map_clone(rng)
+first = haiku_generate_candidates(rows, counts, vocab, syllables, 5, 0.9, rng, native)
+second = haiku_generate_candidates(rows, counts, vocab, syllables, 5, 0.9, replay, native)
+haiku_gen_test_lists(first, second)
+haiku_gen_test_maps(rng, replay)
+assert(native[0] == -1, "Native selector tape changed")
+cursor = 0
+while cursor < list_len(first):
+    assert(haiku_is_haiku(list_get(first, cursor)), "Native candidate missed 5-7-5")
+    cursor = cursor + 1
+haiku_gen_test_lists(rows, old_rows)
+haiku_gen_test_maps(counts, old_counts)
+haiku_gen_test_lists(vocab, old_vocab)
+haiku_gen_test_maps(syllables, old_syllables)
+# Native batches consume exactly the ordered 5/7/5 line stream.
+rng = rng_new(73)
+replay = map_clone(rng)
+batch = haiku_generate_candidates(rows, counts, vocab, syllables, 1, 1.5, rng, native)
+a = haiku_generate_line(rows, counts, vocab, syllables, 5, 1.5, replay, native)
+b = haiku_generate_line(rows, counts, vocab, syllables, 7, 1.5, replay, native)
+c = haiku_generate_line(rows, counts, vocab, syllables, 5, 1.5, replay, native)
+joined = text_concat(text_concat(text_concat(text_concat(a, "\n"), b), "\n"), c)
+assert(text_equal(joined, list_get(batch, 0)), "Native batch changed line order")
+haiku_gen_test_maps(rng, replay)
+# Zero candidates leave an owned stream unchanged.
+before = map_clone(rng)
+empty = haiku_generate_candidates(rows, counts, vocab, syllables, 0, 1, rng, native)
+assert(list_len(empty) == 0, "Zero candidate batch is not empty")
+haiku_gen_test_maps(rng, before)
+# Extreme positive temperatures preserve a valid distribution and whole form.
+cold = haiku_generate_candidates(rows, counts, vocab, syllables, 1, 1e-30, rng, native)
+hot = haiku_generate_candidates(rows, counts, vocab, syllables, 1, 3e38, rng, native)
+assert(haiku_is_haiku(list_get(cold, 0)), "Cold candidate missed 5-7-5")
+assert(haiku_is_haiku(list_get(hot, 0)), "Hot candidate missed 5-7-5")
+long = haiku_generate_line(rows, counts, vocab, syllables, 50, 1, rng, native)
+assert(haiku_line_syllables(haiku_words(long)) == 50, "Maximum target missed its form")
+ECHO HAIKU_GENERATOR_OK

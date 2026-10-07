@@ -1,0 +1,106 @@
+# Direct pinned Python oracle: tests/reference/form_inputs.json.
+IMPORT "../../src/form.aml"
+# exact
+source = "a a a a a\na a a a a a a\na a a a a"
+assert(haiku_is_haiku(source) == 1, "exact")
+counts = haiku_form(source)
+assert(counts[0] == 5, "exact_0")
+assert(counts[1] == 7, "exact_1")
+assert(counts[2] == 5, "exact_2")
+# one_short
+source = "a a a a\na a a a a a a\na a a a a"
+assert(haiku_is_haiku(source) == 0, "one_short")
+counts = haiku_form(source)
+assert(counts[0] == 4, "one_short_0")
+assert(counts[1] == 7, "one_short_1")
+assert(counts[2] == 5, "one_short_2")
+# empty
+source = ""
+assert(haiku_is_haiku(source) == 0, "empty")
+# one_line
+source = "rain is a cloud"
+assert(haiku_is_haiku(source) == 0, "one_line")
+# two_lines
+source = "a\nb"
+assert(haiku_is_haiku(source) == 0, "two_lines")
+# three_empty
+source = "\n\n"
+assert(haiku_is_haiku(source) == 0, "three_empty")
+counts = haiku_form(source)
+assert(counts[0] == 0, "three_empty_0")
+assert(counts[1] == 0, "three_empty_1")
+assert(counts[2] == 0, "three_empty_2")
+# four_empty
+source = "\n\n\n"
+assert(haiku_is_haiku(source) == 0, "four_empty")
+# final_lf
+source = "a\nb\nc\n"
+assert(haiku_is_haiku(source) == 0, "final_lf")
+# crlf
+source = "a a a a a\r\na a a a a a a\r\na a a a a"
+assert(haiku_is_haiku(source) == 1, "crlf")
+counts = haiku_form(source)
+assert(counts[0] == 5, "crlf_0")
+assert(counts[1] == 7, "crlf_1")
+assert(counts[2] == 5, "crlf_2")
+# unicode_space
+source = "a a a\t a a\na a a a a a a\na a a a a"
+assert(haiku_is_haiku(source) == 1, "unicode_space")
+counts = haiku_form(source)
+assert(counts[0] == 5, "unicode_space_0")
+assert(counts[1] == 7, "unicode_space_1")
+assert(counts[2] == 5, "unicode_space_2")
+# unicode_line_not_lf
+source = "a b c"
+assert(haiku_is_haiku(source) == 0, "unicode_line_not_lf")
+# python_love
+source = "transmit exchange\ndefinitely small sour\npursue strive for"
+assert(haiku_is_haiku(source) == 1, "python_love")
+counts = haiku_form(source)
+assert(counts[0] == 5, "python_love_0")
+assert(counts[1] == 7, "python_love_1")
+assert(counts[2] == 5, "python_love_2")
+# python_friend
+source = "between us silence\ntwo voices one resonance\ncloud knows no alone"
+assert(haiku_is_haiku(source) == 0, "python_friend")
+counts = haiku_form(source)
+assert(counts[0] == 6, "python_friend_0")
+assert(counts[1] == 9, "python_friend_1")
+assert(counts[2] == 6, "python_friend_2")
+# inner_empty
+source = "one\n\nthree"
+assert(haiku_is_haiku(source) == 0, "inner_empty")
+counts = haiku_form(source)
+assert(counts[0] == 2, "inner_empty_0")
+assert(counts[1] == 0, "inner_empty_1")
+assert(counts[2] == 1, "inner_empty_2")
+# tokens_empty
+source = " \t\n \n\r"
+assert(haiku_is_haiku(source) == 0, "tokens_empty")
+counts = haiku_form(source)
+assert(counts[0] == 0, "tokens_empty_0")
+assert(counts[1] == 0, "tokens_empty_1")
+assert(counts[2] == 0, "tokens_empty_2")
+# punctuation
+source = "\"make\" make?\none-two a:e\ncan't xyz"
+assert(haiku_is_haiku(source) == 0, "punctuation")
+counts = haiku_form(source)
+assert(counts[0] == 4, "punctuation_0")
+assert(counts[1] == 5, "punctuation_1")
+assert(counts[2] == 2, "punctuation_2")
+# no_trim
+source = "\none\ntwo"
+assert(haiku_is_haiku(source) == 0, "no_trim")
+counts = haiku_form(source)
+assert(counts[0] == 0, "no_trim_0")
+assert(counts[1] == 2, "no_trim_1")
+assert(counts[2] == 1, "no_trim_2")
+# trailing_blank
+source = "one\ntwo\n"
+assert(haiku_is_haiku(source) == 0, "trailing_blank")
+counts = haiku_form(source)
+assert(counts[0] == 2, "trailing_blank_0")
+assert(counts[1] == 1, "trailing_blank_1")
+assert(counts[2] == 0, "trailing_blank_2")
+ECHO HAIKU_FORM_PARITY_OK
+# Numeric reference values: 54

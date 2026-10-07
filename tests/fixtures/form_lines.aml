@@ -1,0 +1,59 @@
+# Direct pinned Python oracle: tests/reference/form_inputs.json.
+IMPORT "../../src/form.aml"
+# empty
+words = list_new()
+assert(haiku_line_syllables(words) == 0, "empty")
+# empty_tokens
+words = list_new()
+list_push(words, "")
+list_push(words, "")
+list_push(words, "")
+assert(haiku_line_syllables(words) == 3, "empty_tokens")
+# simple
+words = list_new()
+list_push(words, "between")
+list_push(words, "us")
+list_push(words, "silence")
+assert(haiku_line_syllables(words) == 6, "simple")
+# original_love
+words = list_new()
+list_push(words, "transmit")
+list_push(words, "exchange")
+assert(haiku_line_syllables(words) == 5, "original_love")
+# upper
+words = list_new()
+list_push(words, "McDonald")
+list_push(words, "mcdonald")
+list_push(words, "MAKE")
+list_push(words, "make")
+assert(haiku_line_syllables(words) == 9, "upper")
+# unicode
+words = list_new()
+list_push(words, "İa")
+list_push(words, "雨")
+list_push(words, "שלום")
+list_push(words, "café")
+assert(haiku_line_syllables(words) == 5, "unicode")
+# boundaries
+words = list_new()
+list_push(words, "one two")
+list_push(words, "a\na")
+list_push(words, "one-two")
+assert(haiku_line_syllables(words) == 8, "boundaries")
+# duplicates
+words = list_new()
+list_push(words, "resonance")
+list_push(words, "resonance")
+list_push(words, "resonance")
+list_push(words, "resonance")
+list_push(words, "resonance")
+list_push(words, "resonance")
+list_push(words, "resonance")
+list_push(words, "resonance")
+list_push(words, "resonance")
+list_push(words, "resonance")
+list_push(words, "resonance")
+list_push(words, "resonance")
+assert(haiku_line_syllables(words) == 48, "duplicates")
+ECHO HAIKU_FORM_PARITY_OK
+# Numeric reference values: 8

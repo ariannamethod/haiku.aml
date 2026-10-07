@@ -2,7 +2,8 @@
 
 2026-10-07. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 This document records the inspected sources, current behavior, and implementation
-order. Numerical, text, lexical, cloud, and memory organs are implemented; the status below
+order. Numerical, text, lexical, cloud, memory, English form, and candidate
+generation organs are implemented; the status below
 marks the boundary between those functions and the remaining organism.
 
 ## Source bodies
@@ -35,6 +36,13 @@ Follow-up bases: AML `355a0345a432d61c35f7e45327ba3ae0bea0b8e6` includes merged
 PRs #25 and #26. NoTorch `c92e915f2e533372073cc95df9c22bdaf014188b` includes merged
 [PR #159](https://github.com/ariannamethod/notorch/pull/159), adding native tanh
 and plain SGD. The original audit and manifesto pins above remain their sources.
+
+The English generator uses AML v5.5.0 from
+[PR #30](https://github.com/ariannamethod/ariannamethod.ai/pull/30), published
+as `6bd1e4b310fb24cc169c166d3691ff096ba8093d`, and the NoTorch sampling API from
+[PR #161](https://github.com/ariannamethod/notorch/pull/161), published as
+`ad7b53afa6b24fb40e22624d5967d7b80eb838bc`. Their bases include the merged
+numeric-map/CodeQL repairs and NoTorch's latest Chuck work, respectively.
 
 ## Implemented first organs
 
@@ -69,6 +77,15 @@ generator transition counts/vocabulary, and recent-ten snapshots separate.
 The [cloud parity record](CLOUD_PARITY.md) specifies event order, the original
 seed corpus, float32 bounds, and the explicit empty-input and snapshot repairs.
 These states live in memory; native file persistence remains a later step.
+
+`src/form.aml` and `src/english_rules.aml` carry the original English syllable
+estimator into AML, including its case-sensitive prefix rules and Unicode
+lowercase behavior. [FORM_PARITY.md](FORM_PARITY.md) records 1,966 direct Python
+reference results. `src/generator.aml` composes those counts with the existing
+ordered transition memory. It preserves the original proposals, then repairs
+oversized and stranded lines using attainable syllable remainders.
+[GENERATOR_PARITY.md](GENERATOR_PARITY.md) separates preserved Python draw paths,
+the explicit form repairs, and the new native random stream.
 
 ## Preserve the organism
 
@@ -119,13 +136,13 @@ lineage and its developments stay traceable.
 
 | Existing dependency/service | Work required |
 |---|---|
-| NumPy transition sampling | Native count-power normalization and categorical draw; explicit PRNG state |
+| NumPy transition sampling | Implemented through canonical NoTorch: stable positive-temperature weights and owned PCG32 state, exposed by AML's optional sampling bridge |
 | NumPy clip/dot/norm | Scalar bounds in AML; vector operations through NoTorch |
 | NumPy object shards | Versioned exchange records in the native state format |
 | SciPy `csgraph/eigsh` | Both observer files import them; neither calls them. No eigensolver is needed for the current path |
 | Micrograd classes | NoTorch linear/bias, tanh, squared-error/backward, SGD, and weight clamp; match each 57-parameter network |
 | SentencePiece package | Native unigram-model/tokenizer support in NoTorch, including the model's normalization behavior; piece-ID and trigram fixtures before replacement |
-| `syllables` | Per-language syllable lexicons and rules carried as project data/code |
+| `syllables` | English estimator and rule data implemented in AML; each later language supplies its own rules |
 | SQLite / aiosqlite | Native snapshot + journal storage covering words, counts, recent trigrams, metrics, bridges, dreams, learners, and lifecycle state |
 | Python collections/async/I/O | AML text values, collections, module exports, event transport, files, and host-facing I/O |
 
@@ -135,7 +152,9 @@ merged PR #159 now supplies `nt_tanh` and `nt_tape_sgd_step`. Its tests compare
 forward values, gradients, and 24-step parameter trajectories against an
 independent double-precision reference for both Haiku-sized networks.
 AML currently implements its own numeric tape, so the NoTorch binding must
-explicitly route Haiku's numerical work to the canonical library.
+explicitly route Haiku's learning work to the canonical library. The first
+binding now routes owned random draws and categorical sampling to NoTorch;
+the tensor/training interface remains a separate milestone.
 
 The baseline build uses AML, NoTorch, and system libraries. The inspected
 `amlc` originally added OpenBLAS on Linux while `--no-accel` also disabled
@@ -147,7 +166,8 @@ the two projects' scalar archives without BLAS. The numerical test uses it.
 AML v5.2.0 adds UTF-8 values, typed function arguments/returns, `PRINT`, and
 shared `IMPORT`; v5.3.0 adds mutable string lists with copied assignment and
 worker containers. AML v5.4.0 adds ordered numeric maps, exact composite keys,
-assertions, and scalar floor. These extend the scalar/array runtime, field
+assertions, and scalar floor. AML v5.5.0 adds an optional NoTorch sampling
+backend and map-owned random streams. These extend the scalar/array runtime, field
 persistence, threads, and float channels. Haiku still needs:
 
 1. Durable word-cloud and transition records. Token lists, indexed numeric
@@ -256,6 +276,29 @@ time is supplied as relative seconds. Allocation failure during publication
 across separate columns remains an explicit error; durable atomic exchange
 records and epoch timestamps belong to the persistence step.
 
+### English form and owned generation
+
+The original estimator's 123 subtracting and 29 adding rules now run in AML.
+Its exact counts cover every original seed, rule mutations, Unicode edges,
+line sums, and form predicates. The generator reuses the existing ordered
+transition rows and counts, including the original first-key/third-word start.
+Supplied draw tapes compare proposal paths directly with the pinned Python
+methods; native operation uses NoTorch's owned PCG32 and stable categorical
+sampling through AML's optional bridge.
+
+The original can overshoot with its first word or one-word fallback, and can
+strand a remainder that no single word completes. A precomputed attainable
+remainder table repairs those cases while preserving the original preference
+for an exact-fit word. The same plan bounds rendered length before any draw,
+so all returned candidates fit the 10,000-codepoint form API. Invalid model,
+temperature, form, and rendering bounds fail before sampling. A draw tape
+exhausted during generation retains its already consumed prefix.
+
+The generator reads transitions, vocabulary, and syllable maps without changing
+them. Each voice supplies its own mutable RNG map. English caches come from
+the verified estimator; other supplied language counts are explicit inputs.
+Candidate selection, foreground orchestration, learning, and dreams follow.
+
 ### RAE development
 
 [RAE_RESEARCH.md](RAE_RESEARCH.md) records a 96-case probe of the original
@@ -272,8 +315,8 @@ metrics, and explicit asynchronous publication order.
    exact token identity and duplicate counts.
 2. Bind the merged NoTorch primitives into AML. Compare MathBrain/RAE
    forward values, gradients, and parameter trajectories to Python fixtures.
-3. Complete the English tokenizer, generator, and foreground exchange around
-   the working cloud and Harmonix. Pin tokenizer mode, word ordering, both Python RNG streams,
+3. Complete the English tokenizer and foreground exchange around the working
+   generator, cloud, and Harmonix. Pin tokenizer mode, word ordering, both Python RNG streams,
    initial state, and event order when producing reference fixtures.
 4. Port learning, bridges, reflection, rings, and dreams; connect the
    integration tasks above. Verify save/restart continuity and worker shutdown.
