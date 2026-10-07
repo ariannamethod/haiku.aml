@@ -1,0 +1,12 @@
+# EXPECT: Haiku learner parameter length differs from its dimensions
+IMPORT "../rae_support.aml"
+params = zeros(57)
+state = haiku_rae_state()
+user = list_new()
+candidates = list_new()
+list_push(candidates, "one\ntwo\nthree")
+list_push(candidates, "rain\ncloud\nsky")
+params = zeros(56)
+# INVALID_CALL
+loss = haiku_rae_observe(params, state, "one\ntwo\nthree", 0.8, user)
+PRINT "HAIKU_INVALID_ACCEPTED"

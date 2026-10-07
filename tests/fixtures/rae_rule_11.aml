@@ -1,0 +1,159 @@
+IMPORT "rae_support.aml"
+# RAE references: 6
+# scored_structure
+params = zeros(57)
+params[0] = -0.46875
+params[1] = 0.0625
+params[2] = -0.375
+params[3] = 0.15625
+params[4] = -0.28125
+params[5] = 0.25
+params[6] = -0.1875
+params[7] = 0.34375
+params[8] = -0.09375
+params[9] = 0.4375
+params[10] = 0
+params[11] = -0.4375
+params[12] = 0.09375
+params[13] = -0.34375
+params[14] = 0.1875
+params[15] = -0.25
+params[16] = 0.28125
+params[17] = -0.15625
+params[18] = 0.375
+params[19] = -0.0625
+params[20] = 0.46875
+params[21] = 0.03125
+params[22] = -0.40625
+params[23] = 0.125
+params[24] = -0.3125
+params[25] = 0.21875
+params[26] = -0.21875
+params[27] = 0.3125
+params[28] = -0.125
+params[29] = 0.40625
+params[30] = -0.03125
+params[31] = -0.46875
+params[32] = 0.0625
+params[33] = -0.375
+params[34] = 0.15625
+params[35] = -0.28125
+params[36] = 0.25
+params[37] = -0.1875
+params[38] = 0.34375
+params[39] = -0.09375
+params[40] = 0.4375
+params[41] = 0
+params[42] = -0.4375
+params[43] = 0.09375
+params[44] = -0.34375
+params[45] = 0.1875
+params[46] = -0.25
+params[47] = 0.28125
+params[48] = -0.15625
+params[49] = 0.375
+params[50] = -0.0625
+params[51] = 0.46875
+params[52] = 0.03125
+params[53] = -0.40625
+params[54] = 0.125
+params[55] = -0.3125
+params[56] = 0.21875
+candidates = list_new()
+piece = ""
+piece = text_concat(piece, "words dance in cloud\nresonance finds its own path\nconstraint births form")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "cloud cloud cloud\ncloud cloud cloud cloud\ncloud cloud cloud")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "rain under glass\nthe room remembers footsteps\nnight folds its wings")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "one two three\nfour five six\nseven eight nine")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "words\nwords dance in the quiet cloud\nresonance")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "invalid shape")
+list_push(candidates, piece)
+user = list_new()
+piece = ""
+piece = text_concat(piece, "words")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "dance")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "cloud")
+list_push(user, piece)
+rows = list_new()
+counts = map_new()
+edge = list_new()
+piece = ""
+piece = text_concat(piece, "words")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "dance")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "in")
+list_push(edge, piece)
+list_push(rows, list_get(edge, 0))
+list_push(rows, list_get(edge, 1))
+list_push(rows, list_get(edge, 2))
+map_set(counts, list_key(edge), 5)
+edge = list_new()
+piece = ""
+piece = text_concat(piece, "dance")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "in")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "cloud")
+list_push(edge, piece)
+list_push(rows, list_get(edge, 0))
+list_push(rows, list_get(edge, 1))
+list_push(rows, list_get(edge, 2))
+map_set(counts, list_key(edge), 9)
+edge = list_new()
+piece = ""
+piece = text_concat(piece, "cloud")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "cloud")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "cloud")
+list_push(edge, piece)
+list_push(rows, list_get(edge, 0))
+list_push(rows, list_get(edge, 1))
+list_push(rows, list_get(edge, 2))
+map_set(counts, list_key(edge), 6)
+selected = haiku_rae_rule(candidates, params, rows, counts, user, 1)
+expected = ""
+expected = text_concat(expected, "words dance in cloud\nresonance finds its own path\nconstraint births form")
+assert(text_equal(selected, expected), "RAE rule choice differs")
+source = ""
+source = text_concat(source, "words dance in cloud\nresonance finds its own path\nconstraint births form")
+score = haiku_mathbrain_score(params, source, rows, counts, user)
+haiku_rae_test_number(score, 0.693210231081)
+source = ""
+source = text_concat(source, "cloud cloud cloud\ncloud cloud cloud cloud\ncloud cloud cloud")
+score = haiku_mathbrain_score(params, source, rows, counts, user)
+haiku_rae_test_number(score, 0.525216581289)
+source = ""
+source = text_concat(source, "rain under glass\nthe room remembers footsteps\nnight folds its wings")
+score = haiku_mathbrain_score(params, source, rows, counts, user)
+haiku_rae_test_number(score, 0.408013836637)
+source = ""
+source = text_concat(source, "one two three\nfour five six\nseven eight nine")
+score = haiku_mathbrain_score(params, source, rows, counts, user)
+haiku_rae_test_number(score, 0.373381027876)
+source = ""
+source = text_concat(source, "words\nwords dance in the quiet cloud\nresonance")
+score = haiku_mathbrain_score(params, source, rows, counts, user)
+haiku_rae_test_number(score, 0.646233744557)
+PRINT "HAIKU_RAE_OK"

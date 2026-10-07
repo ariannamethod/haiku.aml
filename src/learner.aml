@@ -1,0 +1,125 @@
+# Two tanh layers, expressed in AML over stateless NoTorch numerical kernels.
+# Neuron-major parameters: [input weights, bias] for each hidden neuron,
+# then [hidden weights, bias] for the single output neuron. No global tape.
+
+def haiku_learner_size(inputs, hidden):
+    assert(isfinite(inputs) and isfinite(hidden), "Haiku learner dimensions must be finite")
+    assert(inputs >= 1 and inputs <= 64 and inputs == floor(inputs), "Haiku learner input dimension must be an integer in [1, 64]")
+    assert(hidden >= 1 and hidden <= 64 and hidden == floor(hidden), "Haiku learner hidden dimension must be an integer in [1, 64]")
+    return (inputs + 1) * hidden + hidden + 1
+
+def haiku_learner_check(parameters, inputs, hidden):
+    size = haiku_learner_size(inputs, hidden)
+    assert(len(parameters) == size, "Haiku learner parameter length differs from its dimensions")
+    cursor = 0
+    while cursor < size:
+        assert(isfinite(parameters[cursor]), "Haiku learner parameters must be finite")
+        cursor = cursor + 1
+    return size
+
+# Explicit fresh numeric copies; ordinary function arguments share arrays.
+def haiku_learner_part(values, start, count):
+    assert(start >= 0 and start == floor(start) and count >= 1 and count == floor(count), "Haiku learner vector bounds are invalid")
+    assert(start + count <= len(values), "Haiku learner vector bounds exceed its source")
+    result = zeros(count)
+    cursor = 0
+    while cursor < count:
+        result[cursor] = values[start + cursor]
+        cursor = cursor + 1
+    return result
+
+# One owner supplies the random stream. Initial biases remain exactly zero.
+def haiku_learner_new(inputs, hidden, rng):
+    size = haiku_learner_size(inputs, hidden)
+    parameters = zeros(size)
+    noise = rng_normal(rng, inputs * hidden + hidden)
+    first_scale = sqrt(2 / inputs)
+    last_scale = sqrt(2 / hidden)
+    neuron = 0
+    while neuron < hidden:
+        column = 0
+        while column < inputs:
+            parameters[neuron * (inputs + 1) + column] = noise[neuron * inputs + column] * first_scale
+            column = column + 1
+        parameters[(inputs + 1) * hidden + neuron] = noise[inputs * hidden + neuron] * last_scale
+        neuron = neuron + 1
+    return parameters
+
+# Internal common forward/reverse pass. Returns [raw] or [raw, loss, gradient].
+def haiku_learner_run(parameters, x, inputs, hidden, target, reverse):
+    size = haiku_learner_check(parameters, inputs, hidden)
+    assert(len(x) == inputs, "Haiku learner input length differs from its dimension")
+    assert(isfinite(target), "Haiku learner target must be finite")
+    weights = zeros(inputs * hidden)
+    biases = zeros(hidden)
+    neuron = 0
+    while neuron < hidden:
+        column = 0
+        while column < inputs:
+            weights[neuron * inputs + column] = parameters[neuron * (inputs + 1) + column]
+            column = column + 1
+        biases[neuron] = parameters[neuron * (inputs + 1) + inputs]
+        neuron = neuron + 1
+    final_weights = haiku_learner_part(parameters, (inputs + 1) * hidden, hidden)
+    final_bias = haiku_learner_part(parameters, size - 1, 1)
+    activation = nt_tanh(nt_linear(weights, biases, x, hidden, inputs))
+    prediction = nt_tanh(nt_linear(final_weights, final_bias, activation, 1, hidden))
+    if reverse == 0:
+        return prediction
+    desired = zeros(1)
+    desired[0] = target
+    loss = nt_mse_grad(prediction, desired)
+    output_dy = nt_tanh_vjp(prediction, haiku_learner_part(loss, 1, 1))
+    output_vjp = nt_linear_vjp(final_weights, activation, output_dy, 1, hidden)
+    hidden_dy = nt_tanh_vjp(activation, haiku_learner_part(output_vjp, hidden + 1, hidden))
+    hidden_vjp = nt_linear_vjp(weights, x, hidden_dy, hidden, inputs)
+    result = zeros(size + 2)
+    result[0] = prediction[0]
+    result[1] = loss[0]
+    neuron = 0
+    while neuron < hidden:
+        column = 0
+        while column < inputs:
+            result[2 + neuron * (inputs + 1) + column] = hidden_vjp[neuron * inputs + column]
+            column = column + 1
+        result[2 + neuron * (inputs + 1) + inputs] = hidden_vjp[inputs * hidden + neuron]
+        result[2 + (inputs + 1) * hidden + neuron] = output_vjp[neuron]
+        neuron = neuron + 1
+    result[size + 1] = output_vjp[hidden]
+    return result
+
+def haiku_learner_forward(parameters, x, inputs, hidden):
+    result = haiku_learner_run(parameters, x, inputs, hidden, 0, 0)
+    return result[0]
+
+def haiku_learner_gradient(parameters, x, inputs, hidden, target):
+    return haiku_learner_run(parameters, x, inputs, hidden, target, 1)
+
+# A completed result is staged independently of the model's current owner.
+def haiku_learner_step(parameters, x, inputs, hidden, target, lr):
+    assert(isfinite(lr) and lr >= 0, "Haiku learner learning rate must be finite and nonnegative")
+    result = haiku_learner_gradient(parameters, x, inputs, hidden, target)
+    gradients = haiku_learner_part(result, 2, len(parameters))
+    updated = nt_sgd(parameters, gradients, lr)
+    cursor = 0
+    while cursor < len(parameters):
+        result[cursor + 2] = max(-5, min(5, updated[cursor]))
+        cursor = cursor + 1
+    return result
+
+# Validate the whole result before changing the caller's existing parameter array.
+def haiku_learner_publish(parameters, result):
+    assert(len(parameters) >= 1 and len(parameters) <= 10000, "Haiku learner owner must be an array of 1..10000 parameters")
+    assert(len(result) == len(parameters) + 2, "Haiku learner staged result has an invalid length")
+    assert(isfinite(result[0]) and isfinite(result[1]), "Haiku learner staged metrics must be finite")
+    assert(result[1] >= 0, "Haiku learner staged loss must be nonnegative")
+    cursor = 0
+    while cursor < len(parameters):
+        value = result[cursor + 2]
+        assert(isfinite(value) and value >= -5 and value <= 5, "Haiku learner staged parameters must be finite in [-5, 5]")
+        cursor = cursor + 1
+    cursor = 0
+    while cursor < len(parameters):
+        parameters[cursor] = result[cursor + 2]
+        cursor = cursor + 1
+    return result[1]

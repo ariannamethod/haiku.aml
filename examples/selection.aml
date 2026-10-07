@@ -1,0 +1,46 @@
+# Five native AML candidates meet the original recursive selector.
+# Frozen Python-oracle parameters make this example exactly reproducible.
+# RAE observation below is explicit: the original chat trains only MathBrain.
+IMPORT "../src/generator.aml"
+IMPORT "../src/english_seeds.aml"
+IMPORT "../src/rae.aml"
+
+rows = list_new()
+counts = map_new()
+vocab = list_new()
+haiku_chain_seed(rows, counts, vocab, haiku_seed_words)
+syllables = haiku_syllable_cache(vocab)
+voice_rng = rng_new(575)
+native = zeros(1)
+native[0] = -1
+candidates = haiku_generate_candidates(rows, counts, vocab, syllables, 5, 0.9, voice_rng, native)
+
+params = zeros(57)
+cursor = 0
+while cursor < 57:
+    residue = cursor * 17 - 31 * floor(cursor * 17 / 31)
+    params[cursor] = (residue - 15) / 32
+    cursor = cursor + 1
+user = list_new()
+list_push(user, "cloud")
+list_push(user, "words")
+list_push(user, "dance")
+list_push(user, "rest")
+list_push(user, "warm")
+list_push(user, "dream")
+
+choice = haiku_rae_select(params, candidates, user, 3)
+spoken = list_get(candidates, choice[0])
+assert(haiku_is_haiku(spoken), "Selected candidate missed its 5-7-5 form")
+PRINT "Five candidates. Three second thoughts."
+PRINT spoken
+PRINT "Selection confidence:"
+PRINT choice[1]
+
+state = haiku_rae_state()
+loss = haiku_rae_observe(params, state, spoken, 0.85, user)
+PRINT "One explicit RAE observation; loss:"
+PRINT loss
+choice = haiku_rae_select(params, candidates, user, 3)
+PRINT "Confidence after learning:"
+PRINT choice[1]

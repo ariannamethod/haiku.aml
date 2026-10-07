@@ -1,0 +1,283 @@
+IMPORT "rae_support.aml"
+# RAE references: 75
+# empty
+source = ""
+user = list_new()
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0
+expected[2] = 0
+expected[3] = 0
+expected[4] = 0
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# empty_three
+source = ""
+source = text_concat(source, "\n\n")
+user = list_new()
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0
+expected[2] = 0
+expected[3] = 0
+expected[4] = 1
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# mixed_case
+source = ""
+source = text_concat(source, "Cloud cloud CLOUD\ncloud cloud\ncloud")
+user = list_new()
+piece = ""
+piece = text_concat(piece, "Cloud")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "cloud")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "sky")
+list_push(user, piece)
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0.166666666667
+expected[2] = 0.333333333333
+expected[3] = 0.166666666667
+expected[4] = 0.6
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# sigma_expansion
+source = ""
+source = text_concat(source, "ΟΣ ος οσ\nİ I i i̇\nRAIN rain, Rain")
+user = list_new()
+piece = ""
+piece = text_concat(piece, "ος")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "οσ")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "ΟΣ")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "i")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "i̇")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "RAIN")
+list_push(user, piece)
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0.6
+expected[2] = 0.666666666667
+expected[3] = 0.6
+expected[4] = 0.818181818182
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# unicode_whitespace
+source = ""
+source = text_concat(source, " a b\t\n c d\r\ne f ")
+user = list_new()
+piece = ""
+piece = text_concat(piece, "a")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "c")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "e")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "a")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "c")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "e")
+list_push(user, piece)
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 1
+expected[2] = 1
+expected[3] = 1
+expected[4] = 1
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# one_line
+source = ""
+source = text_concat(source, "one two three")
+user = list_new()
+piece = ""
+piece = text_concat(piece, "one")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "two")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "three")
+list_push(user, piece)
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 1
+expected[2] = 1
+expected[3] = 1
+expected[4] = 0
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# sigma_ignorable
+source = ""
+source = text_concat(source, "Α'Σ α'ς\nΑΣΑ ασα\nΟΣ́ ος́")
+user = list_new()
+piece = ""
+piece = text_concat(piece, "α'ς")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "ασα")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "ος́")
+list_push(user, piece)
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0.5
+expected[2] = 1
+expected[3] = 0.5
+expected[4] = 1
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# multilingual
+source = ""
+source = text_concat(source, "ÉTÉ été\nСНЕГ снег\nשלום שלום")
+user = list_new()
+piece = ""
+piece = text_concat(piece, "été")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "снег")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "שלום")
+list_push(user, piece)
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0.5
+expected[2] = 1
+expected[3] = 0.5
+expected[4] = 1
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# punctuation
+source = ""
+source = text_concat(source, "rain, rain RAIN!\ncloud cloud CLOUD\nsnow.")
+user = list_new()
+piece = ""
+piece = text_concat(piece, "rain")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "cloud")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "snow")
+list_push(user, piece)
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0.714285714286
+expected[2] = 0.666666666667
+expected[3] = 0.714285714286
+expected[4] = 0.529411764706
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# final_empty
+source = ""
+source = text_concat(source, "one\ntwo\n")
+user = list_new()
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 1
+expected[2] = 0
+expected[3] = 1
+expected[4] = 0.818181818182
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# middle_empty
+source = ""
+source = text_concat(source, "one two\n\nthree four five six")
+user = list_new()
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 1
+expected[2] = 0
+expected[3] = 1
+expected[4] = 0.272727272727
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# four_empty
+source = ""
+source = text_concat(source, "\n\n\n")
+user = list_new()
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0
+expected[2] = 0
+expected[3] = 0
+expected[4] = 0
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# space_only
+source = ""
+source = text_concat(source, "")
+source = text_concat(source, text_from_codepoint(28))
+source = text_concat(source, "　 \t")
+user = list_new()
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0
+expected[2] = 0
+expected[3] = 0
+expected[4] = 0
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# context_not_lowered
+source = ""
+source = text_concat(source, "cloud rain snow\ncloud rain snow\ncloud rain snow")
+user = list_new()
+piece = ""
+piece = text_concat(piece, "CLOUD")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "RAIN")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "SNOW")
+list_push(user, piece)
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0.333333333333
+expected[2] = 0
+expected[3] = 0.333333333333
+expected[4] = 1
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+# context_exact_boundaries
+source = ""
+source = text_concat(source, "big word\nother thing\nthird token")
+user = list_new()
+piece = ""
+piece = text_concat(piece, "big word")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "other thing")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "third token")
+list_push(user, piece)
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 1
+expected[2] = 0
+expected[3] = 1
+expected[4] = 1
+actual = haiku_rae_features(source, user)
+haiku_rae_test_vector(actual, expected)
+PRINT "HAIKU_RAE_OK"

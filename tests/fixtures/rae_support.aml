@@ -1,0 +1,22 @@
+IMPORT "../../src/rae.aml"
+
+def haiku_rae_test_number(actual, expected):
+    assert(isfinite(actual), "RAE reference result is nonfinite")
+    assert(abs(actual - expected) <= 0.000005, "RAE numerical reference differs")
+    return 1
+
+def haiku_rae_test_vector(actual, expected):
+    assert(len(actual) == len(expected), "RAE reference length differs")
+    cursor = 0
+    while cursor < len(expected):
+        haiku_rae_test_number(actual[cursor], expected[cursor])
+        cursor = cursor + 1
+    return 1
+
+def haiku_rae_test_repeat(piece, count):
+    result = ""
+    cursor = 0
+    while cursor < count:
+        result = text_concat(result, piece)
+        cursor = cursor + 1
+    return result

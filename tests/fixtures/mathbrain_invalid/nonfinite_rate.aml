@@ -1,0 +1,14 @@
+# EXPECT: Haiku learner learning rate must be finite and nonnegative
+IMPORT "../../../src/mathbrain.aml"
+parameters = zeros(57)
+state = haiku_mathbrain_state()
+rows = list_new()
+counts = map_new()
+user = list_new()
+rng = rng_new(42)
+source = "one two three"
+features = zeros(5)
+bad = 1e39
+# INVALID_CALL
+haiku_learner_step(parameters, features, 5, 8, 0.7, bad)
+ECHO HAIKU_MATHBRAIN_INVALID_ACCEPTED

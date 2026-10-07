@@ -1,0 +1,224 @@
+IMPORT "rae_support.aml"
+# RAE references: 5
+# scored_top_three_and_diversity
+params = zeros(57)
+params[0] = 1
+params[1] = 0
+params[2] = 0
+params[3] = 0
+params[4] = 0
+params[5] = 0
+params[6] = 0
+params[7] = 0
+params[8] = 0
+params[9] = 0
+params[10] = 0
+params[11] = 0
+params[12] = 0
+params[13] = 0
+params[14] = 0
+params[15] = 0
+params[16] = 0
+params[17] = 0
+params[18] = 0
+params[19] = 0
+params[20] = 0
+params[21] = 0
+params[22] = 0
+params[23] = 0
+params[24] = 0
+params[25] = 0
+params[26] = 0
+params[27] = 0
+params[28] = 0
+params[29] = 0
+params[30] = 0
+params[31] = 0
+params[32] = 0
+params[33] = 0
+params[34] = 0
+params[35] = 0
+params[36] = 0
+params[37] = 0
+params[38] = 0
+params[39] = 0
+params[40] = 0
+params[41] = 0
+params[42] = 0
+params[43] = 0
+params[44] = 0
+params[45] = 0
+params[46] = 0
+params[47] = 0
+params[48] = 1
+params[49] = 0
+params[50] = 0
+params[51] = 0
+params[52] = 0
+params[53] = 0
+params[54] = 0
+params[55] = 0
+params[56] = 0
+candidates = list_new()
+piece = ""
+piece = text_concat(piece, "h i\nj k\nl m")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "e e\nf f\ng g")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "b b\nc c\nd d")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "a a\na a\na a")
+list_push(candidates, piece)
+user = list_new()
+rows = list_new()
+counts = map_new()
+edge = list_new()
+piece = ""
+piece = text_concat(piece, "e")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "e")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "f")
+list_push(edge, piece)
+list_push(rows, list_get(edge, 0))
+list_push(rows, list_get(edge, 1))
+list_push(rows, list_get(edge, 2))
+map_set(counts, list_key(edge), 3)
+edge = list_new()
+piece = ""
+piece = text_concat(piece, "e")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "f")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "f")
+list_push(edge, piece)
+list_push(rows, list_get(edge, 0))
+list_push(rows, list_get(edge, 1))
+list_push(rows, list_get(edge, 2))
+map_set(counts, list_key(edge), 3)
+edge = list_new()
+piece = ""
+piece = text_concat(piece, "f")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "f")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "g")
+list_push(edge, piece)
+list_push(rows, list_get(edge, 0))
+list_push(rows, list_get(edge, 1))
+list_push(rows, list_get(edge, 2))
+map_set(counts, list_key(edge), 3)
+edge = list_new()
+piece = ""
+piece = text_concat(piece, "f")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "g")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "g")
+list_push(edge, piece)
+list_push(rows, list_get(edge, 0))
+list_push(rows, list_get(edge, 1))
+list_push(rows, list_get(edge, 2))
+map_set(counts, list_key(edge), 3)
+edge = list_new()
+piece = ""
+piece = text_concat(piece, "b")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "b")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "c")
+list_push(edge, piece)
+list_push(rows, list_get(edge, 0))
+list_push(rows, list_get(edge, 1))
+list_push(rows, list_get(edge, 2))
+map_set(counts, list_key(edge), 5)
+edge = list_new()
+piece = ""
+piece = text_concat(piece, "b")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "c")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "c")
+list_push(edge, piece)
+list_push(rows, list_get(edge, 0))
+list_push(rows, list_get(edge, 1))
+list_push(rows, list_get(edge, 2))
+map_set(counts, list_key(edge), 5)
+edge = list_new()
+piece = ""
+piece = text_concat(piece, "c")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "c")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "d")
+list_push(edge, piece)
+list_push(rows, list_get(edge, 0))
+list_push(rows, list_get(edge, 1))
+list_push(rows, list_get(edge, 2))
+map_set(counts, list_key(edge), 5)
+edge = list_new()
+piece = ""
+piece = text_concat(piece, "c")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "d")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "d")
+list_push(edge, piece)
+list_push(rows, list_get(edge, 0))
+list_push(rows, list_get(edge, 1))
+list_push(rows, list_get(edge, 2))
+map_set(counts, list_key(edge), 5)
+edge = list_new()
+piece = ""
+piece = text_concat(piece, "a")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "a")
+list_push(edge, piece)
+piece = ""
+piece = text_concat(piece, "a")
+list_push(edge, piece)
+list_push(rows, list_get(edge, 0))
+list_push(rows, list_get(edge, 1))
+list_push(rows, list_get(edge, 2))
+map_set(counts, list_key(edge), 9)
+selected = haiku_rae_rule(candidates, params, rows, counts, user, 1)
+expected = ""
+expected = text_concat(expected, "b b\nc c\nd d")
+assert(text_equal(selected, expected), "RAE rule choice differs")
+source = ""
+source = text_concat(source, "h i\nj k\nl m")
+score = haiku_mathbrain_score(params, source, rows, counts, user)
+haiku_rae_test_number(score, 0.00999933339333)
+source = ""
+source = text_concat(source, "e e\nf f\ng g")
+score = haiku_mathbrain_score(params, source, rows, counts, user)
+haiku_rae_test_number(score, 0.283342493163)
+source = ""
+source = text_concat(source, "b b\nc c\nd d")
+score = haiku_mathbrain_score(params, source, rows, counts, user)
+haiku_rae_test_number(score, 0.431808180595)
+source = ""
+source = text_concat(source, "a a\na a\na a")
+score = haiku_mathbrain_score(params, source, rows, counts, user)
+haiku_rae_test_number(score, 0.614610880038)
+PRINT "HAIKU_RAE_OK"

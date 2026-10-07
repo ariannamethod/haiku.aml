@@ -1,0 +1,90 @@
+# MathBrain's original five features and online learning, with explicit owners.
+IMPORT "learner.aml"
+IMPORT "memory.aml"
+IMPORT "form.aml"
+
+def haiku_mathbrain_state():
+    state = map_new()
+    map_set(state, "lr", 0.01)
+    map_set(state, "observations", 0)
+    map_set(state, "last_loss", 0)
+    map_set(state, "running_loss", 0)
+    return state
+
+def haiku_mathbrain_check(state):
+    assert(map_len(state) == 4, "Haiku MathBrain state requires exactly four fields")
+    lr = map_get(state, "lr")
+    count = map_get(state, "observations")
+    last = map_get(state, "last_loss")
+    running = map_get(state, "running_loss")
+    assert(lr >= 0, "Haiku MathBrain learning rate must be nonnegative")
+    assert(count >= 0 and count <= 16777216 and count == floor(count), "Haiku MathBrain observations must be an integer in [0, 2^24]")
+    assert(last >= 0 and running >= 0, "Haiku MathBrain losses must be nonnegative")
+    return last
+
+# Exact case survives word splitting, Markov lookup, and context intersection.
+# Features require at least three words; score/observe implement the short skip.
+def haiku_mathbrain_features(source, rows, counts, user):
+    assert(text_len(source) <= 10000, "Haiku MathBrain source limit is 10000 codepoints")
+    assert(list_len(user) <= 10000, "Haiku MathBrain context limit is 10000 flat tokens")
+    haiku_rows_check(rows, counts)
+    haiku_triple_keys(user)
+    words = haiku_words(source)
+    size = list_len(words)
+    assert(size >= 3, "Haiku MathBrain features require at least three words")
+    transitions = 0
+    cursor = 0
+    while cursor + 2 < size:
+        count = haiku_chain_count(counts, list_get(words, cursor), list_get(words, cursor + 1), list_get(words, cursor + 2))
+        if count == 0:
+            count = 0.1
+        transitions = transitions + count
+        cursor = cursor + 1
+    unique = haiku_unique(words)
+    context = haiku_unique(user)
+    overlap = 0
+    cursor = 0
+    while cursor < list_len(context):
+        if list_find(unique, list_get(context, cursor)) >= 0:
+            overlap = overlap + 1
+        cursor = cursor + 1
+    syllables = haiku_line_syllables(words)
+    result = zeros(5)
+    result[0] = min(1, transitions / (size - 2) / 10)
+    result[1] = list_len(unique) / size
+    result[2] = overlap / max(1, list_len(context))
+    result[3] = min(1, syllables / 17)
+    result[4] = result[1]
+    return result
+
+def haiku_mathbrain_score(parameters, source, rows, counts, user):
+    assert(text_len(source) <= 10000, "Haiku MathBrain source limit is 10000 codepoints")
+    if list_len(haiku_words(source)) < 3:
+        return 0
+    features = haiku_mathbrain_features(source, rows, counts, user)
+    return max(0, min(1, haiku_learner_forward(parameters, features, 5, 8)))
+
+# Nonfinite quality and short text preserve the previous loss and every owner.
+# A complete model update and all statistics are validated before publication.
+def haiku_mathbrain_observe(parameters, state, source, quality, rows, counts, user):
+    last = haiku_mathbrain_check(state)
+    if isfinite(quality) == 0:
+        return last
+    assert(text_len(source) <= 10000, "Haiku MathBrain source limit is 10000 codepoints")
+    if list_len(haiku_words(source)) < 3:
+        return last
+    count = map_get(state, "observations")
+    assert(count < 16777216, "Haiku MathBrain observation counter is full")
+    features = haiku_mathbrain_features(source, rows, counts, user)
+    result = haiku_learner_step(parameters, features, 5, 8, max(0, min(1, quality)), map_get(state, "lr"))
+    running = map_get(state, "running_loss")
+    running = running + (result[1] - running) * 0.05
+    assert(isfinite(running) and running >= 0, "Haiku MathBrain staged running loss is invalid")
+    count_key = "observations"
+    last_key = "last_loss"
+    running_key = "running_loss"
+    haiku_learner_publish(parameters, result)
+    map_set(state, count_key, count + 1)
+    map_set(state, last_key, result[1])
+    map_set(state, running_key, running)
+    return result[1]

@@ -1,0 +1,13 @@
+# EXPECT: Haiku learner owner must be an array
+IMPORT "../../../src/mathbrain.aml"
+parameters = zeros(57)
+state = haiku_mathbrain_state()
+rows = list_new()
+counts = map_new()
+user = list_new()
+rng = rng_new(42)
+source = "one two three"
+pending = zeros(2)
+# INVALID_CALL
+haiku_learner_publish(5, pending)
+ECHO HAIKU_MATHBRAIN_INVALID_ACCEPTED

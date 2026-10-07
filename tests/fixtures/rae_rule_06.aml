@@ -1,0 +1,79 @@
+IMPORT "rae_support.aml"
+# RAE references: 1
+# stable_diversity
+params = zeros(57)
+params[0] = -0.46875
+params[1] = 0.0625
+params[2] = -0.375
+params[3] = 0.15625
+params[4] = -0.28125
+params[5] = 0.25
+params[6] = -0.1875
+params[7] = 0.34375
+params[8] = -0.09375
+params[9] = 0.4375
+params[10] = 0
+params[11] = -0.4375
+params[12] = 0.09375
+params[13] = -0.34375
+params[14] = 0.1875
+params[15] = -0.25
+params[16] = 0.28125
+params[17] = -0.15625
+params[18] = 0.375
+params[19] = -0.0625
+params[20] = 0.46875
+params[21] = 0.03125
+params[22] = -0.40625
+params[23] = 0.125
+params[24] = -0.3125
+params[25] = 0.21875
+params[26] = -0.21875
+params[27] = 0.3125
+params[28] = -0.125
+params[29] = 0.40625
+params[30] = -0.03125
+params[31] = -0.46875
+params[32] = 0.0625
+params[33] = -0.375
+params[34] = 0.15625
+params[35] = -0.28125
+params[36] = 0.25
+params[37] = -0.1875
+params[38] = 0.34375
+params[39] = -0.09375
+params[40] = 0.4375
+params[41] = 0
+params[42] = -0.4375
+params[43] = 0.09375
+params[44] = -0.34375
+params[45] = 0.1875
+params[46] = -0.25
+params[47] = 0.28125
+params[48] = -0.15625
+params[49] = 0.375
+params[50] = -0.0625
+params[51] = 0.46875
+params[52] = 0.03125
+params[53] = -0.40625
+params[54] = 0.125
+params[55] = -0.3125
+params[56] = 0.21875
+candidates = list_new()
+piece = ""
+piece = text_concat(piece, "a a\na a\na a")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "b b\nc c\nd d")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "e e\nf f\ng g")
+list_push(candidates, piece)
+user = list_new()
+rows = list_new()
+counts = map_new()
+selected = haiku_rae_rule(candidates, params, rows, counts, user, 0)
+expected = ""
+expected = text_concat(expected, "b b\nc c\nd d")
+assert(text_equal(selected, expected), "RAE rule choice differs")
+PRINT "HAIKU_RAE_OK"
