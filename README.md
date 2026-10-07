@@ -88,19 +88,37 @@ small owl with enormous eyes. It can listen, answer, turn inward, and dream.
 Its movements follow organism events. Haiku keeps its line breaks; Hebrew
 gets right-to-left layout. The core comes first, then the owl gets a window.
 
+The dream-friend will get a place beside him: two characters, their conversation,
+their pauses. This idea is recorded in [TODO](TODO.md); character design comes
+when the interface work begins.
+
 ## Right now
 
-The repository foundation is here: manifesto, agent rules, lineage, and the
-source-pinned migration audit. The first upstream AML compiler repair preserves
-runtime blocks and variable scope. The application port is the next stage.
+The owl has its first pulse. Four functions now run in pure AML:
+`haiku_pulse`, `haiku_observe`, `haiku_temperatures`, and `haiku_bridge_score`.
+They preserve the original pulse, dissonance, temperature mapping, and transition
+score. The text organ will supply their word/trigram counts; the speaking loop,
+learners, memory, and dreams are still in the migration queue.
+
+Build the sibling AML toolchain with
+[the source-origin/scalar-build repair](https://github.com/ariannamethod/ariannamethod.ai/pull/26),
+then run `make test`. See [numerical parity](docs/NUMERICAL_PARITY.md) for build
+paths, the exact input boundary, and reproduction of the reference values.
 
 Reference checks completed on 2026-10-07:
 
 - Python HAiKU: **161 tests passed**.
+- Haiku AML: **49 cases / 130 reference values** pass in the interpreter and
+  compiled scalar executable, at an absolute tolerance of 0.000002.
 - AML runtime: **550 tests passed**.
-- AML compiler: reproduced the two-branch execution defect and verified its
-  repair against interpreted behavior, including functions, arrays, and channels.
+- AML compiler: scope, source origins, nested failures, worker branches and
+  errors, scalar builds, and literal program arguments are covered by regressions.
+- NoTorch: native tanh/backward and SGD are merged in
+  [PR #159](https://github.com/ariannamethod/notorch/pull/159); **5,122 numerical
+  checks** and the full CPU suite pass.
 
+The [RAE research](docs/RAE_RESEARCH.md) records the original recursion's measured
+behavior and proposes learned feedback, small replay memory, and Hebbian traces.
 See [the audit and implementation order](docs/MIGRATION.md).
 
 ## Lineage

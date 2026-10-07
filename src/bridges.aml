@@ -1,0 +1,10 @@
+# Python lineage: harmonix/haiku/phase4_bridges.py at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+# HaikuStateTransition.score. Inputs are already aggregated transition metrics.
+# Similarity and final score retain their sign and range from the original.
+def haiku_bridge_score(similarity, quality_delta, overwhelm, boredom, stuck):
+    quality_factor = 1 + clamp(quality_delta, -0.5, 0.5)
+    base = similarity * quality_factor
+    overwhelm_penalty = 1 - clamp(overwhelm, 0, 1)
+    boredom_penalty = 1 - 0.3 * clamp(boredom, 0, 1)
+    stuck_penalty = 1 - 0.2 * clamp(stuck, 0, 1)
+    return base * overwhelm_penalty * boredom_penalty * stuck_penalty
