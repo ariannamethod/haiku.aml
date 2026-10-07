@@ -1,8 +1,10 @@
-# RAE research — give the owl a useful second thought
+# RAE research — give Haiku a useful second thought
 
 2026-10-07. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 Companion to the [migration map](MIGRATION.md). Research and experiment designs;
-the AML organism is being implemented separately.
+the baseline selector and learners now run in AML. [RAE.md](RAE.md) and
+[MATHBRAIN.md](MATHBRAIN.md) record their implemented contracts and reference
+trajectories; the experiments below remain the next measured developments.
 
 ## What the Python organism actually does
 

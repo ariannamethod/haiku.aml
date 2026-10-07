@@ -1,0 +1,14 @@
+# EXPECT: numerical operands must contain finite values
+IMPORT "../../../src/mathbrain.aml"
+parameters = zeros(57)
+state = haiku_mathbrain_state()
+rows = list_new()
+counts = map_new()
+user = list_new()
+rng = rng_new(42)
+source = "one two three"
+features = zeros(5)
+features[4] = 1e39
+# INVALID_CALL
+haiku_learner_forward(parameters, features, 5, 8)
+ECHO HAIKU_MATHBRAIN_INVALID_ACCEPTED

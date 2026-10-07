@@ -1,0 +1,225 @@
+IMPORT "rae_support.aml"
+# RAE references: 111
+IMPORT "../../src/generator.aml"
+IMPORT "../../src/english_seeds.aml"
+rows = list_new()
+counts = map_new()
+vocab = list_new()
+haiku_chain_seed(rows, counts, vocab, haiku_seed_words)
+syllables = haiku_syllable_cache(vocab)
+rng = rng_new(575)
+native = zeros(1)
+native[0] = -1
+candidates = haiku_generate_candidates(rows, counts, vocab, syllables, 5, 0.9, rng, native)
+expected_text = ""
+expected_text = text_concat(expected_text, "will one rest warm\nthey say subtle his could a\nmaintain protect lose")
+assert(text_equal(list_get(candidates, 0), expected_text), "RAE native candidate differs")
+assert(haiku_is_haiku(list_get(candidates, 0)), "RAE native candidate form differs")
+expected_text = ""
+expected_text = text_concat(expected_text, "no him huge whole\nsudden delayed word prove\nselect value cloud")
+assert(text_equal(list_get(candidates, 1), expected_text), "RAE native candidate differs")
+assert(haiku_is_haiku(list_get(candidates, 1)), "RAE native candidate form differs")
+expected_text = ""
+expected_text = text_concat(expected_text, "perceive within\nconceal disguise attend\ncertainly instant")
+assert(text_equal(list_get(candidates, 2), expected_text), "RAE native candidate differs")
+assert(haiku_is_haiku(list_get(candidates, 2)), "RAE native candidate form differs")
+expected_text = ""
+expected_text = text_concat(expected_text, "probably clearly\nperform behave morph match\nmask uncover more")
+assert(text_equal(list_get(candidates, 3), expected_text), "RAE native candidate differs")
+assert(haiku_is_haiku(list_get(candidates, 3)), "RAE native candidate form differs")
+expected_text = ""
+expected_text = text_concat(expected_text, "portion same share\nand in end among this us\nday us become")
+assert(text_equal(list_get(candidates, 4), expected_text), "RAE native candidate differs")
+assert(haiku_is_haiku(list_get(candidates, 4)), "RAE native candidate form differs")
+params = zeros(57)
+params[0] = -0.46875
+params[1] = 0.0625
+params[2] = -0.375
+params[3] = 0.15625
+params[4] = -0.28125
+params[5] = 0.25
+params[6] = -0.1875
+params[7] = 0.34375
+params[8] = -0.09375
+params[9] = 0.4375
+params[10] = 0
+params[11] = -0.4375
+params[12] = 0.09375
+params[13] = -0.34375
+params[14] = 0.1875
+params[15] = -0.25
+params[16] = 0.28125
+params[17] = -0.15625
+params[18] = 0.375
+params[19] = -0.0625
+params[20] = 0.46875
+params[21] = 0.03125
+params[22] = -0.40625
+params[23] = 0.125
+params[24] = -0.3125
+params[25] = 0.21875
+params[26] = -0.21875
+params[27] = 0.3125
+params[28] = -0.125
+params[29] = 0.40625
+params[30] = -0.03125
+params[31] = -0.46875
+params[32] = 0.0625
+params[33] = -0.375
+params[34] = 0.15625
+params[35] = -0.28125
+params[36] = 0.25
+params[37] = -0.1875
+params[38] = 0.34375
+params[39] = -0.09375
+params[40] = 0.4375
+params[41] = 0
+params[42] = -0.4375
+params[43] = 0.09375
+params[44] = -0.34375
+params[45] = 0.1875
+params[46] = -0.25
+params[47] = 0.28125
+params[48] = -0.15625
+params[49] = 0.375
+params[50] = -0.0625
+params[51] = 0.46875
+params[52] = 0.03125
+params[53] = -0.40625
+params[54] = 0.125
+params[55] = -0.3125
+params[56] = 0.21875
+user = list_new()
+piece = ""
+piece = text_concat(piece, "cloud")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "words")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "dance")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "rest")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "warm")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "dream")
+list_push(user, piece)
+expected = zeros(20)
+expected[0] = 0.646681550605
+expected[1] = 0.595653698565
+expected[2] = 0.554734407006
+expected[3] = 0.563553409932
+expected[4] = 0.557556115677
+expected[5] = 0.752677085423
+expected[6] = 0.550466765979
+expected[7] = 0.388314084904
+expected[8] = 0.42326153669
+expected[9] = 0.399495794281
+expected[10] = 0.752677085423
+expected[11] = 0.550466765979
+expected[12] = 0.388314084904
+expected[13] = 0.42326153669
+expected[14] = 0.399495794281
+expected[15] = 0.752677085423
+expected[16] = 0.550466765979
+expected[17] = 0.388314084904
+expected[18] = 0.42326153669
+expected[19] = 0.399495794281
+trace = haiku_rae_trace(params, candidates, user, 3)
+haiku_rae_test_vector(trace, expected)
+selected = haiku_rae_select(params, candidates, user, 3)
+assert(selected[0] == 0, "RAE native winner differs")
+source = list_get(candidates, selected[0])
+state = haiku_rae_state()
+loss = haiku_rae_observe(params, state, source, 0.85, user)
+haiku_rae_test_number(loss, 0.0413383918645)
+expected = zeros(57)
+expected[0] = -0.468934830037
+expected[1] = 0.0621303399264
+expected[2] = -0.375123220025
+expected[3] = 0.155880339926
+expected[4] = -0.281394649594
+expected[5] = 0.249630339926
+expected[6] = -0.187076975056
+expected[7] = 0.344596049889
+expected[8] = -0.0934679833703
+expected[9] = 0.438346049889
+expected[10] = 0.000331063000036
+expected[11] = -0.436653950111
+expected[12] = 0.09369351727
+expected[13] = -0.34386296546
+expected[14] = 0.187462344847
+expected[15] = -0.25011296546
+expected[16] = 0.281205796124
+expected[17] = -0.15636296546
+expected[18] = 0.375513603652
+expected[19] = -0.0614727926959
+expected[20] = 0.469092402435
+expected[21] = 0.0322772073041
+expected[22] = -0.405848049316
+expected[23] = 0.126027207304
+expected[24] = -0.312475382771
+expected[25] = 0.218799234458
+expected[26] = -0.218733588514
+expected[27] = 0.312549234458
+expected[28] = -0.124980734342
+expected[29] = 0.406299234458
+expected[30] = -0.0314343155301
+expected[31] = -0.46911863106
+expected[32] = 0.0623771229799
+expected[33] = -0.37536863106
+expected[34] = 0.156105753063
+expected[35] = -0.28161863106
+expected[36] = 0.250145410757
+expected[37] = -0.187209178487
+expected[38] = 0.343846940504
+expected[39] = -0.0934591784868
+expected[40] = 0.437613799723
+expected[41] = 0.000290821513155
+expected[42] = -0.4378633561
+expected[43] = 0.0930232877995
+expected[44] = -0.3439922374
+expected[45] = 0.1867732878
+expected[46] = -0.250284365644
+expected[47] = 0.2805232878
+expected[48] = -0.156251607218
+expected[49] = 0.375509424559
+expected[50] = -0.0636493587016
+expected[51] = 0.469392431493
+expected[52] = 0.0326173939183
+expected[53] = -0.408107520278
+expected[54] = 0.1253047406
+expected[55] = -0.312191045583
+expected[56] = 0.221115825563
+haiku_rae_test_vector(params, expected)
+assert(map_get(state, "observations") == 1, "RAE native observation differs")
+expected = zeros(20)
+expected[0] = 0.65217886862
+expected[1] = 0.601755604618
+expected[2] = 0.561244775892
+expected[3] = 0.569989571972
+expected[4] = 0.56384542762
+expected[5] = 0.756525208034
+expected[6] = 0.554877901887
+expected[7] = 0.392871343124
+expected[8] = 0.427842593149
+expected[9] = 0.403271590425
+expected[10] = 0.756525208034
+expected[11] = 0.554877901887
+expected[12] = 0.392871343124
+expected[13] = 0.427842593149
+expected[14] = 0.403271590425
+expected[15] = 0.756525208034
+expected[16] = 0.554877901887
+expected[17] = 0.392871343124
+expected[18] = 0.427842593149
+expected[19] = 0.403271590425
+trace = haiku_rae_trace(params, candidates, user, 3)
+haiku_rae_test_vector(trace, expected)
+selected = haiku_rae_select(params, candidates, user, 3)
+assert(selected[0] == 0, "RAE next native winner differs")
+PRINT "HAIKU_RAE_OK"

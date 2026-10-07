@@ -1,0 +1,125 @@
+IMPORT "rae_support.aml"
+# RAE references: 23
+# generated_after_observe
+params = zeros(57)
+params[0] = -0.468934830037
+params[1] = 0.0621303399264
+params[2] = -0.375123220025
+params[3] = 0.155880339926
+params[4] = -0.281394649594
+params[5] = 0.249630339926
+params[6] = -0.187076975056
+params[7] = 0.344596049889
+params[8] = -0.0934679833703
+params[9] = 0.438346049889
+params[10] = 0.000331063000036
+params[11] = -0.436653950111
+params[12] = 0.09369351727
+params[13] = -0.34386296546
+params[14] = 0.187462344847
+params[15] = -0.25011296546
+params[16] = 0.281205796124
+params[17] = -0.15636296546
+params[18] = 0.375513603652
+params[19] = -0.0614727926959
+params[20] = 0.469092402435
+params[21] = 0.0322772073041
+params[22] = -0.405848049316
+params[23] = 0.126027207304
+params[24] = -0.312475382771
+params[25] = 0.218799234458
+params[26] = -0.218733588514
+params[27] = 0.312549234458
+params[28] = -0.124980734342
+params[29] = 0.406299234458
+params[30] = -0.0314343155301
+params[31] = -0.46911863106
+params[32] = 0.0623771229799
+params[33] = -0.37536863106
+params[34] = 0.156105753063
+params[35] = -0.28161863106
+params[36] = 0.250145410757
+params[37] = -0.187209178487
+params[38] = 0.343846940504
+params[39] = -0.0934591784868
+params[40] = 0.437613799723
+params[41] = 0.000290821513155
+params[42] = -0.4378633561
+params[43] = 0.0930232877995
+params[44] = -0.3439922374
+params[45] = 0.1867732878
+params[46] = -0.250284365644
+params[47] = 0.2805232878
+params[48] = -0.156251607218
+params[49] = 0.375509424559
+params[50] = -0.0636493587016
+params[51] = 0.469392431493
+params[52] = 0.0326173939183
+params[53] = -0.408107520278
+params[54] = 0.1253047406
+params[55] = -0.312191045583
+params[56] = 0.221115825563
+candidates = list_new()
+piece = ""
+piece = text_concat(piece, "will one rest warm\nthey say subtle his could a\nmaintain protect lose")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "no him huge whole\nsudden delayed word prove\nselect value cloud")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "perceive within\nconceal disguise attend\ncertainly instant")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "probably clearly\nperform behave morph match\nmask uncover more")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "portion same share\nand in end among this us\nday us become")
+list_push(candidates, piece)
+user = list_new()
+piece = ""
+piece = text_concat(piece, "cloud")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "words")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "dance")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "rest")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "warm")
+list_push(user, piece)
+piece = ""
+piece = text_concat(piece, "dream")
+list_push(user, piece)
+expected = zeros(20)
+expected[0] = 0.65217886862
+expected[1] = 0.601755604618
+expected[2] = 0.561244775892
+expected[3] = 0.569989571972
+expected[4] = 0.56384542762
+expected[5] = 0.756525208034
+expected[6] = 0.554877901887
+expected[7] = 0.392871343124
+expected[8] = 0.427842593149
+expected[9] = 0.403271590425
+expected[10] = 0.756525208034
+expected[11] = 0.554877901887
+expected[12] = 0.392871343124
+expected[13] = 0.427842593149
+expected[14] = 0.403271590425
+expected[15] = 0.756525208034
+expected[16] = 0.554877901887
+expected[17] = 0.392871343124
+expected[18] = 0.427842593149
+expected[19] = 0.403271590425
+actual = haiku_rae_trace(params, candidates, user, 3)
+haiku_rae_test_vector(actual, expected)
+selected = haiku_rae_select(params, candidates, user, 3)
+assert(selected[0] == 0, "RAE winner differs")
+haiku_rae_test_number(selected[1], 0.756525208034)
+spoken = haiku_rae_reason(params, candidates, user, 3)
+assert(text_equal(spoken, list_get(candidates, 0)), "RAE selected text differs")
+PRINT "HAIKU_RAE_OK"

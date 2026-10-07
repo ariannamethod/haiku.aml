@@ -1,0 +1,12 @@
+# EXPECT: RAE text limit is 10000 codepoints
+IMPORT "../rae_support.aml"
+params = zeros(57)
+state = haiku_rae_state()
+user = list_new()
+candidates = list_new()
+list_push(candidates, "one\ntwo\nthree")
+list_push(candidates, "rain\ncloud\nsky")
+source = text_concat(haiku_rae_test_repeat("x", 10000), "x")
+# INVALID_CALL
+features = haiku_rae_features(source, user)
+PRINT "HAIKU_INVALID_ACCEPTED"

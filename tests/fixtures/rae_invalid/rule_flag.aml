@@ -1,0 +1,13 @@
+# EXPECT: RAE rule scorer flag must be 0 or 1
+IMPORT "../rae_support.aml"
+params = zeros(57)
+state = haiku_rae_state()
+user = list_new()
+candidates = list_new()
+list_push(candidates, "one\ntwo\nthree")
+list_push(candidates, "rain\ncloud\nsky")
+rows = list_new()
+counts = map_new()
+# INVALID_CALL
+chosen = haiku_rae_rule(candidates, params, rows, counts, user, 2)
+PRINT "HAIKU_INVALID_ACCEPTED"

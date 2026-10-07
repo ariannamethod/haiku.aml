@@ -1,0 +1,189 @@
+# Numeric reference values: 50
+IMPORT "mathbrain_support.aml"
+parameters = zeros(57)
+parameters[0] = -0.1875
+parameters[1] = 0.078125
+parameters[2] = -0.140625
+parameters[3] = 0.125
+parameters[4] = -0.09375
+parameters[5] = 0.171875
+parameters[6] = -0.046875
+parameters[7] = 0.21875
+parameters[8] = 0
+parameters[9] = -0.21875
+parameters[10] = 0.046875
+parameters[11] = -0.171875
+parameters[12] = 0.09375
+parameters[13] = -0.125
+parameters[14] = 0.140625
+parameters[15] = -0.078125
+parameters[16] = 0.1875
+parameters[17] = -0.03125
+parameters[18] = 0.234375
+parameters[19] = 0.015625
+parameters[20] = -0.203125
+parameters[21] = 0.0625
+parameters[22] = -0.15625
+parameters[23] = 0.109375
+parameters[24] = -0.109375
+parameters[25] = 0.15625
+parameters[26] = -0.0625
+parameters[27] = 0.203125
+parameters[28] = -0.015625
+parameters[29] = -0.234375
+parameters[30] = 0.03125
+parameters[31] = -0.1875
+parameters[32] = 0.078125
+parameters[33] = -0.140625
+parameters[34] = 0.125
+parameters[35] = -0.09375
+parameters[36] = 0.171875
+parameters[37] = -0.046875
+parameters[38] = 0.21875
+parameters[39] = 0
+parameters[40] = -0.21875
+parameters[41] = 0.046875
+parameters[42] = -0.171875
+parameters[43] = 0.09375
+parameters[44] = -0.125
+parameters[45] = 0.140625
+parameters[46] = -0.078125
+parameters[47] = 0.1875
+parameters[48] = -0.03125
+parameters[49] = 0.234375
+parameters[50] = 0.015625
+parameters[51] = -0.203125
+parameters[52] = 0.0625
+parameters[53] = -0.15625
+parameters[54] = 0.109375
+parameters[55] = -0.109375
+parameters[56] = 0.15625
+rows = list_new()
+counts = map_new()
+list_push(rows, "rain")
+list_push(rows, "finds")
+list_push(rows, "stone")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 3)
+list_push(rows, "finds")
+list_push(rows, "stone")
+list_push(rows, "rain")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 20)
+list_push(rows, "a")
+list_push(rows, "a")
+list_push(rows, "a")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 2)
+# mixed
+source = "rain finds\nstone rain\nI return"
+user = list_new()
+list_push(user, "rain")
+list_push(user, "x")
+list_push(user, "x")
+list_push(user, "I")
+list_push(user, "stone")
+list_push(user, "x")
+expected = zeros(5)
+expected[0] = 0.58000000000000007
+expected[1] = 0.83333333333333337
+expected[2] = 0.75
+expected[3] = 0.47058823529411764
+expected[4] = 0.83333333333333337
+mathbrain_vector(haiku_mathbrain_features(source, rows, counts, user), expected)
+mathbrain_check(haiku_mathbrain_score(parameters, source, rows, counts, user), 0.15182973709927233)
+# repeated
+source = "a a a a a a"
+user = list_new()
+expected = zeros(5)
+expected[0] = 0.20000000000000001
+expected[1] = 0.16666666666666666
+expected[2] = 0
+expected[3] = 0.35294117647058826
+expected[4] = 0.16666666666666666
+mathbrain_vector(haiku_mathbrain_features(source, rows, counts, user), expected)
+mathbrain_check(haiku_mathbrain_score(parameters, source, rows, counts, user), 0.064398740010735867)
+# cross_line
+source = "rain\nfinds\nstone"
+user = list_new()
+expected = zeros(5)
+expected[0] = 0.29999999999999999
+expected[1] = 1
+expected[2] = 0
+expected[3] = 0.23529411764705882
+expected[4] = 1
+mathbrain_vector(haiku_mathbrain_features(source, rows, counts, user), expected)
+mathbrain_check(haiku_mathbrain_score(parameters, source, rows, counts, user), 0.13260268374330481)
+# unknown
+source = "unknown words here"
+user = list_new()
+expected = zeros(5)
+expected[0] = 0.01
+expected[1] = 1
+expected[2] = 0
+expected[3] = 0.29411764705882354
+expected[4] = 1
+mathbrain_vector(haiku_mathbrain_features(source, rows, counts, user), expected)
+mathbrain_check(haiku_mathbrain_score(parameters, source, rows, counts, user), 0.13736384482750102)
+# long
+source = "resonance dissonance everywhere universality"
+user = list_new()
+list_push(user, "resonance")
+list_push(user, "unseen")
+list_push(user, "unseen")
+expected = zeros(5)
+expected[0] = 0.01
+expected[1] = 1
+expected[2] = 0.5
+expected[3] = 1
+expected[4] = 1
+mathbrain_vector(haiku_mathbrain_features(source, rows, counts, user), expected)
+mathbrain_check(haiku_mathbrain_score(parameters, source, rows, counts, user), 0.13650703529468766)
+# case
+source = "RAIN rain Rain"
+user = list_new()
+list_push(user, "RAIN")
+list_push(user, "stone")
+list_push(user, "rain")
+expected = zeros(5)
+expected[0] = 0.01
+expected[1] = 1
+expected[2] = 0.66666666666666663
+expected[3] = 0.17647058823529413
+expected[4] = 1
+mathbrain_vector(haiku_mathbrain_features(source, rows, counts, user), expected)
+mathbrain_check(haiku_mathbrain_score(parameters, source, rows, counts, user), 0.18730492377076818)
+# unicode
+source = "écho rain İce"
+user = list_new()
+list_push(user, "écho")
+list_push(user, "RAIN")
+list_push(user, "İce")
+expected = zeros(5)
+expected[0] = 0.01
+expected[1] = 1
+expected[2] = 0.66666666666666663
+expected[3] = 0.23529411764705882
+expected[4] = 1
+mathbrain_vector(haiku_mathbrain_features(source, rows, counts, user), expected)
+mathbrain_check(haiku_mathbrain_score(parameters, source, rows, counts, user), 0.18449248025898562)
+# boundary_ws
+source = " a\r\n a\t a "
+user = list_new()
+expected = zeros(5)
+expected[0] = 0.20000000000000001
+expected[1] = 0.33333333333333331
+expected[2] = 0
+expected[3] = 0.17647058823529413
+expected[4] = 0.33333333333333331
+mathbrain_vector(haiku_mathbrain_features(source, rows, counts, user), expected)
+mathbrain_check(haiku_mathbrain_score(parameters, source, rows, counts, user), 0.085660241204929891)
+# short
+source = "rain stone"
+user = list_new()
+list_push(user, "rain")
+list_push(user, "stone")
+list_push(user, "rain")
+mathbrain_check(haiku_mathbrain_score(parameters, source, rows, counts, user), 0)
+# empty
+source = ""
+user = list_new()
+mathbrain_check(haiku_mathbrain_score(parameters, source, rows, counts, user), 0)
+ECHO HAIKU_MATHBRAIN_OK

@@ -1,0 +1,12 @@
+# EXPECT: RAE trace needs 2..100 candidates
+IMPORT "../rae_support.aml"
+params = zeros(57)
+state = haiku_rae_state()
+user = list_new()
+candidates = list_new()
+list_push(candidates, "one\ntwo\nthree")
+list_push(candidates, "rain\ncloud\nsky")
+candidates = list_slice(candidates, 0, 1)
+# INVALID_CALL
+trace = haiku_rae_trace(params, candidates, user, 3)
+PRINT "HAIKU_INVALID_ACCEPTED"

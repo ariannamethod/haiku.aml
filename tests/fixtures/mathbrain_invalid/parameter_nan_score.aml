@@ -1,0 +1,14 @@
+# EXPECT: Haiku learner parameters must be finite
+IMPORT "../../../src/mathbrain.aml"
+parameters = zeros(57)
+state = haiku_mathbrain_state()
+rows = list_new()
+counts = map_new()
+user = list_new()
+rng = rng_new(42)
+source = "one two three"
+bad = 1e39
+parameters[0] = bad - bad
+# INVALID_CALL
+haiku_mathbrain_score(parameters, source, rows, counts, user)
+ECHO HAIKU_MATHBRAIN_INVALID_ACCEPTED

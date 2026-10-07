@@ -1,0 +1,11 @@
+# EXPECT: RAE depth must be in [0, 10]
+IMPORT "../rae_support.aml"
+params = zeros(57)
+state = haiku_rae_state()
+user = list_new()
+candidates = list_new()
+list_push(candidates, "one\ntwo\nthree")
+list_push(candidates, "rain\ncloud\nsky")
+# INVALID_CALL
+trace = haiku_rae_trace(params, candidates, user, 11)
+PRINT "HAIKU_INVALID_ACCEPTED"

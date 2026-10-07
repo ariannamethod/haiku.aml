@@ -3,6 +3,15 @@
 Work follows the [Arianna Method Manifesto](ARIANNA_METHOD_MANIFESTO.md).
 The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
 
+## Learning and continuity
+
+- [x] Port MathBrain and RAE's original features, forward/reverse passes,
+  score selection, and online parameter updates through canonical NoTorch.
+- [ ] Connect both learners to one recorded foreground experience, preserving
+  scoring features, quality, source, state revision, and publication order.
+- [ ] Save and restore learner parameters, statistics, and owned random
+  streams together with the cloud and conversation state.
+
 ## Family experiments
 
 - [ ] After the baseline organs work, run the controlled extensions in

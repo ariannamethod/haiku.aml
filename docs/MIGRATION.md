@@ -2,8 +2,8 @@
 
 2026-10-07. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 This document records the inspected sources, current behavior, and implementation
-order. Numerical, text, lexical, cloud, memory, English form, and candidate
-generation organs are implemented; the status below
+order. Numerical, text, lexical, cloud, memory, English form, candidate
+generation, MathBrain, and RAE organs are implemented; the status below
 marks the boundary between those functions and the remaining organism.
 
 ## Source bodies
@@ -44,11 +44,18 @@ as `6bd1e4b310fb24cc169c166d3691ff096ba8093d`, and the NoTorch sampling API from
 `ad7b53afa6b24fb40e22624d5967d7b80eb838bc`. Their bases include the merged
 numeric-map/CodeQL repairs and NoTorch's latest Chuck work, respectively.
 
+The learners use AML v5.6.0 from
+[PR #31](https://github.com/ariannamethod/ariannamethod.ai/pull/31), published as
+`2f8ed872eb7c01c1aa81fcca20c6a99d80ea5ded`, and the stateless NoTorch values from
+[PR #162](https://github.com/ariannamethod/notorch/pull/162), published as
+`8c39e3e6d47e11bad30d3f64f45c1a863929a2a2`. Their tested trees are based on the
+merged previous stage: AML `c6974db`, NoTorch `beccbdb`, Haiku `438a1aa`.
+
 ## Implemented first organs
 
 `src/harmonix.aml` implements pulse, count-based dissonance, and the two
 temperatures. `src/bridges.aml` implements the aggregate transition score.
-Durable cloud storage, cosine/state aggregation, and learning
+Durable cloud storage and cosine/state aggregation
 remain separate work. [NUMERICAL_PARITY.md](NUMERICAL_PARITY.md) records **49 cases /
 130 scalar values** obtained by direct calls to the pinned Python implementation.
 Both interpreted and compiled AML pass with tolerance 0.000002.
@@ -86,6 +93,14 @@ ordered transition memory. It preserves the original proposals, then repairs
 oversized and stranded lines using attainable syllable remainders.
 [GENERATOR_PARITY.md](GENERATOR_PARITY.md) separates preserved Python draw paths,
 the explicit form repairs, and the new native random stream.
+
+`src/learner.aml` composes two-layer tanh forward and reverse passes from
+stateless NoTorch values. `src/mathbrain.aml` preserves the five case-sensitive
+features, displayed-score clipping, raw-output training, and loss statistics.
+`src/rae.aml` preserves Unicode-lowered candidate features, unchanged-case
+context, three score refinements, stable selection, and the explicit rule path.
+Each default learner owns 57 parameters. [MathBrain](MATHBRAIN.md) and
+[RAE](RAE.md) record the Python trajectories and intentional boundaries.
 
 ## Preserve the organism
 
@@ -140,7 +155,7 @@ lineage and its developments stay traceable.
 | NumPy clip/dot/norm | Scalar bounds in AML; vector operations through NoTorch |
 | NumPy object shards | Versioned exchange records in the native state format |
 | SciPy `csgraph/eigsh` | Both observer files import them; neither calls them. No eigensolver is needed for the current path |
-| Micrograd classes | NoTorch linear/bias, tanh, squared-error/backward, SGD, and weight clamp; match each 57-parameter network |
+| Micrograd classes | Implemented: explicit AML forward/reverse composition through stateless NoTorch linear, tanh, MSE-gradient and SGD kernels; parameter clamp in AML |
 | SentencePiece package | Native unigram-model/tokenizer support in NoTorch, including the model's normalization behavior; piece-ID and trigram fixtures before replacement |
 | `syllables` | English estimator and rule data implemented in AML; each later language supplies its own rules |
 | SQLite / aiosqlite | Native snapshot + journal storage covering words, counts, recent trigrams, metrics, bridges, dreams, learners, and lifecycle state |
@@ -151,10 +166,10 @@ Adam/AdamW/Chuck. The initial audit found missing standalone tanh and SGD;
 merged PR #159 now supplies `nt_tanh` and `nt_tape_sgd_step`. Its tests compare
 forward values, gradients, and 24-step parameter trajectories against an
 independent double-precision reference for both Haiku-sized networks.
-AML currently implements its own numeric tape, so the NoTorch binding must
-explicitly route Haiku's learning work to the canonical library. The first
-binding now routes owned random draws and categorical sampling to NoTorch;
-the tensor/training interface remains a separate milestone.
+AML's optional binding now routes owned draws and every learner kernel to
+canonical NoTorch. New stateless `*_values` operations accept borrowed inputs
+and disjoint caller-owned outputs. Both global tapes remain outside this path;
+AML owns each model's arrays, reverse-pass composition, and completed update.
 
 The baseline build uses AML, NoTorch, and system libraries. The inspected
 `amlc` originally added OpenBLAS on Linux while `--no-accel` also disabled
@@ -167,7 +182,9 @@ AML v5.2.0 adds UTF-8 values, typed function arguments/returns, `PRINT`, and
 shared `IMPORT`; v5.3.0 adds mutable string lists with copied assignment and
 worker containers. AML v5.4.0 adds ordered numeric maps, exact composite keys,
 assertions, and scalar floor. AML v5.5.0 adds an optional NoTorch sampling
-backend and map-owned random streams. These extend the scalar/array runtime, field
+backend and map-owned random streams. AML v5.6.0 adds stateless numerical values,
+owned Gaussian initialization, Unicode default lowercase, and scalar finite
+checks. These extend the scalar/array runtime, field
 persistence, threads, and float channels. Haiku still needs:
 
 1. Durable word-cloud and transition records. Token lists, indexed numeric
@@ -176,8 +193,8 @@ persistence, threads, and float channels. Haiku still needs:
 2. Text/array event payloads and worker lifetime handling. Existing channels
    carry floats; the default slot limits are 16 spawns and 16 channels.
 3. General file/record storage and a small local HTTP/event interface.
-4. A NoTorch binding with a defined training owner. Both inspected runtimes
-   use global tape state; serialize learning and publish completed snapshots.
+4. Lifecycle scheduling around the new independent learner arrays: publish
+   completed snapshots at explicit foreground/background handoff points.
 
 Yent demonstrates the compiled/library connection through C-bodied BLOOD
 blocks. Haiku's application behavior will be expressed in AML; the language
@@ -297,7 +314,37 @@ exhausted during generation retains its already consumed prefix.
 The generator reads transitions, vocabulary, and syllable maps without changing
 them. Each voice supplies its own mutable RNG map. English caches come from
 the verified estimator; other supplied language counts are explicit inputs.
-Candidate selection, foreground orchestration, learning, and dreams follow.
+MathBrain and RAE now consume those candidates; foreground orchestration and
+dreams follow.
+
+### Learned candidate choice
+
+MathBrain displays a score clipped to `[0,1]` but trains on the raw tanh output.
+Its finite quality target is clipped; a nonfinite quality or fewer than three
+words skips the update. RAE trains even on an empty selected text and retains
+finite targets outside `[0,1]`. Both apply MSE, plain SGD, and a final ±5 clamp
+to every parameter, including biases. Each owner receives a staged update.
+
+The recursive baseline keeps its actual five features and score recurrence;
+the unused sixth feedback input remains a separate research experiment. Rule
+selection is an explicit API because AML has no exception handler equivalent
+to Python's automatic recursive-error fallback. The generated selection example
+exercises RAE's observation method explicitly; original `chat.py` calls only
+MathBrain's observation method. Their shared foreground experience remains an
+integration task.
+
+Fresh networks use NoTorch's owned standard-normal stream. Its two PCG32 words
+per value define a new reproducible initialization sequence. Explicit frozen
+weights anchor the Python numerical comparisons. Native model file persistence
+and full exchange scheduling remain in the next integration stage.
+
+The combined learner suites compare **5,374 reference fields** through the
+interpreter and compiled scalar executable: 3,717 for MathBrain/shared MLP and
+1,657 for RAE. They include 24 MathBrain steps, ten RAE updates, every parameter
+and gradient, recursive score traces, and stable rule choices. Forty-five
+invalid operations retain their inspected owners. The generated selection
+fixture checks all five actual texts, the selected index and confidence, all
+57 updated RAE parameters, and the next selection against the original Python.
 
 ### RAE development
 
@@ -313,12 +360,12 @@ metrics, and explicit asynchronous publication order.
    and transition memory. Unicode boundary fixtures already cover Cyrillic,
    Hebrew, accents, emoji, whitespace, and empty input; tuple fixtures preserve
    exact token identity and duplicate counts.
-2. Bind the merged NoTorch primitives into AML. Compare MathBrain/RAE
-   forward values, gradients, and parameter trajectories to Python fixtures.
+2. MathBrain/RAE forward values, gradients, and parameter trajectories now run
+   through the NoTorch binding; retain these fixtures while wiring exchanges.
 3. Complete the English tokenizer and foreground exchange around the working
    generator, cloud, and Harmonix. Pin tokenizer mode, word ordering, both Python RNG streams,
    initial state, and event order when producing reference fixtures.
-4. Port learning, bridges, reflection, rings, and dreams; connect the
+4. Connect online learning, bridges, reflection, rings, and dreams; complete the
    integration tasks above. Verify save/restart continuity and worker shutdown.
 5. Add Klaus-inspired language packs with haiku-specific vocabulary and
    syllable behavior; preserve each language's own cloud.

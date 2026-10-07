@@ -1,0 +1,12 @@
+# EXPECT: RAE quality must be finite
+IMPORT "../rae_support.aml"
+params = zeros(57)
+state = haiku_rae_state()
+user = list_new()
+candidates = list_new()
+list_push(candidates, "one\ntwo\nthree")
+list_push(candidates, "rain\ncloud\nsky")
+quality = 3e38 * 2
+# INVALID_CALL
+loss = haiku_rae_observe(params, state, "one\ntwo\nthree", quality, user)
+PRINT "HAIKU_INVALID_ACCEPTED"

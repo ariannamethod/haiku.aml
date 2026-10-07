@@ -1,0 +1,12 @@
+# EXPECT: Haiku learner input dimension must be an integer in [1, 64]
+IMPORT "../../../src/mathbrain.aml"
+parameters = zeros(57)
+state = haiku_mathbrain_state()
+rows = list_new()
+counts = map_new()
+user = list_new()
+rng = rng_new(42)
+source = "one two three"
+# INVALID_CALL
+haiku_learner_new(65, 8, rng)
+ECHO HAIKU_MATHBRAIN_INVALID_ACCEPTED

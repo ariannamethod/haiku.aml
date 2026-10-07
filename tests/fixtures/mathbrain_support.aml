@@ -1,0 +1,24 @@
+IMPORT "../../src/mathbrain.aml"
+
+def mathbrain_check(actual, expected):
+    assert(isfinite(actual), "MathBrain reference result is nonfinite")
+    assert(abs(actual - expected) <= 0.000002, "MathBrain numerical reference differs")
+    return 1
+
+def mathbrain_vector(actual, expected):
+    assert(len(actual) == len(expected), "MathBrain reference vector length differs")
+    cursor = 0
+    while cursor < len(expected):
+        mathbrain_check(actual[cursor], expected[cursor])
+        cursor = cursor + 1
+    return len(expected)
+
+def mathbrain_map(actual, expected):
+    assert(map_len(actual) == map_len(expected), "MathBrain map length differs")
+    keys = map_keys(expected)
+    cursor = 0
+    while cursor < list_len(keys):
+        key = list_get(keys, cursor)
+        mathbrain_check(map_get(actual, key), map_get(expected, key))
+        cursor = cursor + 1
+    return map_len(expected)

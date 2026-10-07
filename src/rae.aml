@@ -1,0 +1,195 @@
+# Python RAE lineage: harmonix/haiku at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+# Two explicit entry points: recursive selection and the original rule chain.
+IMPORT "mathbrain.aml"
+
+# Candidate words are lowercased; context words retain their original identity.
+# Split before lowering so expanding mappings fit the source text loop budget.
+def haiku_rae_features(source, user):
+    assert(text_len(source) <= 10000, "RAE text limit is 10000 codepoints")
+    assert(list_len(user) <= 10000, "RAE context limit is 10000 entries")
+    haiku_trigram_count(user)
+    words = haiku_words(source)
+    unique = map_new()
+    cursor = 0
+    while cursor < list_len(words):
+        map_set(unique, text_lower(list_get(words, cursor)), 1)
+        cursor = cursor + 1
+    context = map_new()
+    overlap = 0
+    cursor = 0
+    while cursor < list_len(user):
+        word = list_get(user, cursor)
+        if map_has(context, word) == 0:
+            map_set(context, word, 1)
+            if map_has(unique, word):
+                overlap = overlap + 1
+        cursor = cursor + 1
+    result = zeros(5)
+    result[0] = 0.5
+    if list_len(words) > 0:
+        result[1] = map_len(unique) / list_len(words)
+    if map_len(context) > 0:
+        result[2] = overlap / map_len(context)
+    result[3] = result[1]
+    result[4] = haiku_line_coherence(source)
+    return result
+
+# Diagnostic trace: consecutive rows contain the initial pass, then each
+# refinement. At least two candidates take this path in the Python selector.
+def haiku_rae_trace(params, candidates, user, steps):
+    size = list_len(candidates)
+    assert(size >= 2 and size <= 100, "RAE trace needs 2..100 candidates")
+    assert(isfinite(steps), "RAE depth must be a finite integer")
+    assert(steps == floor(steps), "RAE depth must be a finite integer")
+    assert(steps >= 0 and steps <= 10, "RAE depth must be in [0, 10]")
+    haiku_learner_check(params, 5, 8)
+    features = zeros(size * 5)
+    trace = zeros(size * (steps + 1))
+    cursor = 0
+    while cursor < size:
+        feature = haiku_rae_features(list_get(candidates, cursor), user)
+        item = 0
+        while item < 5:
+            features[cursor * 5 + item] = feature[item]
+            item = item + 1
+        trace[cursor] = haiku_learner_forward(params, feature, 5, 8)
+        cursor = cursor + 1
+    step = 1
+    while step <= steps:
+        previous = (step - 1) * size
+        low = trace[previous]
+        high = low
+        cursor = 1
+        while cursor < size:
+            low = min(low, trace[previous + cursor])
+            high = max(high, trace[previous + cursor])
+            cursor = cursor + 1
+        cursor = 0
+        while cursor < size:
+            normalized = 0.5
+            if high > low:
+                normalized = (trace[previous + cursor] - low) / (high - low)
+            feature = zeros(5)
+            item = 0
+            while item < 5:
+                feature[item] = features[cursor * 5 + item]
+                item = item + 1
+            # Python appends feedback then slices it off: keep the same 5D MLP.
+            raw = haiku_learner_forward(params, feature, 5, 8)
+            trace[step * size + cursor] = 0.7 * raw + 0.3 * normalized
+            cursor = cursor + 1
+        step = step + 1
+    return trace
+
+# Return [candidate index, confidence]. Ties keep the first candidate.
+# Python's singleton bypasses model, context, and depth evaluation entirely.
+def haiku_rae_select(params, candidates, user, steps):
+    size = list_len(candidates)
+    assert(size > 0, "RAE selection has no candidates")
+    result = zeros(2)
+    result[1] = 1
+    if size == 1:
+        return result
+    trace = haiku_rae_trace(params, candidates, user, steps)
+    result[1] = trace[steps * size]
+    cursor = 1
+    while cursor < size:
+        score = trace[steps * size + cursor]
+        if score > result[1]:
+            result[0] = cursor
+            result[1] = score
+        cursor = cursor + 1
+    return result
+
+# Recursive mode. Runtime errors are explicit; AML does not catch exceptions.
+def haiku_rae_reason(params, candidates, user, steps):
+    if list_len(candidates) == 0:
+        return "cloud is empty\nsilence speaks louder than words\nwait for resonance"
+    if list_len(candidates) == 1:
+        return list_get(candidates, 0)
+    selected = haiku_rae_select(params, candidates, user, steps)
+    return list_get(candidates, selected[0])
+
+# Rule mode: exact three-line structure, stable top three, then case-sensitive
+# diversity. use_scorer=1 enables MathBrain; 0 retains the first three in order.
+def haiku_rae_rule(candidates, params, rows, counts, user, use_scorer):
+    size = list_len(candidates)
+    if size == 0:
+        return "cloud is empty\nsilence speaks louder than words\nwait for resonance"
+    if size == 1:
+        return list_get(candidates, 0)
+    assert(size <= 100, "RAE candidate limit is 100")
+    assert(use_scorer == 0 or use_scorer == 1, "RAE rule scorer flag must be 0 or 1")
+    valid = list_new()
+    cursor = 0
+    while cursor < size:
+        candidate = list_get(candidates, cursor)
+        assert(text_len(candidate) <= 10000, "RAE text limit is 10000 codepoints")
+        if haiku_line_count(candidate) == 3:
+            list_push(valid, candidate)
+        cursor = cursor + 1
+    if list_len(valid) == 0:
+        valid = candidates
+    scores = zeros(list_len(valid))
+    if use_scorer:
+        cursor = 0
+        while cursor < list_len(valid):
+            scores[cursor] = haiku_mathbrain_score(params, list_get(valid, cursor), rows, counts, user)
+            cursor = cursor + 1
+    ranked = zeros(list_len(valid))
+    top = list_new()
+    cursor = 0
+    while cursor < min(3, list_len(valid)):
+        best = -1
+        item = 0
+        while item < list_len(valid):
+            if ranked[item] == 0:
+                if best < 0:
+                    best = item
+                else:
+                    if scores[item] > scores[best]:
+                        best = item
+            item = item + 1
+        list_push(top, list_get(valid, best))
+        ranked[best] = 1
+        cursor = cursor + 1
+    best = 0
+    best_diversity = -1
+    cursor = 0
+    while cursor < list_len(top):
+        words = haiku_words(list_get(top, cursor))
+        unique = map_new()
+        item = 0
+        while item < list_len(words):
+            map_set(unique, list_get(words, item), 1)
+            item = item + 1
+        diversity = map_len(unique) / max(1, list_len(words))
+        if diversity > best_diversity:
+            best = cursor
+            best_diversity = diversity
+        cursor = cursor + 1
+    return list_get(top, best)
+
+def haiku_rae_state():
+    state = map_new()
+    map_set(state, "observations", 0)
+    map_set(state, "learning_rate", 0.01)
+    return state
+
+# Selected-only online learning. Unlike MathBrain, RAE keeps a finite target
+# unchanged and trains even empty text. Publish one complete step before count.
+def haiku_rae_observe(params, state, selected, quality, user):
+    assert(map_len(state) == 2, "RAE learning state needs two fields")
+    assert(map_has(state, "observations") and map_has(state, "learning_rate"), "RAE learning state fields are missing")
+    observations = map_get(state, "observations")
+    assert(observations >= 0 and observations < 16777216, "RAE observation counter is outside [0, 2^24)")
+    assert(observations == floor(observations), "RAE observation counter must be an integer")
+    rate = map_get(state, "learning_rate")
+    assert(rate >= 0, "RAE learning rate must be nonnegative")
+    assert(isfinite(quality), "RAE quality must be finite")
+    features = haiku_rae_features(selected, user)
+    step = haiku_learner_step(params, features, 5, 8, quality, rate)
+    count_key = "observations"
+    haiku_learner_publish(params, step)
+    map_set(state, count_key, observations + 1)
+    return step[1]

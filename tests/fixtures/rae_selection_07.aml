@@ -1,0 +1,107 @@
+IMPORT "rae_support.aml"
+# RAE references: 23
+# negative_ties
+params = zeros(57)
+params[0] = 0
+params[1] = 0
+params[2] = 0
+params[3] = 0
+params[4] = 0
+params[5] = 0
+params[6] = 0
+params[7] = 0
+params[8] = 0
+params[9] = 0
+params[10] = 0
+params[11] = 0
+params[12] = 0
+params[13] = 0
+params[14] = 0
+params[15] = 0
+params[16] = 0
+params[17] = 0
+params[18] = 0
+params[19] = 0
+params[20] = 0
+params[21] = 0
+params[22] = 0
+params[23] = 0
+params[24] = 0
+params[25] = 0
+params[26] = 0
+params[27] = 0
+params[28] = 0
+params[29] = 0
+params[30] = 0
+params[31] = 0
+params[32] = 0
+params[33] = 0
+params[34] = 0
+params[35] = 0
+params[36] = 0
+params[37] = 0
+params[38] = 0
+params[39] = 0
+params[40] = 0
+params[41] = 0
+params[42] = 0
+params[43] = 0
+params[44] = 0
+params[45] = 0
+params[46] = 0
+params[47] = 0
+params[48] = 0
+params[49] = 0
+params[50] = 0
+params[51] = 0
+params[52] = 0
+params[53] = 0
+params[54] = 0
+params[55] = 0
+params[56] = -0.5
+candidates = list_new()
+piece = ""
+piece = text_concat(piece, "words dance in cloud\nresonance finds its own path\nconstraint births form")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "cloud cloud cloud\ncloud cloud cloud cloud\ncloud cloud cloud")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "rain under glass\nthe room remembers footsteps\nnight folds its wings")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "one two three\nfour five six\nseven eight nine")
+list_push(candidates, piece)
+piece = ""
+piece = text_concat(piece, "words\nwords dance in the quiet cloud\nresonance")
+list_push(candidates, piece)
+user = list_new()
+expected = zeros(20)
+expected[0] = -0.46211715726
+expected[1] = -0.46211715726
+expected[2] = -0.46211715726
+expected[3] = -0.46211715726
+expected[4] = -0.46211715726
+expected[5] = -0.173482010082
+expected[6] = -0.173482010082
+expected[7] = -0.173482010082
+expected[8] = -0.173482010082
+expected[9] = -0.173482010082
+expected[10] = -0.173482010082
+expected[11] = -0.173482010082
+expected[12] = -0.173482010082
+expected[13] = -0.173482010082
+expected[14] = -0.173482010082
+expected[15] = -0.173482010082
+expected[16] = -0.173482010082
+expected[17] = -0.173482010082
+expected[18] = -0.173482010082
+expected[19] = -0.173482010082
+actual = haiku_rae_trace(params, candidates, user, 3)
+haiku_rae_test_vector(actual, expected)
+selected = haiku_rae_select(params, candidates, user, 3)
+assert(selected[0] == 0, "RAE winner differs")
+haiku_rae_test_number(selected[1], -0.173482010082)
+spoken = haiku_rae_reason(params, candidates, user, 3)
+assert(text_equal(spoken, list_get(candidates, 0)), "RAE selected text differs")
+PRINT "HAIKU_RAE_OK"

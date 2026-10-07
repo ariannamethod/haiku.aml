@@ -1,0 +1,75 @@
+IMPORT "mathbrain_support.aml"
+
+# Owned normal samples, exact bias placement and each layer's fan-in scaling.
+rng = rng_new(73)
+saved_rng = map_clone(rng)
+noise = rng_normal(saved_rng, 48)
+parameters = haiku_learner_new(5, 8, rng)
+mathbrain_map(rng, saved_rng)
+neuron = 0
+while neuron < 8:
+    column = 0
+    while column < 5:
+        mathbrain_check(parameters[neuron * 6 + column], noise[neuron * 5 + column] * sqrt(2 / 5))
+        column = column + 1
+    mathbrain_check(parameters[neuron * 6 + 5], 0)
+    mathbrain_check(parameters[48 + neuron], noise[40 + neuron] * 0.5)
+    neuron = neuron + 1
+mathbrain_check(parameters[56], 0)
+
+# A second stream and model remain unchanged through another owner's learning.
+other_rng = rng_new(99)
+other = haiku_learner_new(5, 8, other_rng)
+other_saved = haiku_learner_part(other, 0, 57)
+other_rng_saved = map_clone(other_rng)
+before = haiku_learner_part(parameters, 0, 57)
+features = zeros(5)
+features[1] = 0.5
+features[2] = 0.7
+features[3] = 1
+gradient = haiku_learner_gradient(parameters, features, 5, 8, 0.6)
+step = haiku_learner_step(parameters, features, 5, 8, 0.6, 0.01)
+mathbrain_vector(parameters, before)
+haiku_learner_publish(parameters, step)
+expected = haiku_learner_part(step, 2, 57)
+mathbrain_vector(parameters, expected)
+mathbrain_vector(other, other_saved)
+mathbrain_map(other_rng, other_rng_saved)
+mathbrain_map(rng, saved_rng)
+
+# Short inputs and each nonfinite quality skip exactly the current observation.
+state = haiku_mathbrain_state()
+map_set(state, "observations", 7)
+map_set(state, "last_loss", 0.375)
+map_set(state, "running_loss", 0.25)
+saved_state = map_clone(state)
+before = haiku_learner_part(parameters, 0, 57)
+rows = list_new()
+counts = map_new()
+user = list_new()
+mathbrain_check(haiku_mathbrain_observe(parameters, state, "one two", 0.6, rows, counts, user), 0.375)
+bad = 1e39
+assert(isfinite(bad) == 0, "MathBrain infinity probe must be nonfinite")
+mathbrain_check(haiku_mathbrain_observe(parameters, state, "one two three", bad, rows, counts, user), 0.375)
+mathbrain_check(haiku_mathbrain_observe(parameters, state, "one two three", -bad, rows, counts, user), 0.375)
+bad = bad - bad
+assert(isfinite(bad) == 0, "MathBrain NaN probe must be nonfinite")
+mathbrain_check(haiku_mathbrain_observe(parameters, state, "one two three", bad, rows, counts, user), 0.375)
+mathbrain_vector(parameters, before)
+mathbrain_map(state, saved_state)
+
+# Snapshots retain their own parameters and statistics after an accepted event.
+copy = haiku_learner_part(parameters, 0, 57)
+copy_state = map_clone(state)
+loss = haiku_mathbrain_observe(parameters, state, "one two three", 0.8, rows, counts, user)
+mathbrain_vector(copy, before)
+mathbrain_map(copy_state, saved_state)
+mathbrain_check(map_get(state, "observations"), 8)
+mathbrain_check(map_get(state, "last_loss"), loss)
+mathbrain_check(map_get(state, "running_loss"), 0.25 + (loss - 0.25) * 0.05)
+
+# The maximum exact counter value can be reached by one complete update.
+map_set(state, "observations", 16777215)
+haiku_mathbrain_observe(parameters, state, "one two three", 0.5, rows, counts, user)
+assert(map_get(state, "observations") == 16777216, "MathBrain exact counter boundary differs")
+ECHO HAIKU_MATHBRAIN_OK

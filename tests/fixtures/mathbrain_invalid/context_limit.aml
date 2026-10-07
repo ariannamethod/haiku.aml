@@ -1,0 +1,18 @@
+# EXPECT: Haiku MathBrain context limit is 10000 flat tokens
+IMPORT "../../../src/mathbrain.aml"
+parameters = zeros(57)
+state = haiku_mathbrain_state()
+rows = list_new()
+counts = map_new()
+user = list_new()
+rng = rng_new(42)
+source = "one two three"
+cursor = 0
+while cursor < 3334:
+    list_push(user, "one")
+    list_push(user, "two")
+    list_push(user, "three")
+    cursor = cursor + 1
+# INVALID_CALL
+haiku_mathbrain_observe(parameters, state, source, 0.7, rows, counts, user)
+ECHO HAIKU_MATHBRAIN_INVALID_ACCEPTED

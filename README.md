@@ -96,7 +96,7 @@ first; our little presence will find another shape.
 ## Right now
 
 Haiku has a pulse, finds words, and lets each encounter change its memory.
-Forty-nine functions now run in pure AML across ten native modules. Pulse,
+Seventy functions now run in pure AML across thirteen native modules. Pulse,
 dissonance, temperatures, and transition scores preserve the Python formulas.
 The text organ counts Unicode-delimited words, preserves line contents, and
 computes the original RAE three-line coherence feature. The lexical organ
@@ -115,6 +115,13 @@ original syllable rules carried into AML. Every accepted word leaves room to
 finish the line. NoTorch owns the weighted draw; each voice keeps its own
 replayable random state. Seventeen syllables, and a little room for chance.
 
+MathBrain and RAE now give those lines a learned preference. Each has its own
+57 parameters: five features, eight hidden neurons, one answer. MathBrain
+scores a candidate; RAE passes its candidates through the original three-step
+recurrence and chooses a voice. Both learn through canonical NoTorch arithmetic,
+with their features, gradients, clamping, and experience order composed in AML.
+Small networks. Actual changing weights. The octagonal wheel has opinions.
+
 Try `../ariannamethod.ai/runner/aml examples/observe.aml`: one voice brings
 `the / owl / listens`, the other `the / owl / dreams`. Their shared words give
 dissonance **0.5**, novelty **0.5**, arousal **0**, entropy **0.2**, and the next
@@ -127,16 +134,19 @@ two-word input grows the cloud; a later complete triple enters the generator's
 vocabulary. The previous recent-memory snapshot keeps its original contents.
 
 Try `../ariannamethod.ai/runner/aml-notorch examples/generator.aml` for candidates
-grown from the original seed vocabulary. These are the new AML generator's
-lines; candidate scoring and the full conversation are the next organs.
+grown from the original seed vocabulary. Try
+`../ariannamethod.ai/runner/aml-notorch examples/selection.aml` to follow five
+generated candidates through RAE's choice, an explicit learning event, and the
+next scores. These are recorded generator and learner events; the speaking loop
+will join them to your conversation.
 
-The speaking loop, learners, native tokenization, durable storage, and dreams
+The speaking loop, native tokenization, durable storage, and dreams
 are next in the migration queue. New dialogue examples will come from that
 running AML organism.
 
-Build the sibling **AML v5.5.0** toolchain and NoTorch with its owned sampling
-API ([AML #30](https://github.com/ariannamethod/ariannamethod.ai/pull/30),
-[NoTorch #161](https://github.com/ariannamethod/notorch/pull/161)), then run the
+Build the sibling **AML v5.6.0** toolchain and NoTorch with its numerical values
+and owned sampling APIs ([AML #31](https://github.com/ariannamethod/ariannamethod.ai/pull/31),
+[NoTorch #162](https://github.com/ariannamethod/notorch/pull/162)), then run the
 organism's checks:
 
 ```sh
@@ -144,6 +154,7 @@ make -C ../notorch lib BLAS_FLAGS= BLAS_LIBS= X86_SIMD=0 ARM_SIMD=0
 make -C ../ariannamethod.ai notorch NOTORCH_ROOT=../notorch
 make test
 ../ariannamethod.ai/runner/aml-notorch examples/generator.aml
+../ariannamethod.ai/runner/aml-notorch examples/selection.aml
 ```
 
 The fixtures use native `IMPORT`, UTF-8 values, string lists, and numeric maps.
@@ -152,7 +163,8 @@ See [numerical parity](docs/NUMERICAL_PARITY.md) and
 [lexical parity](docs/LEXICAL_PARITY.md) and
 [cloud parity](docs/CLOUD_PARITY.md), plus
 [English form](docs/FORM_PARITY.md) and
-[generator parity](docs/GENERATOR_PARITY.md), for exact boundaries and Python
+[generator parity](docs/GENERATOR_PARITY.md),
+[MathBrain](docs/MATHBRAIN.md), and [RAE](docs/RAE.md), for exact boundaries and Python
 reference reproduction.
 
 Reference checks completed on 2026-10-07:
@@ -171,6 +183,14 @@ Reference checks completed on 2026-10-07:
   and six explicit repair baselines. Native checks cover replay, independent
   state, batch order, the complete seed corpus, temperatures, and exact text
   limits. **36 invalid generations** fail with model and random state inspected.
+- MathBrain adds **3,717 Python reference values**, including every gradient
+  and parameter in 24 learning steps, unclipped negative predictions, loss
+  statistics, and full parameter clamps. Twenty-two rejected observations
+  preserve model, statistics, memory, context, and random state.
+- RAE adds **1,657 reference fields**: Unicode features, every refinement pass,
+  stable rule choices, ten complete gradient/parameter updates, and the native
+  generator-to-learning trace. Twenty-three rejected operations preserve all
+  inspected owners. Both learner suites pass interpreted and compiled.
 - AML runtime: **550 tests passed**.
 - AML compiler: scope, source origins, nested failures, worker branches and
   errors, scalar builds, and literal program arguments are covered by regressions.

@@ -1,0 +1,13 @@
+# EXPECT: Haiku requires complete triples
+IMPORT "../../../src/mathbrain.aml"
+parameters = zeros(57)
+state = haiku_mathbrain_state()
+rows = list_new()
+counts = map_new()
+user = list_new()
+rng = rng_new(42)
+source = "one two three"
+list_push(user, "one")
+# INVALID_CALL
+haiku_mathbrain_observe(parameters, state, source, 0.7, rows, counts, user)
+ECHO HAIKU_MATHBRAIN_INVALID_ACCEPTED

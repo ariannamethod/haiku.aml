@@ -1,0 +1,58 @@
+IMPORT "rae_support.aml"
+# RAE accepted boundaries and Python empty/singleton evaluation order.
+unused = "not a model or context"
+candidates = list_new()
+empty = haiku_rae_reason(unused, candidates, unused, unused)
+assert(text_equal(empty, "cloud is empty\nsilence speaks louder than words\nwait for resonance"), "RAE empty voice differs")
+ruled = haiku_rae_rule(candidates, unused, unused, unused, unused, unused)
+assert(text_equal(ruled, empty), "RAE empty rule voice differs")
+list_push(candidates, "a deliberately single-line singleton")
+selected = haiku_rae_select(unused, candidates, unused, unused)
+assert(selected[0] == 0 and selected[1] == 1, "RAE singleton confidence differs")
+spoken = haiku_rae_reason(unused, candidates, unused, unused)
+assert(text_equal(spoken, list_get(candidates, 0)), "RAE singleton changed")
+ruled = haiku_rae_rule(candidates, unused, unused, unused, unused, unused)
+assert(text_equal(ruled, spoken), "RAE rule singleton changed")
+
+# One original word can expand beyond 10000 codepoints under Unicode lower.
+source = haiku_rae_test_repeat("İ", 10000)
+user = list_new()
+features = haiku_rae_features(source, user)
+assert(features[0] == 0.5 and features[1] == 1 and features[2] == 0, "RAE expanding text boundary differs")
+assert(features[3] == 1 and features[4] == 0, "RAE expanding text coherence differs")
+
+# 9999 is the largest complete flat-triple list below the 10000-entry cap.
+cursor = 0
+while cursor < 3333:
+    list_push(user, "absent")
+    list_push(user, "absent")
+    list_push(user, "absent")
+    cursor = cursor + 1
+features = haiku_rae_features("absent", user)
+assert(features[2] == 1, "RAE complete context boundary differs")
+
+params = zeros(57)
+user = list_new()
+candidates = list_new()
+cursor = 0
+while cursor < 100:
+    list_push(candidates, "one\ntwo\nthree")
+    cursor = cursor + 1
+trace = haiku_rae_trace(params, candidates, user, 0)
+assert(len(trace) == 100 and sum(trace) == 0, "RAE batch boundary differs")
+candidates = list_slice(candidates, 0, 2)
+trace = haiku_rae_trace(params, candidates, user, 10)
+assert(len(trace) == 22, "RAE depth boundary differs")
+cursor = 2
+while cursor < len(trace):
+    haiku_rae_test_number(trace[cursor], 0.15)
+    cursor = cursor + 1
+
+state = haiku_rae_state()
+map_set(state, "observations", 16777215)
+map_set(state, "learning_rate", 0)
+loss = haiku_rae_observe(params, state, "", 0.4, user)
+haiku_rae_test_number(loss, 0.16)
+assert(map_get(state, "observations") == 16777216, "RAE exact counter boundary differs")
+assert(sum(params) == 0, "RAE zero-rate update changed parameters")
+PRINT "HAIKU_RAE_OK"
