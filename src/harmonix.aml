@@ -1,0 +1,44 @@
+# Python lineage: harmonix/haiku/harmonix.py at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+# Text supplies list lengths and word/trigram set counts at this boundary.
+# Counts are nonnegative integers; intersection <= union.
+
+# PulseSnapshot.from_interaction -> [novelty, arousal, entropy].
+# Arousal retains its full value, including values greater than one.
+def haiku_pulse(user_count, system_count, word_overlap, unique_words):
+    pulse = zeros(3)
+    if word_overlap < 1:
+        pulse[0] = 1 - word_overlap
+    pulse[1] = abs(user_count - system_count) / max(1, user_count)
+    pulse[2] = min(1, unique_words / 20)
+    return pulse
+
+# Harmonix.compute_dissonance -> [dissonance, novelty, arousal, entropy].
+# user_count/system_count count list entries, including duplicate trigrams.
+# matching_trigrams counts unique exact matches; only its positivity matters.
+def haiku_observe(user_count, system_count, intersection, union, matching_trigrams):
+    observation = [0.5, 0, 0, 0]
+    if user_count == 0 or system_count == 0 or union == 0:
+        return observation
+    similarity = intersection / union
+    pulse = haiku_pulse(user_count, system_count, similarity, union)
+    dissonance = 1 - similarity
+    if pulse[2] > 0.7:
+        dissonance = dissonance * 1.2
+    if pulse[1] > 0.6:
+        dissonance = dissonance * 1.15
+    if pulse[0] > 0.7:
+        dissonance = dissonance * 1.1
+    if matching_trigrams > 0:
+        dissonance = dissonance * 0.7
+    observation[0] = clamp(dissonance, 0, 1)
+    observation[1] = pulse[0]
+    observation[2] = pulse[1]
+    observation[3] = pulse[2]
+    return observation
+
+# Harmonix.adjust_temperature -> [haiku temperature, observer temperature].
+# The original mapping applies directly to its supplied dissonance.
+def haiku_temperatures(dissonance):
+    temperatures = [0, 0.3]
+    temperatures[0] = 0.3 + dissonance * 1.2
+    return temperatures

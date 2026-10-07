@@ -2,7 +2,8 @@
 
 2026-10-07. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 This document records the inspected sources, current behavior, and implementation
-order. Application modules listed below are planned.
+order. The first numerical functions are implemented; the status below marks
+the boundary between those functions and the remaining organism.
 
 ## Source bodies
 
@@ -18,6 +19,23 @@ order. Application modules listed below are planned.
 
 The manifesto is copied byte-for-byte from the pinned NoTorch source.
 SHA-256: `c8288157c8e2a63cec307510534a3da5415a5d44f3c0a089c8d7f6bbde07b906`.
+
+Follow-up bases: AML `feaeb724fc1fccd2cefae1f5f3fd712658c5ee0a` includes merged
+PR #25. NoTorch `c92e915f2e533372073cc95df9c22bdaf014188b` includes merged
+[PR #159](https://github.com/ariannamethod/notorch/pull/159), adding native tanh
+and plain SGD. The original audit and manifesto pins above remain their sources.
+
+## Implemented first organs
+
+`src/harmonix.aml` implements pulse, count-based dissonance, and the two
+temperatures. `src/bridges.aml` implements the aggregate transition score.
+Text extraction, cloud storage, cosine/state aggregation, and learning remain
+separate work. [NUMERICAL_PARITY.md](NUMERICAL_PARITY.md) records **49 cases /
+130 scalar values** obtained by direct calls to the pinned Python implementation.
+Both interpreted and compiled AML pass with tolerance 0.000002.
+
+The test assembles one source explicitly while native shared module exports
+are pending. No Python or BLOOD C implements the organism in this repository.
 
 ## Preserve the organism
 
@@ -78,16 +96,18 @@ lineage and its developments stay traceable.
 | SQLite / aiosqlite | Native snapshot + journal storage covering words, counts, recent trigrams, metrics, bridges, dreams, learners, and lifecycle state |
 | Python collections/async/I/O | AML text values, collections, module exports, event transport, files, and host-facing I/O |
 
-NoTorch already exposes linear/bias operations, tensor arithmetic, backward,
-and Adam/AdamW/Chuck. Its inspected public API has no standalone tanh or SGD
-entry point; add the operations needed to preserve Haiku's original learner.
+NoTorch exposes linear/bias operations, tensor arithmetic, backward, and
+Adam/AdamW/Chuck. The initial audit found missing standalone tanh and SGD;
+merged PR #159 now supplies `nt_tanh` and `nt_tape_sgd_step`. Its tests compare
+forward values, gradients, and 24-step parameter trajectories against an
+independent double-precision reference for both Haiku-sized networks.
 AML currently implements its own numeric tape, so the NoTorch binding must
 explicitly route Haiku's numerical work to the canonical library.
 
 The baseline build uses AML, NoTorch, and system libraries. The inspected
-`amlc` automatically adds OpenBLAS on Linux; `--no-accel` also disables
-runtime auto-linking. Separate scalar runtime linking from acceleration before
-publishing Haiku's build command.
+`amlc` originally added OpenBLAS on Linux while `--no-accel` also disabled
+runtime auto-linking. The source-origin follow-up adds `--scalar`, which links
+the two projects' scalar archives without BLAS. The numerical test uses it.
 
 ## Language work comes first
 
@@ -132,11 +152,32 @@ functions, loops, arrays, and async channel delivery. It also checks mixed
 BLOOD/AML initialization, runtime failure, and oversized compiler lines.
 The test fails against the original compiler and passes after the repair.
 
+### Source origins and asynchronous failures
+
+The second repair is [AML PR #26](https://github.com/ariannamethod/ariannamethod.ai/pull/26),
+tested commit `11b54b8efff41310b1a1f9bd578960bd71e438ef`.
+
+Review of merged PR #25 exposed missing source origins in compiled programs
+and ignored child execution errors. The follow-up adds `am_exec_source`,
+preserves relative/quoted nested includes from other launch directories, and
+stops failed parents before C `main()`. It also preserves nested SPAWN indentation
+and carries worker diagnostics through AWAIT. `--run` passes literal arguments
+and reports the program's status. These repairs are required by Haiku's future
+module and background-learning paths.
+
+### RAE development
+
+[RAE_RESEARCH.md](RAE_RESEARCH.md) records a 96-case probe of the original
+selector: additional refinement passes do not change the winner. It contains
+three separately testable developments — recurrent feedback within the existing
+57 parameters, replay memory, and output-layer Hebbian traces — with controls,
+metrics, and explicit asynchronous publication order.
+
 ## Implementation order
 
-1. Merge the compiler repair; add native text/collections/module contracts
-   and scalar linking in AML. Exercise Cyrillic, Hebrew, accents, and empty input.
-2. Add the required NoTorch primitives and binding. Compare MathBrain/RAE
+1. Finish native text/collections/module contracts in AML, building on the
+   compiler and scalar-linking repairs. Exercise Cyrillic, Hebrew, accents, and empty input.
+2. Bind the merged NoTorch primitives into AML. Compare MathBrain/RAE
    forward values, gradients, and parameter trajectories to Python fixtures.
 3. Port the English cloud, tokenizer, generator, Harmonix, and foreground
    exchange. Pin tokenizer mode, word ordering, both Python RNG streams,
@@ -146,6 +187,7 @@ The test fails against the original compiler and passes after the repair.
 5. Add Klaus-inspired language packs with haiku-specific vocabulary and
    syllable behavior; preserve each language's own cloud.
 6. Add the local owl interface, conversation, and event-driven animation.
+   [TODO](../TODO.md) records the future visible conversation with the inner friend.
 
 ## Verification receipt
 
