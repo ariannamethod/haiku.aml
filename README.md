@@ -94,29 +94,40 @@ when the interface work begins.
 
 ## Right now
 
-The owl has a pulse and can find the edges of words. Nine functions now run in
-pure AML across three native modules. Pulse, dissonance, temperatures, and
-transition scores preserve the Python formulas. The new text organ counts
-Unicode-delimited words, preserves line contents, and computes the original
-RAE three-line coherence feature.
+The owl has a pulse, finds words, and notices what two voices share.
+Sixteen functions now run in pure AML across four native modules. Pulse,
+dissonance, temperatures, and transition scores preserve the Python formulas.
+The text organ counts Unicode-delimited words, preserves line contents, and
+computes the original RAE three-line coherence feature. The lexical organ
+collects words, builds rolling triples from token lists, and feeds their exact
+overlaps into Harmonix.
+
+Try `../ariannamethod.ai/runner/aml examples/observe.aml`: one voice brings
+`the / owl / listens`, the other `the / owl / dreams`. Their shared words give
+dissonance **0.5**, novelty **0.5**, arousal **0**, entropy **0.2**, and the next
+haiku temperature **0.9**. The example supplies token boundaries explicitly;
+native SentencePiece and the English generator are still in the migration queue.
 
 The speaking loop, learners, word cloud, and dreams are next in the migration
 queue. New dialogue examples will come from that running AML organism.
 
-Build the sibling AML **v5.2.0 modules-and-text toolchain** from
-[AML PR #27](https://github.com/ariannamethod/ariannamethod.ai/pull/27), then run
+Build the sibling AML **v5.3.0 string-list toolchain** from
+[AML PR #28](https://github.com/ariannamethod/ariannamethod.ai/pull/28), then run
 `make test`.
-The fixtures use native `IMPORT`, typed UTF-8 arguments, and string returns.
+The fixtures use native `IMPORT`, UTF-8 values, and string lists.
 See [numerical parity](docs/NUMERICAL_PARITY.md) and
-[text parity](docs/TEXT_PARITY.md) for exact boundaries and Python reference
+[text parity](docs/TEXT_PARITY.md), plus the new
+[lexical parity](docs/LEXICAL_PARITY.md), for exact boundaries and Python reference
 reproduction.
 
 Reference checks completed on 2026-10-07:
 
 - Python HAiKU: **161 tests passed**.
-- Haiku AML: **195 cases / 412 reference values** pass in the interpreter and
-  compiled scalar executable: 130 numerical values and 282 text values. Counts
-  and returned strings compare exactly; float tolerance is 0.000002.
+- Haiku AML: **323 cases / 828 reference results** pass in the interpreter and
+  compiled scalar executable: the original 130 numerical and 282 text values,
+  plus 324 lexical numbers and 92 complete word lists. Counts, strings, and
+  list order compare exactly; float tolerance is 0.000002. Six malformed triple
+  lists fail explicitly in both execution paths.
 - AML runtime: **550 tests passed**.
 - AML compiler: scope, source origins, nested failures, worker branches and
   errors, scalar builds, and literal program arguments are covered by regressions.

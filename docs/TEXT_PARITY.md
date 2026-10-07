@@ -33,11 +33,11 @@ tokenization, and language-specific syllable checks.
 
 ## Run it
 
-Build the sibling AML v5.2.0 runtime/compiler with native strings and `IMPORT`, then:
+Build the sibling AML v5.3.0 runtime/compiler with native strings, lists and `IMPORT`, then:
 
-Toolchain pin: [AML PR #27](https://github.com/ariannamethod/ariannamethod.ai/pull/27),
-`d7e695fdcfd3b5fe0ec02c5776d8f2560f94b995` (v5.2.0). Rebuild the library and
-runner together against that header.
+The complete test command now includes the lexical suite and its v5.3.0 list
+operations. Rebuild the library and runner together against that header.
+See [lexical parity](LEXICAL_PARITY.md) for the current toolchain pin.
 
 ```sh
 make -C ../ariannamethod.ai all
@@ -64,7 +64,7 @@ tests require the two project toolchains and system build tools.
 - 20 line cases check exact string returns, including negative indexes,
   empty lines, CRLF, accents, Cyrillic, Hebrew, and emoji.
 
-The fixture is 222 physical lines; its longest line is 227 bytes. Its imported
+The fixture is 223 physical lines; its longest line is 227 bytes. Its imported
 module has five functions. Integer counts and string returns compare exactly;
 coherence has absolute tolerance **0.000002** for AML float32 arithmetic.
 

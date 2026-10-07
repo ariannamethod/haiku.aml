@@ -14,8 +14,8 @@ The bridge source is `phase4_bridges.py:HaikuStateTransition.score`.
 | `haiku_bridge_score(similarity, quality_delta, overwhelm, boredom, stuck)` | Aggregated transition metrics | Composite transition score |
 
 Counts are nonnegative integer-valued scalars. List lengths include duplicates;
-word and trigram intersection sizes use sets. The text organ will supply these
-counts. Scalar arithmetic and fixed array returns run in AML; the learners'
+word and trigram intersection sizes use sets. The [lexical organ](LEXICAL_PARITY.md)
+now supplies these counts from actual token triples. Scalar arithmetic and fixed array returns run in AML; the learners'
 NoTorch binding follows in the numerical-library work.
 
 The original behavior is retained: empty observations return neutral dissonance
@@ -28,12 +28,12 @@ their original range.
 
 ## Run it
 
-Build the sibling AML v5.2.0 runner, scalar `libaml.a`, and `amlc` with native
-`IMPORT` and UTF-8 values, then:
+Build the sibling AML v5.3.0 runner, scalar `libaml.a`, and `amlc` with native
+`IMPORT`, UTF-8 values, and string lists, then:
 
-Toolchain pin: [AML PR #27](https://github.com/ariannamethod/ariannamethod.ai/pull/27),
-`d7e695fdcfd3b5fe0ec02c5776d8f2560f94b995` (v5.2.0). Rebuild the library and
-runner together against that header.
+The complete test command now includes the lexical suite and its v5.3.0 list
+operations. Rebuild the library and runner together against that header.
+See [lexical parity](LEXICAL_PARITY.md) for the current toolchain pin.
 
 ```sh
 make -C ../ariannamethod.ai all
@@ -126,7 +126,8 @@ print(f'PASS: {checked} fixture values match direct pinned Python calls')
 PY
 ```
 
-The [text boundary module](TEXT_PARITY.md) now covers words, lines, and RAE
-coherence. Set extraction, state storage, asynchronous scheduling, MathBrain,
+The [text boundary module](TEXT_PARITY.md) covers words, lines, and RAE
+coherence; the [lexical observer](LEXICAL_PARITY.md) extracts word and trigram
+sets and calls these formulas. State storage, asynchronous scheduling, MathBrain,
 and the rest of RAE remain the next organs in the [migration map](MIGRATION.md). The
 [RAE experiments](RAE_RESEARCH.md) keep their separate research status.

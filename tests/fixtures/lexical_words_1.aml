@@ -1,0 +1,132 @@
+# Direct pinned Python references: tests/reference/lexical_inputs.json.
+IMPORT "lexical_support.aml"
+failures = 0
+# empty
+source = ""
+expected = list_new()
+actual = haiku_words(source)
+failures = failures + lexical_list_check("empty", actual, expected)
+# one_space
+source = " "
+expected = list_new()
+actual = haiku_words(source)
+failures = failures + lexical_list_check("one_space", actual, expected)
+# spaces_tabs
+source = " \t \t "
+expected = list_new()
+actual = haiku_words(source)
+failures = failures + lexical_list_check("spaces_tabs", actual, expected)
+# one_word
+source = "owl"
+expected = list_new()
+list_push(expected, "owl")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("one_word", actual, expected)
+# two_words
+source = "owl friend"
+expected = list_new()
+list_push(expected, "owl")
+list_push(expected, "friend")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("two_words", actual, expected)
+# one_lf
+source = "\n"
+expected = list_new()
+actual = haiku_words(source)
+failures = failures + lexical_list_check("one_lf", actual, expected)
+# two_lf
+source = "\n\n"
+expected = list_new()
+actual = haiku_words(source)
+failures = failures + lexical_list_check("two_lf", actual, expected)
+# three_lf
+source = "\n\n\n"
+expected = list_new()
+actual = haiku_words(source)
+failures = failures + lexical_list_check("three_lf", actual, expected)
+# two_lines
+source = "one\ntwo"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("two_lines", actual, expected)
+# four_lines
+source = "one\ntwo\nthree\nfour"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("four_lines", actual, expected)
+# balanced
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("balanced", actual, expected)
+# unequal
+source = "one\ntwo three four\nfive six seven eight nine"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+list_push(expected, "seven")
+list_push(expected, "eight")
+list_push(expected, "nine")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("unequal", actual, expected)
+# empty_first
+source = "\none two\nthree"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("empty_first", actual, expected)
+# empty_middle
+source = "one two\n\nthree four five"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("empty_middle", actual, expected)
+# empty_last
+source = "one two\nthree\n"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("empty_last", actual, expected)
+# all_blank
+source = " \n\t\n  "
+expected = list_new()
+actual = haiku_words(source)
+failures = failures + lexical_list_check("all_blank", actual, expected)
+# trailing_lf
+source = "one\ntwo\nthree\n"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("trailing_lf", actual, expected)
+# Numeric reference values: 0
+# List reference results: 17
+if failures == 0:
+    ECHO HAIKU_LEXICAL_PARITY_OK
+else:
+    ECHO HAIKU_LEXICAL_PARITY_FAIL

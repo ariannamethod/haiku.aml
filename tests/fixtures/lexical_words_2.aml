@@ -1,0 +1,182 @@
+# Direct pinned Python references: tests/reference/lexical_inputs.json.
+IMPORT "lexical_support.aml"
+failures = 0
+# leading_lf
+source = "\none\ntwo\nthree"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("leading_lf", actual, expected)
+# crlf
+source = "one two\r\nthree\r\nfour five six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("crlf", actual, expected)
+# cr_only
+source = "one\rtwo\rthree"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("cr_only", actual, expected)
+# mixed_crlf
+source = "one\r\ntwo three\nfour\r"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("mixed_crlf", actual, expected)
+# tabs
+source = "\tone\ttwo\nthree\t four\nfive\t"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("tabs", actual, expected)
+# cyrillic
+source = "сова рядом\nслова слушают ветер\nдруг здесь"
+expected = list_new()
+list_push(expected, "сова")
+list_push(expected, "рядом")
+list_push(expected, "слова")
+list_push(expected, "слушают")
+list_push(expected, "ветер")
+list_push(expected, "друг")
+list_push(expected, "здесь")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("cyrillic", actual, expected)
+# hebrew
+source = "ינשוף כאן\nחבר מקשיב בשקט\nשתי עיניים"
+expected = list_new()
+list_push(expected, "ינשוף")
+list_push(expected, "כאן")
+list_push(expected, "חבר")
+list_push(expected, "מקשיב")
+list_push(expected, "בשקט")
+list_push(expected, "שתי")
+list_push(expected, "עיניים")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("hebrew", actual, expected)
+# french
+source = "été lumière\nune voix répond\nprès de toi"
+expected = list_new()
+list_push(expected, "été")
+list_push(expected, "lumière")
+list_push(expected, "une")
+list_push(expected, "voix")
+list_push(expected, "répond")
+list_push(expected, "près")
+list_push(expected, "de")
+list_push(expected, "toi")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("french", actual, expected)
+# mixed_scripts
+source = "сова owl ינשוף\nété друг\n🦉"
+expected = list_new()
+list_push(expected, "сова")
+list_push(expected, "owl")
+list_push(expected, "ינשוף")
+list_push(expected, "été")
+list_push(expected, "друг")
+list_push(expected, "🦉")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("mixed_scripts", actual, expected)
+# emoji
+source = "🦉 🌒\n🫶🏽\n👩‍💻 ✨"
+expected = list_new()
+list_push(expected, "🦉")
+list_push(expected, "🌒")
+list_push(expected, "🫶🏽")
+list_push(expected, "👩‍💻")
+list_push(expected, "✨")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("emoji", actual, expected)
+# combining_marks
+source = "é ä\nשָׁלוֹם\nй"
+expected = list_new()
+list_push(expected, "é")
+list_push(expected, "ä")
+list_push(expected, "שָׁלוֹם")
+list_push(expected, "й")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("combining_marks", actual, expected)
+# hashes
+source = "one#two #three\nfour # five\n#six"
+expected = list_new()
+list_push(expected, "one#two")
+list_push(expected, "#three")
+list_push(expected, "four")
+list_push(expected, "#")
+list_push(expected, "five")
+list_push(expected, "#six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("hashes", actual, expected)
+# quotes
+source = "\"owl\" 'friend'\nhe said \"hello\"\n'yes'"
+expected = list_new()
+list_push(expected, "\"owl\"")
+list_push(expected, "'friend'")
+list_push(expected, "he")
+list_push(expected, "said")
+list_push(expected, "\"hello\"")
+list_push(expected, "'yes'")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("quotes", actual, expected)
+# backslashes
+source = "owl\\friend\none \\ two\nend\\"
+expected = list_new()
+list_push(expected, "owl\\friend")
+list_push(expected, "one")
+list_push(expected, "\\")
+list_push(expected, "two")
+list_push(expected, "end\\")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("backslashes", actual, expected)
+# nbsp
+source = "one two\nthree four\nfive"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("nbsp", actual, expected)
+# unicode_separators
+source = "one two three"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("unicode_separators", actual, expected)
+# separator_three_lines
+source = "one two\nthree four\nfive"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_three_lines", actual, expected)
+# Numeric reference values: 0
+# List reference results: 17
+if failures == 0:
+    ECHO HAIKU_LEXICAL_PARITY_OK
+else:
+    ECHO HAIKU_LEXICAL_PARITY_FAIL

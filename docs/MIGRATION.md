@@ -35,7 +35,7 @@ and plain SGD. The original audit and manifesto pins above remain their sources.
 
 `src/harmonix.aml` implements pulse, count-based dissonance, and the two
 temperatures. `src/bridges.aml` implements the aggregate transition score.
-Cloud storage, trigram/set extraction, cosine/state aggregation, and learning
+Cloud storage, cosine/state aggregation, and learning
 remain separate work. [NUMERICAL_PARITY.md](NUMERICAL_PARITY.md) records **49 cases /
 130 scalar values** obtained by direct calls to the pinned Python implementation.
 Both interpreted and compiled AML pass with tolerance 0.000002.
@@ -45,8 +45,17 @@ counts, literal LF line counts, exact line extraction, and the original RAE
 coherence feature. [TEXT_PARITY.md](TEXT_PARITY.md) records **146 cases / 282
 reference values**, including Cyrillic, Hebrew, combining marks, and emoji.
 
-Both suites use native `IMPORT`. Their 412 combined reference values pass in
-the interpreter and scalar executable. The organism modules are all AML.
+The numerical and text suites use native `IMPORT`. Their 412 reference values
+pass in the interpreter and scalar executable. The organism modules are all AML.
+
+`src/lexicon.aml` connects these organs: whitespace-delimited word lists,
+rolling triples from token lists, unique words, exact tuple intersections, and
+the full Harmonix observation. Triples retain their three separate components;
+tokens containing spaces or punctuation keep their identity. Duplicate triples
+still contribute to arousal through the original list lengths. The
+[lexical parity record](LEXICAL_PARITY.md) defines this boundary and its fixtures.
+The input to the observer is already tokenized; SentencePiece and the original
+lowercasing/regex fallback remain in the tokenizer migration.
 
 ## Preserve the organism
 
@@ -123,11 +132,13 @@ the two projects' scalar archives without BLAS. The numerical test uses it.
 ## Language work comes first
 
 AML v5.2.0 adds UTF-8 values, typed function arguments/returns, `PRINT`, and
-shared `IMPORT` to the scalar/array runtime, field persistence, threads, and
-float channels. Haiku still needs:
+shared `IMPORT`; v5.3.0 adds mutable string lists with copied assignment and
+worker containers. These extend the scalar/array runtime, field persistence,
+threads, and float channels. Haiku still needs:
 
-1. Token lists, dictionary/set operations, and count/index behavior for growing
-   collections. Immutable strings already have explicit reference ownership.
+1. Word-cloud records with frequencies, weights, and persistent order.
+   Token lists and exact word/trigram set operations now run in AML; larger
+   collections will need indexed lookup with measured performance.
 2. Text/array event payloads and worker lifetime handling. Existing channels
    carry floats; the default slot limits are 16 spawns and 16 channels.
 3. General file/record storage and a small local HTTP/event interface.
@@ -191,6 +202,23 @@ Haiku's Python whitespace and line-coherence rules live
 in `src/text.aml`. Loops retain a 10,000-iteration budget and fail explicitly
 instead of silently truncating a longer text scan.
 
+### String collections and lexical observation
+
+AML v5.3.0 adds native string lists, eight typed intrinsics, JSON list output,
+and copied containers for assignment, persistent storage, and worker snapshots.
+Its tested toolchain is [AML PR #28](https://github.com/ariannamethod/ariannamethod.ai/pull/28),
+commit `11bedd5e6cc042cc80bfc85f1d30443df09827d2`.
+Function parameters retain shared containers so AML functions can append words.
+Persistent replacement is prepared before publication; allocation failure
+preserves the old table. These primitives carry Haiku's growing lexical data
+without a new dependency.
+
+The new word-splitting fixtures exposed an older AML branch bug: a nested false
+`if` could consume its outer `else`. Pairing now checks indentation. Haiku's
+lexical suite checks 324 numerical values and 92 ordered lists against Python,
+plus six explicit malformed-triple failures. All four organism modules together
+pass **323 cases / 828 reference results** interpreted and compiled.
+
 ### RAE development
 
 [RAE_RESEARCH.md](RAE_RESEARCH.md) records a 96-case probe of the original
@@ -201,9 +229,10 @@ metrics, and explicit asynchronous publication order.
 
 ## Implementation order
 
-1. Extend the working strings/modules with token lists, dictionaries, and sets,
-   then connect word overlap and the growing cloud. Unicode boundary fixtures
-   already cover Cyrillic, Hebrew, accents, emoji, whitespace, and empty input.
+1. Connect the working lexical observer to word-cloud records and native
+   tokenization. Unicode boundary fixtures already cover Cyrillic, Hebrew,
+   accents, emoji, whitespace, and empty input; tuple fixtures preserve exact
+   token identity and duplicate counts.
 2. Bind the merged NoTorch primitives into AML. Compare MathBrain/RAE
    forward values, gradients, and parameter trajectories to Python fixtures.
 3. Port the English cloud, tokenizer, generator, Harmonix, and foreground

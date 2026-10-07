@@ -1,0 +1,110 @@
+# Text boundaries and exact sets for Harmonix. Tokens retain their exact text.
+# Python lineage: harmonix/haiku at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+IMPORT "text.aml"
+IMPORT "harmonix.aml"
+
+# Python str.split(): whitespace-delimited words, preserving case/punctuation.
+def haiku_words(source):
+    words = list_new()
+    start = -1
+    cursor = 0
+    size = text_len(source)
+    while cursor < size:
+        if haiku_space(text_codepoint(source, cursor)):
+            if start >= 0:
+                list_push(words, text_slice(source, start, cursor))
+                start = -1
+        else:
+            if start < 0:
+                start = cursor
+        cursor = cursor + 1
+    if start >= 0:
+        list_push(words, text_slice(source, start, size))
+    return words
+
+# Rolling triples over ALREADY segmented tokens. No segmentation happens here.
+# Each group of three list entries is one triple; tokens can contain any text.
+def haiku_trigrams(tokens):
+    triples = list_new()
+    cursor = 0
+    size = list_len(tokens)
+    while cursor + 2 < size:
+        list_push(triples, list_get(tokens, cursor))
+        list_push(triples, list_get(tokens, cursor + 1))
+        list_push(triples, list_get(tokens, cursor + 2))
+        cursor = cursor + 1
+    return triples
+
+# Exact string set in first-occurrence order.
+def haiku_unique(tokens):
+    unique = list_new()
+    cursor = 0
+    while cursor < list_len(tokens):
+        word = list_get(tokens, cursor)
+        if list_find(unique, word) < 0:
+            list_push(unique, word)
+        cursor = cursor + 1
+    return unique
+
+# Decode groups of three. Reading the third item rejects an incomplete group
+# through AML's checked list boundary, before the neutral-empty observation.
+def haiku_trigram_count(triples):
+    cursor = 0
+    count = 0
+    while cursor < list_len(triples):
+        third = list_get(triples, cursor + 2)
+        count = count + 1
+        cursor = cursor + 3
+    return count
+
+# First matching triple's flat offset, or -1. Inputs contain complete triples;
+# offset addresses one triple in needle. Equality compares all three strings.
+def haiku_trigram_find(triples, needle, offset):
+    cursor = 0
+    while cursor < list_len(triples):
+        same = text_equal(list_get(triples, cursor), list_get(needle, offset))
+        same = same and text_equal(list_get(triples, cursor + 1), list_get(needle, offset + 1))
+        same = same and text_equal(list_get(triples, cursor + 2), list_get(needle, offset + 2))
+        if same:
+            return cursor
+        cursor = cursor + 3
+    return -1
+
+# [user count, system count, word intersection, word union, exact triple overlap]
+# Trigram list counts include duplicates; the three set counts do not.
+def haiku_overlap_counts(user, system):
+    user_count = haiku_trigram_count(user)
+    system_count = haiku_trigram_count(system)
+    user_words = haiku_unique(user)
+    system_words = haiku_unique(system)
+    intersection = 0
+    cursor = 0
+    while cursor < list_len(user_words):
+        if list_find(system_words, list_get(user_words, cursor)) >= 0:
+            intersection = intersection + 1
+        cursor = cursor + 1
+    union = list_len(user_words) + list_len(system_words) - intersection
+    seen = list_new()
+    matches = 0
+    cursor = 0
+    while cursor < list_len(user):
+        if haiku_trigram_find(seen, user, cursor) < 0:
+            if haiku_trigram_find(system, user, cursor) >= 0:
+                matches = matches + 1
+            list_push(seen, list_get(user, cursor))
+            list_push(seen, list_get(user, cursor + 1))
+            list_push(seen, list_get(user, cursor + 2))
+        cursor = cursor + 3
+    counts = zeros(5)
+    counts[0] = user_count
+    counts[1] = system_count
+    counts[2] = intersection
+    counts[3] = union
+    counts[4] = matches
+    return counts
+
+# Original Harmonix observation from actual pretokenized triples.
+# Returns [dissonance, novelty, arousal, entropy], preserving both input lists.
+def haiku_observe_trigrams(user, system):
+    counts = haiku_overlap_counts(user, system)
+    return haiku_observe(counts[0], counts[1], counts[2], counts[3], counts[4])

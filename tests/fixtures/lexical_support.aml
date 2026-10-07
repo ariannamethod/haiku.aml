@@ -1,0 +1,45 @@
+# Shared assertion helpers for the pretokenized observer and word boundaries.
+IMPORT "../../src/lexicon.aml"
+
+def lexical_add(triples, first, second, third):
+    list_push(triples, first)
+    list_push(triples, second)
+    list_push(triples, third)
+    return list_len(triples)
+
+def lexical_list_check(name, actual, expected):
+    if list_len(actual) != list_len(expected):
+        ECHO LIST_LENGTH_MISMATCH
+        PRINT name
+        return 1
+    cursor = 0
+    while cursor < list_len(expected):
+        if text_equal(list_get(actual, cursor), list_get(expected, cursor)) == 0:
+            ECHO LIST_ITEM_MISMATCH
+            PRINT name
+            PRINT cursor
+            return 1
+        cursor = cursor + 1
+    return 0
+
+def lexical_observe_check(name, user, system, counts, expected):
+    failures = 0
+    actual_counts = haiku_overlap_counts(user, system)
+    cursor = 0
+    while cursor < 5:
+        if actual_counts[cursor] != counts[cursor]:
+            ECHO OVERLAP_COUNT_MISMATCH
+            PRINT name
+            PRINT cursor
+            failures = failures + 1
+        cursor = cursor + 1
+    actual = haiku_observe_trigrams(user, system)
+    cursor = 0
+    while cursor < 4:
+        if actual[cursor] != actual[cursor] or abs(actual[cursor] - expected[cursor]) > 0.000002:
+            ECHO OBSERVATION_MISMATCH
+            PRINT name
+            PRINT cursor
+            failures = failures + 1
+        cursor = cursor + 1
+    return failures
