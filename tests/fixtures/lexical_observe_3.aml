@@ -1,0 +1,117 @@
+# Direct pinned Python references: tests/reference/lexical_inputs.json.
+IMPORT "lexical_support.aml"
+failures = 0
+# preserve_case
+user = list_new()
+system = list_new()
+lexical_add(user, "OWL", "Friend", "HERE")
+lexical_add(system, "owl", "friend", "here")
+counts = [1, 1, 0, 6, 0]
+observation = [1, 1, 0, 0.29999999999999999]
+failures = failures + lexical_observe_check("preserve_case", user, system, counts, observation)
+# space_join_collision
+user = list_new()
+system = list_new()
+lexical_add(user, "a b", "c", "d")
+lexical_add(system, "a", "b c", "d")
+counts = [1, 1, 1, 5, 0]
+observation = [0.88000000000000012, 0.80000000000000004, 0, 0.25]
+failures = failures + lexical_observe_check("space_join_collision", user, system, counts, observation)
+# pipe_join_collision
+user = list_new()
+system = list_new()
+lexical_add(user, "a|b", "c", "d")
+lexical_add(system, "a", "b|c", "d")
+counts = [1, 1, 1, 5, 0]
+observation = [0.88000000000000012, 0.80000000000000004, 0, 0.25]
+failures = failures + lexical_observe_check("pipe_join_collision", user, system, counts, observation)
+# unit_separator_collision
+user = list_new()
+system = list_new()
+lexical_add(user, text_concat(text_concat("a", text_from_codepoint(31)), "b"), "c", "d")
+lexical_add(system, "a", text_concat(text_concat("b", text_from_codepoint(31)), "c"), "d")
+counts = [1, 1, 1, 5, 0]
+observation = [0.88000000000000012, 0.80000000000000004, 0, 0.25]
+failures = failures + lexical_observe_check("unit_separator_collision", user, system, counts, observation)
+# newline_tokens
+user = list_new()
+system = list_new()
+lexical_add(user, "a\nb", "c", "d")
+lexical_add(system, "a", "b\nc", "d")
+counts = [1, 1, 1, 5, 0]
+observation = [0.88000000000000012, 0.80000000000000004, 0, 0.25]
+failures = failures + lexical_observe_check("newline_tokens", user, system, counts, observation)
+# quote_hash_tokens
+user = list_new()
+system = list_new()
+lexical_add(user, "\"owl\"", "#friend", "a'b")
+lexical_add(system, "\"owl\"", "#friend", "a'b")
+counts = [1, 1, 3, 3, 1]
+observation = [0, 0, 0, 0.14999999999999999]
+failures = failures + lexical_observe_check("quote_hash_tokens", user, system, counts, observation)
+# empty_tokens_identity
+user = list_new()
+system = list_new()
+lexical_add(user, "", "", "")
+lexical_add(system, "", "", "")
+counts = [1, 1, 1, 1, 1]
+observation = [0, 0, 0, 0.050000000000000003]
+failures = failures + lexical_observe_check("empty_tokens_identity", user, system, counts, observation)
+# empty_tokens_reordered
+user = list_new()
+system = list_new()
+lexical_add(user, "", "a", "b")
+lexical_add(system, "a", "", "b")
+counts = [1, 1, 3, 3, 0]
+observation = [0, 0, 0, 0.14999999999999999]
+failures = failures + lexical_observe_check("empty_tokens_reordered", user, system, counts, observation)
+# multiple_exact_repeats
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "b", "c", "d")
+lexical_add(user, "b", "c", "d")
+lexical_add(system, "a", "b", "c")
+lexical_add(system, "b", "c", "d")
+lexical_add(system, "b", "c", "d")
+lexical_add(system, "x", "y", "z")
+counts = [4, 4, 4, 7, 2]
+observation = [0.29999999999999999, 0.4285714285714286, 0, 0.34999999999999998]
+failures = failures + lexical_observe_check("multiple_exact_repeats", user, system, counts, observation)
+# repeated_system
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+lexical_add(system, "a", "b", "c")
+lexical_add(system, "a", "b", "c")
+lexical_add(system, "a", "b", "c")
+lexical_add(system, "a", "b", "c")
+lexical_add(system, "a", "b", "c")
+counts = [1, 5, 3, 3, 1]
+observation = [0, 0, 4, 0.14999999999999999]
+failures = failures + lexical_observe_check("repeated_system", user, system, counts, observation)
+# collision_and_exact
+user = list_new()
+system = list_new()
+lexical_add(user, "a b", "c", "d")
+lexical_add(user, "x", "y", "z")
+lexical_add(system, "a", "b c", "d")
+lexical_add(system, "x", "y", "z")
+counts = [2, 2, 4, 8, 1]
+observation = [0.34999999999999998, 0.5, 0, 0.40000000000000002]
+failures = failures + lexical_observe_check("collision_and_exact", user, system, counts, observation)
+# zero_width_tokens
+user = list_new()
+system = list_new()
+lexical_add(user, "one​two", "👩‍💻", "🫶🏽")
+lexical_add(system, "one", "two", "👩‍💻")
+counts = [1, 1, 1, 5, 0]
+observation = [0.88000000000000012, 0.80000000000000004, 0, 0.25]
+failures = failures + lexical_observe_check("zero_width_tokens", user, system, counts, observation)
+# Numeric reference values: 108
+# List reference results: 0
+if failures == 0:
+    ECHO HAIKU_LEXICAL_PARITY_OK
+else:
+    ECHO HAIKU_LEXICAL_PARITY_FAIL

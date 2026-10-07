@@ -1,0 +1,196 @@
+# Direct pinned Python references: tests/reference/lexical_inputs.json.
+IMPORT "lexical_support.aml"
+failures = 0
+# separator_1680
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_1680", actual, expected)
+# separator_2000
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_2000", actual, expected)
+# separator_2001
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_2001", actual, expected)
+# separator_2002
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_2002", actual, expected)
+# separator_2003
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_2003", actual, expected)
+# separator_2004
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_2004", actual, expected)
+# separator_2005
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_2005", actual, expected)
+# separator_2006
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_2006", actual, expected)
+# separator_2007
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_2007", actual, expected)
+# separator_2008
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_2008", actual, expected)
+# separator_2009
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_2009", actual, expected)
+# separator_200a
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_200a", actual, expected)
+# separator_2028
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_2028", actual, expected)
+# separator_2029
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_2029", actual, expected)
+# separator_202f
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_202f", actual, expected)
+# separator_205f
+source = "one two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_205f", actual, expected)
+# separator_3000
+source = "one　two\nthree four\nfive six"
+expected = list_new()
+list_push(expected, "one")
+list_push(expected, "two")
+list_push(expected, "three")
+list_push(expected, "four")
+list_push(expected, "five")
+list_push(expected, "six")
+actual = haiku_words(source)
+failures = failures + lexical_list_check("separator_3000", actual, expected)
+# Numeric reference values: 0
+# List reference results: 17
+if failures == 0:
+    ECHO HAIKU_LEXICAL_PARITY_OK
+else:
+    ECHO HAIKU_LEXICAL_PARITY_FAIL

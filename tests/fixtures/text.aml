@@ -10,7 +10,8 @@ def haiku_text_check(name, source, words, lines, coherence):
     if haiku_line_count(source) != lines:
         ECHO LINE_COUNT_MISMATCH
         errors = errors + 1
-    if abs(haiku_line_coherence(source) - coherence) > 0.000002:
+    actual_coherence = haiku_line_coherence(source)
+    if actual_coherence != actual_coherence or abs(actual_coherence - coherence) > 0.000002:
         ECHO COHERENCE_MISMATCH
         errors = errors + 1
     if errors > 0:

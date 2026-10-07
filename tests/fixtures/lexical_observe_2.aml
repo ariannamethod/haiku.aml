@@ -1,0 +1,226 @@
+# Direct pinned Python references: tests/reference/lexical_inputs.json.
+IMPORT "lexical_support.aml"
+failures = 0
+# entropy_at_07
+user = list_new()
+system = list_new()
+lexical_add(user, "shared0", "shared0", "shared0")
+lexical_add(user, "shared1", "shared1", "shared1")
+lexical_add(user, "shared2", "shared2", "shared2")
+lexical_add(user, "shared3", "shared3", "shared3")
+lexical_add(user, "shared4", "shared4", "shared4")
+lexical_add(user, "shared5", "shared5", "shared5")
+lexical_add(user, "shared6", "shared6", "shared6")
+lexical_add(user, "user0", "user0", "user0")
+lexical_add(user, "user1", "user1", "user1")
+lexical_add(user, "user2", "user2", "user2")
+lexical_add(user, "shared0", "shared0", "shared0")
+lexical_add(system, "shared0", "shared0", "shared0")
+lexical_add(system, "shared1", "shared1", "shared1")
+lexical_add(system, "shared2", "shared2", "shared2")
+lexical_add(system, "shared3", "shared3", "shared3")
+lexical_add(system, "shared4", "shared4", "shared4")
+lexical_add(system, "shared5", "shared5", "shared5")
+lexical_add(system, "shared6", "shared6", "shared6")
+lexical_add(system, "system0", "system0", "system0")
+lexical_add(system, "system1", "system1", "system1")
+lexical_add(system, "system2", "system2", "system2")
+lexical_add(system, "system3", "system3", "system3")
+counts = [11, 11, 7, 14, 7]
+observation = [0.34999999999999998, 0.5, 0, 0.69999999999999996]
+failures = failures + lexical_observe_check("entropy_at_07", user, system, counts, observation)
+# entropy_above_07
+user = list_new()
+system = list_new()
+lexical_add(user, "shared0", "shared0", "shared0")
+lexical_add(user, "shared1", "shared1", "shared1")
+lexical_add(user, "shared2", "shared2", "shared2")
+lexical_add(user, "shared3", "shared3", "shared3")
+lexical_add(user, "shared4", "shared4", "shared4")
+lexical_add(user, "shared5", "shared5", "shared5")
+lexical_add(user, "shared6", "shared6", "shared6")
+lexical_add(user, "user0", "user0", "user0")
+lexical_add(user, "user1", "user1", "user1")
+lexical_add(user, "user2", "user2", "user2")
+lexical_add(user, "shared0", "shared0", "shared0")
+lexical_add(user, "shared0", "shared0", "shared0")
+lexical_add(system, "shared0", "shared0", "shared0")
+lexical_add(system, "shared1", "shared1", "shared1")
+lexical_add(system, "shared2", "shared2", "shared2")
+lexical_add(system, "shared3", "shared3", "shared3")
+lexical_add(system, "shared4", "shared4", "shared4")
+lexical_add(system, "shared5", "shared5", "shared5")
+lexical_add(system, "shared6", "shared6", "shared6")
+lexical_add(system, "system0", "system0", "system0")
+lexical_add(system, "system1", "system1", "system1")
+lexical_add(system, "system2", "system2", "system2")
+lexical_add(system, "system3", "system3", "system3")
+lexical_add(system, "system4", "system4", "system4")
+counts = [12, 12, 7, 15, 7]
+observation = [0.44799999999999995, 0.53333333333333333, 0, 0.75]
+failures = failures + lexical_observe_check("entropy_above_07", user, system, counts, observation)
+# novelty_below_07
+user = list_new()
+system = list_new()
+lexical_add(user, "shared0", "shared0", "shared0")
+lexical_add(user, "shared1", "shared1", "shared1")
+lexical_add(user, "shared2", "shared2", "shared2")
+lexical_add(user, "user0", "user0", "user0")
+lexical_add(user, "user1", "user1", "user1")
+lexical_add(user, "user2", "user2", "user2")
+lexical_add(system, "shared0", "shared0", "shared0")
+lexical_add(system, "shared1", "shared1", "shared1")
+lexical_add(system, "shared2", "shared2", "shared2")
+lexical_add(system, "system0", "system0", "system0")
+lexical_add(system, "system1", "system1", "system1")
+lexical_add(system, "system2", "system2", "system2")
+counts = [6, 6, 3, 9, 3]
+observation = [0.46666666666666667, 0.66666666666666674, 0, 0.45000000000000001]
+failures = failures + lexical_observe_check("novelty_below_07", user, system, counts, observation)
+# novelty_at_07
+user = list_new()
+system = list_new()
+lexical_add(user, "shared0", "shared0", "shared0")
+lexical_add(user, "shared1", "shared1", "shared1")
+lexical_add(user, "shared2", "shared2", "shared2")
+lexical_add(user, "user0", "user0", "user0")
+lexical_add(user, "user1", "user1", "user1")
+lexical_add(user, "user2", "user2", "user2")
+lexical_add(user, "shared0", "shared0", "shared0")
+lexical_add(system, "shared0", "shared0", "shared0")
+lexical_add(system, "shared1", "shared1", "shared1")
+lexical_add(system, "shared2", "shared2", "shared2")
+lexical_add(system, "system0", "system0", "system0")
+lexical_add(system, "system1", "system1", "system1")
+lexical_add(system, "system2", "system2", "system2")
+lexical_add(system, "system3", "system3", "system3")
+counts = [7, 7, 3, 10, 3]
+observation = [0.48999999999999994, 0.69999999999999996, 0, 0.5]
+failures = failures + lexical_observe_check("novelty_at_07", user, system, counts, observation)
+# novelty_above_07
+user = list_new()
+system = list_new()
+lexical_add(user, "shared0", "shared0", "shared0")
+lexical_add(user, "shared1", "shared1", "shared1")
+lexical_add(user, "shared2", "shared2", "shared2")
+lexical_add(user, "user0", "user0", "user0")
+lexical_add(user, "user1", "user1", "user1")
+lexical_add(user, "user2", "user2", "user2")
+lexical_add(user, "shared0", "shared0", "shared0")
+lexical_add(user, "shared0", "shared0", "shared0")
+lexical_add(system, "shared0", "shared0", "shared0")
+lexical_add(system, "shared1", "shared1", "shared1")
+lexical_add(system, "shared2", "shared2", "shared2")
+lexical_add(system, "system0", "system0", "system0")
+lexical_add(system, "system1", "system1", "system1")
+lexical_add(system, "system2", "system2", "system2")
+lexical_add(system, "system3", "system3", "system3")
+lexical_add(system, "system4", "system4", "system4")
+counts = [8, 8, 3, 11, 3]
+observation = [0.55999999999999994, 0.72727272727272729, 0, 0.55000000000000004]
+failures = failures + lexical_observe_check("novelty_above_07", user, system, counts, observation)
+# all_boosts_before_discount
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+lexical_add(system, "a", "b", "c")
+lexical_add(system, "s0", "s0", "s0")
+lexical_add(system, "s1", "s1", "s1")
+lexical_add(system, "s2", "s2", "s2")
+lexical_add(system, "s3", "s3", "s3")
+lexical_add(system, "s4", "s4", "s4")
+lexical_add(system, "s5", "s5", "s5")
+lexical_add(system, "s6", "s6", "s6")
+lexical_add(system, "s7", "s7", "s7")
+lexical_add(system, "s8", "s8", "s8")
+lexical_add(system, "s9", "s9", "s9")
+lexical_add(system, "s10", "s10", "s10")
+lexical_add(system, "s11", "s11", "s11")
+lexical_add(system, "s12", "s12", "s12")
+lexical_add(system, "s13", "s13", "s13")
+lexical_add(system, "s14", "s14", "s14")
+lexical_add(system, "s15", "s15", "s15")
+lexical_add(system, "s16", "s16", "s16")
+lexical_add(system, "s17", "s17", "s17")
+lexical_add(system, "s18", "s18", "s18")
+lexical_add(system, "s19", "s19", "s19")
+lexical_add(system, "s20", "s20", "s20")
+counts = [1, 22, 3, 24, 1]
+observation = [0.92977500000000002, 0.875, 21, 1]
+failures = failures + lexical_observe_check("all_boosts_before_discount", user, system, counts, observation)
+# all_boosts_clamped
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+lexical_add(system, "s0", "s0", "s0")
+lexical_add(system, "s1", "s1", "s1")
+lexical_add(system, "s2", "s2", "s2")
+lexical_add(system, "s3", "s3", "s3")
+lexical_add(system, "s4", "s4", "s4")
+lexical_add(system, "s5", "s5", "s5")
+lexical_add(system, "s6", "s6", "s6")
+lexical_add(system, "s7", "s7", "s7")
+lexical_add(system, "s8", "s8", "s8")
+lexical_add(system, "s9", "s9", "s9")
+lexical_add(system, "s10", "s10", "s10")
+lexical_add(system, "s11", "s11", "s11")
+lexical_add(system, "s12", "s12", "s12")
+lexical_add(system, "s13", "s13", "s13")
+lexical_add(system, "s14", "s14", "s14")
+lexical_add(system, "s15", "s15", "s15")
+lexical_add(system, "s16", "s16", "s16")
+lexical_add(system, "s17", "s17", "s17")
+lexical_add(system, "s18", "s18", "s18")
+lexical_add(system, "s19", "s19", "s19")
+lexical_add(system, "s20", "s20", "s20")
+counts = [1, 21, 0, 24, 0]
+observation = [1, 1, 20, 1]
+failures = failures + lexical_observe_check("all_boosts_clamped", user, system, counts, observation)
+# cyrillic
+user = list_new()
+system = list_new()
+lexical_add(user, "сова", "рядом", "друг")
+lexical_add(system, "друг", "здесь", "рядом")
+counts = [1, 1, 2, 4, 0]
+observation = [0.5, 0.5, 0, 0.20000000000000001]
+failures = failures + lexical_observe_check("cyrillic", user, system, counts, observation)
+# hebrew
+user = list_new()
+system = list_new()
+lexical_add(user, "ינשוף", "כאן", "חבר")
+lexical_add(system, "ינשוף", "כאן", "חבר")
+lexical_add(system, "שקט", "חבר", "אור")
+counts = [1, 2, 3, 5, 1]
+observation = [0.32199999999999995, 0.40000000000000002, 1, 0.25]
+failures = failures + lexical_observe_check("hebrew", user, system, counts, observation)
+# mixed_scripts
+user = list_new()
+system = list_new()
+lexical_add(user, "owl", "сова", "ינשוף")
+lexical_add(user, "été", "друг", "🦉")
+lexical_add(system, "🦉", "сова", "été")
+counts = [2, 1, 3, 6, 0]
+observation = [0.5, 0.5, 0.5, 0.29999999999999999]
+failures = failures + lexical_observe_check("mixed_scripts", user, system, counts, observation)
+# exact_accents
+user = list_new()
+system = list_new()
+lexical_add(user, "é", "é", "É")
+lexical_add(system, "é", "é", "É")
+counts = [1, 1, 3, 3, 1]
+observation = [0, 0, 0, 0.14999999999999999]
+failures = failures + lexical_observe_check("exact_accents", user, system, counts, observation)
+# different_normalization
+user = list_new()
+system = list_new()
+lexical_add(user, "é", "owl", "friend")
+lexical_add(system, "é", "owl", "friend")
+counts = [1, 1, 2, 4, 0]
+observation = [0.5, 0.5, 0, 0.20000000000000001]
+failures = failures + lexical_observe_check("different_normalization", user, system, counts, observation)
+# Numeric reference values: 108
+# List reference results: 0
+if failures == 0:
+    ECHO HAIKU_LEXICAL_PARITY_OK
+else:
+    ECHO HAIKU_LEXICAL_PARITY_FAIL

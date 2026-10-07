@@ -1,0 +1,3143 @@
+{
+  "source_commit": "abb878c52d763b73e5ad7a4d6a68a9ea7a248a39",
+  "python_version": "3.12.14",
+  "observe_cases": [
+    {
+      "kind": "observe",
+      "name": "empty_both",
+      "user": [],
+      "system": [],
+      "counts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "observation": [
+        0.5,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "empty_user",
+      "user": [],
+      "system": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "counts": [
+        0,
+        1,
+        0,
+        3,
+        0
+      ],
+      "observation": [
+        0.5,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "empty_system",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "system": [],
+      "counts": [
+        1,
+        0,
+        0,
+        3,
+        0
+      ],
+      "observation": [
+        0.5,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "identical",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        3,
+        3,
+        1
+      ],
+      "observation": [
+        0.0,
+        0.0,
+        0.0,
+        0.15
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "same_words_reordered",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "system": [
+        [
+          "c",
+          "b",
+          "a"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        3,
+        3,
+        0
+      ],
+      "observation": [
+        0.0,
+        0.0,
+        0.0,
+        0.15
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "disjoint",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "d",
+          "e",
+          "f"
+        ]
+      ],
+      "system": [
+        [
+          "x",
+          "y",
+          "z"
+        ],
+        [
+          "p",
+          "q",
+          "r"
+        ]
+      ],
+      "counts": [
+        2,
+        2,
+        0,
+        12,
+        0
+      ],
+      "observation": [
+        1.0,
+        1.0,
+        0.0,
+        0.6
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "exact_match_discount",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "d",
+          "e",
+          "f"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "g",
+          "h",
+          "i"
+        ]
+      ],
+      "counts": [
+        2,
+        2,
+        3,
+        9,
+        1
+      ],
+      "observation": [
+        0.4666666666666667,
+        0.6666666666666667,
+        0.0,
+        0.45
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "arousal_below_06",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "d",
+          "e",
+          "f"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "g",
+          "h",
+          "i"
+        ]
+      ],
+      "counts": [
+        4,
+        2,
+        3,
+        9,
+        1
+      ],
+      "observation": [
+        0.4666666666666667,
+        0.6666666666666667,
+        0.5,
+        0.45
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "arousal_at_06",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "d",
+          "e",
+          "f"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "g",
+          "h",
+          "i"
+        ]
+      ],
+      "counts": [
+        5,
+        2,
+        3,
+        9,
+        1
+      ],
+      "observation": [
+        0.4666666666666667,
+        0.6666666666666667,
+        0.6,
+        0.45
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "arousal_above_06",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "d",
+          "e",
+          "f"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "g",
+          "h",
+          "i"
+        ]
+      ],
+      "counts": [
+        6,
+        2,
+        3,
+        9,
+        1
+      ],
+      "observation": [
+        0.5366666666666666,
+        0.6666666666666667,
+        0.6666666666666666,
+        0.45
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "arousal_above_one",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "g",
+          "h",
+          "i"
+        ],
+        [
+          "g",
+          "h",
+          "i"
+        ],
+        [
+          "g",
+          "h",
+          "i"
+        ]
+      ],
+      "counts": [
+        1,
+        4,
+        3,
+        6,
+        1
+      ],
+      "observation": [
+        0.40249999999999997,
+        0.5,
+        3.0,
+        0.3
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "entropy_below_07",
+      "user": [
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared1",
+          "shared1",
+          "shared1"
+        ],
+        [
+          "shared2",
+          "shared2",
+          "shared2"
+        ],
+        [
+          "shared3",
+          "shared3",
+          "shared3"
+        ],
+        [
+          "shared4",
+          "shared4",
+          "shared4"
+        ],
+        [
+          "shared5",
+          "shared5",
+          "shared5"
+        ],
+        [
+          "shared6",
+          "shared6",
+          "shared6"
+        ],
+        [
+          "user0",
+          "user0",
+          "user0"
+        ],
+        [
+          "user1",
+          "user1",
+          "user1"
+        ],
+        [
+          "user2",
+          "user2",
+          "user2"
+        ]
+      ],
+      "system": [
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared1",
+          "shared1",
+          "shared1"
+        ],
+        [
+          "shared2",
+          "shared2",
+          "shared2"
+        ],
+        [
+          "shared3",
+          "shared3",
+          "shared3"
+        ],
+        [
+          "shared4",
+          "shared4",
+          "shared4"
+        ],
+        [
+          "shared5",
+          "shared5",
+          "shared5"
+        ],
+        [
+          "shared6",
+          "shared6",
+          "shared6"
+        ],
+        [
+          "system0",
+          "system0",
+          "system0"
+        ],
+        [
+          "system1",
+          "system1",
+          "system1"
+        ],
+        [
+          "system2",
+          "system2",
+          "system2"
+        ]
+      ],
+      "counts": [
+        10,
+        10,
+        7,
+        13,
+        7
+      ],
+      "observation": [
+        0.3230769230769231,
+        0.46153846153846156,
+        0.0,
+        0.65
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "entropy_at_07",
+      "user": [
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared1",
+          "shared1",
+          "shared1"
+        ],
+        [
+          "shared2",
+          "shared2",
+          "shared2"
+        ],
+        [
+          "shared3",
+          "shared3",
+          "shared3"
+        ],
+        [
+          "shared4",
+          "shared4",
+          "shared4"
+        ],
+        [
+          "shared5",
+          "shared5",
+          "shared5"
+        ],
+        [
+          "shared6",
+          "shared6",
+          "shared6"
+        ],
+        [
+          "user0",
+          "user0",
+          "user0"
+        ],
+        [
+          "user1",
+          "user1",
+          "user1"
+        ],
+        [
+          "user2",
+          "user2",
+          "user2"
+        ],
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ]
+      ],
+      "system": [
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared1",
+          "shared1",
+          "shared1"
+        ],
+        [
+          "shared2",
+          "shared2",
+          "shared2"
+        ],
+        [
+          "shared3",
+          "shared3",
+          "shared3"
+        ],
+        [
+          "shared4",
+          "shared4",
+          "shared4"
+        ],
+        [
+          "shared5",
+          "shared5",
+          "shared5"
+        ],
+        [
+          "shared6",
+          "shared6",
+          "shared6"
+        ],
+        [
+          "system0",
+          "system0",
+          "system0"
+        ],
+        [
+          "system1",
+          "system1",
+          "system1"
+        ],
+        [
+          "system2",
+          "system2",
+          "system2"
+        ],
+        [
+          "system3",
+          "system3",
+          "system3"
+        ]
+      ],
+      "counts": [
+        11,
+        11,
+        7,
+        14,
+        7
+      ],
+      "observation": [
+        0.35,
+        0.5,
+        0.0,
+        0.7
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "entropy_above_07",
+      "user": [
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared1",
+          "shared1",
+          "shared1"
+        ],
+        [
+          "shared2",
+          "shared2",
+          "shared2"
+        ],
+        [
+          "shared3",
+          "shared3",
+          "shared3"
+        ],
+        [
+          "shared4",
+          "shared4",
+          "shared4"
+        ],
+        [
+          "shared5",
+          "shared5",
+          "shared5"
+        ],
+        [
+          "shared6",
+          "shared6",
+          "shared6"
+        ],
+        [
+          "user0",
+          "user0",
+          "user0"
+        ],
+        [
+          "user1",
+          "user1",
+          "user1"
+        ],
+        [
+          "user2",
+          "user2",
+          "user2"
+        ],
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ]
+      ],
+      "system": [
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared1",
+          "shared1",
+          "shared1"
+        ],
+        [
+          "shared2",
+          "shared2",
+          "shared2"
+        ],
+        [
+          "shared3",
+          "shared3",
+          "shared3"
+        ],
+        [
+          "shared4",
+          "shared4",
+          "shared4"
+        ],
+        [
+          "shared5",
+          "shared5",
+          "shared5"
+        ],
+        [
+          "shared6",
+          "shared6",
+          "shared6"
+        ],
+        [
+          "system0",
+          "system0",
+          "system0"
+        ],
+        [
+          "system1",
+          "system1",
+          "system1"
+        ],
+        [
+          "system2",
+          "system2",
+          "system2"
+        ],
+        [
+          "system3",
+          "system3",
+          "system3"
+        ],
+        [
+          "system4",
+          "system4",
+          "system4"
+        ]
+      ],
+      "counts": [
+        12,
+        12,
+        7,
+        15,
+        7
+      ],
+      "observation": [
+        0.44799999999999995,
+        0.5333333333333333,
+        0.0,
+        0.75
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "novelty_below_07",
+      "user": [
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared1",
+          "shared1",
+          "shared1"
+        ],
+        [
+          "shared2",
+          "shared2",
+          "shared2"
+        ],
+        [
+          "user0",
+          "user0",
+          "user0"
+        ],
+        [
+          "user1",
+          "user1",
+          "user1"
+        ],
+        [
+          "user2",
+          "user2",
+          "user2"
+        ]
+      ],
+      "system": [
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared1",
+          "shared1",
+          "shared1"
+        ],
+        [
+          "shared2",
+          "shared2",
+          "shared2"
+        ],
+        [
+          "system0",
+          "system0",
+          "system0"
+        ],
+        [
+          "system1",
+          "system1",
+          "system1"
+        ],
+        [
+          "system2",
+          "system2",
+          "system2"
+        ]
+      ],
+      "counts": [
+        6,
+        6,
+        3,
+        9,
+        3
+      ],
+      "observation": [
+        0.4666666666666667,
+        0.6666666666666667,
+        0.0,
+        0.45
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "novelty_at_07",
+      "user": [
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared1",
+          "shared1",
+          "shared1"
+        ],
+        [
+          "shared2",
+          "shared2",
+          "shared2"
+        ],
+        [
+          "user0",
+          "user0",
+          "user0"
+        ],
+        [
+          "user1",
+          "user1",
+          "user1"
+        ],
+        [
+          "user2",
+          "user2",
+          "user2"
+        ],
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ]
+      ],
+      "system": [
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared1",
+          "shared1",
+          "shared1"
+        ],
+        [
+          "shared2",
+          "shared2",
+          "shared2"
+        ],
+        [
+          "system0",
+          "system0",
+          "system0"
+        ],
+        [
+          "system1",
+          "system1",
+          "system1"
+        ],
+        [
+          "system2",
+          "system2",
+          "system2"
+        ],
+        [
+          "system3",
+          "system3",
+          "system3"
+        ]
+      ],
+      "counts": [
+        7,
+        7,
+        3,
+        10,
+        3
+      ],
+      "observation": [
+        0.48999999999999994,
+        0.7,
+        0.0,
+        0.5
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "novelty_above_07",
+      "user": [
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared1",
+          "shared1",
+          "shared1"
+        ],
+        [
+          "shared2",
+          "shared2",
+          "shared2"
+        ],
+        [
+          "user0",
+          "user0",
+          "user0"
+        ],
+        [
+          "user1",
+          "user1",
+          "user1"
+        ],
+        [
+          "user2",
+          "user2",
+          "user2"
+        ],
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ]
+      ],
+      "system": [
+        [
+          "shared0",
+          "shared0",
+          "shared0"
+        ],
+        [
+          "shared1",
+          "shared1",
+          "shared1"
+        ],
+        [
+          "shared2",
+          "shared2",
+          "shared2"
+        ],
+        [
+          "system0",
+          "system0",
+          "system0"
+        ],
+        [
+          "system1",
+          "system1",
+          "system1"
+        ],
+        [
+          "system2",
+          "system2",
+          "system2"
+        ],
+        [
+          "system3",
+          "system3",
+          "system3"
+        ],
+        [
+          "system4",
+          "system4",
+          "system4"
+        ]
+      ],
+      "counts": [
+        8,
+        8,
+        3,
+        11,
+        3
+      ],
+      "observation": [
+        0.5599999999999999,
+        0.7272727272727273,
+        0.0,
+        0.55
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "all_boosts_before_discount",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "s0",
+          "s0",
+          "s0"
+        ],
+        [
+          "s1",
+          "s1",
+          "s1"
+        ],
+        [
+          "s2",
+          "s2",
+          "s2"
+        ],
+        [
+          "s3",
+          "s3",
+          "s3"
+        ],
+        [
+          "s4",
+          "s4",
+          "s4"
+        ],
+        [
+          "s5",
+          "s5",
+          "s5"
+        ],
+        [
+          "s6",
+          "s6",
+          "s6"
+        ],
+        [
+          "s7",
+          "s7",
+          "s7"
+        ],
+        [
+          "s8",
+          "s8",
+          "s8"
+        ],
+        [
+          "s9",
+          "s9",
+          "s9"
+        ],
+        [
+          "s10",
+          "s10",
+          "s10"
+        ],
+        [
+          "s11",
+          "s11",
+          "s11"
+        ],
+        [
+          "s12",
+          "s12",
+          "s12"
+        ],
+        [
+          "s13",
+          "s13",
+          "s13"
+        ],
+        [
+          "s14",
+          "s14",
+          "s14"
+        ],
+        [
+          "s15",
+          "s15",
+          "s15"
+        ],
+        [
+          "s16",
+          "s16",
+          "s16"
+        ],
+        [
+          "s17",
+          "s17",
+          "s17"
+        ],
+        [
+          "s18",
+          "s18",
+          "s18"
+        ],
+        [
+          "s19",
+          "s19",
+          "s19"
+        ],
+        [
+          "s20",
+          "s20",
+          "s20"
+        ]
+      ],
+      "counts": [
+        1,
+        22,
+        3,
+        24,
+        1
+      ],
+      "observation": [
+        0.929775,
+        0.875,
+        21.0,
+        1.0
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "all_boosts_clamped",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "system": [
+        [
+          "s0",
+          "s0",
+          "s0"
+        ],
+        [
+          "s1",
+          "s1",
+          "s1"
+        ],
+        [
+          "s2",
+          "s2",
+          "s2"
+        ],
+        [
+          "s3",
+          "s3",
+          "s3"
+        ],
+        [
+          "s4",
+          "s4",
+          "s4"
+        ],
+        [
+          "s5",
+          "s5",
+          "s5"
+        ],
+        [
+          "s6",
+          "s6",
+          "s6"
+        ],
+        [
+          "s7",
+          "s7",
+          "s7"
+        ],
+        [
+          "s8",
+          "s8",
+          "s8"
+        ],
+        [
+          "s9",
+          "s9",
+          "s9"
+        ],
+        [
+          "s10",
+          "s10",
+          "s10"
+        ],
+        [
+          "s11",
+          "s11",
+          "s11"
+        ],
+        [
+          "s12",
+          "s12",
+          "s12"
+        ],
+        [
+          "s13",
+          "s13",
+          "s13"
+        ],
+        [
+          "s14",
+          "s14",
+          "s14"
+        ],
+        [
+          "s15",
+          "s15",
+          "s15"
+        ],
+        [
+          "s16",
+          "s16",
+          "s16"
+        ],
+        [
+          "s17",
+          "s17",
+          "s17"
+        ],
+        [
+          "s18",
+          "s18",
+          "s18"
+        ],
+        [
+          "s19",
+          "s19",
+          "s19"
+        ],
+        [
+          "s20",
+          "s20",
+          "s20"
+        ]
+      ],
+      "counts": [
+        1,
+        21,
+        0,
+        24,
+        0
+      ],
+      "observation": [
+        1.0,
+        1.0,
+        20.0,
+        1.0
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "cyrillic",
+      "user": [
+        [
+          "\u0441\u043e\u0432\u0430",
+          "\u0440\u044f\u0434\u043e\u043c",
+          "\u0434\u0440\u0443\u0433"
+        ]
+      ],
+      "system": [
+        [
+          "\u0434\u0440\u0443\u0433",
+          "\u0437\u0434\u0435\u0441\u044c",
+          "\u0440\u044f\u0434\u043e\u043c"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        2,
+        4,
+        0
+      ],
+      "observation": [
+        0.5,
+        0.5,
+        0.0,
+        0.2
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "hebrew",
+      "user": [
+        [
+          "\u05d9\u05e0\u05e9\u05d5\u05e3",
+          "\u05db\u05d0\u05df",
+          "\u05d7\u05d1\u05e8"
+        ]
+      ],
+      "system": [
+        [
+          "\u05d9\u05e0\u05e9\u05d5\u05e3",
+          "\u05db\u05d0\u05df",
+          "\u05d7\u05d1\u05e8"
+        ],
+        [
+          "\u05e9\u05e7\u05d8",
+          "\u05d7\u05d1\u05e8",
+          "\u05d0\u05d5\u05e8"
+        ]
+      ],
+      "counts": [
+        1,
+        2,
+        3,
+        5,
+        1
+      ],
+      "observation": [
+        0.32199999999999995,
+        0.4,
+        1.0,
+        0.25
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "mixed_scripts",
+      "user": [
+        [
+          "owl",
+          "\u0441\u043e\u0432\u0430",
+          "\u05d9\u05e0\u05e9\u05d5\u05e3"
+        ],
+        [
+          "\u00e9t\u00e9",
+          "\u0434\u0440\u0443\u0433",
+          "\ud83e\udd89"
+        ]
+      ],
+      "system": [
+        [
+          "\ud83e\udd89",
+          "\u0441\u043e\u0432\u0430",
+          "\u00e9t\u00e9"
+        ]
+      ],
+      "counts": [
+        2,
+        1,
+        3,
+        6,
+        0
+      ],
+      "observation": [
+        0.5,
+        0.5,
+        0.5,
+        0.3
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "exact_accents",
+      "user": [
+        [
+          "\u00e9",
+          "e\u0301",
+          "\u00c9"
+        ]
+      ],
+      "system": [
+        [
+          "\u00e9",
+          "e\u0301",
+          "\u00c9"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        3,
+        3,
+        1
+      ],
+      "observation": [
+        0.0,
+        0.0,
+        0.0,
+        0.15
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "different_normalization",
+      "user": [
+        [
+          "\u00e9",
+          "owl",
+          "friend"
+        ]
+      ],
+      "system": [
+        [
+          "e\u0301",
+          "owl",
+          "friend"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        2,
+        4,
+        0
+      ],
+      "observation": [
+        0.5,
+        0.5,
+        0.0,
+        0.2
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "preserve_case",
+      "user": [
+        [
+          "OWL",
+          "Friend",
+          "HERE"
+        ]
+      ],
+      "system": [
+        [
+          "owl",
+          "friend",
+          "here"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        0,
+        6,
+        0
+      ],
+      "observation": [
+        1.0,
+        1.0,
+        0.0,
+        0.3
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "space_join_collision",
+      "user": [
+        [
+          "a b",
+          "c",
+          "d"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b c",
+          "d"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        1,
+        5,
+        0
+      ],
+      "observation": [
+        0.8800000000000001,
+        0.8,
+        0.0,
+        0.25
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "pipe_join_collision",
+      "user": [
+        [
+          "a|b",
+          "c",
+          "d"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b|c",
+          "d"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        1,
+        5,
+        0
+      ],
+      "observation": [
+        0.8800000000000001,
+        0.8,
+        0.0,
+        0.25
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "unit_separator_collision",
+      "user": [
+        [
+          "a\u001fb",
+          "c",
+          "d"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b\u001fc",
+          "d"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        1,
+        5,
+        0
+      ],
+      "observation": [
+        0.8800000000000001,
+        0.8,
+        0.0,
+        0.25
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "newline_tokens",
+      "user": [
+        [
+          "a\nb",
+          "c",
+          "d"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b\nc",
+          "d"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        1,
+        5,
+        0
+      ],
+      "observation": [
+        0.8800000000000001,
+        0.8,
+        0.0,
+        0.25
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "quote_hash_tokens",
+      "user": [
+        [
+          "\"owl\"",
+          "#friend",
+          "a'b"
+        ]
+      ],
+      "system": [
+        [
+          "\"owl\"",
+          "#friend",
+          "a'b"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        3,
+        3,
+        1
+      ],
+      "observation": [
+        0.0,
+        0.0,
+        0.0,
+        0.15
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "empty_tokens_identity",
+      "user": [
+        [
+          "",
+          "",
+          ""
+        ]
+      ],
+      "system": [
+        [
+          "",
+          "",
+          ""
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "observation": [
+        0.0,
+        0.0,
+        0.0,
+        0.05
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "empty_tokens_reordered",
+      "user": [
+        [
+          "",
+          "a",
+          "b"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "",
+          "b"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        3,
+        3,
+        0
+      ],
+      "observation": [
+        0.0,
+        0.0,
+        0.0,
+        0.15
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "multiple_exact_repeats",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "b",
+          "c",
+          "d"
+        ],
+        [
+          "b",
+          "c",
+          "d"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "b",
+          "c",
+          "d"
+        ],
+        [
+          "b",
+          "c",
+          "d"
+        ],
+        [
+          "x",
+          "y",
+          "z"
+        ]
+      ],
+      "counts": [
+        4,
+        4,
+        4,
+        7,
+        2
+      ],
+      "observation": [
+        0.3,
+        0.4285714285714286,
+        0.0,
+        0.35
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "repeated_system",
+      "user": [
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ],
+        [
+          "a",
+          "b",
+          "c"
+        ]
+      ],
+      "counts": [
+        1,
+        5,
+        3,
+        3,
+        1
+      ],
+      "observation": [
+        0.0,
+        0.0,
+        4.0,
+        0.15
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "collision_and_exact",
+      "user": [
+        [
+          "a b",
+          "c",
+          "d"
+        ],
+        [
+          "x",
+          "y",
+          "z"
+        ]
+      ],
+      "system": [
+        [
+          "a",
+          "b c",
+          "d"
+        ],
+        [
+          "x",
+          "y",
+          "z"
+        ]
+      ],
+      "counts": [
+        2,
+        2,
+        4,
+        8,
+        1
+      ],
+      "observation": [
+        0.35,
+        0.5,
+        0.0,
+        0.4
+      ]
+    },
+    {
+      "kind": "observe",
+      "name": "zero_width_tokens",
+      "user": [
+        [
+          "one\u200btwo",
+          "\ud83d\udc69\u200d\ud83d\udcbb",
+          "\ud83e\udef6\ud83c\udffd"
+        ]
+      ],
+      "system": [
+        [
+          "one",
+          "two",
+          "\ud83d\udc69\u200d\ud83d\udcbb"
+        ]
+      ],
+      "counts": [
+        1,
+        1,
+        1,
+        5,
+        0
+      ],
+      "observation": [
+        0.8800000000000001,
+        0.8,
+        0.0,
+        0.25
+      ]
+    }
+  ],
+  "word_cases": [
+    {
+      "name": "empty",
+      "text": "",
+      "words": []
+    },
+    {
+      "name": "one_space",
+      "text": " ",
+      "words": []
+    },
+    {
+      "name": "spaces_tabs",
+      "text": " \t \t ",
+      "words": []
+    },
+    {
+      "name": "one_word",
+      "text": "owl",
+      "words": [
+        "owl"
+      ]
+    },
+    {
+      "name": "two_words",
+      "text": "owl friend",
+      "words": [
+        "owl",
+        "friend"
+      ]
+    },
+    {
+      "name": "one_lf",
+      "text": "\n",
+      "words": []
+    },
+    {
+      "name": "two_lf",
+      "text": "\n\n",
+      "words": []
+    },
+    {
+      "name": "three_lf",
+      "text": "\n\n\n",
+      "words": []
+    },
+    {
+      "name": "two_lines",
+      "text": "one\ntwo",
+      "words": [
+        "one",
+        "two"
+      ]
+    },
+    {
+      "name": "four_lines",
+      "text": "one\ntwo\nthree\nfour",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four"
+      ]
+    },
+    {
+      "name": "balanced",
+      "text": "one two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "unequal",
+      "text": "one\ntwo three four\nfive six seven eight nine",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine"
+      ]
+    },
+    {
+      "name": "empty_first",
+      "text": "\none two\nthree",
+      "words": [
+        "one",
+        "two",
+        "three"
+      ]
+    },
+    {
+      "name": "empty_middle",
+      "text": "one two\n\nthree four five",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five"
+      ]
+    },
+    {
+      "name": "empty_last",
+      "text": "one two\nthree\n",
+      "words": [
+        "one",
+        "two",
+        "three"
+      ]
+    },
+    {
+      "name": "all_blank",
+      "text": " \n\t\n  ",
+      "words": []
+    },
+    {
+      "name": "trailing_lf",
+      "text": "one\ntwo\nthree\n",
+      "words": [
+        "one",
+        "two",
+        "three"
+      ]
+    },
+    {
+      "name": "leading_lf",
+      "text": "\none\ntwo\nthree",
+      "words": [
+        "one",
+        "two",
+        "three"
+      ]
+    },
+    {
+      "name": "crlf",
+      "text": "one two\r\nthree\r\nfour five six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "cr_only",
+      "text": "one\rtwo\rthree",
+      "words": [
+        "one",
+        "two",
+        "three"
+      ]
+    },
+    {
+      "name": "mixed_crlf",
+      "text": "one\r\ntwo three\nfour\r",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four"
+      ]
+    },
+    {
+      "name": "tabs",
+      "text": "\tone\ttwo\nthree\t four\nfive\t",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five"
+      ]
+    },
+    {
+      "name": "cyrillic",
+      "text": "\u0441\u043e\u0432\u0430 \u0440\u044f\u0434\u043e\u043c\n\u0441\u043b\u043e\u0432\u0430 \u0441\u043b\u0443\u0448\u0430\u044e\u0442 \u0432\u0435\u0442\u0435\u0440\n\u0434\u0440\u0443\u0433 \u0437\u0434\u0435\u0441\u044c",
+      "words": [
+        "\u0441\u043e\u0432\u0430",
+        "\u0440\u044f\u0434\u043e\u043c",
+        "\u0441\u043b\u043e\u0432\u0430",
+        "\u0441\u043b\u0443\u0448\u0430\u044e\u0442",
+        "\u0432\u0435\u0442\u0435\u0440",
+        "\u0434\u0440\u0443\u0433",
+        "\u0437\u0434\u0435\u0441\u044c"
+      ]
+    },
+    {
+      "name": "hebrew",
+      "text": "\u05d9\u05e0\u05e9\u05d5\u05e3 \u05db\u05d0\u05df\n\u05d7\u05d1\u05e8 \u05de\u05e7\u05e9\u05d9\u05d1 \u05d1\u05e9\u05e7\u05d8\n\u05e9\u05ea\u05d9 \u05e2\u05d9\u05e0\u05d9\u05d9\u05dd",
+      "words": [
+        "\u05d9\u05e0\u05e9\u05d5\u05e3",
+        "\u05db\u05d0\u05df",
+        "\u05d7\u05d1\u05e8",
+        "\u05de\u05e7\u05e9\u05d9\u05d1",
+        "\u05d1\u05e9\u05e7\u05d8",
+        "\u05e9\u05ea\u05d9",
+        "\u05e2\u05d9\u05e0\u05d9\u05d9\u05dd"
+      ]
+    },
+    {
+      "name": "french",
+      "text": "\u00e9t\u00e9 lumi\u00e8re\nune voix r\u00e9pond\npr\u00e8s de toi",
+      "words": [
+        "\u00e9t\u00e9",
+        "lumi\u00e8re",
+        "une",
+        "voix",
+        "r\u00e9pond",
+        "pr\u00e8s",
+        "de",
+        "toi"
+      ]
+    },
+    {
+      "name": "mixed_scripts",
+      "text": "\u0441\u043e\u0432\u0430 owl \u05d9\u05e0\u05e9\u05d5\u05e3\n\u00e9t\u00e9 \u0434\u0440\u0443\u0433\n\ud83e\udd89",
+      "words": [
+        "\u0441\u043e\u0432\u0430",
+        "owl",
+        "\u05d9\u05e0\u05e9\u05d5\u05e3",
+        "\u00e9t\u00e9",
+        "\u0434\u0440\u0443\u0433",
+        "\ud83e\udd89"
+      ]
+    },
+    {
+      "name": "emoji",
+      "text": "\ud83e\udd89 \ud83c\udf12\n\ud83e\udef6\ud83c\udffd\n\ud83d\udc69\u200d\ud83d\udcbb \u2728",
+      "words": [
+        "\ud83e\udd89",
+        "\ud83c\udf12",
+        "\ud83e\udef6\ud83c\udffd",
+        "\ud83d\udc69\u200d\ud83d\udcbb",
+        "\u2728"
+      ]
+    },
+    {
+      "name": "combining_marks",
+      "text": "e\u0301 a\u0308\n\u05e9\u05b8\u05c1\u05dc\u05d5\u05b9\u05dd\n\u0438\u0306",
+      "words": [
+        "e\u0301",
+        "a\u0308",
+        "\u05e9\u05b8\u05c1\u05dc\u05d5\u05b9\u05dd",
+        "\u0438\u0306"
+      ]
+    },
+    {
+      "name": "hashes",
+      "text": "one#two #three\nfour # five\n#six",
+      "words": [
+        "one#two",
+        "#three",
+        "four",
+        "#",
+        "five",
+        "#six"
+      ]
+    },
+    {
+      "name": "quotes",
+      "text": "\"owl\" 'friend'\nhe said \"hello\"\n'yes'",
+      "words": [
+        "\"owl\"",
+        "'friend'",
+        "he",
+        "said",
+        "\"hello\"",
+        "'yes'"
+      ]
+    },
+    {
+      "name": "backslashes",
+      "text": "owl\\friend\none \\ two\nend\\",
+      "words": [
+        "owl\\friend",
+        "one",
+        "\\",
+        "two",
+        "end\\"
+      ]
+    },
+    {
+      "name": "nbsp",
+      "text": "one\u00a0two\nthree\u202ffour\nfive",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five"
+      ]
+    },
+    {
+      "name": "unicode_separators",
+      "text": "one\u2028two\u2029three",
+      "words": [
+        "one",
+        "two",
+        "three"
+      ]
+    },
+    {
+      "name": "separator_three_lines",
+      "text": "one\u2028two\nthree\u2029four\nfive",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five"
+      ]
+    },
+    {
+      "name": "zero_width",
+      "text": "one\u200btwo\nthree\u200dfour\nfive\u2060six",
+      "words": [
+        "one\u200btwo",
+        "three\u200dfour",
+        "five\u2060six"
+      ]
+    },
+    {
+      "name": "bom",
+      "text": "\ufeffone two\nthree\n\ufefffour",
+      "words": [
+        "\ufeffone",
+        "two",
+        "three",
+        "\ufefffour"
+      ]
+    },
+    {
+      "name": "punctuation",
+      "text": "one,two;three\nfour-five\nsix\u2014seven",
+      "words": [
+        "one,two;three",
+        "four-five",
+        "six\u2014seven"
+      ]
+    },
+    {
+      "name": "python_rae_test",
+      "text": "words dance in cloud\nresonance finds its own path\nconstraint births form",
+      "words": [
+        "words",
+        "dance",
+        "in",
+        "cloud",
+        "resonance",
+        "finds",
+        "its",
+        "own",
+        "path",
+        "constraint",
+        "births",
+        "form"
+      ]
+    },
+    {
+      "name": "long_first",
+      "text": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\none\n",
+      "words": [
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "word",
+        "one"
+      ]
+    },
+    {
+      "name": "separator_0009",
+      "text": "one\ttwo\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_000a",
+      "text": "one\ntwo\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_000b",
+      "text": "one\u000btwo\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_000c",
+      "text": "one\ftwo\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_000d",
+      "text": "one\rtwo\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_001c",
+      "text": "one\u001ctwo\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_001d",
+      "text": "one\u001dtwo\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_001e",
+      "text": "one\u001etwo\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_001f",
+      "text": "one\u001ftwo\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_0020",
+      "text": "one two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_0085",
+      "text": "one\u0085two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_00a0",
+      "text": "one\u00a0two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_1680",
+      "text": "one\u1680two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_2000",
+      "text": "one\u2000two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_2001",
+      "text": "one\u2001two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_2002",
+      "text": "one\u2002two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_2003",
+      "text": "one\u2003two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_2004",
+      "text": "one\u2004two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_2005",
+      "text": "one\u2005two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_2006",
+      "text": "one\u2006two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_2007",
+      "text": "one\u2007two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_2008",
+      "text": "one\u2008two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_2009",
+      "text": "one\u2009two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_200a",
+      "text": "one\u200atwo\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_2028",
+      "text": "one\u2028two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_2029",
+      "text": "one\u2029two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_202f",
+      "text": "one\u202ftwo\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_205f",
+      "text": "one\u205ftwo\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    },
+    {
+      "name": "separator_3000",
+      "text": "one\u3000two\nthree four\nfive six",
+      "words": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six"
+      ]
+    }
+  ],
+  "rolling_cases": [
+    {
+      "name": "empty",
+      "tokens": [],
+      "triples": []
+    },
+    {
+      "name": "one",
+      "tokens": [
+        "one"
+      ],
+      "triples": []
+    },
+    {
+      "name": "two",
+      "tokens": [
+        "one",
+        "two"
+      ],
+      "triples": []
+    },
+    {
+      "name": "three",
+      "tokens": [
+        "one",
+        "two",
+        "three"
+      ],
+      "triples": [
+        [
+          "one",
+          "two",
+          "three"
+        ]
+      ]
+    },
+    {
+      "name": "five",
+      "tokens": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five"
+      ],
+      "triples": [
+        [
+          "one",
+          "two",
+          "three"
+        ],
+        [
+          "two",
+          "three",
+          "four"
+        ],
+        [
+          "three",
+          "four",
+          "five"
+        ]
+      ]
+    },
+    {
+      "name": "repeats",
+      "tokens": [
+        "one",
+        "two",
+        "one",
+        "two",
+        "one"
+      ],
+      "triples": [
+        [
+          "one",
+          "two",
+          "one"
+        ],
+        [
+          "two",
+          "one",
+          "two"
+        ],
+        [
+          "one",
+          "two",
+          "one"
+        ]
+      ]
+    },
+    {
+      "name": "empty_strings",
+      "tokens": [
+        "",
+        "a",
+        "",
+        "b",
+        ""
+      ],
+      "triples": [
+        [
+          "",
+          "a",
+          ""
+        ],
+        [
+          "a",
+          "",
+          "b"
+        ],
+        [
+          "",
+          "b",
+          ""
+        ]
+      ]
+    },
+    {
+      "name": "multilingual",
+      "tokens": [
+        "\u0441\u043e\u0432\u0430",
+        "\u05d9\u05e0\u05e9\u05d5\u05e3",
+        "\u00e9t\u00e9",
+        "\ud83e\udd89",
+        "\u0434\u0440\u0443\u0433"
+      ],
+      "triples": [
+        [
+          "\u0441\u043e\u0432\u0430",
+          "\u05d9\u05e0\u05e9\u05d5\u05e3",
+          "\u00e9t\u00e9"
+        ],
+        [
+          "\u05d9\u05e0\u05e9\u05d5\u05e3",
+          "\u00e9t\u00e9",
+          "\ud83e\udd89"
+        ],
+        [
+          "\u00e9t\u00e9",
+          "\ud83e\udd89",
+          "\u0434\u0440\u0443\u0433"
+        ]
+      ]
+    },
+    {
+      "name": "normalization",
+      "tokens": [
+        "\u00e9",
+        "e\u0301",
+        "\u00e9",
+        "\u00c9"
+      ],
+      "triples": [
+        [
+          "\u00e9",
+          "e\u0301",
+          "\u00e9"
+        ],
+        [
+          "e\u0301",
+          "\u00e9",
+          "\u00c9"
+        ]
+      ]
+    },
+    {
+      "name": "embedded_spaces",
+      "tokens": [
+        "a b",
+        "c",
+        "a",
+        "b c",
+        "d"
+      ],
+      "triples": [
+        [
+          "a b",
+          "c",
+          "a"
+        ],
+        [
+          "c",
+          "a",
+          "b c"
+        ],
+        [
+          "a",
+          "b c",
+          "d"
+        ]
+      ]
+    },
+    {
+      "name": "punctuation",
+      "tokens": [
+        "#owl",
+        "a|b",
+        "\"friend\"",
+        "it's",
+        "\\"
+      ],
+      "triples": [
+        [
+          "#owl",
+          "a|b",
+          "\"friend\""
+        ],
+        [
+          "a|b",
+          "\"friend\"",
+          "it's"
+        ],
+        [
+          "\"friend\"",
+          "it's",
+          "\\"
+        ]
+      ]
+    },
+    {
+      "name": "newline",
+      "tokens": [
+        "a\nb",
+        "c",
+        "d",
+        "a\nb"
+      ],
+      "triples": [
+        [
+          "a\nb",
+          "c",
+          "d"
+        ],
+        [
+          "c",
+          "d",
+          "a\nb"
+        ]
+      ]
+    }
+  ],
+  "unique_cases": [
+    {
+      "name": "empty",
+      "tokens": [],
+      "unique": []
+    },
+    {
+      "name": "one",
+      "tokens": [
+        "one"
+      ],
+      "unique": [
+        "one"
+      ]
+    },
+    {
+      "name": "two",
+      "tokens": [
+        "one",
+        "two"
+      ],
+      "unique": [
+        "one",
+        "two"
+      ]
+    },
+    {
+      "name": "three",
+      "tokens": [
+        "one",
+        "two",
+        "three"
+      ],
+      "unique": [
+        "one",
+        "two",
+        "three"
+      ]
+    },
+    {
+      "name": "five",
+      "tokens": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five"
+      ],
+      "unique": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five"
+      ]
+    },
+    {
+      "name": "repeats",
+      "tokens": [
+        "one",
+        "two",
+        "one",
+        "two",
+        "one"
+      ],
+      "unique": [
+        "one",
+        "two"
+      ]
+    },
+    {
+      "name": "empty_strings",
+      "tokens": [
+        "",
+        "a",
+        "",
+        "b",
+        ""
+      ],
+      "unique": [
+        "",
+        "a",
+        "b"
+      ]
+    },
+    {
+      "name": "multilingual",
+      "tokens": [
+        "\u0441\u043e\u0432\u0430",
+        "\u05d9\u05e0\u05e9\u05d5\u05e3",
+        "\u00e9t\u00e9",
+        "\ud83e\udd89",
+        "\u0434\u0440\u0443\u0433"
+      ],
+      "unique": [
+        "\u0441\u043e\u0432\u0430",
+        "\u05d9\u05e0\u05e9\u05d5\u05e3",
+        "\u00e9t\u00e9",
+        "\ud83e\udd89",
+        "\u0434\u0440\u0443\u0433"
+      ]
+    },
+    {
+      "name": "normalization",
+      "tokens": [
+        "\u00e9",
+        "e\u0301",
+        "\u00e9",
+        "\u00c9"
+      ],
+      "unique": [
+        "\u00e9",
+        "e\u0301",
+        "\u00c9"
+      ]
+    },
+    {
+      "name": "embedded_spaces",
+      "tokens": [
+        "a b",
+        "c",
+        "a",
+        "b c",
+        "d"
+      ],
+      "unique": [
+        "a b",
+        "c",
+        "a",
+        "b c",
+        "d"
+      ]
+    },
+    {
+      "name": "punctuation",
+      "tokens": [
+        "#owl",
+        "a|b",
+        "\"friend\"",
+        "it's",
+        "\\"
+      ],
+      "unique": [
+        "#owl",
+        "a|b",
+        "\"friend\"",
+        "it's",
+        "\\"
+      ]
+    },
+    {
+      "name": "newline",
+      "tokens": [
+        "a\nb",
+        "c",
+        "d",
+        "a\nb"
+      ],
+      "unique": [
+        "a\nb",
+        "c",
+        "d"
+      ]
+    }
+  ],
+  "excluded_numeric_cases": [
+    {
+      "name": "empty_word_union",
+      "reason": "Contains zero-element tuples; retained in the numerical count-boundary suite."
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+# A live Harmonix organ: token boundaries are supplied explicitly.
+IMPORT "../src/lexicon.aml"
+
+user_tokens = list_new()
+list_push(user_tokens, "the")
+list_push(user_tokens, "owl")
+list_push(user_tokens, "listens")
+system_tokens = list_new()
+list_push(system_tokens, "the")
+list_push(system_tokens, "owl")
+list_push(system_tokens, "dreams")
+
+user = haiku_trigrams(user_tokens)
+system = haiku_trigrams(system_tokens)
+observation = haiku_observe_trigrams(user, system)
+temperatures = haiku_temperatures(observation[0])
+
+PRINT "dissonance"
+PRINT observation[0]
+PRINT "novelty"
+PRINT observation[1]
+PRINT "arousal"
+PRINT observation[2]
+PRINT "entropy"
+PRINT observation[3]
+PRINT "haiku temperature"
+PRINT temperatures[0]
+PRINT "observer temperature"
+PRINT temperatures[1]

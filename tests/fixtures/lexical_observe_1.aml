@@ -1,0 +1,141 @@
+# Direct pinned Python references: tests/reference/lexical_inputs.json.
+IMPORT "lexical_support.aml"
+failures = 0
+# empty_both
+user = list_new()
+system = list_new()
+counts = [0, 0, 0, 0, 0]
+observation = [0.5, 0, 0, 0]
+failures = failures + lexical_observe_check("empty_both", user, system, counts, observation)
+# empty_user
+user = list_new()
+system = list_new()
+lexical_add(system, "a", "b", "c")
+counts = [0, 1, 0, 3, 0]
+observation = [0.5, 0, 0, 0]
+failures = failures + lexical_observe_check("empty_user", user, system, counts, observation)
+# empty_system
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+counts = [1, 0, 0, 3, 0]
+observation = [0.5, 0, 0, 0]
+failures = failures + lexical_observe_check("empty_system", user, system, counts, observation)
+# identical
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+lexical_add(system, "a", "b", "c")
+counts = [1, 1, 3, 3, 1]
+observation = [0, 0, 0, 0.14999999999999999]
+failures = failures + lexical_observe_check("identical", user, system, counts, observation)
+# same_words_reordered
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+lexical_add(system, "c", "b", "a")
+counts = [1, 1, 3, 3, 0]
+observation = [0, 0, 0, 0.14999999999999999]
+failures = failures + lexical_observe_check("same_words_reordered", user, system, counts, observation)
+# disjoint
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "d", "e", "f")
+lexical_add(system, "x", "y", "z")
+lexical_add(system, "p", "q", "r")
+counts = [2, 2, 0, 12, 0]
+observation = [1, 1, 0, 0.59999999999999998]
+failures = failures + lexical_observe_check("disjoint", user, system, counts, observation)
+# exact_match_discount
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "d", "e", "f")
+lexical_add(system, "a", "b", "c")
+lexical_add(system, "g", "h", "i")
+counts = [2, 2, 3, 9, 1]
+observation = [0.46666666666666667, 0.66666666666666674, 0, 0.45000000000000001]
+failures = failures + lexical_observe_check("exact_match_discount", user, system, counts, observation)
+# arousal_below_06
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "d", "e", "f")
+lexical_add(system, "a", "b", "c")
+lexical_add(system, "g", "h", "i")
+counts = [4, 2, 3, 9, 1]
+observation = [0.46666666666666667, 0.66666666666666674, 0.5, 0.45000000000000001]
+failures = failures + lexical_observe_check("arousal_below_06", user, system, counts, observation)
+# arousal_at_06
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "d", "e", "f")
+lexical_add(system, "a", "b", "c")
+lexical_add(system, "g", "h", "i")
+counts = [5, 2, 3, 9, 1]
+observation = [0.46666666666666667, 0.66666666666666674, 0.59999999999999998, 0.45000000000000001]
+failures = failures + lexical_observe_check("arousal_at_06", user, system, counts, observation)
+# arousal_above_06
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "a", "b", "c")
+lexical_add(user, "d", "e", "f")
+lexical_add(system, "a", "b", "c")
+lexical_add(system, "g", "h", "i")
+counts = [6, 2, 3, 9, 1]
+observation = [0.53666666666666663, 0.66666666666666674, 0.66666666666666663, 0.45000000000000001]
+failures = failures + lexical_observe_check("arousal_above_06", user, system, counts, observation)
+# arousal_above_one
+user = list_new()
+system = list_new()
+lexical_add(user, "a", "b", "c")
+lexical_add(system, "a", "b", "c")
+lexical_add(system, "g", "h", "i")
+lexical_add(system, "g", "h", "i")
+lexical_add(system, "g", "h", "i")
+counts = [1, 4, 3, 6, 1]
+observation = [0.40249999999999997, 0.5, 3, 0.29999999999999999]
+failures = failures + lexical_observe_check("arousal_above_one", user, system, counts, observation)
+# entropy_below_07
+user = list_new()
+system = list_new()
+lexical_add(user, "shared0", "shared0", "shared0")
+lexical_add(user, "shared1", "shared1", "shared1")
+lexical_add(user, "shared2", "shared2", "shared2")
+lexical_add(user, "shared3", "shared3", "shared3")
+lexical_add(user, "shared4", "shared4", "shared4")
+lexical_add(user, "shared5", "shared5", "shared5")
+lexical_add(user, "shared6", "shared6", "shared6")
+lexical_add(user, "user0", "user0", "user0")
+lexical_add(user, "user1", "user1", "user1")
+lexical_add(user, "user2", "user2", "user2")
+lexical_add(system, "shared0", "shared0", "shared0")
+lexical_add(system, "shared1", "shared1", "shared1")
+lexical_add(system, "shared2", "shared2", "shared2")
+lexical_add(system, "shared3", "shared3", "shared3")
+lexical_add(system, "shared4", "shared4", "shared4")
+lexical_add(system, "shared5", "shared5", "shared5")
+lexical_add(system, "shared6", "shared6", "shared6")
+lexical_add(system, "system0", "system0", "system0")
+lexical_add(system, "system1", "system1", "system1")
+lexical_add(system, "system2", "system2", "system2")
+counts = [10, 10, 7, 13, 7]
+observation = [0.32307692307692309, 0.46153846153846156, 0, 0.65000000000000002]
+failures = failures + lexical_observe_check("entropy_below_07", user, system, counts, observation)
+# Numeric reference values: 108
+# List reference results: 0
+if failures == 0:
+    ECHO HAIKU_LEXICAL_PARITY_OK
+else:
+    ECHO HAIKU_LEXICAL_PARITY_FAIL
