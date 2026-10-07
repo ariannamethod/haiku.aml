@@ -1,0 +1,163 @@
+# Observer trigram counts and generator memory remain separate state owners.
+IMPORT "cloud.aml"
+
+# Validate the entire batch before mutation. Composite keys retain token bytes.
+def haiku_triple_keys(triples):
+    assert(list_len(triples) <= 30000, "Haiku triple batch limit is 10000")
+    keys = list_new()
+    cursor = 0
+    while cursor < list_len(triples):
+        assert(cursor + 2 < list_len(triples), "Haiku requires complete triples")
+        list_push(keys, list_key(list_slice(triples, cursor, cursor + 3)))
+        cursor = cursor + 3
+    return keys
+
+# rows contains unique triples in first-occurrence order, matching count keys.
+def haiku_rows_check(rows, counts):
+    keys = haiku_triple_keys(rows)
+    names = map_keys(counts)
+    assert(list_len(keys) == list_len(names), "Haiku triple row/count lengths differ")
+    cursor = 0
+    while cursor < list_len(keys):
+        key = list_get(keys, cursor)
+        assert(text_equal(key, list_get(names, cursor)), "Haiku triple row/count order differs")
+        count = map_get(counts, key)
+        assert(count >= 1 and count <= 16777216 and count == floor(count), "Haiku triple counts must be integers in [1, 2^24]")
+        cursor = cursor + 1
+    return list_len(keys)
+
+def haiku_store_trigrams(rows, counts, resonance, triples):
+    size = haiku_rows_check(rows, counts)
+    assert(map_len(resonance) == size, "Haiku resonance/count lengths differ")
+    names = map_keys(counts)
+    cursor = 0
+    while cursor < size:
+        assert(map_has(resonance, list_get(names, cursor)), "Haiku resonance/count keys differ")
+        cursor = cursor + 1
+    keys = haiku_triple_keys(triples)
+    pending = haiku_count_check(counts, keys)
+    cursor = 0
+    while cursor < list_len(keys):
+        key = list_get(keys, cursor)
+        if map_has(counts, key) == 0:
+            list_push(rows, list_get(triples, cursor * 3))
+            list_push(rows, list_get(triples, cursor * 3 + 1))
+            list_push(rows, list_get(triples, cursor * 3 + 2))
+            map_set(resonance, key, 0.5)
+        map_set(counts, key, map_get(pending, key))
+        cursor = cursor + 1
+    return map_len(counts) - size
+
+# Return a vocabulary membership map after checking the entire supplied state.
+def haiku_chain_check(rows, counts, vocab):
+    haiku_rows_check(rows, counts)
+    assert(list_len(vocab) <= 10000, "Haiku vocabulary limit is 10000")
+    seen = map_new()
+    cursor = 0
+    while cursor < list_len(vocab):
+        word = list_get(vocab, cursor)
+        assert(map_has(seen, word) == 0, "Haiku vocabulary contains duplicate words")
+        map_set(seen, word, 1)
+        cursor = cursor + 1
+    cursor = 0
+    while cursor < list_len(rows):
+        assert(map_has(seen, list_get(rows, cursor)), "Haiku chain word missing from vocabulary")
+        assert(map_has(seen, list_get(rows, cursor + 1)), "Haiku chain word missing from vocabulary")
+        assert(map_has(seen, list_get(rows, cursor + 2)), "Haiku chain word missing from vocabulary")
+        cursor = cursor + 3
+    return seen
+
+# Internal helper: staged state is a checked continuation of the current state.
+def haiku_chain_publish(rows, counts, vocab, nr, nc, nv):
+    cursor = 0
+    names = map_keys(nc)
+    while cursor < list_len(names):
+        key = list_get(names, cursor)
+        if map_has(counts, key) == 0:
+            list_push(rows, list_get(nr, cursor * 3))
+            list_push(rows, list_get(nr, cursor * 3 + 1))
+            list_push(rows, list_get(nr, cursor * 3 + 2))
+        map_set(counts, key, map_get(nc, key))
+        cursor = cursor + 1
+    cursor = list_len(vocab)
+    while cursor < list_len(nv):
+        list_push(vocab, list_get(nv, cursor))
+        cursor = cursor + 1
+    return map_len(counts)
+
+# Learn edge counts and vocabulary only; recent memory is a separate operation.
+def haiku_chain_learn(rows, counts, vocab, triples):
+    seen = haiku_chain_check(rows, counts, vocab)
+    keys = haiku_triple_keys(triples)
+    nc = haiku_count_check(counts, keys)
+    nr = list_clone(rows)
+    nv = list_clone(vocab)
+    old = map_clone(counts)
+    cursor = 0
+    while cursor < list_len(keys):
+        key = list_get(keys, cursor)
+        if map_has(old, key) == 0:
+            list_push(nr, list_get(triples, cursor * 3))
+            list_push(nr, list_get(triples, cursor * 3 + 1))
+            list_push(nr, list_get(triples, cursor * 3 + 2))
+            map_set(old, key, 1)
+        part = 0
+        while part < 3:
+            word = list_get(triples, cursor * 3 + part)
+            if map_has(seen, word) == 0:
+                map_set(seen, word, 1)
+                list_push(nv, word)
+            part = part + 1
+        cursor = cursor + 1
+    assert(list_len(nv) <= 10000, "Haiku vocabulary limit is 10000")
+    return haiku_chain_publish(rows, counts, vocab, nr, nc, nv)
+
+# One fresh generator, preserving all seed words even when there are <3 tokens.
+# Initial adjacent transitions do not become recent/user observer trigrams.
+def haiku_chain_seed(rows, counts, vocab, seeds):
+    assert(list_len(rows) == 0 and map_len(counts) == 0 and list_len(vocab) == 0, "Haiku chain seed requires fresh state")
+    assert(list_len(seeds) <= 10000, "Haiku seed batch limit is 10000")
+    nr = list_new()
+    nc = map_new()
+    nv = haiku_unique(seeds)
+    triples = haiku_trigrams(seeds)
+    haiku_chain_learn(nr, nc, nv, triples)
+    return haiku_chain_publish(rows, counts, vocab, nr, nc, nv)
+
+# Return an independent last-ten-triple snapshot. Retain the returned container.
+# The caller's previous recent list is never extended in place.
+def haiku_chain_update(rows, counts, vocab, recent, triples):
+    haiku_triple_keys(recent)
+    assert(list_len(recent) <= 30, "Haiku recent memory limit is 10 triples")
+    keys = haiku_triple_keys(triples)
+    keep = max(0, 30 - list_len(triples))
+    result = list_slice(recent, max(0, list_len(recent) - keep), list_len(recent))
+    cursor = max(0, list_len(triples) - 30)
+    while cursor < list_len(triples):
+        list_push(result, list_get(triples, cursor))
+        cursor = cursor + 1
+    haiku_chain_learn(rows, counts, vocab, triples)
+    return result
+
+def haiku_chain_count(counts, first, second, third):
+    triple = list_new()
+    list_push(triple, first)
+    list_push(triple, second)
+    list_push(triple, third)
+    key = list_key(triple)
+    if map_has(counts, key):
+        return map_get(counts, key)
+    return 0
+
+# Successors preserve their first insertion order within this bigram.
+def haiku_chain_next(rows, first, second):
+    haiku_triple_keys(rows)
+    result = list_new()
+    cursor = 0
+    while cursor < list_len(rows):
+        same = text_equal(list_get(rows, cursor), first)
+        same = same and text_equal(list_get(rows, cursor + 1), second)
+        if same:
+            list_push(result, list_get(rows, cursor + 2))
+        cursor = cursor + 3
+    return result
