@@ -1,11 +1,12 @@
 # HAiKU → AML: the first engineering map
 
 2026-10-07. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
-Tokenization, foreground, and continuity follow-up: 2026-10-08.
+Tokenization, foreground, continuity, and inner-life follow-up: 2026-10-08.
 This document records the inspected sources, current behavior, and implementation
 order. Numerical, text, lexical, cloud, memory, English form, candidate
 generation, MathBrain, RAE, tokenization, foreground exchange, and complete
-foreground checkpoints are implemented; the status below
+foreground checkpoints, MetaHaiku reflection, and the three rings are implemented;
+the status below
 marks the boundary between those functions and the remaining organism.
 
 ## Source bodies
@@ -73,12 +74,23 @@ commit `b0be0a4e42e3456ef5c208668118868723281a51`. The optional original
 tokenizer asset is acquired and hash-checked outside Git; its source pin is
 unchanged. Its 0.2.2 Unigram arithmetic retains the verified full-path oracle.
 
+The inner-life slice starts from the merged continuity: AML
+`b2475812af450bafaaec5fde1b704899fb9c57c5`, NoTorch
+`9f146edbbfefb0851858837e6b570842bd5b6c41`, and Haiku
+`a46fb6670a923f3113e715dd94d9eadf6fececd0`. AML v5.9.0 supplies complete
+expression validation and native `list_sorted`; Haiku uses binary lexical
+word order measured from the original SQLite covering-index query. The merged
+NoTorch tokenizer/hash sources match the previous slice byte for byte; the
+combined documentation retains both its model-identity and Chuck entries.
+The language change is [AML PR #34](https://github.com/ariannamethod/ariannamethod.ai/pull/34),
+commit `df08aa2bc8b5c3e3bc3ecf777567d893a6913f01`.
+
 ## Implemented first organs
 
 `src/harmonix.aml` implements pulse, count-based dissonance, and the two
 temperatures. `src/bridges.aml` implements the aggregate transition score.
-Durable cloud storage and cosine/state aggregation
-remain separate work. [NUMERICAL_PARITY.md](NUMERICAL_PARITY.md) records **49 cases /
+The complete cloud now persists in the versioned checkpoint; full cosine/state
+aggregation remains separate work. [NUMERICAL_PARITY.md](NUMERICAL_PARITY.md) records **49 cases /
 130 scalar values** obtained by direct calls to the pinned Python implementation.
 Both interpreted and compiled AML pass with tolerance 0.000002.
 
@@ -149,7 +161,7 @@ The foreground entrypoint now preserves this prefix of the event order as an
 explicit fixture: tokenize → cloud/trigram
 update → generator chain update → recent-trigram read → dissonance → five
 candidates → RAE choice → response → quality/bridge handoff → MathBrain
-observation. Phase4 state-ID aggregation, reflection → rings → dream →
+observation → reflection → rings. Phase4 state-ID aggregation and dream →
 shard/metrics remain later steps. In particular,
 `update_chain()` updates recent trigrams before dissonance reads them.
 
@@ -169,11 +181,14 @@ Source inspection identifies these concrete integration tasks:
   The foreground default preserves this. Its explicit `train_rae` option also
   gives RAE the selected experience; this is a separately checked extension.
 - `chat.py` invokes reflection, expansion, and dreams synchronously after
-  printing. `async_harmonix.py` supplies a separate async observer. The AML
-  lifecycle will schedule these organs with explicit snapshot/update ownership.
+  printing. AML now stages reflection and rings after learning, saves their
+  complete state, and then displays the selected response. `async_harmonix.py`
+  supplies a separate async observer; background scheduling remains to connect.
 - `MetaHaiku.reflect()` builds `reflection_seed` but does not pass it to
-  generation; `update_cloud_bias()` ends in `pass`. Connect the bootstrap and
-  reflection feedback with a test that changes the next generation state.
+  generation; `update_cloud_bias()` ends in `pass`. The AML baseline preserves
+  those measured paths and saves bootstrap/history. Inner generation advances
+  the shared voice RNG. Bootstrap-conditioned generation and cloud feedback
+  remain distinct experiments with measured effects on subsequent state.
 - The recursive selector appends its prior score, then slices the feature
   vector back to five dimensions. Current recurrence is the final
   `0.7 * score + 0.3 * previous_normalized_score`. Preserve that baseline;
@@ -332,9 +347,9 @@ Cloud and transition updates prevalidate input shape and counts. Word boosts
 and dormant decay are staged before publication. The application currently
 limits each state/batch to 10,000 records, matching AML's loop budget; its
 counter domain is the exact float32 integer interval through 2^24. Last-use
-time is supplied as relative seconds. Allocation failure during publication
-across separate columns remains an explicit error; durable atomic exchange
-records and epoch timestamps belong to the persistence step.
+time is caller-supplied; sessions use logical turns. Standalone column updates
+can fail during allocation. The session's detached record and atomic checkpoint
+now keep such partial work outside the published life.
 
 ### English form and owned generation
 
@@ -398,7 +413,8 @@ and insertion order with a versioned header and checksum. Files are decoded
 into detached records; writes replace a same-directory temporary after syncing
 its complete contents. No Haiku schema lives in the C runtime.
 
-`src/state.aml` owns the 29-field schema and checks cross-organ relations.
+`src/state.aml` owns the 29-field foreground schema and 36-field inner-life
+schema and checks their cross-organ relations.
 `src/session.aml` runs one accepted turn in a detached candidate. The CLI saves
 that completed candidate, swaps it into the live owner without allocating,
 then prints its answer. A pre-commit save failure preserves both the old file
@@ -411,6 +427,28 @@ defects: independently committed organs, missing random streams, partial
 parameter restoration, a lost learning rate, and colliding shard names. The
 foreground checkpoint restores one complete life without reseeding or replaying
 old experience. Its clock remains a logical turn counter.
+
+### The conversation continues inside
+
+`src/metahaiku.aml` preserves the eight-snippet buffer, ten-word/100-codepoint
+snippet boundary, admission conditions and draw order, and one candidate at
+temperature 0.7. Each reflection stores its actual user/response/internal text
+and four climate values. History has an explicit 10,000-event bound; reaching
+it rejects a staged turn without publishing partial work.
+
+`src/overthinkg.aml` preserves echo/drift/meta's 5/7/3 triples, both CPython
+sampling paths, repeated-word set overlap, aggregate ring coherence, and the
+separate strict `> 0.4` observer-admission score. All admissions compare against
+the same initial observer snapshot. Existing rows retain their counts and
+resonance. Cloud words retain exact identity, including observer-only tokens
+that never entered the speaking vocabulary.
+
+Version 2 saves these organs with the foreground. An explicit, draw-free
+upgrade marks `inner_started_turn`; earlier v1 state and its random streams
+are copied intact. New lives use v2, existing v1 lives continue their saved
+profile until upgraded. The RAE review repair also requires its observation
+count to equal `turn * train_rae`; both formerly accepted inconsistent histories
+now fail before replacing live state or an existing checkpoint.
 
 ### RAE development
 
@@ -431,9 +469,9 @@ metrics, and explicit asynchronous publication order.
 3. The English tokenizer, foreground exchange, and save/restart continuity
    now run around the generator, cloud, and Harmonix. Retain explicit tokenizer
    mode, word ordering, random streams, initial state, and event-order fixtures.
-4. Connect full bridge aggregation, reflection, rings, dreams, and background
-   learning; complete the integration tasks above. Extend the versioned state
-   when those organs arrive and verify worker shutdown.
+4. Reflection, rings, and their versioned restart continuity now run after
+   foreground learning. Connect full bridge aggregation, dreams, and background
+   learning next; extend the state for those organs and verify worker shutdown.
 5. Add Klaus-inspired language packs with haiku-specific vocabulary and
    syllable behavior; preserve each language's own cloud.
 6. Add the local character interface, conversation, and event-driven animation.

@@ -1,0 +1,199 @@
+IMPORT "../../src/metahaiku.aml"
+rng = rng_new(575)
+owner = record_new()
+record_set(owner, "buffer", list_new())
+word = ""
+word = text_concat(word, "the first inner shard")
+list_push(record_get(owner, "buffer"), word)
+word = ""
+word = text_concat(word, "a bright pulse")
+list_push(record_get(owner, "buffer"), word)
+word = ""
+word = text_concat(word, "a quieter moment")
+list_push(record_get(owner, "buffer"), word)
+# whitespace
+spoken = ""
+spoken = text_concat(spoken, " \t\n  ")
+tape = zeros(2)
+tape[1] = 0.875
+before = list_clone(record_get(owner, "buffer"))
+buffer = haiku_meta_bootstrap(record_get(owner, "buffer"), spoken, 0.75, 0, rng, tape)
+assert(text_equal(list_key(before), list_key(record_get(owner, "buffer"))), "Bootstrap changed its input owner")
+assert(tape[0] == 1, "Bootstrap admission draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "the first inner shard")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "a bright pulse")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "a quieter moment")
+list_push(expected, word)
+word = ""
+list_push(expected, word)
+assert(text_equal(list_key(buffer), list_key(expected)), "Reflection ordered-list reference differs")
+record_set(owner, "buffer", buffer)
+# ten_words
+spoken = ""
+spoken = text_concat(spoken, "one two three four five six seven eight nine ten eleven twelve")
+tape = zeros(2)
+tape[1] = 0.875
+before = list_clone(record_get(owner, "buffer"))
+buffer = haiku_meta_bootstrap(record_get(owner, "buffer"), spoken, 0.75, 0, rng, tape)
+assert(text_equal(list_key(before), list_key(record_get(owner, "buffer"))), "Bootstrap changed its input owner")
+assert(tape[0] == 1, "Bootstrap admission draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "the first inner shard")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "a bright pulse")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "a quieter moment")
+list_push(expected, word)
+word = ""
+list_push(expected, word)
+word = ""
+word = text_concat(word, "one two three four five six seven eight nine ten")
+list_push(expected, word)
+assert(text_equal(list_key(buffer), list_key(expected)), "Reflection ordered-list reference differs")
+record_set(owner, "buffer", buffer)
+# unicode_whitespace
+spoken = ""
+spoken = text_concat(spoken, "  pluiemémoire облако שלום\t🌧️\n")
+tape = zeros(2)
+tape[1] = 0.875
+before = list_clone(record_get(owner, "buffer"))
+buffer = haiku_meta_bootstrap(record_get(owner, "buffer"), spoken, 0.75, 0, rng, tape)
+assert(text_equal(list_key(before), list_key(record_get(owner, "buffer"))), "Bootstrap changed its input owner")
+assert(tape[0] == 1, "Bootstrap admission draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "the first inner shard")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "a bright pulse")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "a quieter moment")
+list_push(expected, word)
+word = ""
+list_push(expected, word)
+word = ""
+word = text_concat(word, "one two three four five six seven eight nine ten")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "pluie mémoire облако שלום 🌧️")
+list_push(expected, word)
+assert(text_equal(list_key(buffer), list_key(expected)), "Reflection ordered-list reference differs")
+record_set(owner, "buffer", buffer)
+# hundred_codepoints
+spoken = ""
+spoken = text_concat(spoken, "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀")
+spoken = text_concat(spoken, "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀")
+spoken = text_concat(spoken, "😀😀😀😀😀😀😀😀😀😀😀😀")
+tape = zeros(2)
+tape[1] = 0.875
+before = list_clone(record_get(owner, "buffer"))
+buffer = haiku_meta_bootstrap(record_get(owner, "buffer"), spoken, 0.75, 0, rng, tape)
+assert(text_equal(list_key(before), list_key(record_get(owner, "buffer"))), "Bootstrap changed its input owner")
+assert(tape[0] == 1, "Bootstrap admission draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "the first inner shard")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "a bright pulse")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "a quieter moment")
+list_push(expected, word)
+word = ""
+list_push(expected, word)
+word = ""
+word = text_concat(word, "one two three four five six seven eight nine ten")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "pluie mémoire облако שלום 🌧️")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀")
+word = text_concat(word, "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀")
+list_push(expected, word)
+assert(text_equal(list_key(buffer), list_key(expected)), "Reflection ordered-list reference differs")
+record_set(owner, "buffer", buffer)
+# space_at_cut
+spoken = ""
+spoken = text_concat(spoken, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa another")
+tape = zeros(2)
+tape[1] = 0.875
+before = list_clone(record_get(owner, "buffer"))
+buffer = haiku_meta_bootstrap(record_get(owner, "buffer"), spoken, 0.75, 0, rng, tape)
+assert(text_equal(list_key(before), list_key(record_get(owner, "buffer"))), "Bootstrap changed its input owner")
+assert(tape[0] == 1, "Bootstrap admission draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "the first inner shard")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "a bright pulse")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "a quieter moment")
+list_push(expected, word)
+word = ""
+list_push(expected, word)
+word = ""
+word = text_concat(word, "one two three four five six seven eight nine ten")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "pluie mémoire облако שלום 🌧️")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀")
+word = text_concat(word, "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ")
+list_push(expected, word)
+assert(text_equal(list_key(buffer), list_key(expected)), "Reflection ordered-list reference differs")
+record_set(owner, "buffer", buffer)
+# combining_cut
+spoken = ""
+spoken = text_concat(spoken, "ééééééééééééééééééééééééééééééééééééééééééééééééééé")
+tape = zeros(2)
+tape[1] = 0.875
+before = list_clone(record_get(owner, "buffer"))
+buffer = haiku_meta_bootstrap(record_get(owner, "buffer"), spoken, 0.75, 0, rng, tape)
+assert(text_equal(list_key(before), list_key(record_get(owner, "buffer"))), "Bootstrap changed its input owner")
+assert(tape[0] == 1, "Bootstrap admission draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "a bright pulse")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "a quieter moment")
+list_push(expected, word)
+word = ""
+list_push(expected, word)
+word = ""
+word = text_concat(word, "one two three four five six seven eight nine ten")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "pluie mémoire облако שלום 🌧️")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀")
+word = text_concat(word, "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "éééééééééééééééééééééééééééééééééééééééééééééééééé")
+list_push(expected, word)
+assert(text_equal(list_key(buffer), list_key(expected)), "Reflection ordered-list reference differs")
+record_set(owner, "buffer", buffer)
+PRINT "HAIKU_META_OK"

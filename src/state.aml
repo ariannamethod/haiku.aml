@@ -1,7 +1,8 @@
-# One complete foreground life, at a completed-turn boundary.
+# One complete life, at a completed-turn boundary.
 # Generic records/checkpoints belong to AML; this schema belongs to Haiku.
 IMPORT "foreground.aml"
 IMPORT "english_seeds.aml"
+IMPORT "overthinkg.aml"
 
 def haiku_state_fields(state, names, kind):
     keys = haiku_words(names)
@@ -67,15 +68,26 @@ def haiku_state_bridge(event, turn, clock):
 # Read-only validation of every owner and the relations needed by the next
 # exchange. A detached load passes this before any live record is replaced.
 def haiku_state_check(state, model):
-    assert(list_len(record_keys(state)) == 29, "Haiku state requires exactly twenty-nine fields")
+    haiku_state_fields(state, "version", "float")
+    version = record_get(state, "version")
+    assert(version == 1 or version == 2, "Haiku state version is unsupported")
+    if version == 1:
+        assert(list_len(record_keys(state)) == 29, "Haiku state requires exactly twenty-nine fields")
+    else:
+        assert(list_len(record_keys(state)) == 36, "Haiku inner state requires exactly thirty-six fields")
+        haiku_state_fields(state, "inner_started_turn", "float")
+        haiku_state_fields(state, "meta_bootstrap meta_history ring_trigrams", "list")
+        haiku_state_fields(state, "meta_metrics ring_coherence ring_admission", "array")
     haiku_state_fields(state, "format profile clock_kind tokenizer_mode tokenizer_identity", "string")
     haiku_state_fields(state, "version train_rae turn clock", "float")
     haiku_state_fields(state, "origins observer_rows rows vocab recent", "list")
     haiku_state_fields(state, "weights frequencies last_used observer_counts observer_resonance counts syllables mathbrain_state rae_state voice_rng model_rng bridge_event", "map")
     haiku_state_fields(state, "mathbrain rae draws", "array")
     assert(text_equal(record_get(state, "format"), "haiku.aml"), "Haiku state format is unsupported")
-    assert(record_get(state, "version") == 1, "Haiku state version is unsupported")
-    assert(text_equal(record_get(state, "profile"), "english-foreground-v1"), "Haiku state profile is unsupported")
+    profile = "english-foreground-v1"
+    if version == 2:
+        profile = "english-inner-v2"
+    assert(text_equal(record_get(state, "profile"), profile), "Haiku state profile is unsupported")
     assert(text_equal(record_get(state, "clock_kind"), "turn"), "Haiku state clock kind is unsupported")
     haiku_state_mode(record_get(state, "tokenizer_mode"), record_get(state, "tokenizer_identity"), model)
     haiku_state_integer(record_get(state, "train_rae"), 0, 1)
@@ -110,8 +122,15 @@ def haiku_state_check(state, model):
         key = list_get(names, cursor)
         value = map_get(resonance, key)
         assert(value >= 0 and value <= 1, "Haiku observer resonance is invalid")
-        assert(map_has(counts, key), "Haiku observer triple is absent from its generator")
-        assert(map_get(counts, key) >= map_get(observer, key), "Haiku observer count exceeds its generator count")
+        if version == 1:
+            assert(map_has(counts, key), "Haiku observer triple is absent from its generator")
+            assert(map_get(counts, key) >= map_get(observer, key), "Haiku observer count exceeds its generator count")
+        else:
+            part = 0
+            while part < 3:
+                word = list_get(record_get(state, "observer_rows"), cursor * 3 + part)
+                assert(map_has(weights, word), "Haiku observer word is absent from its cloud")
+                part = part + 1
         cursor = cursor + 1
     recent = record_get(state, "recent")
     assert(list_len(recent) <= 30, "Haiku recent memory exceeds ten triples")
@@ -129,11 +148,42 @@ def haiku_state_check(state, model):
     rae_state = record_get(state, "rae_state")
     assert(map_len(rae_state) == 2, "Haiku RAE state requires exactly two fields")
     haiku_state_integer(map_get(rae_state, "observations"), 0, turn)
+    assert(map_get(rae_state, "observations") == turn * record_get(state, "train_rae"), "Haiku RAE observations differ from its training history")
     assert(map_get(rae_state, "learning_rate") >= 0, "Haiku RAE learning rate must be nonnegative")
     haiku_state_rng(record_get(state, "voice_rng"))
     haiku_state_rng(record_get(state, "model_rng"))
     haiku_gen_tape(record_get(state, "draws"))
     haiku_state_bridge(record_get(state, "bridge_event"), turn, clock)
+    if version == 2:
+        haiku_state_inner_check(state)
+    return 1
+
+# History begins at an explicit completed-turn boundary. Reflection and rings
+# share the foreground's draw stream and publish with the same whole record.
+def haiku_state_inner_check(state):
+    turn = record_get(state, "turn")
+    started = haiku_state_integer(record_get(state, "inner_started_turn"), 0, turn)
+    count = haiku_meta_check(state)
+    assert(count == turn - started, "Haiku inner history differs from completed inner turns")
+    haiku_rings_check(state)
+    if count == 0:
+        assert(list_len(record_get(state, "ring_trigrams")) == 0, "Haiku fresh inner state has ring traces")
+        return 1
+    if map_len(record_get(state, "weights")) < 3:
+        assert(list_len(record_get(state, "ring_trigrams")) == 0, "Haiku small cloud has ring traces")
+    else:
+        assert(list_len(record_get(state, "ring_trigrams")) == 45, "Haiku completed inner turn needs three ring traces")
+    metrics = record_get(state, "meta_metrics")
+    cursor = 0
+    while cursor < count:
+        assert(metrics[cursor * 5] == started + cursor + 1, "Haiku inner history turn differs from its boundary")
+        cursor = cursor + 1
+    names = haiku_words("dissonance novelty arousal entropy")
+    event = record_get(state, "bridge_event")
+    cursor = 0
+    while cursor < 4:
+        assert(metrics[(count - 1) * 5 + cursor + 1] == map_get(event, list_get(names, cursor)), "Haiku inner context differs from its bridge climate")
+        cursor = cursor + 1
     return 1
 
 # Original 587 seed entries (576 unique), in source order. The model stream
@@ -180,6 +230,25 @@ def haiku_state_new(mode, model, train_rae, voice_seed, model_seed):
     record_set(state, "bridge_event", map_new())
     haiku_state_check(state, model)
     return state
+
+# Opt in without replaying old turns or drawing new random values. The caller
+# receives a detached owner and controls its file/save/publication boundary.
+def haiku_state_enable_inner(state, model):
+    haiku_state_check(state, model)
+    pending = record_clone(state)
+    if record_get(pending, "version") == 2:
+        return pending
+    record_set(pending, "version", 2)
+    record_set(pending, "profile", "english-inner-v2")
+    record_set(pending, "inner_started_turn", record_get(pending, "turn"))
+    record_set(pending, "meta_bootstrap", list_new())
+    record_set(pending, "meta_history", list_new())
+    record_set(pending, "meta_metrics", zeros(1))
+    record_set(pending, "ring_trigrams", list_new())
+    record_set(pending, "ring_coherence", zeros(1))
+    record_set(pending, "ring_admission", zeros(1))
+    haiku_state_check(pending, model)
+    return pending
 
 # Wrapper paths are relative to this module. A launcher needing its own base
 # directory calls checkpoint_save/load directly around haiku_state_check.

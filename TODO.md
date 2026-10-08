@@ -14,8 +14,10 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   source, scoring features, quality, state revision, and publication order.
 - [x] Save and restore learner parameters, statistics, and owned random
   streams together with the cloud and conversation state.
+- [x] Connect MetaHaiku reflection and echo/drift/meta rings after foreground
+  learning; retain their owners, shared draw order, and restart continuity.
 - [ ] Complete Phase4 state-ID aggregation beyond the current metric handoff;
-  connect reflection, rings, and dream events after the foreground response.
+  connect dream events after reflection and rings.
 
 ## Family experiments
 

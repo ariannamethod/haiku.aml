@@ -95,7 +95,7 @@ first; our little presence will find another shape.
 
 ## Right now
 
-Haiku now listens, answers, learns, and remembers across AML conversations.
+Haiku now listens, answers, learns, reflects, and remembers across AML conversations.
 Its organs run in pure AML modules. Pulse,
 dissonance, temperatures, and transition scores preserve the Python formulas.
 The text organ counts Unicode-delimited words, preserves line contents, and
@@ -129,14 +129,28 @@ in `haiku.aml` before starting a new state file to let that selector learn from
 the same chosen experience, too.
 Each learner and random stream has an explicit owner.
 
+Then the conversation continues inside. MetaHaiku keeps eight short fragments
+and answers with an internal haiku at temperature 0.7. Echo, drift, and meta
+produce five, seven, and three candidate trigrams; coherent ones enter the
+observer's memory. Their counts remain separate from the speaking chain.
+The inner voice and rings share the voice's random stream, in Python's event
+order. Thinking leaves its place in the next draw.
+
 Close the terminal. Come back. The cloud remembers.
 
 Each completed exchange saves one versioned state: cloud, ordered transitions,
 recent memory, both learners and their statistics, both random streams, and
-the latest bridge event. The next launch resumes `haiku.state` beside the
+the latest bridge event, reflection history, and the latest three-ring trace.
+The next launch resumes `haiku.state` beside the
 entrypoint. Its tokenizer identity and logical clock come with it. Set
 `state_path = ""` for a fresh, unsaved conversation, or choose another path
 for another voice. One running process owns each state file.
+
+New conversations include inner life. Existing version-1 checkpoints retain
+their exact foreground continuation. Set `upgrade_inner = 1` in `haiku.aml`
+to begin reflecting from their next exchange; their earlier memory and random
+streams carry through unchanged. Set `inner_life = 0` to start a new
+foreground-only conversation.
 
 Run `../ariannamethod.ai/runner/aml-notorch haiku.aml`. The first exchange of a
 fresh native state, with the checked-in seeds and settings:
@@ -150,6 +164,16 @@ to and reinforce
 ```
 
 Still a little sour. Now he says it in AML.
+
+After that same exchange, his internal haiku is:
+
+```text
+follow seek without
+give most moderate which
+react relate least
+```
+
+The spoken line has ended. The little cloud is still talking.
 
 Tokenization has two explicit modes. `regex` keeps lowercase Unicode words;
 `sentencepiece` loads the original 650-piece Unigram model through NoTorch,
@@ -180,14 +204,21 @@ generated candidates through RAE's choice, an explicit learning event, and the
 next scores. These examples expose individual generator and learner events;
 `haiku.aml` carries them through the conversation.
 
-Sessions now save after learning and resume with their logical-turn clock.
+Try `../ariannamethod.ai/runner/aml-notorch examples/inner.aml` to hear both the
+spoken and internal haiku and see the three rings' coherence. Its
+[recorded output](examples/inner.txt) comes from three actual AML exchanges.
+
+Sessions now save after learning, reflection, and rings, and resume with their
+logical-turn clock.
 [Continuity](docs/STATE.md) records the complete schema, restore validation,
-and restart checks. Full Phase4 transition aggregation, reflection, rings,
-dreams, and asynchronous scheduling are next. The [foreground record](docs/FOREGROUND.md)
+and restart checks. Full Phase4 transition aggregation, dreams, and asynchronous
+scheduling are next. The [foreground record](docs/FOREGROUND.md)
 keeps that boundary explicit. The family album above still belongs to Python;
 new inner dialogues will come from the AML dream path when it runs.
 
-Build the sibling **AML v5.8.0** toolchain and NoTorch with native Unigram,
+Build the sibling **AML v5.9.0** toolchain
+([language update](https://github.com/ariannamethod/ariannamethod.ai/pull/34))
+and NoTorch with native Unigram,
 model identities, numerical values, and owned sampling, then run the organism's checks:
 
 ```sh
@@ -209,6 +240,7 @@ See [numerical parity](docs/NUMERICAL_PARITY.md) and
 [generator parity](docs/GENERATOR_PARITY.md),
 [MathBrain](docs/MATHBRAIN.md), [RAE](docs/RAE.md),
 [tokenization](docs/TOKENIZER.md), [foreground exchanges](docs/FOREGROUND.md),
+[MetaHaiku](docs/METAHAIKU.md), [the three rings](docs/OVERTHINKG.md),
 and [continuity](docs/STATE.md), for exact boundaries and Python
 reference reproduction.
 
@@ -247,10 +279,15 @@ Reference checks completed on 2026-10-07–08:
 - Continuity compares **five seven-turn variants** with a fresh-process restart:
   regex/SentencePiece, fixed/learning RAE, native/scripted draws, and a supplied
   syllable cache. Responses and complete checkpoint bytes agree through the
-  interpreter and compiled executable. **34 invalid states** preserve every
+  interpreter and compiled executable. **36 invalid foreground states** preserve every
   live owner and the previous file; failed staged generation and failed saving
   do the same. The actual CLI resumes saved configuration and withholds an
   unpublished response after a save failure.
+- Inner life adds exact Python bootstrap and reflection traces, the original
+  rings' sampling/admission paths, and **ten seven-turn restart variants**:
+  fresh version 2 and explicit version-1 migration, in both tokenizer and
+  training modes. Full checkpoint bytes agree across execution paths. A real
+  launcher check covers saved-profile authority and the recorded inner dialogue.
 - AML runtime: **550 tests passed**.
 - AML compiler: scope, source origins, nested failures, worker branches and
   errors, scalar builds, and literal program arguments are covered by regressions.

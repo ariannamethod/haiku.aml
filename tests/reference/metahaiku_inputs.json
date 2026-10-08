@@ -1,0 +1,2222 @@
+{
+  "source": "abb878c52d763b73e5ad7a4d6a68a9ea7a248a39",
+  "vocab": [
+    "rain",
+    "cloud",
+    "wind",
+    "light",
+    "moon",
+    "warm",
+    "dream",
+    "night"
+  ],
+  "edges": [
+    [
+      "rain",
+      "cloud",
+      "wind",
+      1
+    ],
+    [
+      "cloud",
+      "wind",
+      "light",
+      1
+    ],
+    [
+      "wind",
+      "light",
+      "moon",
+      1
+    ],
+    [
+      "light",
+      "moon",
+      "warm",
+      1
+    ],
+    [
+      "moon",
+      "warm",
+      "dream",
+      1
+    ],
+    [
+      "warm",
+      "dream",
+      "night",
+      1
+    ],
+    [
+      "rain",
+      "cloud",
+      "light",
+      3
+    ]
+  ],
+  "draw_overrides": {
+    "1": 0,
+    "2": 0.1875
+  },
+  "bootstrap": [
+    {
+      "name": "empty",
+      "spoken": "",
+      "dissonance": 0.9,
+      "arousal": 0.9,
+      "draw": 0.125,
+      "draws": 0,
+      "before": [],
+      "after": []
+    },
+    {
+      "name": "high_dissonance",
+      "spoken": "the first inner shard",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [],
+      "after": [
+        "the first inner shard"
+      ]
+    },
+    {
+      "name": "high_arousal",
+      "spoken": "a bright pulse",
+      "dissonance": 0,
+      "arousal": 0.75,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "the first inner shard"
+      ],
+      "after": [
+        "the first inner shard",
+        "a bright pulse"
+      ]
+    },
+    {
+      "name": "exact_thresholds",
+      "spoken": "outside the buffer",
+      "dissonance": 0.6,
+      "arousal": 0.6,
+      "draw": 0.3,
+      "draws": 1,
+      "before": [
+        "the first inner shard",
+        "a bright pulse"
+      ],
+      "after": [
+        "the first inner shard",
+        "a bright pulse"
+      ]
+    },
+    {
+      "name": "diversity",
+      "spoken": "a quieter moment",
+      "dissonance": 0,
+      "arousal": 0,
+      "draw": 0.25,
+      "draws": 1,
+      "before": [
+        "the first inner shard",
+        "a bright pulse"
+      ],
+      "after": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment"
+      ]
+    },
+    {
+      "name": "diversity_boundary",
+      "spoken": "still outside",
+      "dissonance": 0,
+      "arousal": 0,
+      "draw": 0.3,
+      "draws": 1,
+      "before": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment"
+      ],
+      "after": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment"
+      ]
+    },
+    {
+      "name": "whitespace",
+      "spoken": " \t\n  ",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment"
+      ],
+      "after": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment",
+        ""
+      ]
+    },
+    {
+      "name": "ten_words",
+      "spoken": "one two three four five six seven eight nine ten eleven twelve",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment",
+        ""
+      ],
+      "after": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment",
+        "",
+        "one two three four five six seven eight nine ten"
+      ]
+    },
+    {
+      "name": "unicode_whitespace",
+      "spoken": "  pluiemémoire облако שלום\t🌧️\n",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment",
+        "",
+        "one two three four five six seven eight nine ten"
+      ],
+      "after": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment",
+        "",
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️"
+      ]
+    },
+    {
+      "name": "hundred_codepoints",
+      "spoken": "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment",
+        "",
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️"
+      ],
+      "after": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment",
+        "",
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      ]
+    },
+    {
+      "name": "space_at_cut",
+      "spoken": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa another",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment",
+        "",
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+      ],
+      "after": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment",
+        "",
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "
+      ]
+    },
+    {
+      "name": "combining_cut",
+      "spoken": "ééééééééééééééééééééééééééééééééééééééééééééééééééé",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "the first inner shard",
+        "a bright pulse",
+        "a quieter moment",
+        "",
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "
+      ],
+      "after": [
+        "a bright pulse",
+        "a quieter moment",
+        "",
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé"
+      ]
+    },
+    {
+      "name": "duplicate",
+      "spoken": "a bright pulse",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "a bright pulse",
+        "a quieter moment",
+        "",
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé"
+      ],
+      "after": [
+        "a quieter moment",
+        "",
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse"
+      ]
+    },
+    {
+      "name": "retention_0",
+      "spoken": "memory number 0",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "a quieter moment",
+        "",
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse"
+      ],
+      "after": [
+        "",
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse",
+        "memory number 0"
+      ]
+    },
+    {
+      "name": "retention_1",
+      "spoken": "memory number 1",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "",
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse",
+        "memory number 0"
+      ],
+      "after": [
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse",
+        "memory number 0",
+        "memory number 1"
+      ]
+    },
+    {
+      "name": "retention_2",
+      "spoken": "memory number 2",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "one two three four five six seven eight nine ten",
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse",
+        "memory number 0",
+        "memory number 1"
+      ],
+      "after": [
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse",
+        "memory number 0",
+        "memory number 1",
+        "memory number 2"
+      ]
+    },
+    {
+      "name": "retention_3",
+      "spoken": "memory number 3",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "pluie mémoire облако שלום 🌧️",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse",
+        "memory number 0",
+        "memory number 1",
+        "memory number 2"
+      ],
+      "after": [
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse",
+        "memory number 0",
+        "memory number 1",
+        "memory number 2",
+        "memory number 3"
+      ]
+    },
+    {
+      "name": "retention_4",
+      "spoken": "memory number 4",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé 😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse",
+        "memory number 0",
+        "memory number 1",
+        "memory number 2",
+        "memory number 3"
+      ],
+      "after": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse",
+        "memory number 0",
+        "memory number 1",
+        "memory number 2",
+        "memory number 3",
+        "memory number 4"
+      ]
+    },
+    {
+      "name": "retention_5",
+      "spoken": "memory number 5",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ",
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse",
+        "memory number 0",
+        "memory number 1",
+        "memory number 2",
+        "memory number 3",
+        "memory number 4"
+      ],
+      "after": [
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse",
+        "memory number 0",
+        "memory number 1",
+        "memory number 2",
+        "memory number 3",
+        "memory number 4",
+        "memory number 5"
+      ]
+    },
+    {
+      "name": "retention_6",
+      "spoken": "memory number 6",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "a bright pulse",
+        "memory number 0",
+        "memory number 1",
+        "memory number 2",
+        "memory number 3",
+        "memory number 4",
+        "memory number 5"
+      ],
+      "after": [
+        "a bright pulse",
+        "memory number 0",
+        "memory number 1",
+        "memory number 2",
+        "memory number 3",
+        "memory number 4",
+        "memory number 5",
+        "memory number 6"
+      ]
+    },
+    {
+      "name": "retention_7",
+      "spoken": "memory number 7",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "a bright pulse",
+        "memory number 0",
+        "memory number 1",
+        "memory number 2",
+        "memory number 3",
+        "memory number 4",
+        "memory number 5",
+        "memory number 6"
+      ],
+      "after": [
+        "memory number 0",
+        "memory number 1",
+        "memory number 2",
+        "memory number 3",
+        "memory number 4",
+        "memory number 5",
+        "memory number 6",
+        "memory number 7"
+      ]
+    },
+    {
+      "name": "retention_8",
+      "spoken": "memory number 8",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "memory number 0",
+        "memory number 1",
+        "memory number 2",
+        "memory number 3",
+        "memory number 4",
+        "memory number 5",
+        "memory number 6",
+        "memory number 7"
+      ],
+      "after": [
+        "memory number 1",
+        "memory number 2",
+        "memory number 3",
+        "memory number 4",
+        "memory number 5",
+        "memory number 6",
+        "memory number 7",
+        "memory number 8"
+      ]
+    },
+    {
+      "name": "retention_9",
+      "spoken": "memory number 9",
+      "dissonance": 0.75,
+      "arousal": 0,
+      "draw": 0.875,
+      "draws": 1,
+      "before": [
+        "memory number 1",
+        "memory number 2",
+        "memory number 3",
+        "memory number 4",
+        "memory number 5",
+        "memory number 6",
+        "memory number 7",
+        "memory number 8"
+      ],
+      "after": [
+        "memory number 2",
+        "memory number 3",
+        "memory number 4",
+        "memory number 5",
+        "memory number 6",
+        "memory number 7",
+        "memory number 8",
+        "memory number 9"
+      ]
+    }
+  ],
+  "turns": [
+    {
+      "turn": 1,
+      "user": "are you here",
+      "spoken": "two voices\none field\nsoftly",
+      "observation": [
+        0.75,
+        0.25,
+        0.125,
+        0.5
+      ],
+      "internal": "rain light cloud light dream\nrain light warm rain wind warm night\nwind moon night cloud moon",
+      "bootstrap": [
+        "two voices one field softly"
+      ],
+      "cursor_before": 0,
+      "cursor_after": 18,
+      "events": [
+        {
+          "kind": "admission",
+          "draw": 0.1875
+        },
+        {
+          "kind": "uniform",
+          "draw": 0,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.1875,
+          "index": 1,
+          "words": [
+            "wind",
+            "light"
+          ],
+          "probabilities": [
+            0.17229536509189888,
+            0.8277046349081011
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.125,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.4375,
+          "index": 3,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.75,
+          "index": 6,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.0625,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.375,
+          "index": 1,
+          "words": [
+            "wind",
+            "light"
+          ],
+          "probabilities": [
+            0.17229536509189888,
+            0.8277046349081011
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.6875,
+          "index": 5,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.0,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.3125,
+          "index": 2,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.625,
+          "index": 5,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.9375,
+          "index": 7,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.25,
+          "index": 2,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.5625,
+          "index": 0,
+          "words": [
+            "moon"
+          ],
+          "probabilities": [
+            1.0
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.875,
+          "index": 7,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.1875,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.5,
+          "index": 4,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        }
+      ]
+    },
+    {
+      "turn": 2,
+      "user": "where is the cloud",
+      "spoken": "rain speaks\nlight gathers\nwe listen",
+      "observation": [
+        0.25,
+        0.5,
+        0.75,
+        0.125
+      ],
+      "internal": "cloud light dream rain light\nwarm night wind warm night wind moon\nnight cloud moon dream cloud",
+      "bootstrap": [
+        "two voices one field softly",
+        "rain speaks light gathers we listen"
+      ],
+      "cursor_before": 18,
+      "cursor_after": 36,
+      "events": [
+        {
+          "kind": "admission",
+          "draw": 0.8125
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.125,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.4375,
+          "index": 0,
+          "words": [
+            "light"
+          ],
+          "probabilities": [
+            1.0
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.75,
+          "index": 6,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.0625,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.375,
+          "index": 3,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.6875,
+          "index": 5,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.0,
+          "index": 0,
+          "words": [
+            "night"
+          ],
+          "probabilities": [
+            1.0
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.3125,
+          "index": 2,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.625,
+          "index": 5,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.9375,
+          "index": 7,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.25,
+          "index": 2,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.5625,
+          "index": 4,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.875,
+          "index": 7,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.1875,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.5,
+          "index": 4,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.8125,
+          "index": 6,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.125,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        }
+      ]
+    },
+    {
+      "turn": 3,
+      "user": "an empty earlier answer",
+      "spoken": "",
+      "observation": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "internal": "light warm rain light warm\nrain light warm night wind moon night\ncloud light dream cloud light",
+      "bootstrap": [
+        "two voices one field softly",
+        "rain speaks light gathers we listen"
+      ],
+      "cursor_before": 36,
+      "cursor_after": 53,
+      "events": [
+        {
+          "kind": "uniform",
+          "draw": 0.4375,
+          "index": 3,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.75,
+          "index": 0,
+          "words": [
+            "warm"
+          ],
+          "probabilities": [
+            1.0
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.0625,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.375,
+          "index": 3,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.6875,
+          "index": 5,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.0,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.3125,
+          "index": 1,
+          "words": [
+            "wind",
+            "light"
+          ],
+          "probabilities": [
+            0.17229536509189888,
+            0.8277046349081011
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.625,
+          "index": 5,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.9375,
+          "index": 7,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.25,
+          "index": 2,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.5625,
+          "index": 4,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.875,
+          "index": 7,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.1875,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.5,
+          "index": 0,
+          "words": [
+            "light"
+          ],
+          "probabilities": [
+            1.0
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.8125,
+          "index": 6,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.125,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.4375,
+          "index": 3,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        }
+      ]
+    },
+    {
+      "turn": 4,
+      "user": "что помнит облако",
+      "spoken": "words live\na long night\nremembers",
+      "observation": [
+        0.5,
+        0.75,
+        0,
+        0.25
+      ],
+      "internal": "rain light warm rain wind\nwarm night wind moon night cloud moon\ndream cloud light dream rain",
+      "bootstrap": [
+        "two voices one field softly",
+        "rain speaks light gathers we listen"
+      ],
+      "cursor_before": 53,
+      "cursor_after": 71,
+      "events": [
+        {
+          "kind": "admission",
+          "draw": 0.75
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.0625,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.375,
+          "index": 1,
+          "words": [
+            "wind",
+            "light"
+          ],
+          "probabilities": [
+            0.17229536509189888,
+            0.8277046349081011
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.6875,
+          "index": 5,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.0,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.3125,
+          "index": 2,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.625,
+          "index": 5,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.9375,
+          "index": 0,
+          "words": [
+            "night"
+          ],
+          "probabilities": [
+            1.0
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.25,
+          "index": 2,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.5625,
+          "index": 4,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.875,
+          "index": 7,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.1875,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.5,
+          "index": 4,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.8125,
+          "index": 6,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.125,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.4375,
+          "index": 3,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.75,
+          "index": 6,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.0625,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        }
+      ]
+    }
+  ],
+  "calls": [
+    {
+      "n": 1,
+      "temperature": 0.7
+    },
+    {
+      "n": 1,
+      "temperature": 0.7
+    },
+    {
+      "n": 1,
+      "temperature": 0.7
+    },
+    {
+      "n": 1,
+      "temperature": 0.7
+    }
+  ],
+  "seed_probes": [
+    {
+      "initial": [],
+      "internal": "rain light cloud light dream\nrain light warm rain wind warm night\nwind moon night cloud moon",
+      "events": [
+        {
+          "kind": "admission",
+          "draw": 0.1875
+        },
+        {
+          "kind": "uniform",
+          "draw": 0,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.1875,
+          "index": 1,
+          "words": [
+            "wind",
+            "light"
+          ],
+          "probabilities": [
+            0.17229536509189888,
+            0.8277046349081011
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.125,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.4375,
+          "index": 3,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.75,
+          "index": 6,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.0625,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.375,
+          "index": 1,
+          "words": [
+            "wind",
+            "light"
+          ],
+          "probabilities": [
+            0.17229536509189888,
+            0.8277046349081011
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.6875,
+          "index": 5,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.0,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.3125,
+          "index": 2,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.625,
+          "index": 5,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.9375,
+          "index": 7,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.25,
+          "index": 2,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.5625,
+          "index": 0,
+          "words": [
+            "moon"
+          ],
+          "probabilities": [
+            1.0
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.875,
+          "index": 7,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.1875,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.5,
+          "index": 4,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        }
+      ],
+      "generation_state_unchanged": true
+    },
+    {
+      "initial": [
+        "a wholly different memory",
+        "une nuit dans la pluie"
+      ],
+      "internal": "rain light cloud light dream\nrain light warm rain wind warm night\nwind moon night cloud moon",
+      "events": [
+        {
+          "kind": "admission",
+          "draw": 0.1875
+        },
+        {
+          "kind": "uniform",
+          "draw": 0,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.1875,
+          "index": 1,
+          "words": [
+            "wind",
+            "light"
+          ],
+          "probabilities": [
+            0.17229536509189888,
+            0.8277046349081011
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.125,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.4375,
+          "index": 3,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.75,
+          "index": 6,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.0625,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.375,
+          "index": 1,
+          "words": [
+            "wind",
+            "light"
+          ],
+          "probabilities": [
+            0.17229536509189888,
+            0.8277046349081011
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.6875,
+          "index": 5,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.0,
+          "index": 0,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.3125,
+          "index": 2,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.625,
+          "index": 5,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.9375,
+          "index": 7,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.25,
+          "index": 2,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "weighted",
+          "draw": 0.5625,
+          "index": 0,
+          "words": [
+            "moon"
+          ],
+          "probabilities": [
+            1.0
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.875,
+          "index": 7,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.1875,
+          "index": 1,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        },
+        {
+          "kind": "uniform",
+          "draw": 0.5,
+          "index": 4,
+          "words": [
+            "rain",
+            "cloud",
+            "wind",
+            "light",
+            "moon",
+            "warm",
+            "dream",
+            "night"
+          ]
+        }
+      ],
+      "generation_state_unchanged": true
+    }
+  ]
+}

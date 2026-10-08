@@ -1,0 +1,24 @@
+# Three encounters, with the internal haiku made visible. Fresh, unsaved state.
+IMPORT "../src/session.aml"
+
+state = haiku_state_enable_inner(haiku_state_new("regex", 0, 0, 575, 57), 0)
+messages = list_new()
+list_push(messages, "what is love")
+list_push(messages, "the cloud remembers our words")
+list_push(messages, "between us silence")
+cursor = 0
+while cursor < list_len(messages):
+    source = list_get(messages, cursor)
+    spoken = haiku_session_turn(state, source, 0)
+    history = record_get(state, "meta_history")
+    PRINT "You:"
+    PRINT source
+    PRINT "HAiKU:"
+    PRINT spoken
+    PRINT "Inside:"
+    PRINT list_get(history, list_len(history) - 1)
+    PRINT "Ring coherence (echo, drift, meta):"
+    PRINT record_get(state, "ring_coherence")
+    if cursor + 1 < list_len(messages):
+        PRINT ""
+    cursor = cursor + 1

@@ -1,0 +1,209 @@
+IMPORT "../../src/metahaiku.aml"
+rng = rng_new(575)
+owner = record_new()
+record_set(owner, "buffer", list_new())
+word = ""
+word = text_concat(word, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ")
+list_push(record_get(owner, "buffer"), word)
+word = ""
+word = text_concat(word, "éééééééééééééééééééééééééééééééééééééééééééééééééé")
+list_push(record_get(owner, "buffer"), word)
+word = ""
+word = text_concat(word, "a bright pulse")
+list_push(record_get(owner, "buffer"), word)
+word = ""
+word = text_concat(word, "memory number 0")
+list_push(record_get(owner, "buffer"), word)
+word = ""
+word = text_concat(word, "memory number 1")
+list_push(record_get(owner, "buffer"), word)
+word = ""
+word = text_concat(word, "memory number 2")
+list_push(record_get(owner, "buffer"), word)
+word = ""
+word = text_concat(word, "memory number 3")
+list_push(record_get(owner, "buffer"), word)
+word = ""
+word = text_concat(word, "memory number 4")
+list_push(record_get(owner, "buffer"), word)
+# retention_5
+spoken = ""
+spoken = text_concat(spoken, "memory number 5")
+tape = zeros(2)
+tape[1] = 0.875
+before = list_clone(record_get(owner, "buffer"))
+buffer = haiku_meta_bootstrap(record_get(owner, "buffer"), spoken, 0.75, 0, rng, tape)
+assert(text_equal(list_key(before), list_key(record_get(owner, "buffer"))), "Bootstrap changed its input owner")
+assert(tape[0] == 1, "Bootstrap admission draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "éééééééééééééééééééééééééééééééééééééééééééééééééé")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "a bright pulse")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 0")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 1")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 2")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 3")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 4")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 5")
+list_push(expected, word)
+assert(text_equal(list_key(buffer), list_key(expected)), "Reflection ordered-list reference differs")
+record_set(owner, "buffer", buffer)
+# retention_6
+spoken = ""
+spoken = text_concat(spoken, "memory number 6")
+tape = zeros(2)
+tape[1] = 0.875
+before = list_clone(record_get(owner, "buffer"))
+buffer = haiku_meta_bootstrap(record_get(owner, "buffer"), spoken, 0.75, 0, rng, tape)
+assert(text_equal(list_key(before), list_key(record_get(owner, "buffer"))), "Bootstrap changed its input owner")
+assert(tape[0] == 1, "Bootstrap admission draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "a bright pulse")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 0")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 1")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 2")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 3")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 4")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 5")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 6")
+list_push(expected, word)
+assert(text_equal(list_key(buffer), list_key(expected)), "Reflection ordered-list reference differs")
+record_set(owner, "buffer", buffer)
+# retention_7
+spoken = ""
+spoken = text_concat(spoken, "memory number 7")
+tape = zeros(2)
+tape[1] = 0.875
+before = list_clone(record_get(owner, "buffer"))
+buffer = haiku_meta_bootstrap(record_get(owner, "buffer"), spoken, 0.75, 0, rng, tape)
+assert(text_equal(list_key(before), list_key(record_get(owner, "buffer"))), "Bootstrap changed its input owner")
+assert(tape[0] == 1, "Bootstrap admission draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "memory number 0")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 1")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 2")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 3")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 4")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 5")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 6")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 7")
+list_push(expected, word)
+assert(text_equal(list_key(buffer), list_key(expected)), "Reflection ordered-list reference differs")
+record_set(owner, "buffer", buffer)
+# retention_8
+spoken = ""
+spoken = text_concat(spoken, "memory number 8")
+tape = zeros(2)
+tape[1] = 0.875
+before = list_clone(record_get(owner, "buffer"))
+buffer = haiku_meta_bootstrap(record_get(owner, "buffer"), spoken, 0.75, 0, rng, tape)
+assert(text_equal(list_key(before), list_key(record_get(owner, "buffer"))), "Bootstrap changed its input owner")
+assert(tape[0] == 1, "Bootstrap admission draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "memory number 1")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 2")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 3")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 4")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 5")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 6")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 7")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 8")
+list_push(expected, word)
+assert(text_equal(list_key(buffer), list_key(expected)), "Reflection ordered-list reference differs")
+record_set(owner, "buffer", buffer)
+# retention_9
+spoken = ""
+spoken = text_concat(spoken, "memory number 9")
+tape = zeros(2)
+tape[1] = 0.875
+before = list_clone(record_get(owner, "buffer"))
+buffer = haiku_meta_bootstrap(record_get(owner, "buffer"), spoken, 0.75, 0, rng, tape)
+assert(text_equal(list_key(before), list_key(record_get(owner, "buffer"))), "Bootstrap changed its input owner")
+assert(tape[0] == 1, "Bootstrap admission draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "memory number 2")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 3")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 4")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 5")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 6")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 7")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 8")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "memory number 9")
+list_push(expected, word)
+assert(text_equal(list_key(buffer), list_key(expected)), "Reflection ordered-list reference differs")
+record_set(owner, "buffer", buffer)
+PRINT "HAIKU_META_OK"

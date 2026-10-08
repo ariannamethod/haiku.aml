@@ -1,0 +1,264 @@
+IMPORT "metahaiku_support.aml"
+state = meta_test_new(1)
+# Full Python reflection 1
+user = ""
+user = text_concat(user, "are you here")
+spoken = ""
+spoken = text_concat(spoken, "two voices\none field\nsoftly")
+observation = zeros(4)
+observation[0] = 0.75
+observation[1] = 0.25
+observation[2] = 0.125
+observation[3] = 0.5
+inner = haiku_meta_reflect(state, user, spoken, observation, 1)
+wanted = ""
+wanted = text_concat(wanted, "rain light cloud light dream\nrain light warm rain wind warm night\nwind moon night cloud moon")
+assert(text_equal(inner, wanted), "Reflection generated text differs from Python")
+assert(haiku_meta_check(state) == 1, "Reflection history count differs")
+tape = record_get(state, "draws")
+assert(tape[0] == 18, "Reflection complete draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "two voices one field softly")
+list_push(expected, word)
+assert(text_equal(list_key(record_get(state, "meta_bootstrap")), list_key(expected)), "Reflection ordered-list reference differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "are you here")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "two voices\none field\nsoftly")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "rain light cloud light dream\nrain light warm rain wind warm night\nwind moon night cloud moon")
+list_push(expected, word)
+assert(text_equal(list_key(record_get(state, "meta_history")), list_key(expected)), "Reflection ordered-list reference differs")
+metrics = record_get(state, "meta_metrics")
+assert(metrics[0] == 1, "Reflection frozen context differs")
+assert(metrics[1] == 0.75, "Reflection frozen context differs")
+assert(metrics[2] == 0.25, "Reflection frozen context differs")
+assert(metrics[3] == 0.125, "Reflection frozen context differs")
+assert(metrics[4] == 0.5, "Reflection frozen context differs")
+user = "changed caller"
+spoken = "changed caller"
+observation[0] = 1
+# Full Python reflection 2
+user = ""
+user = text_concat(user, "where is the cloud")
+spoken = ""
+spoken = text_concat(spoken, "rain speaks\nlight gathers\nwe listen")
+observation = zeros(4)
+observation[0] = 0.25
+observation[1] = 0.5
+observation[2] = 0.75
+observation[3] = 0.125
+inner = haiku_meta_reflect(state, user, spoken, observation, 2)
+wanted = ""
+wanted = text_concat(wanted, "cloud light dream rain light\nwarm night wind warm night wind moon\nnight cloud moon dream cloud")
+assert(text_equal(inner, wanted), "Reflection generated text differs from Python")
+assert(haiku_meta_check(state) == 2, "Reflection history count differs")
+tape = record_get(state, "draws")
+assert(tape[0] == 36, "Reflection complete draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "two voices one field softly")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "rain speaks light gathers we listen")
+list_push(expected, word)
+assert(text_equal(list_key(record_get(state, "meta_bootstrap")), list_key(expected)), "Reflection ordered-list reference differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "are you here")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "two voices\none field\nsoftly")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "rain light cloud light dream\nrain light warm rain wind warm night\nwind moon night cloud moon")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "where is the cloud")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "rain speaks\nlight gathers\nwe listen")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "cloud light dream rain light\nwarm night wind warm night wind moon\nnight cloud moon dream cloud")
+list_push(expected, word)
+assert(text_equal(list_key(record_get(state, "meta_history")), list_key(expected)), "Reflection ordered-list reference differs")
+metrics = record_get(state, "meta_metrics")
+assert(metrics[0] == 1, "Reflection frozen context differs")
+assert(metrics[1] == 0.75, "Reflection frozen context differs")
+assert(metrics[2] == 0.25, "Reflection frozen context differs")
+assert(metrics[3] == 0.125, "Reflection frozen context differs")
+assert(metrics[4] == 0.5, "Reflection frozen context differs")
+assert(metrics[5] == 2, "Reflection frozen context differs")
+assert(metrics[6] == 0.25, "Reflection frozen context differs")
+assert(metrics[7] == 0.5, "Reflection frozen context differs")
+assert(metrics[8] == 0.75, "Reflection frozen context differs")
+assert(metrics[9] == 0.125, "Reflection frozen context differs")
+user = "changed caller"
+spoken = "changed caller"
+observation[0] = 1
+# Full Python reflection 3
+user = ""
+user = text_concat(user, "an empty earlier answer")
+spoken = ""
+observation = zeros(4)
+observation[0] = 0
+observation[1] = 0
+observation[2] = 0
+observation[3] = 0
+inner = haiku_meta_reflect(state, user, spoken, observation, 3)
+wanted = ""
+wanted = text_concat(wanted, "light warm rain light warm\nrain light warm night wind moon night\ncloud light dream cloud light")
+assert(text_equal(inner, wanted), "Reflection generated text differs from Python")
+assert(haiku_meta_check(state) == 3, "Reflection history count differs")
+tape = record_get(state, "draws")
+assert(tape[0] == 53, "Reflection complete draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "two voices one field softly")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "rain speaks light gathers we listen")
+list_push(expected, word)
+assert(text_equal(list_key(record_get(state, "meta_bootstrap")), list_key(expected)), "Reflection ordered-list reference differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "are you here")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "two voices\none field\nsoftly")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "rain light cloud light dream\nrain light warm rain wind warm night\nwind moon night cloud moon")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "where is the cloud")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "rain speaks\nlight gathers\nwe listen")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "cloud light dream rain light\nwarm night wind warm night wind moon\nnight cloud moon dream cloud")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "an empty earlier answer")
+list_push(expected, word)
+word = ""
+list_push(expected, word)
+word = ""
+word = text_concat(word, "light warm rain light warm\nrain light warm night wind moon night\ncloud light dream cloud light")
+list_push(expected, word)
+assert(text_equal(list_key(record_get(state, "meta_history")), list_key(expected)), "Reflection ordered-list reference differs")
+metrics = record_get(state, "meta_metrics")
+assert(metrics[0] == 1, "Reflection frozen context differs")
+assert(metrics[1] == 0.75, "Reflection frozen context differs")
+assert(metrics[2] == 0.25, "Reflection frozen context differs")
+assert(metrics[3] == 0.125, "Reflection frozen context differs")
+assert(metrics[4] == 0.5, "Reflection frozen context differs")
+assert(metrics[5] == 2, "Reflection frozen context differs")
+assert(metrics[6] == 0.25, "Reflection frozen context differs")
+assert(metrics[7] == 0.5, "Reflection frozen context differs")
+assert(metrics[8] == 0.75, "Reflection frozen context differs")
+assert(metrics[9] == 0.125, "Reflection frozen context differs")
+assert(metrics[10] == 3, "Reflection frozen context differs")
+assert(metrics[11] == 0, "Reflection frozen context differs")
+assert(metrics[12] == 0, "Reflection frozen context differs")
+assert(metrics[13] == 0, "Reflection frozen context differs")
+assert(metrics[14] == 0, "Reflection frozen context differs")
+user = "changed caller"
+spoken = "changed caller"
+observation[0] = 1
+# Full Python reflection 4
+user = ""
+user = text_concat(user, "что помнит облако")
+spoken = ""
+spoken = text_concat(spoken, "words live\na long night\nremembers")
+observation = zeros(4)
+observation[0] = 0.5
+observation[1] = 0.75
+observation[2] = 0
+observation[3] = 0.25
+inner = haiku_meta_reflect(state, user, spoken, observation, 4)
+wanted = ""
+wanted = text_concat(wanted, "rain light warm rain wind\nwarm night wind moon night cloud moon\ndream cloud light dream rain")
+assert(text_equal(inner, wanted), "Reflection generated text differs from Python")
+assert(haiku_meta_check(state) == 4, "Reflection history count differs")
+tape = record_get(state, "draws")
+assert(tape[0] == 71, "Reflection complete draw order differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "two voices one field softly")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "rain speaks light gathers we listen")
+list_push(expected, word)
+assert(text_equal(list_key(record_get(state, "meta_bootstrap")), list_key(expected)), "Reflection ordered-list reference differs")
+expected = list_new()
+word = ""
+word = text_concat(word, "are you here")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "two voices\none field\nsoftly")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "rain light cloud light dream\nrain light warm rain wind warm night\nwind moon night cloud moon")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "where is the cloud")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "rain speaks\nlight gathers\nwe listen")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "cloud light dream rain light\nwarm night wind warm night wind moon\nnight cloud moon dream cloud")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "an empty earlier answer")
+list_push(expected, word)
+word = ""
+list_push(expected, word)
+word = ""
+word = text_concat(word, "light warm rain light warm\nrain light warm night wind moon night\ncloud light dream cloud light")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "что помнит облако")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "words live\na long night\nremembers")
+list_push(expected, word)
+word = ""
+word = text_concat(word, "rain light warm rain wind\nwarm night wind moon night cloud moon\ndream cloud light dream rain")
+list_push(expected, word)
+assert(text_equal(list_key(record_get(state, "meta_history")), list_key(expected)), "Reflection ordered-list reference differs")
+metrics = record_get(state, "meta_metrics")
+assert(metrics[0] == 1, "Reflection frozen context differs")
+assert(metrics[1] == 0.75, "Reflection frozen context differs")
+assert(metrics[2] == 0.25, "Reflection frozen context differs")
+assert(metrics[3] == 0.125, "Reflection frozen context differs")
+assert(metrics[4] == 0.5, "Reflection frozen context differs")
+assert(metrics[5] == 2, "Reflection frozen context differs")
+assert(metrics[6] == 0.25, "Reflection frozen context differs")
+assert(metrics[7] == 0.5, "Reflection frozen context differs")
+assert(metrics[8] == 0.75, "Reflection frozen context differs")
+assert(metrics[9] == 0.125, "Reflection frozen context differs")
+assert(metrics[10] == 3, "Reflection frozen context differs")
+assert(metrics[11] == 0, "Reflection frozen context differs")
+assert(metrics[12] == 0, "Reflection frozen context differs")
+assert(metrics[13] == 0, "Reflection frozen context differs")
+assert(metrics[14] == 0, "Reflection frozen context differs")
+assert(metrics[15] == 4, "Reflection frozen context differs")
+assert(metrics[16] == 0.5, "Reflection frozen context differs")
+assert(metrics[17] == 0.75, "Reflection frozen context differs")
+assert(metrics[18] == 0, "Reflection frozen context differs")
+assert(metrics[19] == 0.25, "Reflection frozen context differs")
+user = "changed caller"
+spoken = "changed caller"
+observation[0] = 1
+assert(text_equal(list_key(record_get(state, "vocab")), list_key(haiku_words("rain cloud wind light moon warm dream night"))), "Reflection changed vocabulary")
+assert(map_len(record_get(state, "counts")) == 7, "Reflection changed transition memory")
+assert(map_get(record_get(state, "weights"), "sentinel") == 3, "Reflection changed cloud weights")
+PRINT "HAIKU_META_OK"

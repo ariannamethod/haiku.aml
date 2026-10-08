@@ -1,4 +1,4 @@
-# One accepted exchange publishes one complete foreground owner.
+# One accepted exchange publishes the voice and its completed inner life.
 IMPORT "state.aml"
 
 # The caller strips input and handles blank/quit/EOF before asking for a turn.
@@ -6,6 +6,8 @@ IMPORT "state.aml"
 def haiku_session_turn(state, source, model):
     haiku_state_check(state, model)
     assert(haiku_input_action(source) == 1, "Haiku session needs an accepted input")
+    if record_get(state, "version") == 2:
+        assert(list_len(record_get(state, "meta_history")) < 30000, "Haiku reflection history limit is 10000")
     words = haiku_tokenize(source, record_get(state, "tokenizer_mode"), model)
     user = haiku_trigrams(words)
     haiku_foreground_input(words, user)
@@ -35,6 +37,12 @@ def haiku_session_turn(state, source, model):
     record_set(pending, "bridge_event", bridge_event)
     record_set(pending, "turn", turn)
     record_set(pending, "clock", clock)
+    if record_get(pending, "version") == 2:
+        haiku_meta_reflect(pending, source, spoken, observation, turn)
+        rings = haiku_overthinkg(pending, user)
+        record_set(pending, "ring_trigrams", record_get(rings, "trigrams"))
+        record_set(pending, "ring_coherence", record_get(rings, "coherence"))
+        record_set(pending, "ring_admission", record_get(rings, "admission"))
     haiku_state_check(pending, model)
     record_replace(state, pending)
     return spoken

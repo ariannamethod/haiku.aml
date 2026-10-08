@@ -1,0 +1,55 @@
+# Native NoTorch stream replay, observer admission, and independent state owners.
+IMPORT "rings_support.aml"
+first = ring_test_state()
+ring_test_seed(first, "d", 1, 0, 0, "seed")
+ring_test_seed(first, "b", 1, 0, 0, "seed")
+ring_test_seed(first, "a", 1, 0, 0, "seed")
+ring_test_seed(first, "c", 1, 0, 0, "seed")
+ring_test_seed_row(first, haiku_words("a b c"), 7, 0.25)
+draws = zeros(1)
+draws[0] = -1
+record_set(first, "draws", draws)
+second = record_clone(first)
+old = record_clone(first)
+left = haiku_overthinkg(first, haiku_words("a b c"))
+right = haiku_overthinkg(second, haiku_words("a b c"))
+ring_test_list(record_get(left, "trigrams"), record_get(right, "trigrams"))
+ring_test_list(record_get(first, "observer_rows"), record_get(second, "observer_rows"))
+ring_test_list(record_get(first, "origins"), record_get(second, "origins"))
+names = haiku_words("weights frequencies last_used observer_counts observer_resonance voice_rng")
+cursor = 0
+while cursor < list_len(names):
+    name = list_get(names, cursor)
+    ring_test_map(record_get(first, name), record_get(second, name))
+    cursor = cursor + 1
+names = haiku_words("coherence admission")
+cursor = 0
+while cursor < list_len(names):
+    name = list_get(names, cursor)
+    l = record_get(left, name)
+    r = record_get(right, name)
+    offset = 0
+    while offset < len(l):
+        assert(l[offset] == r[offset], "Native ring replay differs")
+        offset = offset + 1
+    cursor = cursor + 1
+ring_test_untouched(first, old)
+ring_test_untouched(second, old)
+ring_test_map(record_get(first, "weights"), record_get(old, "weights"))
+ring_test_map(record_get(first, "frequencies"), record_get(old, "frequencies"))
+ring_test_map(record_get(first, "last_used"), record_get(old, "last_used"))
+ring_test_row(first, haiku_words("a b c"), 7, 0.25)
+assert(map_len(record_get(first, "observer_counts")) > 1, "Native rings inserted no observer triples")
+names = map_keys(record_get(first, "voice_rng"))
+changed = 0
+cursor = 0
+while cursor < list_len(names):
+    key = list_get(names, cursor)
+    changed = changed or map_get(record_get(first, "voice_rng"), key) != map_get(record_get(old, "voice_rng"), key)
+    cursor = cursor + 1
+assert(changed, "Native rings consumed no random values")
+record_set(first, "ring_trigrams", record_get(left, "trigrams"))
+record_set(first, "ring_coherence", record_get(left, "coherence"))
+record_set(first, "ring_admission", record_get(left, "admission"))
+haiku_rings_check(first)
+ECHO HAIKU_RINGS_OK

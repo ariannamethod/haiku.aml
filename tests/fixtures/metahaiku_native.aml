@@ -1,0 +1,65 @@
+IMPORT "metahaiku_support.aml"
+state = meta_test_new(0)
+before = record_clone(state)
+voice = map_clone(record_get(state, "voice_rng"))
+native = zeros(1)
+native[0] = -1
+observation = zeros(4)
+observation[0] = 0.75
+observation[1] = 0.25
+observation[2] = 0.125
+observation[3] = 0.5
+spoken = "two voices\none field\nsoftly"
+inner = haiku_meta_reflect(state, "are you here", spoken, observation, 1)
+# Admission always precedes the same generator stream, including forced admission.
+draw = rng_uniform(voice)
+expected = haiku_generate_candidates(record_get(before, "rows"), record_get(before, "counts"), record_get(before, "vocab"), record_get(before, "syllables"), 1, 0.7, voice, native)
+assert(text_equal(inner, list_get(expected, 0)), "Native reflection changed admission/generation order")
+assert(haiku_is_haiku(inner), "Native reflection missed its form")
+assert(haiku_meta_check(state) == 1, "Native reflection history is missing")
+names = map_keys(voice)
+cursor = 0
+while cursor < list_len(names):
+    key = list_get(names, cursor)
+    assert(map_get(record_get(state, "voice_rng"), key) == map_get(voice, key), "Native reflection stream differs")
+    cursor = cursor + 1
+tape = record_get(state, "draws")
+assert(tape[0] == -1, "Native reflection changed its draw selector")
+# Both saved context text and pulse values are snapshots of that exchange.
+spoken = "caller changed"
+observation[0] = 1
+history = record_get(state, "meta_history")
+metrics = record_get(state, "meta_metrics")
+assert(text_equal(list_get(history, 1), "two voices\none field\nsoftly"), "Reflection context text changed")
+assert(metrics[1] == 0.75, "Reflection context climate changed")
+# Python's computed reflection_seed has no generation argument. Give the two
+# states different buffers, then compare their next voice and random owner.
+other = record_clone(state)
+list_push(record_get(other, "meta_bootstrap"), "a wholly different memory")
+first = haiku_meta_reflect(state, "listen", "the long\nnight listens\nagain", observation, 2)
+second = haiku_meta_reflect(other, "listen", "the long\nnight listens\nagain", observation, 2)
+assert(text_equal(first, second), "Bootstrap unexpectedly changed the baseline generation path")
+cursor = 0
+while cursor < list_len(names):
+    key = list_get(names, cursor)
+    assert(map_get(record_get(state, "voice_rng"), key) == map_get(record_get(other, "voice_rng"), key), "Bootstrap changed draw consumption")
+    cursor = cursor + 1
+assert(list_len(record_get(state, "meta_bootstrap")) + 1 == list_len(record_get(other, "meta_bootstrap")), "Different inner memories disappeared")
+# Generation and reflection leave their input model and cloud intact.
+names = haiku_words("counts syllables weights")
+cursor = 0
+while cursor < list_len(names):
+    name = list_get(names, cursor)
+    old = record_get(before, name)
+    now = record_get(state, name)
+    keys = map_keys(old)
+    assert(text_equal(list_key(keys), list_key(map_keys(now))), "Reflection changed a model/cloud key")
+    offset = 0
+    while offset < list_len(keys):
+        key = list_get(keys, offset)
+        assert(map_get(old, key) == map_get(now, key), "Reflection changed a model/cloud value")
+        offset = offset + 1
+    cursor = cursor + 1
+assert(text_equal(list_key(record_get(before, "rows")), list_key(record_get(state, "rows"))), "Reflection changed Markov rows")
+assert(text_equal(list_key(record_get(before, "vocab")), list_key(record_get(state, "vocab"))), "Reflection changed vocabulary")
+PRINT "HAIKU_META_OK"
