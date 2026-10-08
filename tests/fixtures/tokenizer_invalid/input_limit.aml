@@ -1,0 +1,10 @@
+# EXPECT: Haiku tokenizer input limit is 10000 codepoints
+IMPORT "../../../src/tokenizer.aml"
+source = "a"
+cursor = 0
+while cursor < 13:
+    source = text_concat(source, source)
+    cursor = cursor + 1
+source = text_concat(source, text_slice(source, 0, 1809))
+haiku_tokenize(source, "regex", 0)
+PRINT "HAIKU_INVALID_ACCEPTED"

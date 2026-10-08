@@ -1,9 +1,10 @@
 # HAiKU → AML: the first engineering map
 
 2026-10-07. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
+Tokenization and foreground follow-up: 2026-10-08.
 This document records the inspected sources, current behavior, and implementation
 order. Numerical, text, lexical, cloud, memory, English form, candidate
-generation, MathBrain, and RAE organs are implemented; the status below
+generation, MathBrain, RAE, tokenization, and foreground exchange are implemented; the status below
 marks the boundary between those functions and the remaining organism.
 
 ## Source bodies
@@ -24,10 +25,13 @@ Subjectivity `221157935d84d5037768f34c4661b11ca6865f91` and Brodsky
 foreground state during reflection, episodic recall, sampling mixtures, rhyme
 reservation, and rendering independence to measured future extensions.
 
-[Q](Q.md), inspected at `f5d00a36ecfcdb5e655e1576770f03d06d900e04`, adds
-weightless field generation, aging expectations, candidate experience, and
-slow Hebbian consolidation to the research queue. Its audit records concrete
-activation and persistence findings before proposing Haiku experiments.
+[Q / PostGPT](Q.md), inspected at `f5d00a36ecfcdb5e655e1576770f03d06d900e04`,
+is the active PostGPT line. Original PostGPT at
+`b711595defb135231dda9858677a4a66578d0d9b` makes the corpus → byte-BPE identity
+→ token-transition coherence contract explicit. Q adds weightless field
+generation, aging expectations, candidate experience, and slow Hebbian
+consolidation to the research queue. Its audit records concrete activation and
+persistence findings before proposing Haiku experiments.
 
 The manifesto is copied byte-for-byte from the pinned NoTorch source.
 SHA-256: `c8288157c8e2a63cec307510534a3da5415a5d44f3c0a089c8d7f6bbde07b906`.
@@ -50,6 +54,12 @@ The learners use AML v5.6.0 from
 [PR #162](https://github.com/ariannamethod/notorch/pull/162), published as
 `8c39e3e6d47e11bad30d3f64f45c1a863929a2a2`. Their tested trees are based on the
 merged previous stage: AML `c6974db`, NoTorch `beccbdb`, Haiku `438a1aa`.
+
+The tokenizer and foreground slice starts from those merged learner PRs:
+AML `c21f2416a0d214a4c486908f9d3acf0bd6a46c22`, NoTorch
+`420fa54fe3b92cdb2f83e20d19fc887b09db3d8e`, and Haiku
+`a47eaefd75400ff23ecc4b4d620834539a4d0ae6`. AML v5.7.0 provides its text input
+and immutable tokenizer values; NoTorch supplies native Unigram inference.
 
 ## Implemented first organs
 
@@ -74,8 +84,12 @@ the full Harmonix observation. Triples retain their three separate components;
 tokens containing spaces or punctuation keep their identity. Duplicate triples
 still contribute to arousal through the original list lengths. The
 [lexical parity record](LEXICAL_PARITY.md) defines this boundary and its fixtures.
-The input to the observer is already tokenized; SentencePiece and the original
-lowercasing/regex fallback remain in the tokenizer migration.
+`src/tokenizer.aml` now supplies those inputs through explicit `regex` and
+`sentencepiece` modes. Regex uses AML's Unicode 15 lowercase and alphanumeric
+classification. SentencePiece uses the exact original Unigram model and its
+embedded `nfkc_cf` normalizer through NoTorch, then removes boundary markers in
+AML. [TOKENIZER.md](TOKENIZER.md) records identity, model provenance, source
+launcher differences, and the preserved unknown-piece behavior.
 
 `src/cloud.aml` now carries ordered word weights, frequencies, last-use clocks,
 and exact origin labels. Each active occurrence boosts its word; dormant words
@@ -117,18 +131,27 @@ Each default learner owns 57 parameters. [MathBrain](MATHBRAIN.md) and
 | `dream_haiku.py` | Trigger/cooldown, four recorded exchanges, friend T=1.2 / self T=0.9, fragment decay and chain feedback | `dream.aml` |
 | `chat.py`, `async_harmonix.py` | Foreground exchange orchestration; separate asynchronous observer with locks and async storage | `haiku.aml`, `life.aml`, `state.aml` |
 
-Preserve foreground event order as an explicit fixture: tokenize → cloud/trigram
+The foreground entrypoint now preserves this prefix of the event order as an
+explicit fixture: tokenize → cloud/trigram
 update → generator chain update → recent-trigram read → dissonance → five
-candidates → RAE choice → response → quality/state transition → MathBrain
-observation → reflection → rings → dream → shard/metrics. In particular,
+candidates → RAE choice → response → quality/bridge handoff → MathBrain
+observation. Phase4 state-ID aggregation, reflection → rings → dream →
+shard/metrics remain later steps. In particular,
 `update_chain()` updates recent trigrams before dissonance reads them.
+
+`haiku.aml` owns each cloud column, observer/generator memory, recent snapshot,
+syllable cache, learner, random stream, and latest bridge event explicitly.
+Sessions use a declared logical-turn clock and fresh state. Their timestamps
+are not yet wall-clock persistence. [FOREGROUND.md](FOREGROUND.md) gives the
+measured exchange contract and the exact remaining boundary.
 
 ## Connections to develop
 
 Source inspection identifies these concrete integration tasks:
 
 - `chat.py` calls `haiku_gen.observe()`; it never calls `rae.observe()`.
-  Wire both learners to the same recorded experience and verify both updates.
+  The foreground default preserves this. Its explicit `train_rae` option also
+  gives RAE the selected experience; this is a separately checked extension.
 - `chat.py` invokes reflection, expansion, and dreams synchronously after
   printing. `async_harmonix.py` supplies a separate async observer. The AML
   lifecycle will schedule these organs with explicit snapshot/update ownership.
@@ -156,7 +179,7 @@ lineage and its developments stay traceable.
 | NumPy object shards | Versioned exchange records in the native state format |
 | SciPy `csgraph/eigsh` | Both observer files import them; neither calls them. No eigensolver is needed for the current path |
 | Micrograd classes | Implemented: explicit AML forward/reverse composition through stateless NoTorch linear, tanh, MSE-gradient and SGD kernels; parameter clamp in AML |
-| SentencePiece package | Native unigram-model/tokenizer support in NoTorch, including the model's normalization behavior; piece-ID and trigram fixtures before replacement |
+| SentencePiece package | Implemented: immutable native Unigram model and exact embedded normalization in NoTorch; AML owns lowercase, piece cleanup, explicit mode selection, and rolling triples |
 | `syllables` | English estimator and rule data implemented in AML; each later language supplies its own rules |
 | SQLite / aiosqlite | Native snapshot + journal storage covering words, counts, recent trigrams, metrics, bridges, dreams, learners, and lifecycle state |
 | Python collections/async/I/O | AML text values, collections, module exports, event transport, files, and host-facing I/O |
@@ -185,7 +208,9 @@ assertions, and scalar floor. AML v5.5.0 adds an optional NoTorch sampling
 backend and map-owned random streams. AML v5.6.0 adds stateless numerical values,
 owned Gaussian initialization, Unicode default lowercase, and scalar finite
 checks. These extend the scalar/array runtime, field
-persistence, threads, and float channels. Haiku still needs:
+persistence, threads, and float channels. The tokenizer/input follow-up adds
+immutable native model values, an optional tokenizer backend, Unicode scalar
+classification, and line input with a distinct EOF result. Haiku still needs:
 
 1. Durable word-cloud and transition records. Token lists, indexed numeric
    lookup, ordered words, frequencies, weights, and in-memory updates now run

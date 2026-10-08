@@ -1,0 +1,22 @@
+IMPORT "../../src/foreground.aml"
+
+def fg_near(actual, expected):
+    assert(isfinite(actual) and abs(actual - expected) <= 0.000002, "Foreground numerical reference differs")
+    return actual
+
+def fg_vector(actual, expected):
+    assert(len(actual) == len(expected), "Foreground vector length differs")
+    cursor = 0
+    while cursor < len(actual):
+        fg_near(actual[cursor], expected[cursor])
+        cursor = cursor + 1
+    return len(actual)
+
+def fg_list(actual, source):
+    expected = haiku_words(source)
+    assert(list_len(actual) == list_len(expected), "Foreground list length differs")
+    cursor = 0
+    while cursor < list_len(actual):
+        assert(text_equal(list_get(actual, cursor), list_get(expected, cursor)), "Foreground list content/order differs")
+        cursor = cursor + 1
+    return list_len(actual)

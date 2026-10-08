@@ -1,9 +1,18 @@
-# Q — a cousin with a field full of unfinished expectations
+# Q / PostGPT — coherence from the tokenized field
 
 2026-10-07. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 Source audit and proposed experiments; these extensions are not implemented in Haiku.
 
+**Q is the active PostGPT line.** Its README names PostGPT as its direct ancestor
+and places active development in Q. The inherited path is corpus → BPE tokens
+→ MetaWeights → continuation: tokenization fixes the identities, and bigram and
+trigram structure gives the field its local coherence. Haiku brings this
+principle into its cloud and transition memory while preserving its own
+Python SentencePiece and regex contracts.
+
 Inspected [Q at `f5d00a36ecfcdb5e655e1576770f03d06d900e04`](https://github.com/ariannamethod/q/tree/f5d00a36ecfcdb5e655e1576770f03d06d900e04).
+The direct ancestor was inspected at
+[PostGPT `b711595defb135231dda9858677a4a66578d0d9b`](https://github.com/ariannamethod/postgpt/tree/b711595defb135231dda9858677a4a66578d0d9b).
 The C engine is the execution reference below; measurements call the original
 Python mechanisms. The README presents **θ = ε + γ + αδ**: transformer substrate,
 living statistical field, and an adapting parliament. It publishes attention
@@ -14,6 +23,36 @@ Q's useful kinship is concrete: experience changes the field while speech is
 happening. Haiku already has a living cloud, transition memory, dissonance,
 dreams, and two tiny learners. Q supplies ways to give those organs different
 memory timescales and a record of expectations that have not yet resolved.
+
+## The units underneath coherence
+
+Original PostGPT's `BPETokenizer` learns ordered merges over 256 UTF-8 byte
+roots. `MetaWeights.build` collects token frequencies, bigrams, trigrams,
+positional affinities, and co-occurrences. Its `generate_meta` first tries the
+exact last two tokens, then a bigram, then unigram fallback. Association boosts,
+repetition penalties, top-15 filtering, and temperature operate on those
+corpus-backed continuations.
+
+Q keeps that identity through its transition field. Its `coherence_score`
+combines mean bigram strength, 0.5 times adjacent Hebbian density, 0.8 times
+mean trigram strength, and a length bonus. Surface boundary scoring supplies
+another signal during candidate selection. Prophecy, phase memory, and SPA
+are additional mechanisms on this substrate.
+
+The shipped `q.merges` has 1,024 merges and 1,280 entries. Of these, 117 entries
+span multiple whitespace-separated units. `The cloud remembers.` becomes
+`["The ", "clou", "d ", "remem", "ber", "s", "."]`; lowercase `the ` has a
+different identity. There is no whole-word reconstruction before Q's transition
+memory. For multilingual byte BPE, concatenate token bytes before UTF-8 decoding:
+decoding each incomplete byte piece separately loses characters.
+
+Haiku's exact tokens feed its cloud, observer, generator, and learners. Its
+SentencePiece path lowercases, normalizes with the model, encodes Unigram pieces,
+removes every `▁`, and drops empty pieces; regex mode retains lowercase word
+runs. Keep the source text, selected mode and model, ordered tokens, and rolling
+triples explicit. A future reconstructed-word view needs its own named contract
+and checks. The PostGPT connection makes preserving these boundaries more
+important: changing token identity changes the field being learned.
 
 ## What actually runs
 

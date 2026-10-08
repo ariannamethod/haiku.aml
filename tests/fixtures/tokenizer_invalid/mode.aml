@@ -1,0 +1,4 @@
+# EXPECT: Haiku tokenizer mode must be regex or sentencepiece
+IMPORT "../../../src/tokenizer.aml"
+haiku_tokenize("cloud", "auto", 0)
+PRINT "HAIKU_INVALID_ACCEPTED"

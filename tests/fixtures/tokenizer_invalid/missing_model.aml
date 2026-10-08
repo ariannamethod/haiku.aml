@@ -1,0 +1,4 @@
+# EXPECT: tokenizer
+IMPORT "../../../src/tokenizer.aml"
+model = tokenizer_load("definitely-absent-tokenizer.model")
+PRINT "HAIKU_INVALID_ACCEPTED"

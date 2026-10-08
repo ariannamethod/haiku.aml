@@ -1,0 +1,4 @@
+# EXPECT: tokenizer
+IMPORT "../../../src/tokenizer.aml"
+haiku_tokenize("cloud", "sentencepiece", 0)
+PRINT "HAIKU_INVALID_ACCEPTED"

@@ -1,0 +1,48 @@
+IMPORT "foreground_support.aml"
+
+assert(text_equal(haiku_input_strip(""), ""), "Empty input trim differs")
+assert(text_equal(haiku_input_strip(" \n\t\r"), ""), "Whitespace input trim differs")
+assert(text_equal(haiku_input_strip("  rain moon  "), "rain moon"), "Input trim differs")
+assert(text_equal(haiku_input_strip("rain\tmoon"), "rain\tmoon"), "Internal whitespace changed")
+spaces = [9, 10, 11, 12, 13, 28, 29, 30, 31, 32, 133, 160, 5760, 8192, 8193]
+cursor = 0
+while cursor < len(spaces):
+    space = text_from_codepoint(spaces[cursor])
+    source = text_concat(space, text_concat("Rain", space))
+    assert(text_equal(haiku_input_strip(source), "Rain"), "Unicode input trim differs")
+    cursor = cursor + 1
+spaces = [8194, 8195, 8196, 8197, 8198, 8199, 8200, 8201, 8202, 8232, 8233, 8239, 8287, 12288]
+cursor = 0
+while cursor < len(spaces):
+    space = text_from_codepoint(spaces[cursor])
+    source = text_concat(space, text_concat("Rain", space))
+    assert(text_equal(haiku_input_strip(source), "Rain"), "Unicode input trim differs")
+    cursor = cursor + 1
+assert(haiku_input_action(haiku_input_strip(" QuIt ")) == 2, "Quit gate differs")
+assert(haiku_input_action(haiku_input_strip(" EXIT ")) == 2, "Exit gate differs")
+assert(haiku_input_action(haiku_input_strip(" Q ")) == 2, "Q gate differs")
+assert(haiku_input_action(haiku_input_strip(" \t")) == 0, "Empty gate differs")
+assert(haiku_input_action("quiet") == 1, "Quit prefix was accepted")
+assert(haiku_input_action("!!!") == 1, "Punctuation is still an exchange")
+
+observation = [0.3, 0.3, 0, 0.4]
+fg_near(haiku_foreground_quality(observation), 0.5)
+observation = [0.7, 0.7, 0, 0.8]
+fg_near(haiku_foreground_quality(observation), 0.5)
+observation = [0.300001, 0.300001, 0, 0.400001]
+fg_near(haiku_foreground_quality(observation), 1)
+observation = [0.699999, 0.699999, 0, 0.799999]
+fg_near(haiku_foreground_quality(observation), 1)
+observation = [0.5, 0, 0, 0]
+fg_near(haiku_foreground_quality(observation), 0.7)
+event = haiku_foreground_bridge(observation, 0.7, 4, 12)
+fg_near(map_get(event, "turn"), 4)
+fg_near(map_get(event, "clock"), 12)
+fg_near(map_get(event, "quality_before"), 0.5)
+fg_near(map_get(event, "quality_after"), 0.7)
+observation = [0.2, 0.7, 9, 0.3]
+event = haiku_foreground_bridge(observation, 0.5, 1, 1)
+fg_near(map_get(event, "boredom"), 1)
+fg_near(map_get(event, "overwhelm"), 1)
+fg_near(map_get(event, "stuck"), 0)
+PRINT "HAIKU_FOREGROUND_OK"
