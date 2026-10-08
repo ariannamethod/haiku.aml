@@ -1,10 +1,11 @@
 # HAiKU → AML: the first engineering map
 
 2026-10-07. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
-Tokenization and foreground follow-up: 2026-10-08.
+Tokenization, foreground, and continuity follow-up: 2026-10-08.
 This document records the inspected sources, current behavior, and implementation
 order. Numerical, text, lexical, cloud, memory, English form, candidate
-generation, MathBrain, RAE, tokenization, and foreground exchange are implemented; the status below
+generation, MathBrain, RAE, tokenization, foreground exchange, and complete
+foreground checkpoints are implemented; the status below
 marks the boundary between those functions and the remaining organism.
 
 ## Source bodies
@@ -61,6 +62,17 @@ AML `c21f2416a0d214a4c486908f9d3acf0bd6a46c22`, NoTorch
 `a47eaefd75400ff23ecc4b4d620834539a4d0ae6`. AML v5.7.0 provides its text input
 and immutable tokenizer values; NoTorch supplies native Unigram inference.
 
+The continuity slice starts from the merged foreground: AML
+`2e94d22745fd31497bc720b15d7a00687e54568d`, NoTorch
+`0b0444a10e907447c3ee90a6c15dbca811e50d16`, and Haiku
+`e6e0cdabe4393b68b7610e35c3d9b4d76085fe42`. NoTorch's loaded-model identity
+is published in [PR #165](https://github.com/ariannamethod/notorch/pull/165),
+commit `9380e86017d466f456ae54514aa841f00c26ea9e`. AML's records and checkpoints
+are published in [PR #33](https://github.com/ariannamethod/ariannamethod.ai/pull/33),
+commit `b0be0a4e42e3456ef5c208668118868723281a51`. The optional original
+tokenizer asset is acquired and hash-checked outside Git; its source pin is
+unchanged. Its 0.2.2 Unigram arithmetic retains the verified full-path oracle.
+
 ## Implemented first organs
 
 `src/harmonix.aml` implements pulse, count-based dissonance, and the two
@@ -97,7 +109,9 @@ decay once per nonempty update. `src/memory.aml` keeps observer trigrams,
 generator transition counts/vocabulary, and recent-ten snapshots separate.
 The [cloud parity record](CLOUD_PARITY.md) specifies event order, the original
 seed corpus, float32 bounds, and the explicit empty-input and snapshot repairs.
-These states live in memory; native file persistence remains a later step.
+These states now belong to one versioned foreground checkpoint, together with
+the learners, random streams, and session configuration. [STATE.md](STATE.md)
+records the schema and native save/restart contract.
 
 `src/form.aml` and `src/english_rules.aml` carry the original English syllable
 estimator into AML, including its case-sensitive prefix rules and Unicode
@@ -139,11 +153,13 @@ observation. Phase4 state-ID aggregation, reflection → rings → dream →
 shard/metrics remain later steps. In particular,
 `update_chain()` updates recent trigrams before dissonance reads them.
 
-`haiku.aml` owns each cloud column, observer/generator memory, recent snapshot,
-syllable cache, learner, random stream, and latest bridge event explicitly.
-Sessions use a declared logical-turn clock and fresh state. Their timestamps
-are not yet wall-clock persistence. [FOREGROUND.md](FOREGROUND.md) gives the
-measured exchange contract and the exact remaining boundary.
+`src/state.aml` gathers each cloud column, observer/generator memory, recent
+snapshot, syllable cache, learner, random stream, and latest bridge event into
+one checked record. `src/session.aml` stages complete turns before publication.
+`haiku.aml` resumes its source-relative checkpoint and saves after each completed
+learning event. Sessions retain their declared logical-turn clock across restarts.
+[FOREGROUND.md](FOREGROUND.md) gives the measured exchange contract and the exact
+remaining boundary.
 
 ## Connections to develop
 
@@ -181,7 +197,7 @@ lineage and its developments stay traceable.
 | Micrograd classes | Implemented: explicit AML forward/reverse composition through stateless NoTorch linear, tanh, MSE-gradient and SGD kernels; parameter clamp in AML |
 | SentencePiece package | Implemented: immutable native Unigram model and exact embedded normalization in NoTorch; AML owns lowercase, piece cleanup, explicit mode selection, and rolling triples |
 | `syllables` | English estimator and rule data implemented in AML; each later language supplies its own rules |
-| SQLite / aiosqlite | Native snapshot + journal storage covering words, counts, recent trigrams, metrics, bridges, dreams, learners, and lifecycle state |
+| SQLite / aiosqlite | Implemented: native versioned foreground snapshots covering words, counts, recent trigrams, metrics, learners, streams, and session state. Event journals, bridge aggregation, and dream/lifecycle state follow their organs |
 | Python collections/async/I/O | AML text values, collections, module exports, event transport, files, and host-facing I/O |
 
 NoTorch exposes linear/bias operations, tensor arithmetic, backward, and
@@ -210,14 +226,16 @@ owned Gaussian initialization, Unicode default lowercase, and scalar finite
 checks. These extend the scalar/array runtime, field
 persistence, threads, and float channels. The tokenizer/input follow-up adds
 immutable native model values, an optional tokenizer backend, Unicode scalar
-classification, and line input with a distinct EOF result. Haiku still needs:
+classification, and line input with a distinct EOF result. AML v5.8.0 adds flat
+typed records, versioned native checkpoints, atomic file replacement, and exact
+model-content identity. Haiku supplies its schema and whole-record validation
+in AML. Haiku still needs:
 
-1. Durable word-cloud and transition records. Token lists, indexed numeric
-   lookup, ordered words, frequencies, weights, and in-memory updates now run
-   in AML. Their native save/restart format must preserve every state owner.
+1. Durable event history for the later organs. The foreground's native
+   save/restart format now preserves every current state owner together.
 2. Text/array event payloads and worker lifetime handling. Existing channels
    carry floats; the default slot limits are 16 spawns and 16 channels.
-3. General file/record storage and a small local HTTP/event interface.
+3. A small local HTTP/event interface over the organism's events.
 4. Lifecycle scheduling around the new independent learner arrays: publish
    completed snapshots at explicit foreground/background handoff points.
 
@@ -339,8 +357,8 @@ exhausted during generation retains its already consumed prefix.
 The generator reads transitions, vocabulary, and syllable maps without changing
 them. Each voice supplies its own mutable RNG map. English caches come from
 the verified estimator; other supplied language counts are explicit inputs.
-MathBrain and RAE now consume those candidates; foreground orchestration and
-dreams follow.
+MathBrain and RAE now consume those candidates in the foreground exchange;
+dream generation follows in its own stage.
 
 ### Learned candidate choice
 
@@ -355,13 +373,14 @@ the unused sixth feedback input remains a separate research experiment. Rule
 selection is an explicit API because AML has no exception handler equivalent
 to Python's automatic recursive-error fallback. The generated selection example
 exercises RAE's observation method explicitly; original `chat.py` calls only
-MathBrain's observation method. Their shared foreground experience remains an
-integration task.
+MathBrain's observation method. The foreground now offers shared RAE experience
+as an explicit training option.
 
 Fresh networks use NoTorch's owned standard-normal stream. Its two PCG32 words
 per value define a new reproducible initialization sequence. Explicit frozen
-weights anchor the Python numerical comparisons. Native model file persistence
-and full exchange scheduling remain in the next integration stage.
+weights anchor the Python numerical comparisons. The complete foreground
+checkpoint now saves both learner arrays and random streams together.
+Background exchange scheduling remains a later integration stage.
 
 The combined learner suites compare **5,374 reference fields** through the
 interpreter and compiled scalar executable: 3,717 for MathBrain/shared MLP and
@@ -370,6 +389,28 @@ and gradient, recursive score traces, and stable rule choices. Forty-five
 invalid operations retain their inspected owners. The generated selection
 fixture checks all five actual texts, the selected index and confidence, all
 57 updated RAE parameters, and the next selection against the original Python.
+
+### A life between processes
+
+AML's generic flat records hold typed scalar, UTF-8, array/matrix, list, and
+numeric-map leaves. Its checkpoint format preserves float32 bits, dimensions,
+and insertion order with a versioned header and checksum. Files are decoded
+into detached records; writes replace a same-directory temporary after syncing
+its complete contents. No Haiku schema lives in the C runtime.
+
+`src/state.aml` owns the 29-field schema and checks cross-organ relations.
+`src/session.aml` runs one accepted turn in a detached candidate. The CLI saves
+that completed candidate, swaps it into the live owner without allocating,
+then prints its answer. A pre-commit save failure preserves both the old file
+and the published in-memory owner. Source-relative paths work in interpreted
+and compiled launches. The optional tokenizer is reopened and checked against
+the identity of its exact loaded bytes.
+
+The [continuity receipt](STATE.md) also records measured Python persistence
+defects: independently committed organs, missing random streams, partial
+parameter restoration, a lost learning rate, and colliding shard names. The
+foreground checkpoint restores one complete life without reseeding or replaying
+old experience. Its clock remains a logical turn counter.
 
 ### RAE development
 
@@ -381,17 +422,18 @@ metrics, and explicit asynchronous publication order.
 
 ## Implementation order
 
-1. Connect native tokenization to the working lexical observer, word cloud,
-   and transition memory. Unicode boundary fixtures already cover Cyrillic,
+1. Native tokenization now connects to the lexical observer, word cloud,
+   and transition memory. Unicode boundary fixtures cover Cyrillic,
    Hebrew, accents, emoji, whitespace, and empty input; tuple fixtures preserve
    exact token identity and duplicate counts.
 2. MathBrain/RAE forward values, gradients, and parameter trajectories now run
    through the NoTorch binding; retain these fixtures while wiring exchanges.
-3. Complete the English tokenizer and foreground exchange around the working
-   generator, cloud, and Harmonix. Pin tokenizer mode, word ordering, both Python RNG streams,
-   initial state, and event order when producing reference fixtures.
-4. Connect online learning, bridges, reflection, rings, and dreams; complete the
-   integration tasks above. Verify save/restart continuity and worker shutdown.
+3. The English tokenizer, foreground exchange, and save/restart continuity
+   now run around the generator, cloud, and Harmonix. Retain explicit tokenizer
+   mode, word ordering, random streams, initial state, and event-order fixtures.
+4. Connect full bridge aggregation, reflection, rings, dreams, and background
+   learning; complete the integration tasks above. Extend the versioned state
+   when those organs arrive and verify worker shutdown.
 5. Add Klaus-inspired language packs with haiku-specific vocabulary and
    syllable behavior; preserve each language's own cloud.
 6. Add the local character interface, conversation, and event-driven animation.

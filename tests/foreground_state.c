@@ -51,9 +51,14 @@ int main(int argc, char **argv) {
     source[size] = 0;
     char *marker = strstr(source, "PRINT \"HAiKU");
     require(marker != NULL, "entrypoint initialization marker");
-    const char *snapshots = "fg_initial_math = mathbrain\nfg_initial_rae = rae\nfg_initial_rng = voice_rng\n"
-        "fg_initial_rows = rows\nfg_initial_counts = counts\nfg_initial_vocab = vocab\n"
-        "fg_initial_syllables = syllables\n";
+    const char *snapshots =
+        "fg_initial_math = record_get(state, \"mathbrain\")\n"
+        "fg_initial_rae = record_get(state, \"rae\")\n"
+        "fg_initial_rng = record_get(state, \"voice_rng\")\n"
+        "fg_initial_rows = record_get(state, \"rows\")\n"
+        "fg_initial_counts = record_get(state, \"counts\")\n"
+        "fg_initial_vocab = record_get(state, \"vocab\")\n"
+        "fg_initial_syllables = record_get(state, \"syllables\")\n";
     size_t prefix = (size_t)(marker - source), extra = strlen(snapshots);
     char *program = malloc((size_t)size + extra + 1);
     require(program != NULL, "snapshot source");
@@ -66,6 +71,24 @@ int main(int argc, char **argv) {
     int result = am_exec_source(program, argv[1]);
     if (*argv[4]) require(result && strstr(am_get_error(), argv[4]), am_get_error());
     else require(!result, am_get_error());
+    /* Inspect the published owner even when a detached turn failed. */
+    require(!am_exec(
+        "turn = record_get(state, \"turn\")\n"
+        "mathbrain = record_get(state, \"mathbrain\")\n"
+        "mathbrain_state = record_get(state, \"mathbrain_state\")\n"
+        "rae = record_get(state, \"rae\")\n"
+        "rae_state = record_get(state, \"rae_state\")\n"
+        "voice_rng = record_get(state, \"voice_rng\")\n"
+        "rows = record_get(state, \"rows\")\n"
+        "counts = record_get(state, \"counts\")\n"
+        "vocab = record_get(state, \"vocab\")\n"
+        "syllables = record_get(state, \"syllables\")\n"
+        "recent = record_get(state, \"recent\")\n"
+        "weights = record_get(state, \"weights\")\n"
+        "frequencies = record_get(state, \"frequencies\")\n"
+        "last_used = record_get(state, \"last_used\")\n"
+        "bridge_event = record_get(state, \"bridge_event\")\n"
+        "observer_counts = record_get(state, \"observer_counts\")\n"), am_get_error());
     require(am_get_var_float("turn") == turns, "accepted turn count");
     require(field(am_get_var_map("mathbrain_state"), "observations") == turns, "MathBrain count");
     require(field(am_get_var_map("rae_state"), "observations") == rae, "RAE count");

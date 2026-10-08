@@ -3,6 +3,8 @@
 set -euo pipefail
 
 haiku_root=$(cd "$(dirname "$0")/.." && pwd)
+bash "$haiku_root/scripts/setup-tokenizer.sh" --check
+bash "$haiku_root/tests/tokenizer_setup.sh"
 haiku_aml=${HAIKU_AML:-"$haiku_root/../ariannamethod.ai/runner/aml-notorch"}
 haiku_amlc=${HAIKU_AMLC:-"$haiku_root/../ariannamethod.ai/tools/amlc"}
 haiku_lib=${HAIKU_AML_LIB:-"$haiku_root/../ariannamethod.ai/libaml.a"}

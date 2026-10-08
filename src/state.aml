@@ -1,0 +1,198 @@
+# One complete foreground life, at a completed-turn boundary.
+# Generic records/checkpoints belong to AML; this schema belongs to Haiku.
+IMPORT "foreground.aml"
+IMPORT "english_seeds.aml"
+
+def haiku_state_fields(state, names, kind):
+    keys = haiku_words(names)
+    cursor = 0
+    while cursor < list_len(keys):
+        key = list_get(keys, cursor)
+        assert(record_has(state, key), "Haiku state field is missing")
+        assert(text_equal(record_kind(state, key), kind), "Haiku state field has the wrong type")
+        cursor = cursor + 1
+    return list_len(keys)
+
+def haiku_state_integer(value, low, high):
+    assert(isfinite(value), "Haiku state integer must be finite")
+    assert(value >= low and value <= high and value == floor(value), "Haiku state integer is outside its range")
+    return value
+
+# Check without drawing. Both random streams survive a restart bit for bit.
+def haiku_state_rng(rng):
+    assert(map_len(rng) == 5, "Haiku RNG needs exactly five fields")
+    assert(map_get(rng, "algorithm") == 1, "Haiku RNG algorithm is unsupported")
+    names = haiku_words("state0 state1 state2 state3")
+    cursor = 0
+    while cursor < 4:
+        haiku_state_integer(map_get(rng, list_get(names, cursor)), 0, 65535)
+        cursor = cursor + 1
+    return 1
+
+# A handle is reopened independently. The checkpoint records the exact bytes
+# that defined its pieces and embedded normalizer, never a filename guess.
+def haiku_state_mode(mode, identity, model):
+    if text_equal(mode, "regex"):
+        assert(text_equal(identity, ""), "Haiku regex state has a tokenizer identity")
+        return 1
+    assert(text_equal(mode, "sentencepiece"), "Haiku tokenizer mode is unsupported")
+    assert(text_len(identity) == 64, "Haiku tokenizer identity must be SHA256")
+    assert(text_equal(identity, tokenizer_identity(model)), "Haiku tokenizer model identity differs")
+    return 1
+
+def haiku_state_bridge(event, turn, clock):
+    if turn == 0:
+        assert(map_len(event) == 0, "Haiku fresh state has a bridge event")
+        return 1
+    assert(map_len(event) == 11, "Haiku bridge event requires eleven fields")
+    assert(map_get(event, "turn") == turn and map_get(event, "clock") == clock, "Haiku bridge event clock differs")
+    observation = zeros(4)
+    observation[0] = map_get(event, "dissonance")
+    observation[1] = map_get(event, "novelty")
+    observation[2] = map_get(event, "arousal")
+    observation[3] = map_get(event, "entropy")
+    assert(observation[0] >= 0 and observation[0] <= 1, "Haiku bridge dissonance is invalid")
+    assert(observation[1] >= 0 and observation[1] <= 1, "Haiku bridge novelty is invalid")
+    assert(observation[2] >= 0, "Haiku bridge arousal is invalid")
+    assert(observation[3] >= 0 and observation[3] <= 1, "Haiku bridge entropy is invalid")
+    expected = haiku_foreground_bridge(observation, haiku_foreground_quality(observation), turn, clock)
+    names = map_keys(expected)
+    cursor = 0
+    while cursor < list_len(names):
+        key = list_get(names, cursor)
+        assert(map_get(event, key) == map_get(expected, key), "Haiku bridge event differs from its observation")
+        cursor = cursor + 1
+    return 1
+
+# Read-only validation of every owner and the relations needed by the next
+# exchange. A detached load passes this before any live record is replaced.
+def haiku_state_check(state, model):
+    assert(list_len(record_keys(state)) == 29, "Haiku state requires exactly twenty-nine fields")
+    haiku_state_fields(state, "format profile clock_kind tokenizer_mode tokenizer_identity", "string")
+    haiku_state_fields(state, "version train_rae turn clock", "float")
+    haiku_state_fields(state, "origins observer_rows rows vocab recent", "list")
+    haiku_state_fields(state, "weights frequencies last_used observer_counts observer_resonance counts syllables mathbrain_state rae_state voice_rng model_rng bridge_event", "map")
+    haiku_state_fields(state, "mathbrain rae draws", "array")
+    assert(text_equal(record_get(state, "format"), "haiku.aml"), "Haiku state format is unsupported")
+    assert(record_get(state, "version") == 1, "Haiku state version is unsupported")
+    assert(text_equal(record_get(state, "profile"), "english-foreground-v1"), "Haiku state profile is unsupported")
+    assert(text_equal(record_get(state, "clock_kind"), "turn"), "Haiku state clock kind is unsupported")
+    haiku_state_mode(record_get(state, "tokenizer_mode"), record_get(state, "tokenizer_identity"), model)
+    haiku_state_integer(record_get(state, "train_rae"), 0, 1)
+    turn = haiku_state_integer(record_get(state, "turn"), 0, 16777216)
+    clock = haiku_state_integer(record_get(state, "clock"), 0, 16777216)
+    assert(clock == turn, "Haiku turn clock differs from its counter")
+
+    weights = record_get(state, "weights")
+    used = record_get(state, "last_used")
+    haiku_cloud_check(weights, record_get(state, "frequencies"), used, record_get(state, "origins"))
+    words = map_keys(weights)
+    cursor = 0
+    while cursor < list_len(words):
+        haiku_state_integer(map_get(used, list_get(words, cursor)), 0, clock)
+        cursor = cursor + 1
+
+    counts = record_get(state, "counts")
+    vocab = record_get(state, "vocab")
+    assert(haiku_gen_check(record_get(state, "rows"), counts, vocab, record_get(state, "syllables")) > 0, "Haiku foreground vocabulary is empty")
+    cursor = 0
+    while cursor < list_len(vocab):
+        assert(map_has(weights, list_get(vocab, cursor)), "Haiku vocabulary word is absent from its cloud")
+        cursor = cursor + 1
+
+    observer = record_get(state, "observer_counts")
+    resonance = record_get(state, "observer_resonance")
+    size = haiku_rows_check(record_get(state, "observer_rows"), observer)
+    assert(map_len(resonance) == size, "Haiku observer resonance/count lengths differ")
+    names = map_keys(observer)
+    cursor = 0
+    while cursor < size:
+        key = list_get(names, cursor)
+        value = map_get(resonance, key)
+        assert(value >= 0 and value <= 1, "Haiku observer resonance is invalid")
+        assert(map_has(counts, key), "Haiku observer triple is absent from its generator")
+        assert(map_get(counts, key) >= map_get(observer, key), "Haiku observer count exceeds its generator count")
+        cursor = cursor + 1
+    recent = record_get(state, "recent")
+    assert(list_len(recent) <= 30, "Haiku recent memory exceeds ten triples")
+    keys = haiku_triple_keys(recent)
+    cursor = 0
+    while cursor < list_len(keys):
+        assert(map_has(counts, list_get(keys, cursor)), "Haiku recent triple is absent from its generator")
+        cursor = cursor + 1
+
+    haiku_learner_check(record_get(state, "mathbrain"), 5, 8)
+    haiku_learner_check(record_get(state, "rae"), 5, 8)
+    math_state = record_get(state, "mathbrain_state")
+    haiku_mathbrain_check(math_state)
+    assert(map_get(math_state, "observations") == turn, "Haiku MathBrain observations differ from completed turns")
+    rae_state = record_get(state, "rae_state")
+    assert(map_len(rae_state) == 2, "Haiku RAE state requires exactly two fields")
+    haiku_state_integer(map_get(rae_state, "observations"), 0, turn)
+    assert(map_get(rae_state, "learning_rate") >= 0, "Haiku RAE learning rate must be nonnegative")
+    haiku_state_rng(record_get(state, "voice_rng"))
+    haiku_state_rng(record_get(state, "model_rng"))
+    haiku_gen_tape(record_get(state, "draws"))
+    haiku_state_bridge(record_get(state, "bridge_event"), turn, clock)
+    return 1
+
+# Original 587 seed entries (576 unique), in source order. The model stream
+# initializes MathBrain first, RAE second; the voice stream has its own owner.
+def haiku_state_new(mode, model, train_rae, voice_seed, model_seed):
+    identity = ""
+    if text_equal(mode, "sentencepiece"):
+        identity = tokenizer_identity(model)
+    haiku_state_mode(mode, identity, model)
+    haiku_state_integer(train_rae, 0, 1)
+    state = record_new()
+    record_set(state, "format", "haiku.aml")
+    record_set(state, "version", 1)
+    record_set(state, "profile", "english-foreground-v1")
+    record_set(state, "clock_kind", "turn")
+    record_set(state, "tokenizer_mode", mode)
+    record_set(state, "tokenizer_identity", identity)
+    record_set(state, "train_rae", train_rae)
+    record_set(state, "turn", 0)
+    record_set(state, "clock", 0)
+    record_set(state, "weights", map_new())
+    record_set(state, "frequencies", map_new())
+    record_set(state, "last_used", map_new())
+    record_set(state, "origins", list_new())
+    record_set(state, "observer_rows", list_new())
+    record_set(state, "observer_counts", map_new())
+    record_set(state, "observer_resonance", map_new())
+    record_set(state, "rows", list_new())
+    record_set(state, "counts", map_new())
+    record_set(state, "vocab", list_new())
+    record_set(state, "recent", list_new())
+    haiku_cloud_seed(record_get(state, "weights"), record_get(state, "frequencies"), record_get(state, "last_used"), record_get(state, "origins"), haiku_seed_words, 0)
+    haiku_chain_seed(record_get(state, "rows"), record_get(state, "counts"), record_get(state, "vocab"), haiku_seed_words)
+    record_set(state, "syllables", haiku_syllable_cache(record_get(state, "vocab")))
+    record_set(state, "voice_rng", rng_new(voice_seed))
+    record_set(state, "model_rng", rng_new(model_seed))
+    record_set(state, "mathbrain", haiku_learner_new(5, 8, record_get(state, "model_rng")))
+    record_set(state, "rae", haiku_learner_new(5, 8, record_get(state, "model_rng")))
+    record_set(state, "mathbrain_state", haiku_mathbrain_state())
+    record_set(state, "rae_state", haiku_rae_state())
+    draws = zeros(1)
+    draws[0] = -1
+    record_set(state, "draws", draws)
+    record_set(state, "bridge_event", map_new())
+    haiku_state_check(state, model)
+    return state
+
+# Wrapper paths are relative to this module. A launcher needing its own base
+# directory calls checkpoint_save/load directly around haiku_state_check.
+def haiku_state_save(state, path, model):
+    haiku_state_check(state, model)
+    return checkpoint_save(state, path)
+
+def haiku_state_load(path, model):
+    state = checkpoint_load(path)
+    haiku_state_check(state, model)
+    return state
+
+def haiku_state_restore(live, path, model):
+    checked = haiku_state_load(path, model)
+    record_replace(live, checked)
+    return 1

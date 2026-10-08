@@ -5,9 +5,11 @@ Python reference: `harmonix/haiku` at
 `abb878c52d763b73e5ad7a4d6a68a9ea7a248a39`, especially `chat.py`.
 
 Run `../ariannamethod.ai/runner/aml-notorch haiku.aml` and write to Haiku.
-The [entrypoint](../haiku.aml) owns its state explicitly; the six
+The [entrypoint](../haiku.aml) owns one versioned state record; the six
 [foreground helpers](../src/foreground.aml) carry input gates, cache growth,
-quality, and the bridge handoff. All organism behavior is AML.
+quality, and the bridge handoff. [session.aml](../src/session.aml) stages a
+complete exchange and [state.aml](../src/state.aml) checks every persistent owner.
+All organism behavior is AML.
 
 ## One encounter, in order
 
@@ -19,9 +21,13 @@ quality, and the bridge handoff. All organism behavior is AML.
 3. Read that **updated** recent snapshot. Compute dissonance, pulse, and the two
    temperatures. The first complete input therefore observes its own triples.
 4. Extend the syllable cache, generate five candidates, and select through the
-   original three RAE refinements. Publish the selected three lines.
+   original three RAE refinements. Keep the selected three lines for publication.
 5. Compute quality with the original three open intervals. Record the bridge
    handoff, then train MathBrain. Optional shared experience trains RAE next.
+6. Validate the complete candidate state. The CLI saves its checkpoint, swaps
+   it into the live owner without allocating, then prints the selected three
+   lines. This moves display
+   after learning and storage; the numerical and lexical event order is unchanged.
 
 Generated candidates and the selected response leave cloud, transition counts,
 and recent memory at the state established by the incoming message. Reflection,
@@ -35,7 +41,7 @@ gives dissonance 0.5, temperature 0.9, and quality 0.7.
 
 ## Owners and configuration
 
-Each fresh execution owns cloud columns, observer rows/counts/resonance,
+Each session owns cloud columns, observer rows/counts/resonance,
 generator rows/counts/vocabulary/recent, syllable cache, two learner arrays and
 their statistics, sampling state, and the last bridge event. The initial cloud
 has the original **587 seed entries / 576 unique words**. Seed transitions belong
@@ -45,10 +51,15 @@ Configuration is at the top of `haiku.aml`:
 
 | Setting | Default | Behavior |
 |---|---|---|
-| `tokenizer_mode` | `"regex"` | Historical root-launcher word boundaries; `"sentencepiece"` loads the bundled model relative to the source file. |
-| `voice_rng` | `rng_new(575)` | One owned native sampling stream. |
-| `model_rng` | `rng_new(57)` | Initializes MathBrain and then RAE; each model retains its own 57 parameters. |
+| `state_path` | `"haiku.state"` | Source-relative checkpoint; resume when present and save each completed turn. An empty string starts an unsaved session. |
+| `tokenizer_mode` | `"regex"` | Historical root-launcher word boundaries; `"sentencepiece"` loads the verified optional model relative to the source file. Applies to new state. |
+| Voice seed | `575` | Starts an owned native sampling stream; resumption restores its exact state. |
+| Model seed | `57` | Initializes MathBrain and then RAE; resumption restores both 57-parameter arrays and the initialization stream. |
 | `train_rae` | `0` | Python chat's MathBrain-only training; `1` gives both learners the selected text, context, and quality once per exchange. |
+
+Saved tokenizer mode and `train_rae` are authoritative on resumption. Use a
+new path to begin another configuration. Install the optional tokenizer with
+`bash scripts/setup-tokenizer.sh`; default regex sessions need no model asset.
 
 MathBrain learns the quality signal; the default selector reads RAE weights.
 The shared-experience option connects that signal to RAE's subsequent choices.
@@ -57,7 +68,7 @@ parity uses explicit weights and draw tapes.
 
 The CLI uses **logical-turn clocks**: seeds have clock zero, accepted turn `n`
 uses clock `n`. Clock values occupy `last_used`; boost/decay still occurs once
-per active exchange. Native persistence will supply elapsed-time clocks.
+per active exchange. Checkpoints preserve this clock exactly across restarts.
 
 Input and lowered text are bounded at 10,000 codepoints; learner context is
 bounded at 10,000 flat triple components. SentencePiece's original unknown
@@ -70,20 +81,21 @@ The bridge handoff contains turn, clock, dissonance, novelty, arousal, entropy,
 quality before/after, and boredom/overwhelm/stuck flags. The four climate values
 are shared by its before/after metric snapshots; quality changes from 0.5 to
 the observed value. Phase4 state-ID formatting, transition aggregation, and
-durable logs remain in the migration queue. The response is visible before
-learning; a learning failure ends execution after that output. Storage,
-MetaHaiku, Overthinkg, dreams, and background scheduling retain their separate
-planned work. A fresh process starts fresh state.
+durable event logs remain in the migration queue. MetaHaiku, Overthinkg, dreams,
+and background scheduling retain their separate planned work. The complete
+foreground snapshot now persists; [STATE.md](STATE.md) records its validation
+and publication boundaries. One running process owns each checkpoint path.
 
 ## Receipts
 
 [foreground.input](../examples/foreground.input) and
 [foreground.txt](../examples/foreground.txt) record an unedited native three-turn
-conversation using the defaults above. Replay it with:
+conversation starting with fresh state. `make test-foreground` uses an isolated,
+unsaved copy of the real entrypoint, so an existing conversation is preserved:
 
 ```sh
-../ariannamethod.ai/runner/aml-notorch haiku.aml < examples/foreground.input
 make test-foreground
+make test-state
 ```
 
 The Python oracle calls the original tokenizer, cloud, generator, RAE, bridge,
