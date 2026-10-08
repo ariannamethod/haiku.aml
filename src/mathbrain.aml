@@ -12,6 +12,7 @@ def haiku_mathbrain_state():
     return state
 
 def haiku_mathbrain_check(state):
+    # AML numeric maps admit finite values only, including through the host API.
     assert(map_len(state) == 4, "Haiku MathBrain state requires exactly four fields")
     lr = map_get(state, "lr")
     count = map_get(state, "observations")

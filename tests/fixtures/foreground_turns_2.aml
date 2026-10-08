@@ -1,0 +1,815 @@
+IMPORT "foreground_support.aml"
+weights = map_new()
+frequencies = map_new()
+last_used = map_new()
+observer_counts = map_new()
+observer_resonance = map_new()
+counts = map_new()
+origins = list_new()
+observer_rows = list_new()
+rows = list_new()
+vocab = list_new()
+recent = list_new()
+seed_source = ""
+seed_source = text_concat(seed_source, "rain moon wind cloud rest warm dream night light sky word sun")
+seeds = haiku_words(seed_source)
+map_set(weights, "rain", 1.2100000000000002)
+map_set(frequencies, "rain", 2)
+map_set(last_used, "rain", 2)
+list_push(origins, "seed")
+map_set(weights, "moon", 1.089)
+map_set(frequencies, "moon", 1)
+map_set(last_used, "moon", 2)
+list_push(origins, "seed")
+map_set(weights, "wind", 0.98009999999999997)
+map_set(frequencies, "wind", 0)
+map_set(last_used, "wind", 0)
+list_push(origins, "seed")
+map_set(weights, "cloud", 0.98009999999999997)
+map_set(frequencies, "cloud", 0)
+map_set(last_used, "cloud", 0)
+list_push(origins, "seed")
+map_set(weights, "rest", 0.98009999999999997)
+map_set(frequencies, "rest", 0)
+map_set(last_used, "rest", 0)
+list_push(origins, "seed")
+map_set(weights, "warm", 0.98009999999999997)
+map_set(frequencies, "warm", 0)
+map_set(last_used, "warm", 0)
+list_push(origins, "seed")
+map_set(weights, "dream", 0.98009999999999997)
+map_set(frequencies, "dream", 0)
+map_set(last_used, "dream", 0)
+list_push(origins, "seed")
+map_set(weights, "night", 0.98009999999999997)
+map_set(frequencies, "night", 0)
+map_set(last_used, "night", 0)
+list_push(origins, "seed")
+map_set(weights, "light", 0.98009999999999997)
+map_set(frequencies, "light", 0)
+map_set(last_used, "light", 0)
+list_push(origins, "seed")
+map_set(weights, "sky", 0.98009999999999997)
+map_set(frequencies, "sky", 0)
+map_set(last_used, "sky", 0)
+list_push(origins, "seed")
+map_set(weights, "word", 0.98009999999999997)
+map_set(frequencies, "word", 0)
+map_set(last_used, "word", 0)
+list_push(origins, "seed")
+map_set(weights, "sun", 0.98009999999999997)
+map_set(frequencies, "sun", 0)
+map_set(last_used, "sun", 0)
+list_push(origins, "seed")
+list_push(rows, "rain")
+list_push(rows, "moon")
+list_push(rows, "wind")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 1)
+list_push(rows, "moon")
+list_push(rows, "wind")
+list_push(rows, "cloud")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 1)
+list_push(rows, "wind")
+list_push(rows, "cloud")
+list_push(rows, "rest")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 1)
+list_push(rows, "cloud")
+list_push(rows, "rest")
+list_push(rows, "warm")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 1)
+list_push(rows, "rest")
+list_push(rows, "warm")
+list_push(rows, "dream")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 1)
+list_push(rows, "warm")
+list_push(rows, "dream")
+list_push(rows, "night")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 1)
+list_push(rows, "dream")
+list_push(rows, "night")
+list_push(rows, "light")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 1)
+list_push(rows, "night")
+list_push(rows, "light")
+list_push(rows, "sky")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 1)
+list_push(rows, "light")
+list_push(rows, "sky")
+list_push(rows, "word")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 1)
+list_push(rows, "sky")
+list_push(rows, "word")
+list_push(rows, "sun")
+map_set(counts, list_key(list_slice(rows, list_len(rows) - 3, list_len(rows))), 1)
+list_push(vocab, "rain")
+list_push(vocab, "moon")
+list_push(vocab, "wind")
+list_push(vocab, "cloud")
+list_push(vocab, "rest")
+list_push(vocab, "warm")
+list_push(vocab, "dream")
+list_push(vocab, "night")
+list_push(vocab, "light")
+list_push(vocab, "sky")
+list_push(vocab, "word")
+list_push(vocab, "sun")
+syllables = haiku_syllable_cache(vocab)
+voice_rng = rng_new(575)
+draws = zeros(666)
+cursor = 0
+while cursor < 665:
+    residue = cursor * 5 + 3
+    residue = residue - floor(residue / 16) * 16
+    draws[cursor + 1] = residue / 16
+    cursor = cursor + 1
+draws[0] = 170
+mathbrain_state = haiku_mathbrain_state()
+rae_state = haiku_rae_state()
+turn = 2
+mathbrain = zeros(57)
+mathbrain[0] = -0.46876406698717105
+mathbrain[1] = 0.061507036199689752
+mathbrain[2] = -0.375
+mathbrain[3] = 0.15484330128289381
+mathbrain[4] = -0.28224296380031028
+mathbrain[5] = 0.24859330128289381
+mathbrain[6] = -0.18746601707181579
+mathbrain[7] = 0.34614879493065015
+mathbrain[8] = -0.09375
+mathbrain[9] = 0.44089829281842108
+mathbrain[10] = 0.0023987949306501638
+mathbrain[11] = -0.43410170718157892
+mathbrain[12] = 0.093744990175479131
+mathbrain[13] = -0.34410363467206168
+mathbrain[14] = 0.1875
+mathbrain[15] = -0.25050098245208735
+mathbrain[16] = 0.28089636532793832
+mathbrain[17] = -0.15675098245208738
+mathbrain[18] = 0.3750436973553658
+mathbrain[19] = -0.059415480797709752
+mathbrain[20] = 0.46875
+mathbrain[21] = 0.035619735536577851
+mathbrain[22] = -0.40316548079770975
+mathbrain[23] = 0.12936973553657785
+mathbrain[24] = -0.31249819731163064
+mathbrain[25] = 0.21887724859077926
+mathbrain[26] = -0.21875
+mathbrain[27] = 0.31268026883693728
+mathbrain[28] = -0.12487275140922076
+mathbrain[29] = 0.40643026883693728
+mathbrain[30] = -0.03126964680039291
+mathbrain[31] = -0.4701368329689114
+mathbrain[32] = 0.0625
+mathbrain[33] = -0.37696468003929112
+mathbrain[34] = 0.1548631670310886
+mathbrain[35] = -0.28321468003929112
+mathbrain[36] = 0.25001192447768483
+mathbrain[37] = -0.18665827216342348
+mathbrain[38] = 0.34375
+mathbrain[39] = -0.092557552231516585
+mathbrain[40] = 0.43834172783657654
+mathbrain[41] = 0.0011924477684834211
+mathbrain[42] = -0.43752648436137997
+mathbrain[43] = 0.091880515667296117
+mathbrain[44] = -0.34375
+mathbrain[45] = 0.1848515638620028
+mathbrain[46] = -0.2518694843327039
+mathbrain[47] = 0.27860156386200285
+mathbrain[48] = -0.15393529508810314
+mathbrain[49] = 0.37728954710049478
+mathbrain[50] = -0.066546482182135783
+mathbrain[51] = 0.46715668095281693
+mathbrain[52] = 0.037523252297744079
+mathbrain[53] = -0.41302134421258957
+mathbrain[54] = 0.12582419189607921
+mathbrain[55] = -0.30925470297159863
+mathbrain[56] = 0.22834487181850391
+rae = zeros(57)
+rae[0] = -0.46875
+rae[1] = 0.0625
+rae[2] = -0.375
+rae[3] = 0.15625
+rae[4] = -0.28125
+rae[5] = 0.25
+rae[6] = -0.1875
+rae[7] = 0.34375
+rae[8] = -0.09375
+rae[9] = 0.4375
+rae[10] = 0
+rae[11] = -0.4375
+rae[12] = 0.09375
+rae[13] = -0.34375
+rae[14] = 0.1875
+rae[15] = -0.25
+rae[16] = 0.28125
+rae[17] = -0.15625
+rae[18] = 0.375
+rae[19] = -0.0625
+rae[20] = 0.46875
+rae[21] = 0.03125
+rae[22] = -0.40625
+rae[23] = 0.125
+rae[24] = -0.3125
+rae[25] = 0.21875
+rae[26] = -0.21875
+rae[27] = 0.3125
+rae[28] = -0.125
+rae[29] = 0.40625
+rae[30] = -0.03125
+rae[31] = -0.46875
+rae[32] = 0.0625
+rae[33] = -0.375
+rae[34] = 0.15625
+rae[35] = -0.28125
+rae[36] = 0.25
+rae[37] = -0.1875
+rae[38] = 0.34375
+rae[39] = -0.09375
+rae[40] = 0.4375
+rae[41] = 0
+rae[42] = -0.4375
+rae[43] = 0.09375
+rae[44] = -0.34375
+rae[45] = 0.1875
+rae[46] = -0.25
+rae[47] = 0.28125
+rae[48] = -0.15625
+rae[49] = 0.375
+rae[50] = -0.0625
+rae[51] = 0.46875
+rae[52] = 0.03125
+rae[53] = -0.40625
+rae[54] = 0.125
+rae[55] = -0.3125
+rae[56] = 0.21875
+map_set(mathbrain_state, "observations", 2)
+map_set(mathbrain_state, "running_loss", 0.0081198726269751231)
+map_set(mathbrain_state, "last_loss", 0.078825243796429759)
+# Turn 3: rain moon wind
+source = haiku_input_strip("rain moon wind")
+assert(haiku_input_action(source) == 1, "Expected an accepted exchange")
+words = haiku_tokenize(source, "regex", 0)
+user = haiku_trigrams(words)
+haiku_foreground_input(words, user)
+turn = turn + 1
+clock = turn
+haiku_cloud_morph(weights, frequencies, last_used, origins, words, clock)
+haiku_store_trigrams(observer_rows, observer_counts, observer_resonance, user)
+recent = haiku_chain_update(rows, counts, vocab, recent, user)
+system = list_clone(recent)
+observation = haiku_observe_trigrams(user, system)
+temperatures = haiku_temperatures(observation[0])
+haiku_foreground_cache(syllables, vocab)
+candidates = haiku_generate_candidates(rows, counts, vocab, syllables, 5, temperatures[0], voice_rng, draws)
+choice = haiku_rae_select(rae, candidates, user, 3)
+spoken = list_get(candidates, choice[0])
+quality = haiku_foreground_quality(observation)
+bridge_event = haiku_foreground_bridge(observation, quality, turn, clock)
+loss = haiku_mathbrain_observe(mathbrain, mathbrain_state, spoken, quality, rows, counts, user)
+fg_near(turn, 3)
+fg_near(draws[0], 255)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind")
+fg_list(words, wanted_text)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind")
+fg_list(user, wanted_text)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind")
+fg_list(system, wanted_text)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind")
+fg_list(recent, wanted_text)
+fg_near(observation[0], 0)
+fg_near(observation[1], 0)
+fg_near(observation[2], 0)
+fg_near(observation[3], 0.14999999999999999)
+fg_near(temperatures[0], 0.29999999999999999)
+fg_near(temperatures[1], 0.29999999999999999)
+fg_near(list_len(candidates), 5)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "cloud warm sun cloud dream\nword wind dream sky moon warm sky\nrain wind light rain cloud")
+assert(text_equal(list_get(candidates, 0), wanted_text), "Foreground candidate/draw trace differs")
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "night sky cloud dream word\nwind rest sky moon warm sky rain\nrest dream rain cloud night")
+assert(text_equal(list_get(candidates, 1), wanted_text), "Foreground candidate/draw trace differs")
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "sun cloud dream word wind\ndream light moon warm sky rain rest\nlight word cloud night sun")
+assert(text_equal(list_get(candidates, 2), wanted_text), "Foreground candidate/draw trace differs")
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "cloud warm word wind dream\nsky sun warm sky rain rest light\nrain wind night sun cloud")
+assert(text_equal(list_get(candidates, 3), wanted_text), "Foreground candidate/draw trace differs")
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "dream light wind dream sky\nmoon cloud sky rain rest light rain\ncloud warm sun cloud dream")
+assert(text_equal(list_get(candidates, 4), wanted_text), "Foreground candidate/draw trace differs")
+fg_near(choice[0], 2)
+fg_near(choice[1], 0.79465454634287802)
+fg_near(quality, 0.5)
+fg_near(loss, 0.029494576492423451)
+fg_near(map_get(mathbrain_state, "observations"), 3)
+fg_near(map_get(mathbrain_state, "running_loss"), 0.0091886078202475397)
+fg_near(map_get(mathbrain_state, "last_loss"), 0.029494576492423451)
+expected = zeros(57)
+expected[0] = -0.4687612154863518
+expected[1] = 0.061708318610460201
+expected[2] = -0.37471484991807519
+expected[3] = 0.15512845136481862
+expected[4] = -0.28204168138953983
+expected[5] = 0.24887845136481862
+expected[6] = -0.18747295570067962
+expected[7] = 0.34565900936379201
+expected[8] = -0.094443862886382401
+expected[9] = 0.44020442993203868
+expected[10] = 0.001909009363792003
+expected[11] = -0.43479557006796132
+expected[12] = 0.093746161337428316
+expected[13] = -0.34402096441682506
+expected[14] = 0.18761711619491853
+expected[15] = -0.2503838662571688
+expected[16] = 0.28097903558317494
+expected[17] = -0.15663386625716885
+expected[18] = 0.37503569136302023
+expected[19] = -0.059980609669163021
+expected[20] = 0.46794940076544123
+expected[21] = 0.034819136302019056
+expected[22] = -0.40373060966916302
+expected[23] = 0.12856913630201905
+expected[24] = -0.31249872016437491
+expected[25] = 0.21884034133824287
+expected[26] = -0.21880228527442655
+expected[27] = 0.31262798356251076
+expected[28] = -0.12490965866175714
+expected[29] = 0.40637798356251076
+expected[30] = -0.031265412636092713
+expected[31] = -0.46983795078301493
+expected[32] = 0.062923416430020015
+expected[33] = -0.37654126360927109
+expected[34] = 0.15516204921698509
+expected[35] = -0.28279126360927109
+expected[36] = 0.25000994654212505
+expected[37] = -0.18679789114411538
+expected[38] = 0.34355220644401979
+expected[39] = -0.092755345787496779
+expected[40] = 0.43820210885588462
+expected[41] = 0.00099465421250322854
+expected[42] = -0.43752065525799311
+expected[43] = 0.09229198178872125
+expected[44] = -0.34316708966131437
+expected[45] = 0.1854344742006884
+expected[46] = -0.25145801821127878
+expected[47] = 0.27918447420068848
+expected[48] = -0.15368780384361247
+expected[49] = 0.37699564779892381
+expected[50] = -0.0660611166401677
+expected[51] = 0.46658873814591906
+expected[52] = 0.036560752625482341
+expected[53] = -0.41174835419701172
+expected[54] = 0.12505619927989214
+expected[55] = -0.30925921630163244
+expected[56] = 0.22645997346381933
+fg_vector(mathbrain, expected)
+expected = zeros(57)
+expected[0] = -0.46875
+expected[1] = 0.0625
+expected[2] = -0.375
+expected[3] = 0.15625
+expected[4] = -0.28125
+expected[5] = 0.25
+expected[6] = -0.1875
+expected[7] = 0.34375
+expected[8] = -0.09375
+expected[9] = 0.4375
+expected[10] = 0
+expected[11] = -0.4375
+expected[12] = 0.09375
+expected[13] = -0.34375
+expected[14] = 0.1875
+expected[15] = -0.25
+expected[16] = 0.28125
+expected[17] = -0.15625
+expected[18] = 0.375
+expected[19] = -0.0625
+expected[20] = 0.46875
+expected[21] = 0.03125
+expected[22] = -0.40625
+expected[23] = 0.125
+expected[24] = -0.3125
+expected[25] = 0.21875
+expected[26] = -0.21875
+expected[27] = 0.3125
+expected[28] = -0.125
+expected[29] = 0.40625
+expected[30] = -0.03125
+expected[31] = -0.46875
+expected[32] = 0.0625
+expected[33] = -0.375
+expected[34] = 0.15625
+expected[35] = -0.28125
+expected[36] = 0.25
+expected[37] = -0.1875
+expected[38] = 0.34375
+expected[39] = -0.09375
+expected[40] = 0.4375
+expected[41] = 0
+expected[42] = -0.4375
+expected[43] = 0.09375
+expected[44] = -0.34375
+expected[45] = 0.1875
+expected[46] = -0.25
+expected[47] = 0.28125
+expected[48] = -0.15625
+expected[49] = 0.375
+expected[50] = -0.0625
+expected[51] = 0.46875
+expected[52] = 0.03125
+expected[53] = -0.40625
+expected[54] = 0.125
+expected[55] = -0.3125
+expected[56] = 0.21875
+fg_vector(rae, expected)
+fg_near(map_get(rae_state, "observations"), 0)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind cloud rest warm dream night light sky word sun")
+fg_list(map_keys(weights), wanted_text)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind cloud rest warm dream night light sky word sun")
+fg_list(map_keys(frequencies), wanted_text)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind cloud rest warm dream night light sky word sun")
+fg_list(map_keys(last_used), wanted_text)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "seed seed seed seed seed seed seed seed seed seed seed seed")
+fg_list(origins, wanted_text)
+fg_near(map_get(weights, "rain"), 1.3310000000000004)
+fg_near(map_get(frequencies, "rain"), 3)
+fg_near(map_get(last_used, "rain"), 3)
+fg_near(map_get(weights, "moon"), 1.1979)
+fg_near(map_get(frequencies, "moon"), 2)
+fg_near(map_get(last_used, "moon"), 3)
+fg_near(map_get(weights, "wind"), 1.0781100000000001)
+fg_near(map_get(frequencies, "wind"), 1)
+fg_near(map_get(last_used, "wind"), 3)
+fg_near(map_get(weights, "cloud"), 0.97029899999999991)
+fg_near(map_get(frequencies, "cloud"), 0)
+fg_near(map_get(last_used, "cloud"), 0)
+fg_near(map_get(weights, "rest"), 0.97029899999999991)
+fg_near(map_get(frequencies, "rest"), 0)
+fg_near(map_get(last_used, "rest"), 0)
+fg_near(map_get(weights, "warm"), 0.97029899999999991)
+fg_near(map_get(frequencies, "warm"), 0)
+fg_near(map_get(last_used, "warm"), 0)
+fg_near(map_get(weights, "dream"), 0.97029899999999991)
+fg_near(map_get(frequencies, "dream"), 0)
+fg_near(map_get(last_used, "dream"), 0)
+fg_near(map_get(weights, "night"), 0.97029899999999991)
+fg_near(map_get(frequencies, "night"), 0)
+fg_near(map_get(last_used, "night"), 0)
+fg_near(map_get(weights, "light"), 0.97029899999999991)
+fg_near(map_get(frequencies, "light"), 0)
+fg_near(map_get(last_used, "light"), 0)
+fg_near(map_get(weights, "sky"), 0.97029899999999991)
+fg_near(map_get(frequencies, "sky"), 0)
+fg_near(map_get(last_used, "sky"), 0)
+fg_near(map_get(weights, "word"), 0.97029899999999991)
+fg_near(map_get(frequencies, "word"), 0)
+fg_near(map_get(last_used, "word"), 0)
+fg_near(map_get(weights, "sun"), 0.97029899999999991)
+fg_near(map_get(frequencies, "sun"), 0)
+fg_near(map_get(last_used, "sun"), 0)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind")
+fg_list(observer_rows, wanted_text)
+fg_near(map_len(observer_counts), 1)
+fg_near(map_len(observer_resonance), 1)
+key = list_key(haiku_words("rain moon wind"))
+fg_near(map_get(observer_counts, key), 1)
+fg_near(map_get(observer_resonance, key), 0.5)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind moon wind cloud wind cloud rest cloud rest warm rest warm dream warm dream night dream night li")
+wanted_text = text_concat(wanted_text, "ght night light sky light sky word sky word sun")
+fg_list(rows, wanted_text)
+fg_near(map_len(counts), 10)
+fg_near(haiku_chain_count(counts, "rain", "moon", "wind"), 2)
+fg_near(haiku_chain_count(counts, "moon", "wind", "cloud"), 1)
+fg_near(haiku_chain_count(counts, "wind", "cloud", "rest"), 1)
+fg_near(haiku_chain_count(counts, "cloud", "rest", "warm"), 1)
+fg_near(haiku_chain_count(counts, "rest", "warm", "dream"), 1)
+fg_near(haiku_chain_count(counts, "warm", "dream", "night"), 1)
+fg_near(haiku_chain_count(counts, "dream", "night", "light"), 1)
+fg_near(haiku_chain_count(counts, "night", "light", "sky"), 1)
+fg_near(haiku_chain_count(counts, "light", "sky", "word"), 1)
+fg_near(haiku_chain_count(counts, "sky", "word", "sun"), 1)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind cloud rest warm dream night light sky word sun")
+fg_list(vocab, wanted_text)
+fg_near(map_len(syllables), 12)
+assert(map_get(syllables, "rain") == haiku_syllables("rain"), "Syllable cache differs")
+assert(map_get(syllables, "moon") == haiku_syllables("moon"), "Syllable cache differs")
+assert(map_get(syllables, "wind") == haiku_syllables("wind"), "Syllable cache differs")
+assert(map_get(syllables, "cloud") == haiku_syllables("cloud"), "Syllable cache differs")
+assert(map_get(syllables, "rest") == haiku_syllables("rest"), "Syllable cache differs")
+assert(map_get(syllables, "warm") == haiku_syllables("warm"), "Syllable cache differs")
+assert(map_get(syllables, "dream") == haiku_syllables("dream"), "Syllable cache differs")
+assert(map_get(syllables, "night") == haiku_syllables("night"), "Syllable cache differs")
+assert(map_get(syllables, "light") == haiku_syllables("light"), "Syllable cache differs")
+assert(map_get(syllables, "sky") == haiku_syllables("sky"), "Syllable cache differs")
+assert(map_get(syllables, "word") == haiku_syllables("word"), "Syllable cache differs")
+assert(map_get(syllables, "sun") == haiku_syllables("sun"), "Syllable cache differs")
+fg_near(map_len(bridge_event), 11)
+fg_near(map_get(bridge_event, "turn"), 3)
+fg_near(map_get(bridge_event, "clock"), 3)
+fg_near(map_get(bridge_event, "dissonance"), 0)
+fg_near(map_get(bridge_event, "novelty"), 0)
+fg_near(map_get(bridge_event, "arousal"), 0)
+fg_near(map_get(bridge_event, "entropy"), 0.14999999999999999)
+fg_near(map_get(bridge_event, "quality_before"), 0.5)
+fg_near(map_get(bridge_event, "quality_after"), 0.5)
+fg_near(map_get(bridge_event, "boredom"), 1)
+fg_near(map_get(bridge_event, "overwhelm"), 0)
+fg_near(map_get(bridge_event, "stuck"), 0)
+# Turn 4: wind cloud rest
+source = haiku_input_strip("wind cloud rest")
+assert(haiku_input_action(source) == 1, "Expected an accepted exchange")
+words = haiku_tokenize(source, "regex", 0)
+user = haiku_trigrams(words)
+haiku_foreground_input(words, user)
+turn = turn + 1
+clock = turn
+haiku_cloud_morph(weights, frequencies, last_used, origins, words, clock)
+haiku_store_trigrams(observer_rows, observer_counts, observer_resonance, user)
+recent = haiku_chain_update(rows, counts, vocab, recent, user)
+system = list_clone(recent)
+observation = haiku_observe_trigrams(user, system)
+temperatures = haiku_temperatures(observation[0])
+haiku_foreground_cache(syllables, vocab)
+candidates = haiku_generate_candidates(rows, counts, vocab, syllables, 5, temperatures[0], voice_rng, draws)
+choice = haiku_rae_select(rae, candidates, user, 3)
+spoken = list_get(candidates, choice[0])
+quality = haiku_foreground_quality(observation)
+bridge_event = haiku_foreground_bridge(observation, quality, turn, clock)
+loss = haiku_mathbrain_observe(mathbrain, mathbrain_state, spoken, quality, rows, counts, user)
+fg_near(turn, 4)
+fg_near(draws[0], 340)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "wind cloud rest")
+fg_list(words, wanted_text)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "wind cloud rest")
+fg_list(user, wanted_text)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind wind cloud rest")
+fg_list(system, wanted_text)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind wind cloud rest")
+fg_list(recent, wanted_text)
+fg_near(observation[0], 0.32199999999999995)
+fg_near(observation[1], 0.40000000000000002)
+fg_near(observation[2], 1)
+fg_near(observation[3], 0.25)
+fg_near(temperatures[0], 0.6863999999999999)
+fg_near(temperatures[1], 0.29999999999999999)
+fg_near(list_len(candidates), 5)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "word wind dream sky moon\nwarm night rain rest light rain cloud\nnight sky cloud dream word")
+assert(text_equal(list_get(candidates, 0), wanted_text), "Foreground candidate/draw trace differs")
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "wind rest sky moon warm\nsky sun rest light rain cloud night\nsun cloud dream word wind")
+assert(text_equal(list_get(candidates, 1), wanted_text), "Foreground candidate/draw trace differs")
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "dream light moon warm sky\nrain wind light rain cloud night sun\ncloud warm word wind dream")
+assert(text_equal(list_get(candidates, 2), wanted_text), "Foreground candidate/draw trace differs")
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "sky sun warm sky rain\nrest dream rain cloud night sun cloud\ndream light wind dream sky")
+assert(text_equal(list_get(candidates, 3), wanted_text), "Foreground candidate/draw trace differs")
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "moon cloud sky rain rest\nlight word cloud night sun cloud dream\nword wind dream sky moon")
+assert(text_equal(list_get(candidates, 4), wanted_text), "Foreground candidate/draw trace differs")
+fg_near(choice[0], 1)
+fg_near(choice[1], 0.79465454634287802)
+fg_near(quality, 0.84999999999999998)
+fg_near(loss, 0.033307313909121339)
+fg_near(map_get(mathbrain_state, "observations"), 4)
+fg_near(map_get(mathbrain_state, "running_loss"), 0.01039454312469123)
+fg_near(map_get(mathbrain_state, "last_loss"), 0.033307313909121339)
+expected = zeros(57)
+expected[0] = -0.46876427305714713
+expected[1] = 0.061492490083732074
+expected[2] = -0.3750206069976067
+expected[3] = 0.15482269428528711
+expected[4] = -0.28225750991626797
+expected[5] = 0.24857269428528711
+expected[6] = -0.1874655052946709
+expected[7] = 0.34618492037617293
+expected[8] = -0.093698822285509437
+expected[9] = 0.44094947053291161
+expected[10] = 0.0024349203761729146
+expected[11] = -0.43405052946708839
+expected[12] = 0.093744912762042942
+expected[13] = -0.34410909914990984
+expected[14] = 0.1874922586563818
+expected[15] = -0.25050872379570555
+expected[16] = 0.28089090085009016
+expected[17] = -0.15675872379570557
+expected[18] = 0.37504429322826471
+expected[19] = -0.059373419181316875
+expected[20] = 0.46880958728988992
+expected[21] = 0.035679322826467762
+expected[22] = -0.40312341918131689
+expected[23] = 0.12942932282646774
+expected[24] = -0.31249817307394157
+expected[25] = 0.21887895948647865
+expected[26] = -0.21874757623109253
+expected[27] = 0.3126826926058448
+expected[28] = -0.12487104051352137
+expected[29] = 0.4064326926058448
+expected[30] = -0.031269955100174315
+expected[31] = -0.4701585953064224
+expected[32] = 0.062469170021859401
+expected[33] = -0.3769955100174317
+expected[34] = 0.1548414046935776
+expected[35] = -0.2832455100174317
+expected[36] = 0.25001205859679881
+expected[37] = -0.18664880493184952
+expected[38] = 0.34376341191139642
+expected[39] = -0.092544140320120136
+expected[40] = 0.43835119506815051
+expected[41] = 0.0012058596798798728
+expected[42] = -0.43752691380184489
+expected[43] = 0.09185020222271327
+expected[44] = -0.34379294404649235
+expected[45] = 0.18480861981551042
+expected[46] = -0.25189979777728677
+expected[47] = 0.2785586198155105
+expected[48] = -0.15395126179407082
+expected[49] = 0.37730572175670735
+expected[50] = -0.066581356403603034
+expected[51] = 0.46719263030844194
+expected[52] = 0.037593850765516822
+expected[53] = -0.41311326560663492
+expected[54] = 0.1258794382757332
+expected[55] = -0.30924965578568353
+expected[56] = 0.22848373967639959
+fg_vector(mathbrain, expected)
+expected = zeros(57)
+expected[0] = -0.46875
+expected[1] = 0.0625
+expected[2] = -0.375
+expected[3] = 0.15625
+expected[4] = -0.28125
+expected[5] = 0.25
+expected[6] = -0.1875
+expected[7] = 0.34375
+expected[8] = -0.09375
+expected[9] = 0.4375
+expected[10] = 0
+expected[11] = -0.4375
+expected[12] = 0.09375
+expected[13] = -0.34375
+expected[14] = 0.1875
+expected[15] = -0.25
+expected[16] = 0.28125
+expected[17] = -0.15625
+expected[18] = 0.375
+expected[19] = -0.0625
+expected[20] = 0.46875
+expected[21] = 0.03125
+expected[22] = -0.40625
+expected[23] = 0.125
+expected[24] = -0.3125
+expected[25] = 0.21875
+expected[26] = -0.21875
+expected[27] = 0.3125
+expected[28] = -0.125
+expected[29] = 0.40625
+expected[30] = -0.03125
+expected[31] = -0.46875
+expected[32] = 0.0625
+expected[33] = -0.375
+expected[34] = 0.15625
+expected[35] = -0.28125
+expected[36] = 0.25
+expected[37] = -0.1875
+expected[38] = 0.34375
+expected[39] = -0.09375
+expected[40] = 0.4375
+expected[41] = 0
+expected[42] = -0.4375
+expected[43] = 0.09375
+expected[44] = -0.34375
+expected[45] = 0.1875
+expected[46] = -0.25
+expected[47] = 0.28125
+expected[48] = -0.15625
+expected[49] = 0.375
+expected[50] = -0.0625
+expected[51] = 0.46875
+expected[52] = 0.03125
+expected[53] = -0.40625
+expected[54] = 0.125
+expected[55] = -0.3125
+expected[56] = 0.21875
+fg_vector(rae, expected)
+fg_near(map_get(rae_state, "observations"), 0)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind cloud rest warm dream night light sky word sun")
+fg_list(map_keys(weights), wanted_text)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind cloud rest warm dream night light sky word sun")
+fg_list(map_keys(frequencies), wanted_text)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind cloud rest warm dream night light sky word sun")
+fg_list(map_keys(last_used), wanted_text)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "seed seed seed seed seed seed seed seed seed seed seed seed")
+fg_list(origins, wanted_text)
+fg_near(map_get(weights, "rain"), 1.3176900000000005)
+fg_near(map_get(frequencies, "rain"), 3)
+fg_near(map_get(last_used, "rain"), 3)
+fg_near(map_get(weights, "moon"), 1.185921)
+fg_near(map_get(frequencies, "moon"), 2)
+fg_near(map_get(last_used, "moon"), 3)
+fg_near(map_get(weights, "wind"), 1.1859210000000002)
+fg_near(map_get(frequencies, "wind"), 2)
+fg_near(map_get(last_used, "wind"), 4)
+fg_near(map_get(weights, "cloud"), 1.0673288999999999)
+fg_near(map_get(frequencies, "cloud"), 1)
+fg_near(map_get(last_used, "cloud"), 4)
+fg_near(map_get(weights, "rest"), 1.0673288999999999)
+fg_near(map_get(frequencies, "rest"), 1)
+fg_near(map_get(last_used, "rest"), 4)
+fg_near(map_get(weights, "warm"), 0.96059600999999994)
+fg_near(map_get(frequencies, "warm"), 0)
+fg_near(map_get(last_used, "warm"), 0)
+fg_near(map_get(weights, "dream"), 0.96059600999999994)
+fg_near(map_get(frequencies, "dream"), 0)
+fg_near(map_get(last_used, "dream"), 0)
+fg_near(map_get(weights, "night"), 0.96059600999999994)
+fg_near(map_get(frequencies, "night"), 0)
+fg_near(map_get(last_used, "night"), 0)
+fg_near(map_get(weights, "light"), 0.96059600999999994)
+fg_near(map_get(frequencies, "light"), 0)
+fg_near(map_get(last_used, "light"), 0)
+fg_near(map_get(weights, "sky"), 0.96059600999999994)
+fg_near(map_get(frequencies, "sky"), 0)
+fg_near(map_get(last_used, "sky"), 0)
+fg_near(map_get(weights, "word"), 0.96059600999999994)
+fg_near(map_get(frequencies, "word"), 0)
+fg_near(map_get(last_used, "word"), 0)
+fg_near(map_get(weights, "sun"), 0.96059600999999994)
+fg_near(map_get(frequencies, "sun"), 0)
+fg_near(map_get(last_used, "sun"), 0)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind wind cloud rest")
+fg_list(observer_rows, wanted_text)
+fg_near(map_len(observer_counts), 2)
+fg_near(map_len(observer_resonance), 2)
+key = list_key(haiku_words("rain moon wind"))
+fg_near(map_get(observer_counts, key), 1)
+fg_near(map_get(observer_resonance, key), 0.5)
+key = list_key(haiku_words("wind cloud rest"))
+fg_near(map_get(observer_counts, key), 1)
+fg_near(map_get(observer_resonance, key), 0.5)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind moon wind cloud wind cloud rest cloud rest warm rest warm dream warm dream night dream night li")
+wanted_text = text_concat(wanted_text, "ght night light sky light sky word sky word sun")
+fg_list(rows, wanted_text)
+fg_near(map_len(counts), 10)
+fg_near(haiku_chain_count(counts, "rain", "moon", "wind"), 2)
+fg_near(haiku_chain_count(counts, "moon", "wind", "cloud"), 1)
+fg_near(haiku_chain_count(counts, "wind", "cloud", "rest"), 2)
+fg_near(haiku_chain_count(counts, "cloud", "rest", "warm"), 1)
+fg_near(haiku_chain_count(counts, "rest", "warm", "dream"), 1)
+fg_near(haiku_chain_count(counts, "warm", "dream", "night"), 1)
+fg_near(haiku_chain_count(counts, "dream", "night", "light"), 1)
+fg_near(haiku_chain_count(counts, "night", "light", "sky"), 1)
+fg_near(haiku_chain_count(counts, "light", "sky", "word"), 1)
+fg_near(haiku_chain_count(counts, "sky", "word", "sun"), 1)
+wanted_text = ""
+wanted_text = text_concat(wanted_text, "rain moon wind cloud rest warm dream night light sky word sun")
+fg_list(vocab, wanted_text)
+fg_near(map_len(syllables), 12)
+assert(map_get(syllables, "rain") == haiku_syllables("rain"), "Syllable cache differs")
+assert(map_get(syllables, "moon") == haiku_syllables("moon"), "Syllable cache differs")
+assert(map_get(syllables, "wind") == haiku_syllables("wind"), "Syllable cache differs")
+assert(map_get(syllables, "cloud") == haiku_syllables("cloud"), "Syllable cache differs")
+assert(map_get(syllables, "rest") == haiku_syllables("rest"), "Syllable cache differs")
+assert(map_get(syllables, "warm") == haiku_syllables("warm"), "Syllable cache differs")
+assert(map_get(syllables, "dream") == haiku_syllables("dream"), "Syllable cache differs")
+assert(map_get(syllables, "night") == haiku_syllables("night"), "Syllable cache differs")
+assert(map_get(syllables, "light") == haiku_syllables("light"), "Syllable cache differs")
+assert(map_get(syllables, "sky") == haiku_syllables("sky"), "Syllable cache differs")
+assert(map_get(syllables, "word") == haiku_syllables("word"), "Syllable cache differs")
+assert(map_get(syllables, "sun") == haiku_syllables("sun"), "Syllable cache differs")
+fg_near(map_len(bridge_event), 11)
+fg_near(map_get(bridge_event, "turn"), 4)
+fg_near(map_get(bridge_event, "clock"), 4)
+fg_near(map_get(bridge_event, "dissonance"), 0.32199999999999995)
+fg_near(map_get(bridge_event, "novelty"), 0.40000000000000002)
+fg_near(map_get(bridge_event, "arousal"), 1)
+fg_near(map_get(bridge_event, "entropy"), 0.25)
+fg_near(map_get(bridge_event, "quality_before"), 0.5)
+fg_near(map_get(bridge_event, "quality_after"), 0.84999999999999998)
+fg_near(map_get(bridge_event, "boredom"), 0)
+fg_near(map_get(bridge_event, "overwhelm"), 1)
+fg_near(map_get(bridge_event, "stuck"), 0)
+PRINT "HAIKU_FOREGROUND_OK"

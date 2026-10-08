@@ -1,0 +1,91 @@
+# Foreground exchange helpers. Python chat.py: abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+# The caller owns every cloud, chain, learner, RNG, and event container.
+IMPORT "generator.aml"
+IMPORT "rae.aml"
+IMPORT "tokenizer.aml"
+
+# input(...).strip(), retaining the original 29-codepoint whitespace boundary.
+def haiku_input_strip(source):
+    size = text_len(source)
+    assert(size <= 10000, "Haiku input limit is 10000 codepoints")
+    start = 0
+    end = size
+    scanning = 1
+    while start < end and scanning:
+        if haiku_space(text_codepoint(source, start)):
+            start = start + 1
+        else:
+            scanning = 0
+    scanning = 1
+    while end > start and scanning:
+        if haiku_space(text_codepoint(source, end - 1)):
+            end = end - 1
+        else:
+            scanning = 0
+    return text_slice(source, start, end)
+
+# 0 = empty, 1 = exchange, 2 = quit. Call after stripping and before mutation.
+def haiku_input_action(source):
+    lower = text_lower(source)
+    if text_equal(lower, "quit") or text_equal(lower, "exit") or text_equal(lower, "q"):
+        return 2
+    if text_len(source) == 0:
+        return 0
+    return 1
+
+# Validate everything the generator/learners will receive before accepting a
+# turn. SentencePiece can return unknown pieces containing internal whitespace.
+# Their identity stays intact; this English voice requires one-word pieces.
+def haiku_foreground_input(words, user):
+    assert(list_len(user) <= 10000, "Haiku foreground context limit is 10000 flat tokens")
+    haiku_triple_keys(user)
+    if list_len(user) > 0:
+        cursor = 0
+        while cursor < list_len(words):
+            haiku_gen_word(list_get(words, cursor))
+            cursor = cursor + 1
+    return list_len(words)
+
+# Cache grows only when complete input triples enlarge generator vocabulary.
+def haiku_foreground_cache(cache, vocab):
+    assert(list_len(vocab) <= 10000, "Haiku vocabulary limit is 10000")
+    cursor = 0
+    while cursor < list_len(vocab):
+        word = haiku_gen_word(list_get(vocab, cursor))
+        if map_has(cache, word) == 0:
+            map_set(cache, word, haiku_syllables(word))
+        cursor = cursor + 1
+    return map_len(cache)
+
+# The three intervals are open, exactly as in Python chat.py.
+def haiku_foreground_quality(observation):
+    assert(len(observation) == 4, "Haiku observation needs four values")
+    dissonance = observation[0]
+    novelty = observation[1]
+    entropy = observation[3]
+    quality = 0.5
+    if dissonance > 0.3 and dissonance < 0.7:
+        quality = quality + 0.2
+    if entropy > 0.4 and entropy < 0.8:
+        quality = quality + 0.15
+    if novelty > 0.3 and novelty < 0.7:
+        quality = quality + 0.15
+    return clamp(quality, 0, 1)
+
+# A handoff for Phase4: both metric snapshots and flags, before learning.
+# State-ID aggregation and durable event storage have their own migration step.
+def haiku_foreground_bridge(observation, quality, turn, clock):
+    assert(len(observation) == 4, "Haiku observation needs four values")
+    event = map_new()
+    map_set(event, "turn", turn)
+    map_set(event, "clock", clock)
+    map_set(event, "dissonance", observation[0])
+    map_set(event, "novelty", observation[1])
+    map_set(event, "arousal", observation[2])
+    map_set(event, "entropy", observation[3])
+    map_set(event, "quality_before", 0.5)
+    map_set(event, "quality_after", quality)
+    map_set(event, "boredom", observation[0] < 0.3 and observation[3] < 0.4)
+    map_set(event, "overwhelm", observation[0] > 0.8 or observation[2] > 0.8)
+    map_set(event, "stuck", quality < 0.4)
+    return event

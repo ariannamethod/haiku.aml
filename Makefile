@@ -7,9 +7,9 @@ AML_BRIDGE_LIB ?= $(AML_ROOT)/libaml_notorch.a
 NOTORCH_ROOT ?= ../notorch
 NOTORCH_LIB ?= $(NOTORCH_ROOT)/libnotorch.a
 
-.PHONY: test test-numerical test-text test-lexical test-cloud test-form test-generator test-mathbrain test-rae
+.PHONY: test test-numerical test-text test-lexical test-cloud test-form test-generator test-mathbrain test-rae test-tokenizer test-foreground
 
-test: test-numerical test-text test-lexical test-cloud test-form test-generator test-mathbrain test-rae
+test: test-numerical test-text test-lexical test-cloud test-form test-generator test-mathbrain test-rae test-tokenizer test-foreground
 
 test-numerical:
 	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" bash tests/run_numerical.sh
@@ -34,3 +34,9 @@ test-mathbrain:
 
 test-rae:
 	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" HAIKU_AML_INCLUDE="$(abspath $(AML_INCLUDE))" HAIKU_AML_BRIDGE_LIB="$(abspath $(AML_BRIDGE_LIB))" HAIKU_NOTORCH_LIB="$(abspath $(NOTORCH_LIB))" bash tests/run_rae.sh
+
+test-tokenizer:
+	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" HAIKU_AML_INCLUDE="$(abspath $(AML_INCLUDE))" HAIKU_AML_BRIDGE_LIB="$(abspath $(AML_BRIDGE_LIB))" HAIKU_NOTORCH_LIB="$(abspath $(NOTORCH_LIB))" bash tests/run_tokenizer.sh
+
+test-foreground:
+	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" HAIKU_AML_INCLUDE="$(abspath $(AML_INCLUDE))" HAIKU_AML_BRIDGE_LIB="$(abspath $(AML_BRIDGE_LIB))" HAIKU_NOTORCH_LIB="$(abspath $(NOTORCH_LIB))" bash tests/run_foreground.sh

@@ -1,0 +1,31 @@
+IMPORT "tokenizer_support.aml"
+# Tokenizer references: 13
+assert(text_equal(haiku_tokenizer_piece("▁▁"), ""), "empty marker run")
+assert(text_equal(haiku_tokenizer_piece("a▁b▁c"), "abc"), "all interior markers")
+assert(text_equal(haiku_tokenizer_piece("▁cloud▁"), "cloud"), "both marker ends")
+assert(text_equal(haiku_tokenizer_piece("é́💫"), "é́💫"), "piece identity")
+assert(list_len(haiku_tokenize("", "regex", 0)) == 0, "empty regex")
+source = "a"
+cursor = 0
+while cursor < 13:
+    source = text_concat(source, source)
+    cursor = cursor + 1
+source = text_concat(source, text_slice(source, 0, 1808))
+assert(text_len(source) == 10000, "source boundary fixture")
+actual = haiku_tokenize(source, "regex", 0)
+assert(list_len(actual) == 1, "10000 codepoint word")
+assert(text_equal(list_get(actual, 0), source), "whole boundary word")
+source = "İ"
+cursor = 0
+while cursor < 12:
+    source = text_concat(source, source)
+    cursor = cursor + 1
+source = text_concat(source, text_slice(source, 0, 904))
+assert(text_len(haiku_tokenizer_lower(source)) == 10000, "lower expansion boundary")
+actual = haiku_tokenize(source, "regex", 0)
+assert(list_len(actual) == 5000, "combining dots separate runs")
+assert(text_equal(list_get(actual, 4999), "i"), "last expanded run")
+model = tokenizer_load("../../models/haiku_sp.model")
+assert(list_len(haiku_tokenize("", "sentencepiece", model)) == 0, "empty native")
+assert(list_len(haiku_tokenize("▁▁", "sentencepiece", model)) == 0, "all markers removed")
+PRINT "HAIKU_TOKENIZER_OK"

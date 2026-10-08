@@ -1,0 +1,4 @@
+# EXPECT: text operation requires a string
+IMPORT "../../../src/tokenizer.aml"
+haiku_tokenize(1, "regex", 0)
+PRINT "HAIKU_INVALID_ACCEPTED"

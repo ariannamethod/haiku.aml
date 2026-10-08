@@ -1,0 +1,8 @@
+# EXPECT: Haiku generator words cannot contain whitespace
+IMPORT "../../../src/tokenizer.aml"
+IMPORT "../../../src/generator.aml"
+model = tokenizer_load("../../../models/haiku_sp.model")
+words = haiku_tokenize("\n", "sentencepiece", model)
+assert(list_len(words) == 1 and text_equal(list_get(words, 0), "\n"), "Whitespace token changed")
+haiku_gen_word(list_get(words, 0))
+PRINT "HAIKU_INVALID_ACCEPTED"

@@ -1,0 +1,10 @@
+# EXPECT: Haiku tokenizer lowercase limit is 10000 codepoints
+IMPORT "../../../src/tokenizer.aml"
+source = "İ"
+cursor = 0
+while cursor < 12:
+    source = text_concat(source, source)
+    cursor = cursor + 1
+source = text_concat(source, text_slice(source, 0, 905))
+haiku_tokenize(source, "regex", 0)
+PRINT "HAIKU_INVALID_ACCEPTED"

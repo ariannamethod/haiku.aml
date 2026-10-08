@@ -1,0 +1,9 @@
+IMPORT "../../src/tokenizer.aml"
+
+def haiku_tokenizer_test_list(actual, expected, label):
+    assert(list_len(actual) == list_len(expected), text_concat(label, " length"))
+    cursor = 0
+    while cursor < list_len(expected):
+        assert(text_equal(list_get(actual, cursor), list_get(expected, cursor)), text_concat(label, " token"))
+        cursor = cursor + 1
+    return 1

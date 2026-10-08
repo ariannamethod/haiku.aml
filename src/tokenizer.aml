@@ -1,0 +1,71 @@
+# DualTokenizer lineage: harmonix/haiku/tokenizer.py at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+# Mode is explicit. The historical root launcher used the Unicode regex path.
+IMPORT "lexicon.aml"
+
+def haiku_tokenizer_lower(source):
+    assert(text_len(source) <= 10000, "Haiku tokenizer input limit is 10000 codepoints")
+    lowered = text_lower(source)
+    assert(text_len(lowered) <= 10000, "Haiku tokenizer lowercase limit is 10000 codepoints")
+    return lowered
+
+# Python re.findall(r'\b\w+\b', text.lower()): Unicode letters/numbers or '_'.
+# Combining marks, punctuation, and joiners separate runs.
+def haiku_tokenize_regex(source):
+    lowered = haiku_tokenizer_lower(source)
+    words = list_new()
+    start = -1
+    cursor = 0
+    size = text_len(lowered)
+    while cursor < size:
+        cp = text_codepoint(lowered, cursor)
+        if codepoint_isalnum(cp) or cp == 95:
+            if start < 0:
+                start = cursor
+        else:
+            if start >= 0:
+                list_push(words, text_slice(lowered, start, cursor))
+                start = -1
+        cursor = cursor + 1
+    if start >= 0:
+        list_push(words, text_slice(lowered, start, size))
+    return words
+
+# Source uses replace('▁', ''), including interior/repeated markers.
+def haiku_tokenizer_piece(piece):
+    if text_find(piece, "▁") < 0:
+        return piece
+    size = text_len(piece)
+    assert(size <= 10000, "Haiku tokenizer piece limit is 10000 codepoints")
+    clean = ""
+    start = 0
+    cursor = 0
+    while cursor < size:
+        if text_codepoint(piece, cursor) == 9601:
+            clean = text_concat(clean, text_slice(piece, start, cursor))
+            start = cursor + 1
+        cursor = cursor + 1
+    return text_concat(clean, text_slice(piece, start, size))
+
+# NoTorch returns native Unigram pieces from the original model and normalizer.
+# Unknown surface strings, punctuation and whitespace retain source behavior.
+def haiku_tokenize_sentencepiece(source, model):
+    lowered = haiku_tokenizer_lower(source)
+    pieces = tokenizer_pieces(model, lowered)
+    assert(list_len(pieces) <= 10000, "Haiku tokenizer piece count limit is 10000")
+    words = list_new()
+    cursor = 0
+    while cursor < list_len(pieces):
+        piece = haiku_tokenizer_piece(list_get(pieces, cursor))
+        if text_len(piece) > 0:
+            list_push(words, piece)
+        cursor = cursor + 1
+    return words
+
+# In regex mode model can be 0. Load an immutable native model once for SP mode.
+def haiku_tokenize(source, mode, model):
+    if text_equal(mode, "regex"):
+        return haiku_tokenize_regex(source)
+    if text_equal(mode, "sentencepiece"):
+        return haiku_tokenize_sentencepiece(source, model)
+    assert(0, "Haiku tokenizer mode must be regex or sentencepiece")
+    return list_new()

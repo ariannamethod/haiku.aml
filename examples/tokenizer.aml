@@ -1,0 +1,21 @@
+# From the repository root: ../ariannamethod.ai/runner/aml-notorch examples/tokenizer.aml
+IMPORT "../src/tokenizer.aml"
+
+source = "Tell me about harmony and dissonance."
+words = haiku_tokenize(source, "regex", 0)
+PRINT "The root launcher's words:"
+cursor = 0
+while cursor < list_len(words):
+    PRINT list_get(words, cursor)
+    cursor = cursor + 1
+
+model = tokenizer_load("../models/haiku_sp.model")
+words = haiku_tokenize(source, "sentencepiece", model)
+PRINT "The original model's pieces:"
+cursor = 0
+while cursor < list_len(words):
+    PRINT list_get(words, cursor)
+    cursor = cursor + 1
+triples = haiku_trigrams(words)
+PRINT "Rolling triples:"
+PRINT list_len(triples) / 3
