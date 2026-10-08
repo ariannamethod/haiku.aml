@@ -3,6 +3,7 @@
 set -euo pipefail
 
 haiku_root=$(cd "$(dirname "$0")/.." && pwd)
+bash "$haiku_root/scripts/setup-tokenizer.sh" --check
 haiku_aml=${HAIKU_AML:-"$haiku_root/../ariannamethod.ai/runner/aml-notorch"}
 haiku_amlc=${HAIKU_AMLC:-"$haiku_root/../ariannamethod.ai/tools/amlc"}
 haiku_lib=${HAIKU_AML_LIB:-"$haiku_root/../ariannamethod.ai/libaml.a"}
@@ -14,6 +15,12 @@ read -r -a haiku_link_flags <<< "${HAIKU_NOTORCH_LDFLAGS:-}"
 haiku_work=$(mktemp -d "${TMPDIR:-/tmp}/haiku-foreground.XXXXXX")
 trap 'rm -rf "$haiku_work"' EXIT
 mkdir -p "$haiku_work/prefix/lib"
+mkdir -p "$haiku_work/fresh"
+ln -s "$haiku_root/src" "$haiku_work/fresh/src"
+ln -s "$haiku_root/models" "$haiku_work/fresh/models"
+# Keep this fixed-seed receipt independent of a user's live checkpoint.
+haiku_cli="$haiku_work/fresh/haiku.aml"
+sed 's/^state_path = "haiku.state"$/state_path = ""/' "$haiku_root/haiku.aml" > "$haiku_cli"
 ln -s "$haiku_lib" "$haiku_work/prefix/lib/libaml.a"
 ln -s "$haiku_bridge" "$haiku_work/prefix/lib/libaml_notorch.a"
 ln -s "$haiku_notorch" "$haiku_work/prefix/lib/libnotorch.a"
@@ -37,11 +44,11 @@ for haiku_fixture in "$haiku_root"/tests/fixtures/foreground_turns_*.aml \
 done
 
 # The complete native transcript is an unedited output of this entrypoint.
-(cd "$haiku_work" && "$haiku_aml" "$haiku_root/haiku.aml") \
+(cd "$haiku_work" && "$haiku_aml" "$haiku_cli") \
     < "$haiku_root/examples/foreground.input" > "$haiku_work/chat.out" 2> "$haiku_work/chat.err"
 if [ -s "$haiku_work/chat.err" ]; then cat "$haiku_work/chat.err" >&2; exit 1; fi
 diff -u "$haiku_root/examples/foreground.txt" "$haiku_work/chat.out"
-if ! AML_PREFIX="$haiku_work/prefix" "$haiku_amlc" "$haiku_root/haiku.aml" --scalar \
+if ! AML_PREFIX="$haiku_work/prefix" "$haiku_amlc" "$haiku_cli" --scalar \
     -o "$haiku_work/haiku" > "$haiku_work/compile.out" 2> "$haiku_work/compile.err"; then
     cat "$haiku_work/compile.out" "$haiku_work/compile.err" >&2; exit 1
 fi
@@ -54,12 +61,12 @@ diff -u "$haiku_work/chat.out" "$haiku_work/chat-compiled.out"
     "$haiku_bridge" "$haiku_lib" "$haiku_notorch" -lm -lpthread \
     "${haiku_link_flags[@]}" -o "$haiku_work/owners"
 printf '\n\t\n QuIt \n' > "$haiku_work/empty.input"
-"$haiku_work/owners" "$haiku_root/haiku.aml" 0 0 '' < "$haiku_work/empty.input" > "$haiku_work/owners.out"
-"$haiku_work/owners" "$haiku_root/haiku.aml" 0 0 '' < /dev/null > "$haiku_work/owners.out"
-"$haiku_work/owners" "$haiku_root/haiku.aml" 3 0 '' \
+"$haiku_work/owners" "$haiku_cli" 0 0 '' < "$haiku_work/empty.input" > "$haiku_work/owners.out"
+"$haiku_work/owners" "$haiku_cli" 0 0 '' < /dev/null > "$haiku_work/owners.out"
+"$haiku_work/owners" "$haiku_cli" 3 0 '' \
     < "$haiku_root/examples/foreground.input" > "$haiku_work/owners.out"
 awk 'BEGIN {for(i=0;i<3336;i++) printf "x "; print ""}' > "$haiku_work/long.input"
-"$haiku_work/owners" "$haiku_root/haiku.aml" 0 0 'foreground context limit' \
+"$haiku_work/owners" "$haiku_cli" 0 0 'foreground context limit' \
     < "$haiku_work/long.input" > "$haiku_work/owners.out"
 
 # Alternate source configurations keep their own source-relative src/models.
@@ -68,10 +75,10 @@ for haiku_variant in coupled sentencepiece; do
     ln -s "$haiku_root/src" "$haiku_work/$haiku_variant/src"
     ln -s "$haiku_root/models" "$haiku_work/$haiku_variant/models"
 done
-sed 's/^train_rae = 0$/train_rae = 1/' "$haiku_root/haiku.aml" > "$haiku_work/coupled/haiku.aml"
+sed 's/^train_rae = 0$/train_rae = 1/' "$haiku_cli" > "$haiku_work/coupled/haiku.aml"
 "$haiku_work/owners" "$haiku_work/coupled/haiku.aml" 3 3 '' \
     < "$haiku_root/examples/foreground.input" > "$haiku_work/owners.out"
-sed 's/^tokenizer_mode = "regex"$/tokenizer_mode = "sentencepiece"/' "$haiku_root/haiku.aml" \
+sed 's/^tokenizer_mode = "regex"$/tokenizer_mode = "sentencepiece"/' "$haiku_cli" \
     > "$haiku_work/sentencepiece/haiku.aml"
 printf 'what is love\nquit\n' > "$haiku_work/sp.input"
 (cd "$haiku_work" && "$haiku_aml" "$haiku_work/sentencepiece/haiku.aml") \
@@ -90,7 +97,7 @@ printf 'rain\tmoon wind\n' > "$haiku_work/sp-invalid.input"
 "$haiku_work/owners" "$haiku_work/sentencepiece/haiku.aml" 0 0 'cannot contain whitespace' \
     < "$haiku_work/sp-invalid.input" > "$haiku_work/owners.out"
 printf '!!!\nquit\n' > "$haiku_work/punctuation.input"
-"$haiku_work/owners" "$haiku_root/haiku.aml" 1 0 '' \
+"$haiku_work/owners" "$haiku_cli" 1 0 '' \
     < "$haiku_work/punctuation.input" > "$haiku_work/owners.out"
 
 printf 'PASS: seven Python foreground turns + explicit punctuation repair, complete states/parameters/draws, both execution paths\n'

@@ -1,47 +1,35 @@
 # HAiKU's foreground voice. Runtime dependencies: AML + NoTorch.
-IMPORT "src/foreground.aml"
-IMPORT "src/english_seeds.aml"
+IMPORT "src/session.aml"
 
-# Choose "regex" or "sentencepiece" explicitly. The root Python launcher uses
-# regex; its haiku-directory launcher finds the supplied SentencePiece model.
+# One process owns this checkpoint. Paths follow this source, even after amlc.
+# Set state_path to "" for a fresh, unsaved conversation.
+state_path = "haiku.state"
+
+# These settings start a new life. An existing checkpoint carries its own
+# tokenizer mode and training choice. Use a new path for another voice.
 tokenizer_mode = "regex"
+train_rae = 0
+resuming = 0
+if text_len(state_path) > 0:
+    resuming = file_exists(state_path)
+if resuming:
+    restored = checkpoint_load(state_path)
+    tokenizer_mode = record_get(restored, "tokenizer_mode")
+
 tokenizer_model = 0
 if text_equal(tokenizer_mode, "sentencepiece"):
     tokenizer_model = tokenizer_load("models/haiku_sp.model")
 
-# A fresh process is reproducible. Each stream and learner belongs to this voice.
-# Set train_rae to 1 to give RAE the same selected experience as MathBrain.
-# The original Python chat trains MathBrain alone; that is the default here.
-train_rae = 0
-voice_rng = rng_new(575)
-model_rng = rng_new(57)
-mathbrain = haiku_learner_new(5, 8, model_rng)
-mathbrain_state = haiku_mathbrain_state()
-rae = haiku_learner_new(5, 8, model_rng)
-rae_state = haiku_rae_state()
-draws = zeros(1)
-draws[0] = -1
-
-# Explicit foreground owners. Seed trigrams belong to the generator alone.
-weights = map_new()
-frequencies = map_new()
-last_used = map_new()
-origins = list_new()
-haiku_cloud_seed(weights, frequencies, last_used, origins, haiku_seed_words, 0)
-observer_rows = list_new()
-observer_counts = map_new()
-observer_resonance = map_new()
-rows = list_new()
-counts = map_new()
-vocab = list_new()
-recent = list_new()
-haiku_chain_seed(rows, counts, vocab, haiku_seed_words)
-syllables = haiku_syllable_cache(vocab)
-bridge_event = map_new()
-turn = 0
+if resuming:
+    haiku_state_check(restored, tokenizer_model)
+    state = restored
+else:
+    state = haiku_state_new(tokenizer_mode, tokenizer_model, train_rae, 575, 57)
 listening = 1
 
 PRINT "HAiKU — the cloud is listening."
+if resuming:
+    PRINT "The cloud remembers. Our conversation continues."
 PRINT "Write something. Type quit to leave."
 while listening:
     PRINT "You:"
@@ -54,31 +42,19 @@ while listening:
         if action == 2:
             listening = 0
         if action == 1:
-            words = haiku_tokenize(source, tokenizer_mode, tokenizer_model)
-            user = haiku_trigrams(words)
-            haiku_foreground_input(words, user)
-            turn = turn + 1
-            # In-memory sessions use logical-turn clocks; persistence will
-            # supply elapsed seconds. Cloud weights decay once per exchange.
-            clock = turn
-            haiku_cloud_morph(weights, frequencies, last_used, origins, words, clock)
-            haiku_store_trigrams(observer_rows, observer_counts, observer_resonance, user)
-            recent = haiku_chain_update(rows, counts, vocab, recent, user)
-            system = list_clone(recent)
-            observation = haiku_observe_trigrams(user, system)
-            temperatures = haiku_temperatures(observation[0])
-            haiku_foreground_cache(syllables, vocab)
-            candidates = haiku_generate_candidates(rows, counts, vocab, syllables, 5, temperatures[0], voice_rng, draws)
-            choice = haiku_rae_select(rae, candidates, user, 3)
-            spoken = list_get(candidates, choice[0])
+            next_state = record_clone(state)
+            spoken = haiku_session_turn(next_state, source, tokenizer_model)
+            saved = 1
+            if text_len(state_path) > 0:
+                saved = checkpoint_save(next_state, state_path)
+            # No allocation after file replacement: publish the same complete
+            # state in memory, then reveal its response.
+            record_swap(state, next_state)
+            if saved == 2:
+                PRINT "Memory written; storage could not confirm durability."
             PRINT ""
             PRINT "HAiKU:"
             PRINT spoken
             PRINT ""
-            quality = haiku_foreground_quality(observation)
-            bridge_event = haiku_foreground_bridge(observation, quality, turn, clock)
-            loss = haiku_mathbrain_observe(mathbrain, mathbrain_state, spoken, quality, rows, counts, user)
-            if train_rae:
-                haiku_rae_observe(rae, rae_state, spoken, quality, user)
 
 PRINT "The cloud goes quiet."

@@ -20,7 +20,18 @@ The original root launcher, `haiku_run.py`, left its working directory
 unchanged. Its default relative model path missed `haiku/models/`, so it
 used regex. Running inside `haiku/` loaded the 650-piece model. The AML
 default preserves the root launcher's behavior; selecting SentencePiece
-activates the original [model data](../models/README.md) explicitly.
+activates the original [model data](../models/README.md) explicitly. The optional
+asset is installed locally and ignored by Git:
+
+```bash
+bash scripts/setup-tokenizer.sh
+# Offline, from the pinned Python checkout:
+bash scripts/setup-tokenizer.sh --from ../harmonix/haiku/models/haiku_sp.model
+```
+
+Setup verifies the original 256,534-byte asset's SHA-256 before atomic
+publication. `bash scripts/setup-tokenizer.sh --check` verifies it without
+network access. The regex mode runs without a model file.
 
 Regex follows CPython 3.12 / Unicode 15: `\w` is `isalnum()` plus `_`.
 Combining marks and joiners break runs. `ΟΣ` becomes `ος`; `İ` becomes
@@ -38,8 +49,9 @@ expansion is checked before scanning. Native piece count is also bounded
 at 10,000. Marker-containing pieces are checked before cleanup. Strings
 and the loaded model remain immutable throughout tokenization.
 
-`make test-tokenizer` checks 84 pinned Python cases in the interpreter and
-compiled scalar runner: punctuation, unknown runs, compatibility forms,
+`make test-tokenizer` first verifies the installed asset and tests setup in
+isolated directories, then checks 84 pinned Python cases in the interpreter
+and compiled scalar runner: punctuation, unknown runs, compatibility forms,
 normalization sequences, multilingual marks, specials, Unicode category
 boundaries, and 48 seeded random inputs. It compares native pieces, final
 tokens and complete rolling triples byte-for-byte. Both runners load the

@@ -1,0 +1,40 @@
+# One accepted exchange publishes one complete foreground owner.
+IMPORT "state.aml"
+
+# The caller strips input and handles blank/quit/EOF before asking for a turn.
+# All mutable organs belong to a detached candidate until the final replacement.
+def haiku_session_turn(state, source, model):
+    haiku_state_check(state, model)
+    assert(haiku_input_action(source) == 1, "Haiku session needs an accepted input")
+    words = haiku_tokenize(source, record_get(state, "tokenizer_mode"), model)
+    user = haiku_trigrams(words)
+    haiku_foreground_input(words, user)
+    turn = record_get(state, "turn")
+    assert(turn < 16777216, "Haiku turn increment exceeds 2^24")
+    turn = turn + 1
+    clock = turn
+    pending = record_clone(state)
+
+    haiku_cloud_morph(record_get(pending, "weights"), record_get(pending, "frequencies"), record_get(pending, "last_used"), record_get(pending, "origins"), words, clock)
+    haiku_store_trigrams(record_get(pending, "observer_rows"), record_get(pending, "observer_counts"), record_get(pending, "observer_resonance"), user)
+    recent = haiku_chain_update(record_get(pending, "rows"), record_get(pending, "counts"), record_get(pending, "vocab"), record_get(pending, "recent"), user)
+    record_set(pending, "recent", recent)
+    system = list_clone(recent)
+    observation = haiku_observe_trigrams(user, system)
+    temperatures = haiku_temperatures(observation[0])
+    haiku_foreground_cache(record_get(pending, "syllables"), record_get(pending, "vocab"))
+    candidates = haiku_generate_candidates(record_get(pending, "rows"), record_get(pending, "counts"), record_get(pending, "vocab"), record_get(pending, "syllables"), 5, temperatures[0], record_get(pending, "voice_rng"), record_get(pending, "draws"))
+    choice = haiku_rae_select(record_get(pending, "rae"), candidates, user, 3)
+    spoken = list_get(candidates, choice[0])
+
+    quality = haiku_foreground_quality(observation)
+    bridge_event = haiku_foreground_bridge(observation, quality, turn, clock)
+    haiku_mathbrain_observe(record_get(pending, "mathbrain"), record_get(pending, "mathbrain_state"), spoken, quality, record_get(pending, "rows"), record_get(pending, "counts"), user)
+    if record_get(pending, "train_rae"):
+        haiku_rae_observe(record_get(pending, "rae"), record_get(pending, "rae_state"), spoken, quality, user)
+    record_set(pending, "bridge_event", bridge_event)
+    record_set(pending, "turn", turn)
+    record_set(pending, "clock", clock)
+    haiku_state_check(pending, model)
+    record_replace(state, pending)
+    return spoken

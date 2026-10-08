@@ -12,7 +12,7 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   RAE learning an explicit option; Python chat trains MathBrain alone.
 - [ ] Give foreground and background work one versioned experience record with
   source, scoring features, quality, state revision, and publication order.
-- [ ] Save and restore learner parameters, statistics, and owned random
+- [x] Save and restore learner parameters, statistics, and owned random
   streams together with the cloud and conversation state.
 - [ ] Complete Phase4 state-ID aggregation beyond the current metric handoff;
   connect reflection, rings, and dream events after the foreground response.

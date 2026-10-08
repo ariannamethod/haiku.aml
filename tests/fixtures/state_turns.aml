@@ -1,0 +1,15 @@
+# One fixed seven-turn corpus; output only the continuation after save point A.
+IMPORT "../../src/session.aml"
+
+def state_part_a(state, model):
+    haiku_session_turn(state, "rain", model)
+    haiku_session_turn(state, "rain moon", model)
+    haiku_session_turn(state, "what is love", model)
+    return 1
+
+def state_part_b(state, model):
+    PRINT haiku_session_turn(state, "the cloud remembers our words", model)
+    PRINT haiku_session_turn(state, "rain moon wind cloud rest warm dream night light sky word sun dawn dusk leaf branch root stone tide shore", model)
+    PRINT haiku_session_turn(state, "CLOUD rain MOON", model)
+    PRINT haiku_session_turn(state, "!!!", model)
+    return 1

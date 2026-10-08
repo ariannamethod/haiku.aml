@@ -1,0 +1,66 @@
+{
+  "source": "abb878c52d763b73e5ad7a4d6a68a9ea7a248a39",
+  "mathbrain_rate_roundtrip": {
+    "saved": 0.075,
+    "loaded": 0.01
+  },
+  "mathbrain_bad_parameter": {
+    "changed_indexes": [
+      0,
+      1,
+      2
+    ],
+    "first_four": [
+      2.125,
+      1.5,
+      -2.0,
+      -0.390625
+    ],
+    "observations": 90
+  },
+  "mathbrain_nonfinite_load": {
+    "nan_first_weight": true,
+    "observations": 123
+  },
+  "rae_short_load": {
+    "first_four": [
+      2.125,
+      -1.5,
+      -0.125,
+      -0.125
+    ],
+    "observations": 123
+  },
+  "rae_wrong_type_load": {
+    "first_weight": "bad",
+    "observations": 321
+  },
+  "rae_failed_load_counter": 987,
+  "rae_extra_weights": {
+    "provided": 70,
+    "loaded": 57,
+    "all_zero": true
+  },
+  "same_millisecond_shards": {
+    "sql_rows": [
+      [
+        "shards/shard_1234567.npy",
+        0.2
+      ],
+      [
+        "shards/shard_1234567.npy",
+        0.8
+      ]
+    ],
+    "files": 1,
+    "first_record_payload_input": "second",
+    "payload_keys": [
+      "timestamp",
+      "input",
+      "output",
+      "dissonance",
+      "user_trigrams",
+      "system_trigrams"
+    ]
+  }
+}

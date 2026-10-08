@@ -95,8 +95,8 @@ first; our little presence will find another shape.
 
 ## Right now
 
-Haiku now listens, answers, and learns during an AML conversation.
-Eighty-one functions run in pure AML across fifteen native modules. Pulse,
+Haiku now listens, answers, learns, and remembers across AML conversations.
+Its organs run in pure AML modules. Pulse,
 dissonance, temperatures, and transition scores preserve the Python formulas.
 The text organ counts Unicode-delimited words, preserves line contents, and
 computes the original RAE three-line coherence feature. The lexical organ
@@ -125,11 +125,21 @@ Small networks. Actual changing weights. The octagonal wheel has opinions.
 The foreground now joins these organs: input → tokens → living memory → five
 candidates → RAE's choice → a response → quality → MathBrain learning.
 The default preserves Python chat's fixed RAE selector; set `train_rae = 1`
-in `haiku.aml` to let that selector learn from the same chosen experience, too.
+in `haiku.aml` before starting a new state file to let that selector learn from
+the same chosen experience, too.
 Each learner and random stream has an explicit owner.
 
+Close the terminal. Come back. The cloud remembers.
+
+Each completed exchange saves one versioned state: cloud, ordered transitions,
+recent memory, both learners and their statistics, both random streams, and
+the latest bridge event. The next launch resumes `haiku.state` beside the
+entrypoint. Its tokenizer identity and logical clock come with it. Set
+`state_path = ""` for a fresh, unsaved conversation, or choose another path
+for another voice. One running process owns each state file.
+
 Run `../ariannamethod.ai/runner/aml-notorch haiku.aml`. The first exchange of a
-fresh native session, with the checked-in seeds and settings:
+fresh native state, with the checked-in seeds and settings:
 
 ```text
 You: what is love
@@ -146,7 +156,11 @@ Tokenization has two explicit modes. `regex` keeps lowercase Unicode words;
 including its own normalization table. Python's choice depended on the launch
 directory; AML's choice is written in `haiku.aml`. The default matches launching
 Python from the Harmonix root. Model paths follow the AML source, so launching
-from another directory does not change the voice. See [the tokenizer](docs/TOKENIZER.md).
+from another directory does not change the voice. Acquire the optional model
+with `bash scripts/setup-tokenizer.sh`; its exact size and SHA-256 are checked
+before installation. Regex needs no model download. Existing state retains
+its selected mode and verifies the identity of the loaded model. See
+[the tokenizer](docs/TOKENIZER.md).
 
 Try `../ariannamethod.ai/runner/aml examples/observe.aml`: one voice brings
 `the / owl / listens`, the other `the / owl / dreams`. Their shared words give
@@ -166,18 +180,20 @@ generated candidates through RAE's choice, an explicit learning event, and the
 next scores. These examples expose individual generator and learner events;
 `haiku.aml` carries them through the conversation.
 
-Sessions currently start fresh and keep state in memory, using a logical-turn
-clock. Durable storage, full Phase4 transition aggregation, reflection, rings,
+Sessions now save after learning and resume with their logical-turn clock.
+[Continuity](docs/STATE.md) records the complete schema, restore validation,
+and restart checks. Full Phase4 transition aggregation, reflection, rings,
 dreams, and asynchronous scheduling are next. The [foreground record](docs/FOREGROUND.md)
 keeps that boundary explicit. The family album above still belongs to Python;
 new inner dialogues will come from the AML dream path when it runs.
 
-Build the sibling **AML v5.7.0** toolchain and NoTorch with native Unigram,
-numerical values, and owned sampling, then run the organism's checks:
+Build the sibling **AML v5.8.0** toolchain and NoTorch with native Unigram,
+model identities, numerical values, and owned sampling, then run the organism's checks:
 
 ```sh
 make -C ../notorch lib BLAS_FLAGS= BLAS_LIBS= X86_SIMD=0 ARM_SIMD=0
 make -C ../ariannamethod.ai notorch NOTORCH_ROOT=../notorch
+bash scripts/setup-tokenizer.sh
 make test
 ../ariannamethod.ai/runner/aml-notorch haiku.aml
 ../ariannamethod.ai/runner/aml-notorch examples/generator.aml
@@ -192,7 +208,8 @@ See [numerical parity](docs/NUMERICAL_PARITY.md) and
 [English form](docs/FORM_PARITY.md) and
 [generator parity](docs/GENERATOR_PARITY.md),
 [MathBrain](docs/MATHBRAIN.md), [RAE](docs/RAE.md),
-[tokenization](docs/TOKENIZER.md), and [foreground exchanges](docs/FOREGROUND.md), for exact boundaries and Python
+[tokenization](docs/TOKENIZER.md), [foreground exchanges](docs/FOREGROUND.md),
+and [continuity](docs/STATE.md), for exact boundaries and Python
 reference reproduction.
 
 Reference checks completed on 2026-10-07–08:
@@ -227,6 +244,13 @@ Reference checks completed on 2026-10-07–08:
   learner parameters. Real interpreted/compiled conversations agree; blank,
   quit, EOF, and rejected input preserve the inspected owners. Shared RAE
   experience has its own checked update.
+- Continuity compares **five seven-turn variants** with a fresh-process restart:
+  regex/SentencePiece, fixed/learning RAE, native/scripted draws, and a supplied
+  syllable cache. Responses and complete checkpoint bytes agree through the
+  interpreter and compiled executable. **34 invalid states** preserve every
+  live owner and the previous file; failed staged generation and failed saving
+  do the same. The actual CLI resumes saved configuration and withholds an
+  unpublished response after a save failure.
 - AML runtime: **550 tests passed**.
 - AML compiler: scope, source origins, nested failures, worker branches and
   errors, scalar builds, and literal program arguments are covered by regressions.
