@@ -1,7 +1,8 @@
 # Continuity — the cloud remembers
 
 2026-10-08. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
-Version 1 saves the complete foreground organism from [state.aml](../src/state.aml).
+Version 1 saves the foreground; version 2 adds MetaHaiku and the three rings.
+Both schemas live in [state.aml](../src/state.aml).
 With the same runtime and profile, closing the process and reopening its
 checkpoint preserves the next response, the next learning update, and both
 random streams exactly.
@@ -10,8 +11,8 @@ random streams exactly.
 
 [haiku.aml](../haiku.aml) uses `haiku.state` beside its own source file. The path
 retains that source origin when compiled. A present checkpoint supplies its
-tokenizer mode and `train_rae`; the fresh settings and seeds apply only to a new
-life. Set `state_path = ""` for an unsaved session. Each path has one running
+tokenizer mode, `train_rae`, and profile; fresh settings and seeds apply only to
+a new life. Set `state_path = ""` for an unsaved session. Each path has one running
 writer; concurrent writers require a later ownership protocol.
 
 The CLI clones the live record, completes an exchange in that candidate, and
@@ -36,11 +37,12 @@ wrappers whose relative paths follow **src/state.aml**. The CLI calls generic
 checkpoint operations at its own source origin. Absolute paths work in either
 interface.
 
-## The 29 fields
+## The 29 foreground fields
 
 The generic AML checkpoint preserves IEEE-754 binary32 bits, array shapes,
 UTF-8 bytes, and record/map/list insertion order. There is no save-time timestamp.
-Haiku accepts exactly this versioned schema:
+Version 1 accepts exactly these fields. Version 2 retains all of them, with
+`version = 2` and `profile = "english-inner-v2"`:
 
 | Fields | Type | Meaning |
 |---|---|---|
@@ -58,21 +60,71 @@ Haiku accepts exactly this versioned schema:
 The cache is stored, because supplied syllable counts control generation.
 The initialization stream is stored after **both** learner initializations.
 The tokenizer handle is reopened and its exact byte identity verified. Candidate
-texts, the selected response, gradients, and temporary feature arrays are local
-to one completed exchange; the next turn recomputes them. Stateless NoTorch SGD
-has no optimizer buffer to save.
+batches, gradients, and temporary feature arrays are local to one completed
+exchange. Version 1 also keeps its selected response local; version 2 retains
+user, selected, and internal text in `meta_history`. Stateless NoTorch SGD has
+no optimizer buffer to save.
 
 Validation checks exact fields/types, finite parameter arrays, ordered triple
 rows/counts, cloud columns, vocabulary/cache coverage, observer/generator count
 relations, recent membership, bounded clocks/counts, learner statistics, both
 RNGs, draw cursor/tape, and the reconstructed bridge event. MathBrain observations
-equal completed turns; RAE observations can range from zero through that count.
+equal completed turns. The persisted `train_rae` setting governs the whole
+session: RAE observations equal `turn * train_rae`, so fixed RAE has zero and
+learning RAE has one observation per completed turn.
 The logical clock resumes at the next integer. Cloud decay still occurs once
 per active exchange, independent of elapsed wall time.
 
-Version 1 persists the implemented foreground. Reflection, rings, dreams,
-Phase4 transition aggregation and event history, and background workers retain
-their later migration stages.
+Version 1 keeps its observer-to-generator count relation. Version 2 validates
+observer rows, counts, and resonance independently: rings insert observer-only
+triples, preserving their exact cloud token identities. Generator vocabulary
+and rows keep their own word/form checks.
+
+## Seven more fields for an inner life
+
+Version 2 requires exactly 36 fields. Its seven additional owners are:
+
+| Fields | Type | Meaning |
+|---|---|---|
+| `inner_started_turn` | float | Completed-turn boundary at which inner life was enabled. |
+| `meta_bootstrap` | list | Last eight admitted snippets, each at most ten words and 100 codepoints. |
+| `meta_history` | list | Ordered flat rows of user text, spoken haiku, and internal haiku. |
+| `meta_metrics` | array | Five values per history row: turn, dissonance, novelty, arousal, entropy. |
+| `ring_trigrams` | list | Latest echo/drift/meta candidates: five, seven, and three triples, in that order. |
+| `ring_coherence` | array | Three ring coherence values. |
+| `ring_admission` | array | Fifteen per-triple admission coherence values. |
+
+Fresh inner leaves have empty lists and numeric `[0]` sentinels. Every completed
+inner turn appends one reflection row and replaces the latest ring receipt.
+Custom clouds with fewer than three words retain an empty receipt, following
+the rings' skip rule; growth to three words enables the full receipt.
+The reflection count equals `turn - inner_started_turn`; its metric turns are
+contiguous from that boundary, and its latest climate equals the bridge event.
+History retains up to 10,000 complete reflection rows. Reaching that limit
+rejects the next turn before publication, retaining the existing checkpoint.
+
+The foreground, bootstrap admission, internal generation, and rings consume
+the same owned `voice_rng` or explicit draw tape in event order. Reflection and
+ring updates belong to the detached turn candidate. Saving commits all 36
+owners together, including observer-only ring insertions.
+
+## Explicit migration
+
+`haiku_state_new` continues to construct version 1. Calling
+`haiku_state_enable_inner(state, model)` validates that owner and returns a
+detached version 2 clone. It retains every foreground value, sets the boundary
+to the current completed turn, initializes the six inner leaves, and consumes
+no random values. Calling it on version 2 returns an equal detached clone.
+The caller chooses when to save and publish that result.
+
+The CLI starts a fresh life with `inner_life = 1`; set it to `0` to begin with
+the foreground profile. Existing v1 checkpoints continue their existing voice
+until `upgrade_inner = 1` explicitly enables inner life. Migration starts at
+that checkpoint's current turn, retaining its learned foreground memory.
+Existing v2 checkpoints resume their own profile regardless of fresh settings.
+
+Dreams, Phase4 transition aggregation and event history, and background workers
+retain their later migration stages.
 
 ## Python lineage and measured repairs
 
@@ -104,6 +156,17 @@ complete final checkpoint bytes must match. It also exercises repeated restore,
 model mismatch, malformed and semantically invalid snapshots, unchanged live
 owners after failed restore/staged generation, and preservation of an existing
 checkpoint when validation rejects a save.
+
+`make test-inner-state` repeats the seven-turn comparison for ten variants:
+five fresh v2 lives and five v1 lives explicitly upgraded after turn three.
+It covers the same tokenizer/training/draw choices, including a supplied
+syllable cache. The complete 36-field checkpoint and response text must agree
+across interpreted and compiled fresh-process continuations. Host inspection
+checks detached migration, repeated migration, rejected restores, exact
+observer-only token identities, exhaustion inside MetaHaiku and rings, and
+failed file publication with every live leaf and previous file preserved.
+A one-word custom cloud also continues across a two-word checkpoint, then
+starts its three rings as the third word arrives.
 
 The historical Python audit is a development reference:
 

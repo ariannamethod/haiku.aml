@@ -1,4 +1,4 @@
-# HAiKU's foreground voice. Runtime dependencies: AML + NoTorch.
+# HAiKU's voice and inner life. Runtime dependencies: AML + NoTorch.
 IMPORT "src/session.aml"
 
 # One process owns this checkpoint. Paths follow this source, even after amlc.
@@ -9,6 +9,11 @@ state_path = "haiku.state"
 # tokenizer mode and training choice. Use a new path for another voice.
 tokenizer_mode = "regex"
 train_rae = 0
+inner_life = 1
+
+# Existing foreground-only lives keep their exact continuation. Set this to 1
+# to grow their inner voice from the next completed exchange.
+upgrade_inner = 0
 resuming = 0
 if text_len(state_path) > 0:
     resuming = file_exists(state_path)
@@ -23,8 +28,12 @@ if text_equal(tokenizer_mode, "sentencepiece"):
 if resuming:
     haiku_state_check(restored, tokenizer_model)
     state = restored
+    if upgrade_inner:
+        state = haiku_state_enable_inner(state, tokenizer_model)
 else:
     state = haiku_state_new(tokenizer_mode, tokenizer_model, train_rae, 575, 57)
+    if inner_life:
+        state = haiku_state_enable_inner(state, tokenizer_model)
 listening = 1
 
 PRINT "HAiKU — the cloud is listening."

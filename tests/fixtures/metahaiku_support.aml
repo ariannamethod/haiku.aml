@@ -1,0 +1,36 @@
+IMPORT "../../src/metahaiku.aml"
+
+# A small ordered generator with an unequal-weight transition at T=0.7.
+def meta_test_new(scripted):
+    state = record_new()
+    record_set(state, "meta_bootstrap", list_new())
+    record_set(state, "meta_history", list_new())
+    record_set(state, "meta_metrics", zeros(1))
+    record_set(state, "rows", list_new())
+    record_set(state, "counts", map_new())
+    record_set(state, "vocab", list_new())
+    seeds = haiku_words("rain cloud wind light moon warm dream night")
+    haiku_chain_seed(record_get(state, "rows"), record_get(state, "counts"), record_get(state, "vocab"), seeds)
+    extra = haiku_words("rain cloud light")
+    cursor = 0
+    while cursor < 3:
+        list_push(record_get(state, "rows"), list_get(extra, cursor))
+        cursor = cursor + 1
+    map_set(record_get(state, "counts"), list_key(extra), 3)
+    record_set(state, "syllables", haiku_syllable_cache(record_get(state, "vocab")))
+    record_set(state, "voice_rng", rng_new(575))
+    tape = zeros(1)
+    tape[0] = -1
+    if scripted:
+        tape = zeros(513)
+        cursor = 0
+        while cursor < 512:
+            draw = cursor * 5 + 3
+            tape[cursor + 1] = (draw - floor(draw / 16) * 16) / 16
+            cursor = cursor + 1
+        tape[2] = 0
+        tape[3] = 0.1875
+    record_set(state, "draws", tape)
+    record_set(state, "weights", map_new())
+    map_set(record_get(state, "weights"), "sentinel", 3)
+    return state

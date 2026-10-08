@@ -1,0 +1,133 @@
+# The inner voice, from Python metahaiku.py at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+IMPORT "generator.aml"
+
+# Reflection admission and ring drift share the voice's ordered draw stream.
+def haiku_inner_draw(rng, tape):
+    assert(len(tape) >= 1, "Haiku inner draw tape is empty")
+    if tape[0] == -1:
+        assert(len(tape) == 1, "Haiku native draw tape must contain only -1")
+        return rng_uniform(rng)
+    cursor = tape[0]
+    assert(isfinite(cursor), "Haiku inner draw cursor must be finite")
+    assert(cursor >= 0 and cursor == floor(cursor), "Haiku inner draw cursor is invalid")
+    cursor = cursor + 1
+    assert(cursor < len(tape), "Haiku scripted draw tape exhausted")
+    draw = tape[cursor]
+    assert(isfinite(draw) and draw >= 0 and draw < 1, "Haiku scripted draws must be finite in [0, 1)")
+    tape[0] = cursor
+    return draw
+
+# Python split/join first, then its 100-codepoint slice, including partial words.
+def haiku_meta_snippet(spoken):
+    assert(text_len(spoken) <= 10000, "Haiku reflection text limit is 10000 codepoints")
+    words = haiku_words(spoken)
+    snippet = ""
+    cursor = 0
+    while cursor < min(10, list_len(words)):
+        if cursor > 0:
+            snippet = text_concat(snippet, " ")
+        snippet = text_concat(snippet, list_get(words, cursor))
+        cursor = cursor + 1
+    return text_slice(snippet, 0, 100)
+
+# Even a high-dissonance/arousal admission consumes the diversity draw.
+# An empty spoken text consumes none; nonempty whitespace can add an empty shard.
+def haiku_meta_bootstrap(buffer, spoken, dissonance, arousal, rng, tape):
+    assert(list_len(buffer) <= 8, "Haiku bootstrap limit is eight snippets")
+    assert(text_len(spoken) <= 10000, "Haiku reflection text limit is 10000 codepoints")
+    assert(isfinite(dissonance) and dissonance >= 0 and dissonance <= 1, "Haiku reflection dissonance is invalid")
+    assert(isfinite(arousal) and arousal >= 0, "Haiku reflection arousal is invalid")
+    result = list_clone(buffer)
+    if text_len(spoken) > 0:
+        draw = haiku_inner_draw(rng, tape)
+        if dissonance > 0.6 or arousal > 0.6 or draw < 0.3:
+            list_push(result, haiku_meta_snippet(spoken))
+            result = list_slice(result, max(0, list_len(result) - 8), list_len(result))
+    return result
+
+# Flat leaves freeze the actual chat context. History rows are user/spoken/inner;
+# metrics rows are turn/dissonance/novelty/arousal/entropy. The empty array is [0].
+def haiku_meta_check(state):
+    assert(text_equal(record_kind(state, "meta_bootstrap"), "list"), "Haiku bootstrap must be a list")
+    assert(text_equal(record_kind(state, "meta_history"), "list"), "Haiku reflection history must be a list")
+    assert(text_equal(record_kind(state, "meta_metrics"), "array"), "Haiku reflection metrics must be an array")
+    buffer = record_get(state, "meta_bootstrap")
+    history = record_get(state, "meta_history")
+    metrics = record_get(state, "meta_metrics")
+    assert(list_len(buffer) <= 8, "Haiku bootstrap limit is eight snippets")
+    cursor = 0
+    while cursor < list_len(buffer):
+        snippet = list_get(buffer, cursor)
+        assert(text_len(snippet) <= 100 and haiku_word_count(snippet) <= 10, "Haiku bootstrap snippet exceeds its bound")
+        cursor = cursor + 1
+    count = list_len(history) / 3
+    assert(count == floor(count) and count <= 10000, "Haiku reflection history requires at most 10000 complete rows")
+    assert(rows(metrics) == 0 and cols(metrics) == 0, "Haiku reflection metrics must be a vector")
+    assert(len(metrics) == max(1, count * 5), "Haiku reflection metrics/history lengths differ")
+    if count == 0:
+        assert(metrics[0] == 0 and list_len(buffer) == 0, "Haiku empty reflection state has retained experience")
+    previous = 0
+    cursor = 0
+    while cursor < count:
+        slot = cursor * 5
+        turn = metrics[slot]
+        assert(isfinite(turn), "Haiku reflection turn must be finite")
+        assert(turn > previous and turn <= 16777216 and turn == floor(turn), "Haiku reflection turn order is invalid")
+        previous = turn
+        offset = 1
+        while offset < 5:
+            value = metrics[slot + offset]
+            assert(isfinite(value) and value >= 0, "Haiku reflection climate must be finite and nonnegative")
+            if offset != 3:
+                assert(value <= 1, "Haiku reflection climate is outside [0, 1]")
+            offset = offset + 1
+        offset = 0
+        while offset < 3:
+            assert(text_len(list_get(history, cursor * 3 + offset)) <= 10000, "Haiku reflection text limit is 10000 codepoints")
+            offset = offset + 1
+        assert(haiku_line_count(list_get(history, cursor * 3 + 2)) == 3, "Haiku inner voice must have three lines")
+        cursor = cursor + 1
+    return count
+
+# The caller owns a detached turn. A failed generation cannot publish its draws.
+# Python computes reflection_seed but never passes it, and cloud_bias ends pass.
+# Preserve those measured paths: the buffer/history live; this event generates.
+def haiku_meta_reflect(state, user, spoken, observation, turn):
+    count = haiku_meta_check(state)
+    assert(count < 10000, "Haiku reflection history is full")
+    assert(isfinite(turn), "Haiku reflection turn must be finite")
+    assert(turn >= 1 and turn <= 16777216 and turn == floor(turn), "Haiku reflection turn is invalid")
+    old_metrics = record_get(state, "meta_metrics")
+    if count > 0:
+        assert(turn > old_metrics[(count - 1) * 5], "Haiku reflection turn order is invalid")
+    assert(text_len(user) <= 10000 and text_len(spoken) <= 10000, "Haiku reflection text limit is 10000 codepoints")
+    assert(len(observation) == 4, "Haiku reflection needs four climate values")
+    cursor = 0
+    while cursor < 4:
+        value = observation[cursor]
+        assert(isfinite(value) and value >= 0, "Haiku reflection climate must be finite and nonnegative")
+        if cursor != 2:
+            assert(value <= 1, "Haiku reflection climate is outside [0, 1]")
+        cursor = cursor + 1
+    buffer = haiku_meta_bootstrap(record_get(state, "meta_bootstrap"), spoken, observation[0], observation[2], record_get(state, "voice_rng"), record_get(state, "draws"))
+    candidates = haiku_generate_candidates(record_get(state, "rows"), record_get(state, "counts"), record_get(state, "vocab"), record_get(state, "syllables"), 1, 0.7, record_get(state, "voice_rng"), record_get(state, "draws"))
+    internal = list_get(candidates, 0)
+    metrics = zeros((count + 1) * 5)
+    cursor = 0
+    while cursor < count:
+        offset = 0
+        while offset < 5:
+            metrics[cursor * 5 + offset] = old_metrics[cursor * 5 + offset]
+            offset = offset + 1
+        cursor = cursor + 1
+    metrics[count * 5] = turn
+    cursor = 0
+    while cursor < 4:
+        metrics[count * 5 + cursor + 1] = observation[cursor]
+        cursor = cursor + 1
+    record_set(state, "meta_bootstrap", buffer)
+    list_push(record_get(state, "meta_history"), user)
+    list_push(record_get(state, "meta_history"), spoken)
+    list_push(record_get(state, "meta_history"), internal)
+    record_set(state, "meta_metrics", metrics)
+    return internal

@@ -24,14 +24,19 @@ All organism behavior is AML.
    original three RAE refinements. Keep the selected three lines for publication.
 5. Compute quality with the original three open intervals. Record the bridge
    handoff, then train MathBrain. Optional shared experience trains RAE next.
-6. Validate the complete candidate state. The CLI saves its checkpoint, swaps
+6. Version 2 reflects at temperature 0.7, then runs echo/drift/meta rings against
+   one observer snapshot. Store the internal haiku, its context, and ring traces.
+   Version 1 retains its foreground-only event order.
+7. Validate the complete candidate state. The CLI saves its checkpoint, swaps
    it into the live owner without allocating, then prints the selected three
    lines. This moves display
    after learning and storage; the numerical and lexical event order is unchanged.
 
 Generated candidates and the selected response leave cloud, transition counts,
-and recent memory at the state established by the incoming message. Reflection,
-rings, and dream feedback have their own later stages.
+and recent memory at the state established by the incoming message. Reflection
+consumes shared voice draws. Rings can add observer trigrams while leaving
+generator transitions and recent memory unchanged. Dream feedback follows in
+a later stage.
 
 The quality signal begins at 0.5. It adds 0.2 for `0.3 < dissonance < 0.7`,
 0.15 for `0.4 < entropy < 0.8`, and 0.15 for `0.3 < novelty < 0.7`.
@@ -56,8 +61,11 @@ Configuration is at the top of `haiku.aml`:
 | Voice seed | `575` | Starts an owned native sampling stream; resumption restores its exact state. |
 | Model seed | `57` | Initializes MathBrain and then RAE; resumption restores both 57-parameter arrays and the initialization stream. |
 | `train_rae` | `0` | Python chat's MathBrain-only training; `1` gives both learners the selected text, context, and quality once per exchange. |
+| `inner_life` | `1` | New lives use the version-2 reflection/rings profile; `0` creates a foreground-only version-1 life. |
+| `upgrade_inner` | `0` | Set to `1` to grow an existing version-1 life from its next exchange. Already-enabled lives retain their history. |
 
-Saved tokenizer mode and `train_rae` are authoritative on resumption. Use a
+Saved tokenizer mode, `train_rae`, and profile are authoritative on resumption.
+`upgrade_inner` explicitly changes the profile at a completed-turn boundary. Use a
 new path to begin another configuration. Install the optional tokenizer with
 `bash scripts/setup-tokenizer.sh`; default regex sessions need no model asset.
 
@@ -81,21 +89,24 @@ The bridge handoff contains turn, clock, dissonance, novelty, arousal, entropy,
 quality before/after, and boredom/overwhelm/stuck flags. The four climate values
 are shared by its before/after metric snapshots; quality changes from 0.5 to
 the observed value. Phase4 state-ID formatting, transition aggregation, and
-durable event logs remain in the migration queue. MetaHaiku, Overthinkg, dreams,
-and background scheduling retain their separate planned work. The complete
-foreground snapshot now persists; [STATE.md](STATE.md) records its validation
+durable event logs remain in the migration queue, along with dreams and
+background scheduling. The complete foreground and enabled inner snapshot
+now persist; [STATE.md](STATE.md) records their validation
 and publication boundaries. One running process owns each checkpoint path.
 
 ## Receipts
 
 [foreground.input](../examples/foreground.input) and
 [foreground.txt](../examples/foreground.txt) record an unedited native three-turn
-conversation starting with fresh state. `make test-foreground` uses an isolated,
-unsaved copy of the real entrypoint, so an existing conversation is preserved:
+conversation starting with fresh version-1 state. `make test-foreground` uses an
+isolated, unsaved copy of the real entrypoint with `inner_life = 0`.
+`make test-inner-cli` checks the new default, profile resumption, explicit upgrade,
+and the recorded [inner dialogue](../examples/inner.txt) through both execution paths:
 
 ```sh
 make test-foreground
 make test-state
+make test-inner-cli
 ```
 
 The Python oracle calls the original tokenizer, cloud, generator, RAE, bridge,

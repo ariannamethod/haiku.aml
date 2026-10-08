@@ -18,9 +18,10 @@ mkdir -p "$haiku_work/prefix/lib"
 mkdir -p "$haiku_work/fresh"
 ln -s "$haiku_root/src" "$haiku_work/fresh/src"
 ln -s "$haiku_root/models" "$haiku_work/fresh/models"
-# Keep this fixed-seed receipt independent of a user's live checkpoint.
+# Keep the historical v1 voice receipt and a user's live checkpoint independent.
 haiku_cli="$haiku_work/fresh/haiku.aml"
-sed 's/^state_path = "haiku.state"$/state_path = ""/' "$haiku_root/haiku.aml" > "$haiku_cli"
+sed -e 's/^state_path = "haiku.state"$/state_path = ""/' \
+    -e 's/^inner_life = 1$/inner_life = 0/' "$haiku_root/haiku.aml" > "$haiku_cli"
 ln -s "$haiku_lib" "$haiku_work/prefix/lib/libaml.a"
 ln -s "$haiku_bridge" "$haiku_work/prefix/lib/libaml_notorch.a"
 ln -s "$haiku_notorch" "$haiku_work/prefix/lib/libnotorch.a"

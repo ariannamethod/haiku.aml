@@ -1,0 +1,105 @@
+IMPORT "../../src/overthinkg.aml"
+
+def ring_test_near(actual, wanted):
+    assert(abs(actual - wanted) <= 0.000002, "Ring reference value differs")
+    return 1
+
+def ring_test_list(actual, wanted):
+    assert(list_len(actual) == list_len(wanted), "Ring list length differs")
+    cursor = 0
+    while cursor < list_len(actual):
+        assert(text_equal(list_get(actual, cursor), list_get(wanted, cursor)), "Ring ordered text differs")
+        cursor = cursor + 1
+    return 1
+
+def ring_test_map(actual, wanted):
+    ring_test_list(map_keys(actual), map_keys(wanted))
+    names = map_keys(actual)
+    cursor = 0
+    while cursor < list_len(names):
+        key = list_get(names, cursor)
+        assert(map_get(actual, key) == map_get(wanted, key), "Ring changed an unrelated map")
+        cursor = cursor + 1
+    return 1
+
+def ring_test_state():
+    state = record_new()
+    names = haiku_words("weights frequencies last_used observer_counts observer_resonance counts syllables mathbrain_state rae_state")
+    cursor = 0
+    while cursor < list_len(names):
+        record_set(state, list_get(names, cursor), map_new())
+        cursor = cursor + 1
+    names = haiku_words("origins observer_rows rows vocab recent")
+    cursor = 0
+    while cursor < list_len(names):
+        record_set(state, list_get(names, cursor), list_new())
+        cursor = cursor + 1
+    record_set(state, "voice_rng", rng_new(575))
+    record_set(state, "model_rng", rng_new(57))
+    record_set(state, "clock", 7)
+    record_set(state, "mathbrain", zeros(57))
+    record_set(state, "rae", zeros(57))
+    record_set(state, "draws", zeros(1))
+    map_set(record_get(state, "counts"), "untouched", 3)
+    map_set(record_get(state, "syllables"), "untouched", 3)
+    list_push(record_get(state, "rows"), "untouched")
+    list_push(record_get(state, "vocab"), "untouched")
+    list_push(record_get(state, "recent"), "untouched")
+    return state
+
+def ring_test_seed(state, word, weight, frequency, clock, origin):
+    map_set(record_get(state, "weights"), word, weight)
+    map_set(record_get(state, "frequencies"), word, frequency)
+    map_set(record_get(state, "last_used"), word, clock)
+    list_push(record_get(state, "origins"), origin)
+    return 1
+
+def ring_test_seed_row(state, triple, count, resonance):
+    cursor = 0
+    while cursor < 3:
+        list_push(record_get(state, "observer_rows"), list_get(triple, cursor))
+        cursor = cursor + 1
+    map_set(record_get(state, "observer_counts"), list_key(triple), count)
+    map_set(record_get(state, "observer_resonance"), list_key(triple), resonance)
+    return 1
+
+def ring_test_cloud(state, word, weight, frequency, clock, origin, index):
+    assert(text_equal(list_get(map_keys(record_get(state, "weights")), index), word), "Ring cloud word order differs")
+    ring_test_near(map_get(record_get(state, "weights"), word), weight)
+    assert(map_get(record_get(state, "frequencies"), word) == frequency, "Ring cloud frequency differs")
+    assert(map_get(record_get(state, "last_used"), word) == clock, "Ring cloud clock differs")
+    assert(text_equal(list_get(record_get(state, "origins"), index), origin), "Ring cloud origin differs")
+    return 1
+
+def ring_test_row(state, triple, count, resonance):
+    key = list_key(triple)
+    assert(map_get(record_get(state, "observer_counts"), key) == count, "Ring observer count differs")
+    ring_test_near(map_get(record_get(state, "observer_resonance"), key), resonance)
+    return 1
+
+def ring_test_untouched(state, old):
+    names = haiku_words("counts syllables mathbrain_state rae_state model_rng")
+    cursor = 0
+    while cursor < list_len(names):
+        key = list_get(names, cursor)
+        ring_test_map(record_get(state, key), record_get(old, key))
+        cursor = cursor + 1
+    names = haiku_words("rows vocab recent")
+    cursor = 0
+    while cursor < list_len(names):
+        key = list_get(names, cursor)
+        ring_test_list(record_get(state, key), record_get(old, key))
+        cursor = cursor + 1
+    names = haiku_words("mathbrain rae")
+    cursor = 0
+    while cursor < list_len(names):
+        key = list_get(names, cursor)
+        actual = record_get(state, key)
+        wanted = record_get(old, key)
+        assert(len(actual) == len(wanted), "Ring changed unrelated parameters")
+        offset = 0
+        while offset < len(actual):
+            assert(actual[offset] == wanted[offset], "Ring changed unrelated parameters")
+            offset = offset + 1
+        cursor = cursor + 1
+    return 1

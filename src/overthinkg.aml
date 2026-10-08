@@ -1,0 +1,204 @@
+# Echo, drift, meta: the Python Overthinkg rings, in their original event order.
+# Reference: harmonix/haiku/overthinkg.py at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+IMPORT "metahaiku.aml"
+
+# Count each distinct word once per pair of triples. Repeated rows retain
+# their occurrence weight; repeated words inside one triple do not.
+def haiku_ring_overlap(triples, context):
+    haiku_triple_keys(triples)
+    haiku_triple_keys(context)
+    overlap = 0
+    cursor = 0
+    while cursor < list_len(triples):
+        words = haiku_unique(list_slice(triples, cursor, cursor + 3))
+        other = 0
+        while other < list_len(context):
+            part = 0
+            while part < list_len(words):
+                word = list_get(words, part)
+                found = text_equal(word, list_get(context, other))
+                found = found or text_equal(word, list_get(context, other + 1))
+                found = found or text_equal(word, list_get(context, other + 2))
+                overlap = overlap + found
+                part = part + 1
+            other = other + 3
+        cursor = cursor + 3
+    return overlap
+
+# random.sample(words, 3): preserve CPython's pool path through 21 words,
+# then its selected-index/retry path. Cloud words are unique SQL identities.
+def haiku_ring_sample(words, rng, tape):
+    size = list_len(words)
+    assert(size >= 3, "Haiku ring sampling needs at least three words")
+    uniform = zeros(1)
+    uniform[0] = -1
+    result = list_new()
+    pool = list_new()
+    if size <= 21:
+        pool = list_clone(words)
+    part = 0
+    while part < 3:
+        if size <= 21:
+            index = haiku_gen_pick(size - part, uniform, 1, rng, tape)
+            list_push(result, list_get(pool, index))
+            list_set(pool, index, list_get(pool, size - part - 1))
+        else:
+            index = haiku_gen_pick(size, uniform, 1, rng, tape)
+            word = list_get(words, index)
+            while list_find(result, word) >= 0:
+                index = haiku_gen_pick(size, uniform, 1, rng, tape)
+                word = list_get(words, index)
+            list_push(result, word)
+        part = part + 1
+    return result
+
+def haiku_ring_generate(words, recent, amount, rng, tape):
+    assert(amount >= 0 and amount <= 7 and amount == floor(amount), "Haiku ring amount must be an integer in [0, 7]")
+    haiku_triple_keys(recent)
+    uniform = zeros(1)
+    uniform[0] = -1
+    triples = list_new()
+    cursor = 0
+    while cursor < amount:
+        drift = 0
+        if list_len(recent) > 0:
+            drift = haiku_inner_draw(rng, tape) < 0.6
+        if drift:
+            base = haiku_gen_pick(list_len(recent) / 3, uniform, 1, rng, tape) * 3
+            triple = list_slice(recent, base, base + 3)
+            index = haiku_gen_pick(3, uniform, 1, rng, tape)
+            word = list_get(words, haiku_gen_pick(list_len(words), uniform, 1, rng, tape))
+            list_set(triple, index, word)
+        else:
+            triple = haiku_ring_sample(words, rng, tape)
+        part = 0
+        while part < 3:
+            list_push(triples, list_get(triple, part))
+            part = part + 1
+        cursor = cursor + 1
+    return triples
+
+# Mutate the caller's detached candidate. Admission always sees the original
+# observer snapshot; SQL INSERT OR IGNORE leaves existing counts untouched.
+def haiku_ring_process(state, triples, existing, source):
+    rows = record_get(state, "observer_rows")
+    counts = record_get(state, "observer_counts")
+    resonance = record_get(state, "observer_resonance")
+    weights = record_get(state, "weights")
+    scores = zeros(max(1, list_len(triples) / 3))
+    cursor = 0
+    while cursor < list_len(triples):
+        triple = list_slice(triples, cursor, cursor + 3)
+        score = haiku_ring_overlap(triple, existing) / max(1, list_len(existing))
+        scores[cursor / 3] = min(1, score)
+        if score > 0.4:
+            key = list_key(triple)
+            if map_has(counts, key) == 0:
+                assert(map_len(counts) < 10000, "Haiku observer limit is 10000 triples")
+                part = 0
+                while part < 3:
+                    list_push(rows, list_get(triple, part))
+                    part = part + 1
+                map_set(counts, key, 1)
+                map_set(resonance, key, score)
+            part = 0
+            while part < 3:
+                word = list_get(triple, part)
+                if map_has(weights, word) == 0:
+                    haiku_cloud_add(weights, record_get(state, "frequencies"), record_get(state, "last_used"), record_get(state, "origins"), word, score, record_get(state, "clock"), source)
+                part = part + 1
+        cursor = cursor + 3
+    record_set(state, "observer_rows", rows)
+    record_set(state, "observer_counts", counts)
+    record_set(state, "observer_resonance", resonance)
+    record_set(state, "weights", weights)
+    return scores
+
+# The chat path always supplies current-user triples, including an empty list.
+# Source SQL uses a covering UNIQUE index for the word query: binary text order.
+# Returned receipts describe this event; the session stores them in ring_*.
+def haiku_overthinkg(state, recent):
+    haiku_cloud_check(record_get(state, "weights"), record_get(state, "frequencies"), record_get(state, "last_used"), record_get(state, "origins"))
+    haiku_clock_check(record_get(state, "clock"))
+    haiku_rows_check(record_get(state, "observer_rows"), record_get(state, "observer_counts"))
+    names = map_keys(record_get(state, "observer_counts"))
+    resonance = record_get(state, "observer_resonance")
+    assert(map_len(resonance) == list_len(names), "Haiku ring resonance/count lengths differ")
+    cursor = 0
+    while cursor < list_len(names):
+        value = map_get(resonance, list_get(names, cursor))
+        assert(value >= 0 and value <= 1, "Haiku ring observer resonance is invalid")
+        cursor = cursor + 1
+    haiku_triple_keys(recent)
+    haiku_gen_tape(record_get(state, "draws"))
+    receipt = record_new()
+    record_set(receipt, "trigrams", list_new())
+    record_set(receipt, "coherence", zeros(1))
+    record_set(receipt, "admission", zeros(1))
+    words = list_sorted(map_keys(record_get(state, "weights")))
+    existing = list_clone(record_get(state, "observer_rows"))
+    if list_len(words) < 3:
+        return receipt
+    record_set(receipt, "coherence", zeros(3))
+    record_set(receipt, "admission", zeros(15))
+    coherence = record_get(receipt, "coherence")
+    admission = record_get(receipt, "admission")
+    produced = record_get(receipt, "trigrams")
+    sources = haiku_words("echo drift meta")
+    ring = 0
+    offset = 0
+    while ring < 3:
+        amount = 5
+        if ring == 1:
+            amount = 7
+        if ring == 2:
+            amount = 3
+        triples = haiku_ring_generate(words, recent, amount, record_get(state, "voice_rng"), record_get(state, "draws"))
+        value = 0.5
+        if list_len(recent) > 0:
+            value = min(1, haiku_ring_overlap(triples, recent) / (amount * list_len(recent)) * 10)
+        coherence[ring] = value
+        source = text_concat("overthinking:", list_get(sources, ring))
+        scores = haiku_ring_process(state, triples, existing, source)
+        cursor = 0
+        while cursor < list_len(triples):
+            list_push(produced, list_get(triples, cursor))
+            cursor = cursor + 1
+        cursor = 0
+        while cursor < amount:
+            admission[offset + cursor] = scores[cursor]
+            cursor = cursor + 1
+        offset = offset + amount
+        ring = ring + 1
+    record_set(receipt, "trigrams", produced)
+    return receipt
+
+# The state validator owns the relation to completed inner-event count.
+# Observer-only words keep their original identity, including whitespace.
+def haiku_rings_check(state):
+    triples = record_get(state, "ring_trigrams")
+    coherence = record_get(state, "ring_coherence")
+    admission = record_get(state, "ring_admission")
+    assert(rows(coherence) == 0 and cols(coherence) == 0, "Haiku ring coherence must be a vector")
+    assert(rows(admission) == 0 and cols(admission) == 0, "Haiku ring admission must be a vector")
+    if list_len(triples) == 0:
+        assert(len(coherence) == 1 and len(admission) == 1, "Haiku empty rings require scalar sentinels")
+        assert(coherence[0] == 0 and admission[0] == 0, "Haiku empty ring sentinels must be zero")
+        return 1
+    assert(list_len(triples) == 45 and len(coherence) == 3 and len(admission) == 15, "Haiku rings require 5/7/3 triples and coherence scores")
+    cursor = 0
+    while cursor < 3:
+        assert(coherence[cursor] >= 0 and coherence[cursor] <= 1, "Haiku ring coherence must be finite in [0, 1]")
+        cursor = cursor + 1
+    cursor = 0
+    while cursor < 15:
+        assert(admission[cursor] >= 0 and admission[cursor] <= 1, "Haiku ring admission must be finite in [0, 1]")
+        triple = list_slice(triples, cursor * 3, cursor * 3 + 3)
+        if admission[cursor] > 0.4:
+            assert(map_has(record_get(state, "observer_counts"), list_key(triple)), "Haiku admitted ring triple is absent from observer memory")
+        part = 0
+        while part < 3:
+            assert(map_has(record_get(state, "weights"), list_get(triple, part)), "Haiku ring word is absent from its cloud")
+            part = part + 1
+        cursor = cursor + 1
+    return 1
