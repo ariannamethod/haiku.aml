@@ -1,0 +1,14 @@
+[
+  {
+    "path": "1984/weights/penelope.bin",
+    "returncode": 1,
+    "stdout": "format: DoE (flat)\nDoE param count 1346719287 != expected 26256912\n",
+    "stderr": ""
+  },
+  {
+    "path": "janus/weights/nanojanus.bin",
+    "returncode": 1,
+    "stdout": "format: DoE (flat)\nDoE param count 1346719287 != expected 26256912\n",
+    "stderr": ""
+  }
+]
