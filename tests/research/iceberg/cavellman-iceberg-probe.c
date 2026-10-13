@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <limits.h>
+#include <string.h>
 #include "semantic_tokenizer.h"
 
 static void show(const char *s) {
@@ -43,7 +46,15 @@ int main(int argc, char **argv) {
     if (!f) { perror(argv[1]); return 1; }
     char line[128]; int mismatches = 0, n = 0;
     if (!fgets(line, sizeof line, f)) { fclose(f); return 1; }
-    int declared = atoi(line);
+    char *end;
+    errno = 0;
+    long declared = strtol(line, &end, 10);
+    if (errno || end == line || declared < 0 || declared > INT_MAX ||
+        (*end && strcmp(end, "\n") && strcmp(end, "\r\n"))) {
+        fprintf(stderr, "invalid vocabulary count header\n");
+        fclose(f);
+        return 1;
+    }
     while (fgets(line, sizeof line, f)) {
         line[strcspn(line, "\r\n")] = 0;
         if (n >= GLYPH_COUNT || strcmp(line, GLYPH_NAMES[n])) {
@@ -52,7 +63,9 @@ int main(int argc, char **argv) {
         }
         n++;
     }
-    fclose(f);
-    printf("shipped_vocab_declared=%d lines=%d mismatches=%d\n", declared, n, mismatches);
-    return 0;
+    int read_failed = ferror(f);
+    int close_failed = fclose(f);
+    printf("shipped_vocab_declared=%ld lines=%d mismatches=%d\n", declared, n, mismatches);
+    return read_failed || close_failed || mismatches ||
+           declared != GLYPH_COUNT || n != GLYPH_COUNT;
 }

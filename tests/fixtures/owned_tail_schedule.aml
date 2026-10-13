@@ -1,0 +1,46 @@
+# Controlled schedules around the real tail, with launch-time owner mutation.
+IMPORT "../../src/session.aml"
+
+state = haiku_state_enable_dreams(haiku_state_new("regex", 0, 1, 575, 57), 0)
+record_set(state, "dream_config", [1, 1, 4])
+tape = zeros(2049)
+i = 1
+while i < len(tape):
+    draw = i * 5 + 3
+    tape[i] = (draw - floor(draw / 16) * 16) / 16
+    i = i + 1
+record_set(state, "draws", tape)
+expected = record_clone(state)
+spoken = haiku_session_turn(expected, "memory", 0)
+pending = record_clone(state)
+experience = haiku_session_prepare(pending, "memory", 0)
+receipt = record_clone(experience)
+CHANNEL CREATE haiku_release 1
+CHANNEL CREATE haiku_finished 1
+SPAWN controlled_tail:
+    CHANNEL READ haiku_release signal
+    completed = haiku_session_tail(pending, experience, 0)
+    CHANNEL WRITE haiku_finished 1
+    return completed
+# The worker is blocked until these launch inputs have changed in the parent.
+map_set(record_get(pending, "weights"), "the", 0)
+record_set(experience, "output", "this belongs to the parent after launch")
+record_set(experience, "quality", 0)
+CHANNEL WRITE haiku_release 1
+CHANNEL READ haiku_finished finished
+# Completion is delayed in the parent while the result already exists.
+assert(finished == 1 and record_get(state, "turn") == 0, "worker published before its owner")
+i = 0
+while i < 40:
+    unrelated = i * i
+    i = i + 1
+AWAIT controlled_tail INTO completed
+haiku_session_result_check(state, completed, receipt, 0)
+assert(text_equal(spoken, record_get(receipt, "output")), "worker selected another voice")
+assert(haiku_dream_check(completed) == 1, "controlled schedule did not include its dream")
+assert(map_get(record_get(completed, "mathbrain_state"), "observations") == 1, "ordered learner did not complete")
+checkpoint_save(expected, "owned-schedule-serial.state")
+checkpoint_save(completed, "owned-schedule-worker.state")
+CHANNEL CLOSE haiku_release
+CHANNEL CLOSE haiku_finished
+PRINT "HAIKU_OWNED_SCHEDULE_OK"

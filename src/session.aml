@@ -1,22 +1,21 @@
 # One accepted exchange publishes the voice and its completed inner life.
 IMPORT "state.aml"
 
-# The caller strips input and handles blank/quit/EOF before asking for a turn.
-# All mutable organs belong to a detached candidate until the final replacement.
-def haiku_session_turn(state, source, model):
-    haiku_state_check(state, model)
+# Accept one foreground exchange into an already detached candidate. Its flat
+# experience record travels beside that candidate; runtime model handles stay
+# outside both records. The caller handles blank/quit/EOF before accepting it.
+def haiku_session_prepare(pending, source, model):
+    haiku_state_check(pending, model)
     assert(haiku_input_action(source) == 1, "Haiku session needs an accepted input")
-    if record_get(state, "version") >= 2:
-        assert(list_len(record_get(state, "meta_history")) < 30000, "Haiku reflection history limit is 10000")
-    words = haiku_tokenize(source, record_get(state, "tokenizer_mode"), model)
+    if record_get(pending, "version") >= 2:
+        assert(list_len(record_get(pending, "meta_history")) < 30000, "Haiku reflection history limit is 10000")
+    words = haiku_tokenize(source, record_get(pending, "tokenizer_mode"), model)
     user = haiku_trigrams(words)
     haiku_foreground_input(words, user)
-    turn = record_get(state, "turn")
+    turn = record_get(pending, "turn")
     assert(turn < 16777216, "Haiku turn increment exceeds 2^24")
     turn = turn + 1
     clock = turn
-    pending = record_clone(state)
-
     haiku_cloud_morph(record_get(pending, "weights"), record_get(pending, "frequencies"), record_get(pending, "last_used"), record_get(pending, "origins"), words, clock)
     haiku_store_trigrams(record_get(pending, "observer_rows"), record_get(pending, "observer_counts"), record_get(pending, "observer_resonance"), user)
     recent = haiku_chain_update(record_get(pending, "rows"), record_get(pending, "counts"), record_get(pending, "vocab"), record_get(pending, "recent"), user)
@@ -31,15 +30,33 @@ def haiku_session_turn(state, source, model):
 
     quality = haiku_foreground_quality(observation)
     bridge_event = haiku_foreground_bridge(observation, quality, turn, clock)
+    experience = haiku_journal_capture(pending, source, spoken, user, system, temperatures, turn)
+    record_set(experience, "base_revision", turn - 1)
+    record_set(experience, "observation", observation)
+    record_set(experience, "quality", quality)
+    record_set(experience, "bridge_event", bridge_event)
+    return experience
+
+# This exact tail serves both schedules. All mutations stay with the candidate;
+# no worker opens a checkpoint or publishes a live owner.
+def haiku_session_tail(pending, experience, model):
+    turn = record_get(experience, "turn")
+    assert(record_get(pending, "turn") == record_get(experience, "base_revision"), "Haiku tail base revision differs")
+    assert(turn == record_get(experience, "base_revision") + 1, "Haiku tail revision does not follow its base")
+    source = record_get(experience, "input")
+    spoken = record_get(experience, "output")
+    user = haiku_journal_unpack(record_get(experience, "user_key"))
+    observation = record_get(experience, "observation")
+    quality = record_get(experience, "quality")
+    bridge_event = record_get(experience, "bridge_event")
     if record_get(pending, "version") == 3:
-        experience = haiku_journal_capture(pending, source, spoken, user, system, temperatures, turn)
         haiku_phase4_turn(pending, bridge_event)
     haiku_mathbrain_observe(record_get(pending, "mathbrain"), record_get(pending, "mathbrain_state"), spoken, quality, record_get(pending, "rows"), record_get(pending, "counts"), user)
     if record_get(pending, "train_rae"):
         haiku_rae_observe(record_get(pending, "rae"), record_get(pending, "rae_state"), spoken, quality, user)
     record_set(pending, "bridge_event", bridge_event)
     record_set(pending, "turn", turn)
-    record_set(pending, "clock", clock)
+    record_set(pending, "clock", turn)
     if record_get(pending, "version") >= 2:
         haiku_meta_reflect(pending, source, spoken, observation, turn)
         rings = haiku_overthinkg(pending, user)
@@ -51,5 +68,43 @@ def haiku_session_turn(state, source, model):
             haiku_dream_run(pending, spoken, model)
         haiku_journal_append(pending, experience)
     haiku_state_check(pending, model)
-    record_replace(state, pending)
-    return spoken
+    return pending
+
+# The sole publisher checks the revision before replacing any owner. Reusing a
+# result after a completed turn, or delivering it to a later turn, fails here.
+def haiku_session_result_check(state, completed, experience, model):
+    assert(record_get(state, "turn") == record_get(experience, "base_revision"), "Haiku completed tail has a stale base revision")
+    assert(record_get(completed, "turn") == record_get(experience, "turn"), "Haiku completed tail revision differs")
+    assert(record_get(completed, "turn") == record_get(state, "turn") + 1, "Haiku completed tail must advance exactly one turn")
+    haiku_state_check(completed, model)
+    assert(record_get(completed, "version") == record_get(state, "version"), "Haiku completed tail changed its profile")
+    assert(record_get(completed, "train_rae") == record_get(state, "train_rae"), "Haiku completed tail changed its learner mode")
+    assert(text_equal(record_get(completed, "tokenizer_mode"), record_get(state, "tokenizer_mode")), "Haiku completed tail changed its tokenizer mode")
+    assert(text_equal(record_get(completed, "tokenizer_identity"), record_get(state, "tokenizer_identity")), "Haiku completed tail changed its tokenizer identity")
+    if record_get(completed, "version") >= 2:
+        history = record_get(completed, "meta_history")
+        assert(text_equal(list_get(history, list_len(history) - 3), record_get(experience, "input")), "Haiku completed tail belongs to another input")
+        assert(text_equal(list_get(history, list_len(history) - 2), record_get(experience, "output")), "Haiku completed tail belongs to another response")
+    return 1
+
+# Serial scheduling remains available for exact continuation and comparison.
+def haiku_session_turn(state, source, model):
+    pending = record_clone(state)
+    experience = haiku_session_prepare(pending, source, model)
+    completed = haiku_session_tail(pending, experience, model)
+    haiku_session_result_check(state, completed, experience, model)
+    record_replace(state, completed)
+    return record_get(experience, "output")
+
+# One owned worker, one complete result. SPAWN snapshots the candidate and
+# experience, including their PCG state. Joining transfers the completed record
+# out of worker lifetime. The caller still saves before revealing the response.
+def haiku_session_worker_turn(state, source, model):
+    pending = record_clone(state)
+    experience = haiku_session_prepare(pending, source, model)
+    SPAWN haiku_tail:
+        return haiku_session_tail(pending, experience, model)
+    AWAIT haiku_tail INTO completed
+    haiku_session_result_check(state, completed, experience, model)
+    record_replace(state, completed)
+    return record_get(experience, "output")

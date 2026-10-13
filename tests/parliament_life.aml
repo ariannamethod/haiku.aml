@@ -1,0 +1,102 @@
+IMPORT "../src/parliament.aml"
+
+def parliament_equal(a, b):
+    assert(len(a) == len(b), "Parliament test length differs")
+    i = 0
+    while i < len(a):
+        assert(a[i] == b[i], "Parliament test numeric value differs")
+        i = i + 1
+    return 1
+
+glyphs = zeros(88)
+glyphs[2] = 1
+climate = [0.45, 0.5, 2, 0.5]
+rings = [0.5, 0.4, 0.3]
+x = haiku_parliament_features(glyphs, climate, rings, 0.5)
+assert(abs(x[90] - 0.6666667) < 0.000001, "Unbounded source arousal was lost")
+origin = haiku_parliament_signature(x, zeros(96), 0)
+boundary = zeros(64)
+i = 0
+while i < 64:
+    boundary[i] = -origin[i]
+    i = i + 1
+live = haiku_parliament_new("haiku", 42, origin, boundary)
+friend = haiku_parliament_new("friend", 43, origin, boundary)
+friend_before = record_clone(friend)
+assert(haiku_parliament_check(live) == 4, "Parliament did not start with four voices")
+assert(list_len(record_keys(live)) == 32, "Parliament schema changed without versioning")
+first = haiku_parliament_step(live, x, 0, 1, 1, 0, 1)
+assert(record_get(first, "committed") == 1 and record_get(first, "verdict") == 0, "Origin-aligned event was not admitted")
+assert(record_get(live, "revision") == 1, "Admitted revision did not advance")
+assert(haiku_parliament_dot(record_get(live, "field"), record_get(live, "field")) > 0, "Admitted parliament did not change the glyph field")
+parliament_equal(record_get(friend, "field"), record_get(friend_before, "field"))
+parliament_equal(record_get(friend, "a"), record_get(friend_before, "a"))
+before = record_clone(live)
+again = haiku_parliament_step(live, x, 0, 1, 1, 0, 1)
+replay = haiku_parliament_step(live, x, 7, 100, 1, 1, 1)
+assert(record_get(again, "committed") == 0 and record_get(replay, "committed") == 0, "Replayed evidence was admitted twice")
+assert(record_get(live, "revision") == record_get(before, "revision"), "Replay advanced revision")
+parliament_equal(record_get(live, "field"), record_get(before, "field"))
+parliament_equal(record_get(live, "credit"), record_get(before, "credit"))
+parliament_equal(record_get(live, "a"), record_get(before, "a"))
+
+# Delayed independent metrics affect credits and each selected expert's cursor.
+later = haiku_parliament_features(glyphs, climate, rings, 0.8)
+observed = haiku_parliament_step(live, later, 0, 2, 2, 0, 1)
+reward = haiku_parliament_reward(live, 1, 0, 2, 2, later)
+assert(abs(reward - 0.3) < 0.000001, "Delayed reward formula differs")
+assert(haiku_parliament_dot(record_get(live, "credit"), record_get(live, "credit")) > 0, "Independent reward did not change credits")
+cursors = record_get(live, "cursor")
+assert(cursors[0] + cursors[1] + cursors[2] + cursors[3] >= 2, "Selected experts did not advance private Oja cursors")
+assert(record_get(live, "revision") == 3, "Reward revision did not advance")
+
+# Negative axis is a fixture for plasticity rejection, not a user/source class.
+blocked = haiku_parliament_new("blocked-fixture", 42, boundary, origin)
+blocked_before = record_clone(blocked)
+decision = haiku_parliament_step(blocked, x, 0, 1, 1, 0, 1)
+assert(record_get(decision, "verdict") == 4 and record_get(decision, "alpha") == 0, "Boundary fixture was not DARK")
+parliament_equal(record_get(blocked, "field"), record_get(blocked_before, "field"))
+parliament_equal(record_get(blocked, "a"), record_get(blocked_before, "a"))
+memory = record_get(blocked, "memory_rows")
+assert(memory[0] == 4 and memory[2] == 1, "Dark memory did not retain its encounter")
+decision = haiku_parliament_step(blocked, x, 0, 2, 2, 0, 1)
+assert(memory[2] == 1, "Published snapshots leaked mutable alias changes")
+memory = record_get(blocked, "memory_rows")
+assert(memory[2] == 2 and memory[4] == 0, "Repeated wound used a second memory slot")
+
+# Stable feature-ID projection preserves smooth neighboring numeric values.
+near = haiku_parliament_part(x, 0, 96)
+near[89] = near[89] + 0.00000006
+sig1 = haiku_parliament_signature(x, zeros(96), 0)
+sig2 = haiku_parliament_signature(near, zeros(96), 0)
+assert(haiku_parliament_dot(sig1, sig2) > 0.99999, "One-ULP climate change scrambled the signature")
+
+# Owned lifecycle: one birth, private cursor, and minimum active population.
+life = record_clone(live)
+vitality = record_get(life, "vitality")
+ages = record_get(life, "age")
+vitality[0] = 0.9
+ages[0] = 21
+gates = zeros(16)
+gates[0] = 1
+haiku_parliament_lifecycle(life, gates)
+assert(haiku_parliament_check(life) == 5, "Mature strong expert did not give birth")
+ids = record_get(life, "ids")
+assert(ids[4] == 5, "Child identity did not advance")
+vitality[4] = 0
+vitality[0] = 0.3
+i = 0
+while i < 8:
+    haiku_parliament_lifecycle(life, gates)
+    i = i + 1
+assert(haiku_parliament_check(life) == 4, "Starved extra expert did not retire")
+i = 0
+while i < 4:
+    vitality[i] = 0
+    i = i + 1
+i = 0
+while i < 12:
+    haiku_parliament_lifecycle(life, zeros(16))
+    i = i + 1
+assert(haiku_parliament_check(life) == 4, "Starvation removed the minimum parliament")
+PRINT "HAIKU_PARLIAMENT_LIFE_OK"

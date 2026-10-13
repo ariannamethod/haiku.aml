@@ -19,6 +19,7 @@
   },
   "execution": "Q8_0 matrices expand once through NoTorch gguf_dequant to immutable owned F32; auxiliary F32 tensors borrow read-only mapping",
   "converter": "ariannamethod/notorch/tools/pen7_to_gguf.c --q8_0",
+  "converter_revision": "4d0b807d6d545d8e25b25bebf425377d62833ede",
   "tokenizer": {
     "algorithm": "byte-rank-pass-v1",
     "vocabulary": 2048,

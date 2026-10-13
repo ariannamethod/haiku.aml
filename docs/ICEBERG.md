@@ -9,15 +9,19 @@ directions; glyphs let differently worded experiences leave a shared conceptual
 trace. His further choice is **duality inside both Haiku and the dream-friend**.
 Each can carry both currents into their conversation.
 
-This document records source research, executed probes and a proposed extension.
-The new organs are not connected to Haiku yet. The merged organism already has
-the complete serial chat tail, dreams, Phase4 memory and an experience journal.
-The remaining [worker stage](ASYNC.md) comes before this extension becomes its
-default life. Python Haiku remains the behavioral and artistic reference.
+This document separates source research, executed foundations and the proposed
+full extension. The [owned worker tail](ASYNC.md) now preserves the complete
+chat's dreams, Phase4 memory and journal through join, save, swap and display.
+The two frozen sources are packaged as [Q8_0/F32 GGUF](../weights/README.md),
+and a private [parliament](PARLIAMENT.md) runs in isolated AML fixtures. The
+stable chat does not load those sources or import the parliament yet. Four
+trajectories, parameter mixing, learned glyph bindings and their return path
+into words remain integration work. Python Haiku remains the behavioral and
+artistic reference.
 
 ## Sources and receipts
 
-Six research threads inspected the implementations and exercised bounded paths.
+The family research inspected implementations and exercised bounded paths.
 The source revisions below make each observation reproducible.
 
 | Source | Inspected revision | Detailed receipt |
@@ -29,20 +33,32 @@ The source revisions below make each observation reproducible.
 | [caveLLMan](https://github.com/ariannamethod/caveLLMan/tree/471aed21abe9b7b882a464f07bc66b8ef3d5c411) | `471aed21abe9b7b882a464f07bc66b8ef3d5c411` | [Compression and pressure](research/iceberg/CAVELLMAN.md) |
 | [NoTorch](https://github.com/ariannamethod/notorch/tree/bfde06669ad34896421b86147e919ca902a0d337) | `bfde06669ad34896421b86147e919ca902a0d337` | [PEN7 numerical proof](research/iceberg/NOTORCH.md) |
 | [AML](https://github.com/ariannamethod/ariannamethod.ai/tree/f2d4496790be33505715ba90373fea5225799625) | `f2d4496790be33505715ba90373fea5225799625` | [Gamma, Janus and model ownership](research/iceberg/AML_GAMMA.md) |
+| [DoE](https://github.com/ariannamethod/doe/tree/588cf0009d3933dc5b7e72ac553fdd6e7932fa65) | `588cf0009d3933dc5b7e72ac553fdd6e7932fa65` | [Election, expert lifecycle and Oja](research/iceberg/DOE.md) |
+| [LoRAGrad](https://github.com/ariannamethod/loragrad/tree/57c5553a867b363b2eb2029f1827618026fd49fb) | `57c5553a867b363b2eb2029f1827618026fd49fb` | [Immune axis, credits and memory](research/iceberg/LORAGRAD.md) |
 
 Small portable probes and commands live in
 [tests/research/iceberg](../tests/research/iceberg/README.md). They use optional
-reference checkouts and are outside the runtime and normal test gate. No model
-weights, binaries or live state are added to this repository.
+reference checkouts and are outside the runtime and normal test gate. The
+pinned reports preserve their historical findings; the implemented foundations
+below describe what has changed since those audits. The two approved converted
+assets live in `weights/` with their manifest. Probe executables and live state
+remain outside the repository.
 
 ## Words below the cloud
 
-Both checked-in PEN7 files are real trained assets:
+Both original PEN7 files, checked into their source repositories, are trained
+assets:
 
 | Asset | Bytes | Float32 parameters | SHA-256 |
 |---|---:|---:|---|
 | `1984/weights/penelope.bin` | 78,477,152 | 19,619,280 | `afff67c780a7c78fdc1f76e521dfda30d65e68b95fe5bd324bb392b84ba3cd38` |
 | `janus/weights/nanojanus.bin` | 78,477,152 | 19,619,280 | `d675df2ee3a150d63bc73935a84060280d0f6b0aa84283e4b78ab905180b576c` |
+
+Haiku carries their converted descendants as `weights/haiku1.gguf` and
+`weights/haiku2.gguf`: **21,308,576 bytes each**, with Q8_0 matrices and F32
+positions, norms and gates. The [manifest](../weights/manifest.json) pins both
+source revisions and both converted identities. The source weights stay frozen;
+learning in the parliament changes its own small state.
 
 They have the same tensor layout and exactly the same 1,792 BPE merge tuples:
 2,048 tokens, width 448, eight layers, seven heads, FFN width 896, context 256.
@@ -84,14 +100,22 @@ logits in all 2,048 positions (mean absolute difference 4.88956). The
 distinction directly inspectable. Choosing a useful default balance belongs to
 the word-admission and trajectory experiments.
 
-The current NoTorch loaders do not accept PEN7. A forward-only family loader
-and an AML immutable model value are still needed. The architecture includes
-learned positions alongside RoPE, RMSNorm epsilon `1e-5`, and a dense `Wr @ h`
-branch blended with attention. The name RRPRAM alone is insufficient to select
-the correct operation; the numerical receipt records the exact contract.
+NoTorch now has a native PEN7-to-GGUF converter and `penelope` family loader,
+tokenizer and forward. Its Q8 path expands matrices once to owned F32 and
+executes them without a training tape; auxiliary F32 tensors borrow the
+read-only mapping. Learned positions alongside RoPE, RMSNorm epsilon `1e-5`,
+and the dense `Wr @ h` branch retain their exact architecture. The
+[conversion/forward receipt](../weights/README.md) records four tested context
+lengths, chunked input, quantization differences and deliberate wrong-RoPE
+controls. The earlier research loader limitation is fixed at the NoTorch layer.
 
-Both f32 files together are **149.68 MiB**, before working buffers. A short
-scalar forward in the probe took about 136 ms per model on this host. The source
+An immutable PEN7 model value in AML, source availability, word admission and
+representation extraction into the organ still need their integration boundary.
+
+Both expanded F32 parameter bodies together are **149.68 MiB**, before mapped
+Q8 bytes and working buffers. The smaller GGUF files reduce storage; the current
+forward still holds expanded matrices. A short scalar forward in the original
+F32 probe took about 136 ms per model on this host. The source
 C twelve-step chains took about 3.5–4 seconds. Those are different workloads
 and single-run observations, not interface latency promises.
 
@@ -131,12 +155,12 @@ Keep the coefficient convention visible: AML `JANUS_BLEND = b` means `0=A,
 1=B`, whereas the full-weight equation above means `alpha=1` selects A.
 Thus its coefficient is `alpha = 1 - b`.
 
-AML's current field `G` and the historical Janus model callbacks are process
+The audited AML field `G` and the historical Janus model callbacks are process
 globals. The Go carrier holds one active engine. Haiku needs owned field/model
 contexts so the two presences can evolve independently and use the canonical
 NoTorch path. A configured gamma slot also does not establish load success:
 the measured `LOAD_GAMMA` path retains its slot when a callback returns failure.
-Provider readiness must be a separate explicit result. The
+Provider readiness must be a separate explicit result. The pinned
 [gamma audit](research/iceberg/AML_GAMMA.md) records the source paths and probes.
 
 ### Four trajectories, two autobiographies
@@ -261,6 +285,30 @@ admissions and later haiku. Compare repeated paraphrases, unrelated contexts
 and a held-out set of word/concept bindings. Then test whether a new concept
 survives restart and influences a later exchange through its recorded history.
 
+## A private parliament now has a body
+
+Oleg's next direction adds DoE's living experts and LoRAGrad's immune field to
+that conceptual life. [`src/parliament.aml`](../src/parliament.aml) implements
+the first bounded organ: 96 fixed feature coordinates, rank-four adapters,
+four initial experts and a population floor of four, up to sixteen slots. Its
+election can select as few as two experts. The 64-dimensional immune signature
+uses stable feature columns; tiny metric changes preserve nearby signatures.
+
+The admitted proposal changes a persistent 88-value glyph-pressure field.
+Six immune verdicts govern its magnitude; 64 combined SCAR/DARK memories retain
+encounters with deduplication and least-recently-used replacement. Thirty-two
+receipts bind later learning to a retained human-source witness with its actual
+saved climate. Private credits and adapters change through that delayed reward;
+the PEN7 bodies stay frozen. Birth, retirement, expert identities, per-expert
+rank cursors, RNG and all receipts survive checkpoint continuation.
+
+These are executed mechanisms, documented and tested in [PARLIAMENT](PARLIAMENT.md).
+The module is experimental and separate from stable chat. Its current callers
+provide features directly. Word-to-glyph binding, real model representations,
+recursive symbol birth and influence on spoken candidates are the next links
+to build. Each presence will receive its own owner; no shared mutable parliament
+is implied by sharing the two sources.
+
 ## Quiet absence, explicit continuity
 
 The HTML Penelope and NanoJanus paths demonstrate actual model-free field
@@ -295,29 +343,38 @@ each completed change through its existing validate/checkpoint/swap boundary.
 
 ## Porting findings that affect the design
 
-The detailed receipts preserve the small divergences so the port can choose a
-contract rather than inherit them accidentally:
+The detailed receipts preserve divergences measured in the pinned source
+revisions so the port can choose an explicit contract:
 
-- NanoJanus currently computes new prophecy debt from a one-candidate list, so
+- The audited NanoJanus computes new prophecy debt from a one-candidate list, so
   it is always zero; an initial debt only decays. Its prophecy average also
   reads a missing field. Retain the real candidate contrast and step receipt.
 - Negative calendar drift differs between Python modulo and C/JS remainder.
   At the measured day 740, dissonance is `.781594` versus `.218406`, changing
   the directional budget. Choose one signed-time convention and checkpoint
   the calendar input used by each event.
-- caveLLMan's current compound metadata collides with reserved model IDs and
+- The audited caveLLMan compound metadata collides with reserved model IDs and
   its zero-initialized Hebbian factors stay zero. The successor's recursive
   allocation and working initialization provide better references.
 - Penelope's AML file embeds the C engine through `BLOOD COMPILE`. Its vendor
   cleanup is a separate task. Haiku's behavior remains ordinary AML modules;
   generic model execution belongs to NoTorch and generic ownership to AML.
+- DoE's audited Oja cursor is global and can confine each expert to the same
+  rank window; its spore omits lifecycle and RNG continuation. Haiku's organ
+  implements persisted per-expert cursors and a complete owned checkpoint.
+- LoRAGrad's audited numeric signature hashes changing float bits, and its
+  append-only memories stop recording when full. Haiku implements a fixed
+  feature projection and bounded deduplicated replacement. The original audit
+  results remain attached to their original source revisions.
 
 ## Implementation order and evidence
 
-| Stage | Concrete next work | Evidence required |
+| Stage | Current boundary | Evidence or next gate |
 |---|---|---|
-| Finish the Python baseline | Complete the reusable AML worker and ordered publication described in ASYNC | Serial/worker continuation, restart, quit/EOF and revision ownership agree |
-| Optional lexical sources | NoTorch PEN7 loader/forward, immutable AML handle, bounded AML word admission | Source logits at several lengths, malformed assets, zero/one/two sources, unchanged disabled-profile draws |
+| Owned Python baseline | Implemented reusable worker and join/save/swap/display publication in ASYNC | Serial/worker/compiled continuation, restart, controlled completion and rejected publication checked; early display/pending intent remain later work |
+| Frozen lexical bodies | Implemented NoTorch converter, GGUF loader/forward and two Q8_0/F32 assets | Source pins, all-tensor conversion, multiple lengths, chunking and numerical controls recorded with weights |
+| Private parliament | Implemented standalone AML field, experts, immunity, delayed reward and exact restart | Interpreter/compiled life and memory fixtures, rejected states and checkpoint continuation checked; no stable-chat import |
+| Optional lexical sources | Next: immutable AML handle, bounded AML word admission and representation features | Zero/one/two sources, quiet absence, explicit identities and unchanged disabled-profile draws |
 | Duality in each presence | Separate Haiku/friend owners, retrospective/prospective contexts, parameter mixing, calendar and operative debt | Four histories and their mixing state survive restart; interventions remain local until an explicit exchange; mixed parameters are checked against endpoint controls |
 | Conceptual attraction | Shared seed concepts, private directed traces, learned word bindings, model representations and tagged exchange | Same concept through lexical aliases; neural contribution and lived history separately change measured pressure/bindings and later admission |
 | Dream-born glyphs | Bounded recursive symbol formation and stable structure across both owners | Creation threshold, recursive identity, save/restart, adoption and replay provenance |

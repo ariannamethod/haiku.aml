@@ -31,8 +31,10 @@ GPLv3; their pinned license files are linked in the manifest. Haiku retains its
 
 ## Reproduce the bodies
 
-Use NoTorch's native `tools/pen7_to_gguf.c` converter and the pinned original
-files. Its output path must not already exist. From the NoTorch checkout:
+Use NoTorch's native `tools/pen7_to_gguf.c` converter at
+[`4d0b807`](https://github.com/ariannamethod/notorch/commit/4d0b807d6d545d8e25b25bebf425377d62833ede)
+and the pinned original files. Its output path must not already exist. From
+the NoTorch checkout:
 
 ```sh
 make pen7_to_gguf BLAS_FLAGS= BLAS_LIBS= X86_SIMD=0 ARM_SIMD=0
@@ -53,6 +55,12 @@ every tensor, source size/header, tokenizer and finite values before publishing
 the output. NoTorch's independent audit reconstructs all 609,280 Q8 blocks per
 body and checks the 26 F32 tensors byte for byte. NoTorch owns quantization,
 dequantization, forward operations and the native tokenizer.
+
+The repository's [publication workflow](../.github/workflows/publish-weights.yml)
+reproduces these bytes from the pinned sources and publishes each verified
+asset in its own commit and push on the integration branch. Its local
+`scripts/publish-weights.sh --offline SOURCE_ROOT OUTPUT_DIR` mode performs
+the same conversion and verification without changing Git files or refs.
 
 ## Executed comparison
 

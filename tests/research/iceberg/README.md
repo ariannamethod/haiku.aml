@@ -33,10 +33,38 @@ iceberg_pin 1984 a0d20019587ff14e5516eb050ba0876d6edd0baa
 iceberg_pin janus 5a945a9d7c1dc9abfa217f685f0a81455f9ac493
 iceberg_pin notorch bfde06669ad34896421b86147e919ca902a0d337
 iceberg_pin ariannamethod.ai f2d4496790be33505715ba90373fea5225799625
+iceberg_pin doe 588cf0009d3933dc5b7e72ac553fdd6e7932fa65
+iceberg_pin loragrad 57c5553a867b363b2eb2029f1827618026fd49fb
 ```
 
 Each pin check must exit zero before running its corresponding probe. The
 external source trees are read in place; none of the commands edits them.
+
+## Parliament and immune memory
+
+The new receipts are [DoE](../../../docs/research/iceberg/DOE.md) and
+[LoRAGrad](../../../docs/research/iceberg/LORAGRAD.md). These probes execute the
+pinned relatives, including behavior deliberately changed in Haiku's port.
+
+```sh
+cc -O2 -w -I "$iceberg_sources" \
+  "$iceberg_probes/doe-parliament-probe.c" -lm -lpthread \
+  -o "$iceberg_work/doe-parliament"
+(cd "$iceberg_work" && ./doe-parliament)
+
+cc -O2 -std=c11 -DLG_STANDALONE -I "$iceberg_sources/loragrad" \
+  "$iceberg_sources/loragrad/loragrad.c" \
+  "$iceberg_probes/loragrad-immune-probe.c" -lm \
+  -o "$iceberg_work/loragrad-immune"
+"$iceberg_work/loragrad-immune"
+```
+
+The DoE probe writes its temporary spore only inside `iceberg_work`. It confirms
+election, the shared rank-cursor starvation and the source spore's omitted
+lifecycle counters. The immune probe confirms recall overrides, first-256
+memory saturation, credit-only adaptation and discontinuous float-bit signatures.
+Both must exit zero. Their assertions describe the pinned source; Haiku uses
+owned cursors, complete checkpoints and a smooth feature-ID projection.
 
 ## Glyphs and pressure
 
@@ -72,7 +100,10 @@ that body's update. The PEN7 experiment below uses canonical NoTorch.
 | `cavellman-iceberg-probe.c` | 514 aliases / 506 distinct strings; exact compressed examples; all 88 shipped vocabulary IDs match |
 | `cavellman-surface-probe.c` | First-pair emergence, ID88/BOS overlap, survival then death below .525, surprise-driven pressure, raw-count/normalization order, zero Hebbian factors after 100 updates |
 
-All four probes exit zero and print their observations. They do not start a
+All four probes exit zero and print their observations. The vocabulary probe
+fails for changed words, extra or missing entries, a malformed count header,
+or a declared count other than 88; its printed mismatch count is a real gate.
+They do not start a
 colony, training loop, server, or source CLI. Compiler warnings originating in
 the included pinned sources remain visible.
 
@@ -159,7 +190,7 @@ and resident memory are observations from the original host, not exact portable
 expectations. Endpoint and wrong-RoPE receipts are alongside it.
 
 The loader-only observations have their own successful exit status: zero means
-the current native tensor and GGUF loaders both declined PEN7 as expected.
+the pinned native tensor and GGUF loaders both declined raw PEN7 as expected.
 
 ```sh
 "$iceberg_work/pen7" --loaders "$iceberg_sources/1984/weights/penelope.bin"
@@ -167,4 +198,6 @@ the current native tensor and GGUF loaders both declined PEN7 as expected.
 ```
 
 The audit records exact weight identities, forward values, and measured memory.
-No weights are copied into Haiku, and these commands publish no model or state.
+These research commands copy no weights and publish no model or state. Haiku's
+two subsequently approved GGUF assets and their reproducible conversion live
+under [weights](../../../weights/README.md).

@@ -1,0 +1,45 @@
+IMPORT "../src/parliament.aml"
+origin = zeros(64)
+boundary = zeros(64)
+origin[0] = 1
+boundary[0] = -1
+state = haiku_parliament_new("memory-fixture", 7, origin, boundary)
+directions = record_get(state, "immune_w")
+i = 0
+while i < 1024:
+    directions[i] = 0
+    i = i + 1
+i = 0
+while i < 16:
+    directions[i * 64] = 1
+    i = i + 1
+positions = [1, 0.3, 0, -0.3, -0.6, -0.2]
+i = 0
+while i < 6:
+    signature = zeros(64)
+    signature[0] = positions[i]
+    signature[1] = sqrt(1 - positions[i] * positions[i])
+    verdict = haiku_parliament_vote(state, signature)
+    assert(record_get(verdict, "verdict") == i, "LoRAGrad verdict order differs")
+    if i == 1:
+        expected = (0.7 * 0.3 + 0.3 * tanh(0.3) - 0.1) / 0.3
+        assert(abs(record_get(verdict, "alpha") - expected) < 0.000001, "Weakening attenuation differs")
+    i = i + 1
+
+i = 0
+while i < 64:
+    signature = zeros(64)
+    signature[i] = 1
+    haiku_parliament_remember(state, signature, 3, i + 1, 0)
+    i = i + 1
+haiku_parliament_remember(state, origin, 3, 65, 0)
+haiku_parliament_remember(state, boundary, 4, 66, 1)
+record_set(state, "clock", 66)
+assert(haiku_parliament_check(state) == 4, "Full immune memory became invalid")
+rows = record_get(state, "memory_rows")
+sigs = record_get(state, "memory_sigs")
+assert(rows[2] == 2 and rows[1] == 65, "Repeated wound failed deduplication")
+assert(rows[4] == 4 and rows[5] == 66 and sigs[64] == -1, "New wound did not replace the least-recently-used slot")
+decision = haiku_parliament_vote(state, origin)
+assert(record_get(decision, "verdict") == 3 and record_get(decision, "alpha") == 0, "Scar recall did not override an otherwise passing vote")
+PRINT "HAIKU_PARLIAMENT_MEMORY_OK"
