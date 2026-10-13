@@ -25,6 +25,23 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
 
 ## Family experiments
 
+- [x] Audit Penelope, NanoJanus, Actually.life, Leo and caveLLMan; verify both
+  PEN7 assets through existing NoTorch operations. Preserve source pins,
+  executable receipts and the proposed [iceberg](docs/ICEBERG.md).
+- [ ] After the worker baseline, add optional PEN7 lexical sources with quiet
+  missing-weight fallback, explicit word admission and immutable shared models.
+- [ ] Give both Haiku and the dream-friend their own retrospective/prospective
+  trajectories, each mixing both sources through its own gamma/Janus field.
+  Persist four histories, each presence's parameter-mixing balance and their
+  exchanges while sharing the two immutable weight sets. Give the field owned
+  state and the provider explicit load results in the AML/NoTorch boundary.
+- [ ] Add a conceptual field beneath the words: persistent glyph attraction,
+  learned word bindings, then recursive symbols born during dream consolidation.
+  Keep external observations, peer exchange and internal replay distinct.
+- [ ] Let model representations contribute to glyph formation and learned
+  concept bindings; let that field influence later parameter mixing and words.
+  Use NoTorch for numerical work, retain shared concept identities and each
+  presence's own experience, and compare with the working weightless field.
 - [ ] After the baseline organs work, run the controlled extensions in
   [FAMILY.md](docs/FAMILY.md): reflection preserves foreground state, episodic
   recall, state-at-contact word memory, sampling mixtures, variable form,

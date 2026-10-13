@@ -340,6 +340,11 @@ corpus and token identity to a coherent transition field. Q is the active
 PostGPT continuation, with aging expectations and slow consolidation on that
 substrate. Its [source audit](docs/Q.md) traces the working paths and ranks three
 experiments for Haiku's future memory.
+Oleg's [iceberg](docs/ICEBERG.md) brings Penelope's words, Janus's two directions,
+and the glyph lives of Actually.life, Leo and caveLLMan underneath that small
+surface. Both Haiku and the friend will carry their own duality. The source
+audit and NoTorch proof are ready; these deeper organs are the next family
+experiments after the worker baseline.
 See [the audit and implementation order](docs/MIGRATION.md).
 
 ## Lineage
@@ -351,7 +356,12 @@ See [the audit and implementation order](docs/MIGRATION.md).
 [Yent AML](https://github.com/ariannamethod/yent.aml) ·
 [Subjectivity](https://github.com/ariannamethod/subjectivity) ·
 [Brodsky](https://github.com/ariannamethod/brodsky) ·
-[Q / PostGPT](https://github.com/ariannamethod/q)
+[Q / PostGPT](https://github.com/ariannamethod/q) ·
+[Penelope](https://github.com/ariannamethod/1984) ·
+[Janus](https://github.com/ariannamethod/janus) ·
+[Actually.life](https://github.com/ariannamethod/actually.life) ·
+[Leo](https://github.com/ariannamethod/leo) ·
+[caveLLMan](https://github.com/ariannamethod/caveLLMan)
 
 GNU GPL v3 — see [LICENSE](LICENSE).
 

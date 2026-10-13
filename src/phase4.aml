@@ -287,6 +287,8 @@ def haiku_phase4_record(state, current, before, after, previous, turn_id, clock,
     if count > 0:
         used = log_rows[(count - 1) * 8 + 3] + log_rows[(count - 1) * 8 + 4]
     metrics = haiku_phase4_extend(record_get(state, "phase4_metric_rows"), used * 2, (map_len(before) + map_len(after)) * 2)
+    # AML list assignment copies the container; additions stay private until
+    # record_set below, including an overflow after one new name was staged.
     names = record_get(state, "phase4_metric_names")
     named = map_new()
     cursor = 0

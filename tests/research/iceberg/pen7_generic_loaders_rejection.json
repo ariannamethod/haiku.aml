@@ -1,0 +1,14 @@
+[
+  {
+    "path": "1984/weights/penelope.bin",
+    "returncode": 0,
+    "stdout": "{\"nt_load_accepted\":false,\"nt_load_count\":-1,\"gguf_accepted\":false}\n",
+    "stderr": "gguf: bad magic (got 0x50454e37)\n"
+  },
+  {
+    "path": "janus/weights/nanojanus.bin",
+    "returncode": 0,
+    "stdout": "{\"nt_load_accepted\":false,\"nt_load_count\":-1,\"gguf_accepted\":false}\n",
+    "stderr": "gguf: bad magic (got 0x50454e37)\n"
+  }
+]
