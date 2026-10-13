@@ -22,12 +22,17 @@ All organism behavior is AML.
    temperatures. The first complete input therefore observes its own triples.
 4. Extend the syllable cache, generate five candidates, and select through the
    original three RAE refinements. Keep the selected three lines for publication.
-5. Compute quality with the original three open intervals. Record the bridge
-   handoff, then train MathBrain. Optional shared experience trains RAE next.
-6. Version 2 reflects at temperature 0.7, then runs echo/drift/meta rings against
+5. Compute quality with the original three open intervals. Version 3 freezes
+   the experience features and contexts and records the Phase4 transition;
+   earlier profiles retain the bridge handoff. Train MathBrain. Optional
+   shared experience trains RAE next.
+6. Versions 2 and 3 reflect at temperature 0.7, then run echo/drift/meta rings against
    one observer snapshot. Store the internal haiku, its context, and ring traces.
    Version 1 retains its foreground-only event order.
-7. Validate the complete candidate state. The CLI saves its checkpoint, swaps
+7. Version 3 checks dream eligibility, generates the complete dialogue before
+   feedback, then updates fragments and generator memory. Append the exchange
+   journal and its final cloud-size metric.
+8. Validate the complete candidate state. The CLI saves its checkpoint, swaps
    it into the live owner without allocating, then prints the selected three
    lines. This moves display
    after learning and storage; the numerical and lexical event order is unchanged.
@@ -35,8 +40,9 @@ All organism behavior is AML.
 Generated candidates and the selected response leave cloud, transition counts,
 and recent memory at the state established by the incoming message. Reflection
 consumes shared voice draws. Rings can add observer trigrams while leaving
-generator transitions and recent memory unchanged. Dream feedback follows in
-a later stage.
+generator transitions and recent memory unchanged. Version 3 dream feedback
+then changes the speaking chain and recent memory, while preserving the
+foreground contexts in the journal.
 
 The quality signal begins at 0.5. It adds 0.2 for `0.3 < dissonance < 0.7`,
 0.15 for `0.4 < entropy < 0.8`, and 0.15 for `0.3 < novelty < 0.7`.
@@ -61,11 +67,13 @@ Configuration is at the top of `haiku.aml`:
 | Voice seed | `575` | Starts an owned native sampling stream; resumption restores its exact state. |
 | Model seed | `57` | Initializes MathBrain and then RAE; resumption restores both 57-parameter arrays and the initialization stream. |
 | `train_rae` | `0` | Python chat's MathBrain-only training; `1` gives both learners the selected text, context, and quality once per exchange. |
-| `inner_life` | `1` | New lives use the version-2 reflection/rings profile; `0` creates a foreground-only version-1 life. |
+| `inner_life` | `1` | New lives include reflection/rings; `0` creates a foreground-only version-1 life. |
+| `dream_life` | `1` | With inner life enabled, new lives use version 3: Phase4, dreams and an exchange journal. Set to `0` for version 2. |
 | `upgrade_inner` | `0` | Set to `1` to grow an existing version-1 life from its next exchange. Already-enabled lives retain their history. |
+| `upgrade_dreams` | `0` | Set to `1` to grow an existing version-1 or version-2 life into version 3 from its next exchange. |
 
 Saved tokenizer mode, `train_rae`, and profile are authoritative on resumption.
-`upgrade_inner` explicitly changes the profile at a completed-turn boundary. Use a
+The upgrade flags explicitly change the profile at a completed-turn boundary. Use a
 new path to begin another configuration. Install the optional tokenizer with
 `bash scripts/setup-tokenizer.sh`; default regex sessions need no model asset.
 
@@ -88,9 +96,10 @@ records both tokenizer modes.
 The bridge handoff contains turn, clock, dissonance, novelty, arousal, entropy,
 quality before/after, and boredom/overwhelm/stuck flags. The four climate values
 are shared by its before/after metric snapshots; quality changes from 0.5 to
-the observed value. Phase4 state-ID formatting, transition aggregation, and
-durable event logs remain in the migration queue, along with dreams and
-background scheduling. The complete foreground and enabled inner snapshot
+the observed value. Version 3 retains [Phase4](PHASE4.md) metric maps, named
+states and transition aggregates, [dreams](DREAM.md), and the [exchange journal](JOURNAL.md).
+Background scheduling follows the measured [worker plan](ASYNC.md).
+The complete foreground and enabled inner snapshot
 now persist; [STATE.md](STATE.md) records their validation
 and publication boundaries. One running process owns each checkpoint path.
 
@@ -100,7 +109,7 @@ and publication boundaries. One running process owns each checkpoint path.
 [foreground.txt](../examples/foreground.txt) record an unedited native three-turn
 conversation starting with fresh version-1 state. `make test-foreground` uses an
 isolated, unsaved copy of the real entrypoint with `inner_life = 0`.
-`make test-inner-cli` checks the new default, profile resumption, explicit upgrade,
+`make test-inner-cli` checks version 2, profile resumption, explicit upgrade,
 and the recorded [inner dialogue](../examples/inner.txt) through both execution paths:
 
 ```sh

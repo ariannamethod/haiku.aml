@@ -1,0 +1,38 @@
+IMPORT "journal_support.aml"
+
+# Exact UTF-8 bytes, empty tokens and delimiter characters retain identity.
+tokens = list_new()
+list_push(tokens, "")
+list_push(tokens, ":")
+list_push(tokens, "\"\\\n\t")
+journal_test_list(haiku_journal_unpack(list_key(tokens)), tokens)
+tokens = list_new()
+list_push(tokens, "mémoire")
+list_push(tokens, "שלום")
+list_push(tokens, "🌧️é")
+journal_test_list(haiku_journal_unpack(list_key(tokens)), tokens)
+assert(list_len(haiku_journal_unpack("0:")) == 0, "Empty journal context changed")
+assert(text_equal(list_key(haiku_journal_unpack("3:0:0:0:")), "3:0:0:0:"), "Empty tokens lost their boundaries")
+
+# The maximum accepted foreground context fits one canonical text leaf.
+tokens = list_new()
+cursor = 0
+while cursor < 9999:
+    list_push(tokens, "é")
+    cursor = cursor + 1
+encoded = list_key(tokens)
+decoded = haiku_journal_unpack(encoded)
+assert(list_len(decoded) == 9999, "Journal maximum context was truncated")
+journal_test_list(decoded, tokens)
+
+# Byte lengths and codepoint lengths differ throughout this long token.
+word = ""
+cursor = 0
+while cursor < 10000:
+    word = text_concat(word, "😀")
+    cursor = cursor + 1
+tokens = list_new()
+list_push(tokens, word)
+list_push(tokens, "x:y")
+list_push(tokens, "")
+journal_test_list(haiku_journal_unpack(list_key(tokens)), tokens)

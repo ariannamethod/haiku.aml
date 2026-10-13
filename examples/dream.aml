@@ -1,0 +1,29 @@
+# A real first dream under the ordinary seeds, ten-turn interval and p=0.25.
+# Short encounters leave room for the cloud's voice. No forced dream event.
+IMPORT "../src/session.aml"
+
+state = haiku_state_new("regex", 0, 0, 575, 57)
+state = haiku_state_enable_dreams(state, 0)
+messages = haiku_words("rain moon silence presence warmth memory return home")
+cursor = 0
+while cursor < 40 and record_get(state, "dream_last_turn") == 0:
+    index = cursor - floor(cursor / 8) * 8
+    source = list_get(messages, index)
+    spoken = haiku_session_turn(state, source, 0)
+    cursor = cursor + 1
+assert(record_get(state, "dream_last_turn") > 0, "This conversation did not reach its first dream")
+PRINT "The first dream opens on turn:"
+PRINT record_get(state, "turn")
+PRINT "You:"
+PRINT source
+history = record_get(state, "dream_history")
+cursor = 0
+while cursor < list_len(history):
+    if cursor == 0 or cursor == 2:
+        PRINT "HAiKU:"
+    else:
+        PRINT "Friend:"
+    PRINT list_get(history, cursor)
+    PRINT ""
+    cursor = cursor + 1
+PRINT "The dialogue returns to memory."

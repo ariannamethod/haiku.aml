@@ -3,6 +3,8 @@
 IMPORT "foreground.aml"
 IMPORT "english_seeds.aml"
 IMPORT "overthinkg.aml"
+IMPORT "dream.aml"
+IMPORT "journal.aml"
 
 def haiku_state_fields(state, names, kind):
     keys = haiku_words(names)
@@ -70,11 +72,19 @@ def haiku_state_bridge(event, turn, clock):
 def haiku_state_check(state, model):
     haiku_state_fields(state, "version", "float")
     version = record_get(state, "version")
-    assert(version == 1 or version == 2, "Haiku state version is unsupported")
+    assert(version == 1 or version == 2 or version == 3, "Haiku state version is unsupported")
     if version == 1:
         assert(list_len(record_keys(state)) == 29, "Haiku state requires exactly twenty-nine fields")
-    else:
+    if version == 2:
         assert(list_len(record_keys(state)) == 36, "Haiku inner state requires exactly thirty-six fields")
+    if version == 3:
+        assert(list_len(record_keys(state)) == 55, "Haiku dream state requires exactly fifty-five fields")
+        haiku_state_fields(state, "phase4_started_turn dream_last_turn", "float")
+        haiku_state_fields(state, "phase4_prev", "string")
+        haiku_state_fields(state, "phase4_log phase4_metric_names phase4_states phase4_edges dream_fragments dream_history journal_text", "list")
+        haiku_state_fields(state, "phase4_log_rows phase4_metric_rows phase4_snapshots phase4_totals dream_config dream_weights dream_dialogs journal_values", "array")
+        haiku_state_fields(state, "dream_vocab", "map")
+    if version >= 2:
         haiku_state_fields(state, "inner_started_turn", "float")
         haiku_state_fields(state, "meta_bootstrap meta_history ring_trigrams", "list")
         haiku_state_fields(state, "meta_metrics ring_coherence ring_admission", "array")
@@ -87,6 +97,8 @@ def haiku_state_check(state, model):
     profile = "english-foreground-v1"
     if version == 2:
         profile = "english-inner-v2"
+    if version == 3:
+        profile = "english-dream-v3"
     assert(text_equal(record_get(state, "profile"), profile), "Haiku state profile is unsupported")
     assert(text_equal(record_get(state, "clock_kind"), "turn"), "Haiku state clock kind is unsupported")
     haiku_state_mode(record_get(state, "tokenizer_mode"), record_get(state, "tokenizer_identity"), model)
@@ -107,9 +119,13 @@ def haiku_state_check(state, model):
     counts = record_get(state, "counts")
     vocab = record_get(state, "vocab")
     assert(haiku_gen_check(record_get(state, "rows"), counts, vocab, record_get(state, "syllables")) > 0, "Haiku foreground vocabulary is empty")
+    dream_vocab = map_new()
+    if version == 3:
+        dream_vocab = record_get(state, "dream_vocab")
     cursor = 0
     while cursor < list_len(vocab):
-        assert(map_has(weights, list_get(vocab, cursor)), "Haiku vocabulary word is absent from its cloud")
+        word = list_get(vocab, cursor)
+        assert(map_has(weights, word) or map_has(dream_vocab, word), "Haiku vocabulary word is absent from its cloud and dream provenance")
         cursor = cursor + 1
 
     observer = record_get(state, "observer_counts")
@@ -154,8 +170,12 @@ def haiku_state_check(state, model):
     haiku_state_rng(record_get(state, "model_rng"))
     haiku_gen_tape(record_get(state, "draws"))
     haiku_state_bridge(record_get(state, "bridge_event"), turn, clock)
-    if version == 2:
+    if version >= 2:
         haiku_state_inner_check(state)
+    if version == 3:
+        count = haiku_state_phase4_check(state)
+        haiku_state_dream_check(state)
+        assert(haiku_journal_check(state) == count, "Haiku journal and bridge histories differ")
     return 1
 
 # History begins at an explicit completed-turn boundary. Reflection and rings
@@ -185,6 +205,86 @@ def haiku_state_inner_check(state):
         assert(metrics[(count - 1) * 5 + cursor + 1] == map_get(event, list_get(names, cursor)), "Haiku inner context differs from its bridge climate")
         cursor = cursor + 1
     return 1
+
+# Phase4 keeps general metric maps; the conversational profile fixes those
+# maps to each completed turn's exact climate and before/after quality.
+def haiku_state_phase4_check(state):
+    turn = record_get(state, "turn")
+    started = haiku_state_integer(record_get(state, "phase4_started_turn"), record_get(state, "inner_started_turn"), turn)
+    count = haiku_phase4_check(state)
+    assert(count == turn - started, "Haiku bridge history differs from completed dream turns")
+    log = record_get(state, "phase4_log")
+    rows = record_get(state, "phase4_log_rows")
+    metrics = record_get(state, "meta_metrics")
+    names = haiku_words("dissonance novelty arousal entropy")
+    flags = haiku_words("overwhelm boredom stuck")
+    previous = ""
+    cursor = 0
+    while cursor < count:
+        clock = started + cursor + 1
+        assert(rows[cursor * 8] == clock, "Haiku bridge turn clock differs")
+        identity = text_concat("turn_", text_fixed(clock, 0))
+        assert(text_equal(list_get(log, cursor * 3 + 2), identity), "Haiku bridge turn identity differs")
+        assert(text_equal(list_get(log, cursor * 3 + 1), previous), "Haiku bridge previous turn differs")
+        observation = zeros(4)
+        at = (clock - record_get(state, "inner_started_turn") - 1) * 5
+        part = 0
+        while part < 4:
+            observation[part] = metrics[at + part + 1]
+            part = part + 1
+        expected = haiku_foreground_bridge(observation, haiku_foreground_quality(observation), clock, clock)
+        before = haiku_phase4_metrics(state, cursor, 0)
+        after = haiku_phase4_metrics(state, cursor, 1)
+        assert(map_len(before) == 5 and map_len(after) == 5, "Haiku bridge climate requires five metrics")
+        part = 0
+        while part < 4:
+            name = list_get(names, part)
+            assert(map_get(before, name) == observation[part] and map_get(after, name) == observation[part], "Haiku bridge climate differs from its inner turn")
+            part = part + 1
+        assert(map_get(before, "quality") == 0.5, "Haiku bridge before quality differs")
+        assert(map_get(after, "quality") == map_get(expected, "quality_after"), "Haiku bridge after quality differs")
+        current = haiku_bridge_id(observation[0], observation[3], map_get(expected, "quality_after"))
+        assert(text_equal(list_get(log, cursor * 3), current), "Haiku bridge state identity differs from its climate")
+        part = 0
+        while part < 3:
+            assert(rows[cursor * 8 + part + 5] == map_get(expected, list_get(flags, part)), "Haiku bridge flags differ from its climate")
+            part = part + 1
+        previous = current
+        cursor = cursor + 1
+    return count
+
+# Dream feedback can give the generator words absent from the SQL-style cloud.
+# Their first dream turn remains explicit, even when a later user adds them.
+def haiku_state_dream_check(state):
+    count = haiku_dream_check(state)
+    turn = record_get(state, "turn")
+    started = record_get(state, "phase4_started_turn")
+    last = haiku_state_integer(record_get(state, "dream_last_turn"), 0, turn)
+    dialogs = record_get(state, "dream_dialogs")
+    history = record_get(state, "dream_history")
+    meta = record_get(state, "meta_history")
+    dream_turns = map_new()
+    cursor = 0
+    while cursor < count:
+        clock = haiku_state_integer(dialogs[cursor * 3], started + 1, turn)
+        index = clock - record_get(state, "inner_started_turn") - 1
+        opening = list_get(history, dialogs[cursor * 3 + 1])
+        assert(text_equal(opening, list_get(meta, index * 3 + 1)), "Haiku dream opening differs from its spoken turn")
+        map_set(dream_turns, text_fixed(clock, 0), 1)
+        cursor = cursor + 1
+    provenance = record_get(state, "dream_vocab")
+    vocab = record_get(state, "vocab")
+    syllables = record_get(state, "syllables")
+    assert(map_len(provenance) <= list_len(vocab), "Haiku dream provenance exceeds its vocabulary")
+    words = map_keys(provenance)
+    cursor = 0
+    while cursor < list_len(words):
+        word = list_get(words, cursor)
+        assert(map_has(syllables, word), "Haiku dream provenance word is absent from its generator")
+        clock = haiku_state_integer(map_get(provenance, word), started + 1, last)
+        assert(map_has(dream_turns, text_fixed(clock, 0)), "Haiku dream provenance turn has no dialog")
+        cursor = cursor + 1
+    return count
 
 # Original 587 seed entries (576 unique), in source order. The model stream
 # initializes MathBrain first, RAE second; the voice stream has its own owner.
@@ -236,7 +336,7 @@ def haiku_state_new(mode, model, train_rae, voice_seed, model_seed):
 def haiku_state_enable_inner(state, model):
     haiku_state_check(state, model)
     pending = record_clone(state)
-    if record_get(pending, "version") == 2:
+    if record_get(pending, "version") >= 2:
         return pending
     record_set(pending, "version", 2)
     record_set(pending, "profile", "english-inner-v2")
@@ -247,6 +347,22 @@ def haiku_state_enable_inner(state, model):
     record_set(pending, "ring_trigrams", list_new())
     record_set(pending, "ring_coherence", zeros(1))
     record_set(pending, "ring_admission", zeros(1))
+    haiku_state_check(pending, model)
+    return pending
+
+# Both older profiles retain their exact owners until this explicit upgrade.
+# A fresh Phase4 log begins here; dreams never fabricate earlier exchanges.
+def haiku_state_enable_dreams(state, model):
+    pending = haiku_state_enable_inner(state, model)
+    if record_get(pending, "version") == 3:
+        return pending
+    record_set(pending, "version", 3)
+    record_set(pending, "profile", "english-dream-v3")
+    record_set(pending, "phase4_started_turn", record_get(pending, "turn"))
+    haiku_phase4_init(pending)
+    haiku_dream_init(pending, list_new())
+    record_set(pending, "journal_text", list_new())
+    record_set(pending, "journal_values", zeros(1))
     haiku_state_check(pending, model)
     return pending
 

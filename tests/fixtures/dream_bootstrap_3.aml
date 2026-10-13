@@ -1,0 +1,125 @@
+IMPORT "../../src/dream.aml"
+state = record_new()
+bootstrap = list_new()
+seed = ""
+seed = text_concat(seed, "seed 0\n ligne 0 ")
+list_push(bootstrap, seed)
+seed = ""
+seed = text_concat(seed, "seed 1\n ligne 1 ")
+list_push(bootstrap, seed)
+seed = ""
+seed = text_concat(seed, "seed 2\n ligne 2 ")
+list_push(bootstrap, seed)
+seed = ""
+seed = text_concat(seed, "seed 3\n ligne 3 ")
+list_push(bootstrap, seed)
+seed = ""
+seed = text_concat(seed, "seed 4\n ligne 4 ")
+list_push(bootstrap, seed)
+seed = ""
+seed = text_concat(seed, "seed 5\n ligne 5 ")
+list_push(bootstrap, seed)
+seed = ""
+seed = text_concat(seed, "seed 6\n ligne 6 ")
+list_push(bootstrap, seed)
+seed = ""
+seed = text_concat(seed, "seed 7\n ligne 7 ")
+list_push(bootstrap, seed)
+seed = ""
+seed = text_concat(seed, "seed 8\n ligne 8 ")
+list_push(bootstrap, seed)
+seed = ""
+seed = text_concat(seed, "seed 9\n ligne 9 ")
+list_push(bootstrap, seed)
+seed = ""
+seed = text_concat(seed, "seed 10\n ligne 10 ")
+list_push(bootstrap, seed)
+seed = ""
+seed = text_concat(seed, "seed 11\n ligne 11 ")
+list_push(bootstrap, seed)
+haiku_dream_init(state, bootstrap)
+haiku_dream_check(state)
+haiku_dream_init(state, haiku_words("ignored"))
+assert(list_len(record_get(state, "dream_fragments")) == 20, "Dream fragment count differs")
+weights = record_get(state, "dream_weights")
+item = ""
+item = text_concat(item, "seed 0")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 0), item), "Dream fragment text differs")
+assert(abs(weights[0] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "ligne 0")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 1), item), "Dream fragment text differs")
+assert(abs(weights[1] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "seed 1")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 2), item), "Dream fragment text differs")
+assert(abs(weights[2] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "ligne 1")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 3), item), "Dream fragment text differs")
+assert(abs(weights[3] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "seed 2")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 4), item), "Dream fragment text differs")
+assert(abs(weights[4] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "ligne 2")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 5), item), "Dream fragment text differs")
+assert(abs(weights[5] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "seed 3")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 6), item), "Dream fragment text differs")
+assert(abs(weights[6] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "ligne 3")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 7), item), "Dream fragment text differs")
+assert(abs(weights[7] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "seed 4")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 8), item), "Dream fragment text differs")
+assert(abs(weights[8] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "ligne 4")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 9), item), "Dream fragment text differs")
+assert(abs(weights[9] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "seed 5")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 10), item), "Dream fragment text differs")
+assert(abs(weights[10] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "ligne 5")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 11), item), "Dream fragment text differs")
+assert(abs(weights[11] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "seed 6")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 12), item), "Dream fragment text differs")
+assert(abs(weights[12] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "ligne 6")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 13), item), "Dream fragment text differs")
+assert(abs(weights[13] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "seed 7")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 14), item), "Dream fragment text differs")
+assert(abs(weights[14] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "ligne 7")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 15), item), "Dream fragment text differs")
+assert(abs(weights[15] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "seed 8")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 16), item), "Dream fragment text differs")
+assert(abs(weights[16] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "ligne 8")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 17), item), "Dream fragment text differs")
+assert(abs(weights[17] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "seed 9")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 18), item), "Dream fragment text differs")
+assert(abs(weights[18] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "ligne 9")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 19), item), "Dream fragment text differs")
+assert(abs(weights[19] - 1.0) < 0.000002, "Dream fragment decay differs")
+PRINT "HAIKU_DREAM_OK"

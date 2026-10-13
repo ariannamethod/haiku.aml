@@ -1,0 +1,1610 @@
+{
+  "source": "abb878c52d763b73e5ad7a4d6a68a9ea7a248a39",
+  "ids": [
+    {
+      "input": 0.0,
+      "original": 0,
+      "state": "d0.0_e0.0_q0.0",
+      "python64": "d0.0_e0.0_q0.0"
+    },
+    {
+      "input": 0.05000000074505806,
+      "original": 0.05,
+      "state": "d0.1_e0.1_q0.1",
+      "python64": "d0.1_e0.1_q0.1"
+    },
+    {
+      "input": 0.15000000596046448,
+      "original": 0.15,
+      "state": "d0.2_e0.2_q0.2",
+      "python64": "d0.1_e0.1_q0.1"
+    },
+    {
+      "input": 0.25,
+      "original": 0.25,
+      "state": "d0.2_e0.2_q0.2",
+      "python64": "d0.2_e0.2_q0.2"
+    },
+    {
+      "input": 0.3499999940395355,
+      "original": 0.35,
+      "state": "d0.3_e0.3_q0.3",
+      "python64": "d0.3_e0.3_q0.3"
+    },
+    {
+      "input": 0.44999998807907104,
+      "original": 0.45,
+      "state": "d0.4_e0.4_q0.4",
+      "python64": "d0.5_e0.5_q0.5"
+    },
+    {
+      "input": 0.550000011920929,
+      "original": 0.55,
+      "state": "d0.6_e0.6_q0.6",
+      "python64": "d0.6_e0.6_q0.6"
+    },
+    {
+      "input": 0.6499999761581421,
+      "original": 0.65,
+      "state": "d0.6_e0.6_q0.6",
+      "python64": "d0.7_e0.7_q0.7"
+    },
+    {
+      "input": 0.75,
+      "original": 0.75,
+      "state": "d0.8_e0.8_q0.8",
+      "python64": "d0.8_e0.8_q0.8"
+    },
+    {
+      "input": 0.8500000238418579,
+      "original": 0.85,
+      "state": "d0.9_e0.9_q0.9",
+      "python64": "d0.8_e0.8_q0.8"
+    },
+    {
+      "input": 0.949999988079071,
+      "original": 0.95,
+      "state": "d0.9_e0.9_q0.9",
+      "python64": "d0.9_e0.9_q0.9"
+    },
+    {
+      "input": 1.0,
+      "original": 1,
+      "state": "d1.0_e1.0_q1.0",
+      "python64": "d1.0_e1.0_q1.0"
+    },
+    {
+      "input": -0.0,
+      "original": -0.0,
+      "state": "d-0.0_e-0.0_q-0.0",
+      "python64": "d-0.0_e-0.0_q-0.0"
+    },
+    {
+      "input": -0.25,
+      "original": -0.25,
+      "state": "d-0.2_e-0.2_q-0.2",
+      "python64": "d-0.2_e-0.2_q-0.2"
+    },
+    {
+      "input": -0.75,
+      "original": -0.75,
+      "state": "d-0.8_e-0.8_q-0.8",
+      "python64": "d-0.8_e-0.8_q-0.8"
+    },
+    {
+      "input": 13.25,
+      "original": 13.25,
+      "state": "d13.2_e13.2_q13.2",
+      "python64": "d13.2_e13.2_q13.2"
+    }
+  ],
+  "cosines": [
+    {
+      "before": {},
+      "after": {},
+      "result": 0.0
+    },
+    {
+      "before": {
+        "a": 1.0
+      },
+      "after": {
+        "b": 2.0
+      },
+      "result": 0.0
+    },
+    {
+      "before": {
+        "shared": 1.0,
+        "extra": 999.0
+      },
+      "after": {
+        "shared": 1.0
+      },
+      "result": 1.0
+    },
+    {
+      "before": {
+        "x": 0.0
+      },
+      "after": {
+        "x": 1.0
+      },
+      "result": 0.0
+    },
+    {
+      "before": {
+        "x": 1.0
+      },
+      "after": {
+        "x": -1.0
+      },
+      "result": -1.0
+    },
+    {
+      "before": {
+        "x": 1.0,
+        "y": 2.0
+      },
+      "after": {
+        "x": 2.0,
+        "y": 1.0
+      },
+      "result": 0.7999999999999998
+    },
+    {
+      "before": {
+        "pluie": -0.5,
+        "дождь": 0.25,
+        "שלום": 0.75
+      },
+      "after": {
+        "שלום": 0.5,
+        "pluie": 0.25,
+        "дождь": -0.5
+      },
+      "result": 0.1781741612749496
+    },
+    {
+      "before": {
+        "x": 3.0000000054977558e+38,
+        "y": 1.9999999360571385e+38
+      },
+      "after": {
+        "x": 1.9999999360571385e+38,
+        "y": -3.0000000054977558e+38
+      },
+      "result": 0.0
+    },
+    {
+      "before": {
+        "x": 3.0000000054977558e+38,
+        "y": 1.9999999360571385e+38
+      },
+      "after": {
+        "x": 3.0000000054977558e+38,
+        "y": 1.9999999360571385e+38
+      },
+      "result": 1.0
+    },
+    {
+      "before": {
+        "x": 1.401298464324817e-45,
+        "y": 2.802596928649634e-45
+      },
+      "after": {
+        "x": 2.802596928649634e-45,
+        "y": 1.401298464324817e-45
+      },
+      "result": 0.7999999999999998
+    },
+    {
+      "before": {
+        "x": 1.401298464324817e-45,
+        "y": 2.802596928649634e-45
+      },
+      "after": {
+        "x": -1.401298464324817e-45,
+        "y": -2.802596928649634e-45
+      },
+      "result": -0.9999999999999998
+    },
+    {
+      "before": {
+        "x": 3.0000000054977558e+38,
+        "y": 1.401298464324817e-45
+      },
+      "after": {
+        "x": 1.401298464324817e-45,
+        "y": 3.0000000054977558e+38
+      },
+      "result": 9.341989745045455e-84
+    }
+  ],
+  "history_events": [
+    {
+      "current": "S",
+      "previous": "",
+      "clock": 1,
+      "before": {
+        "only_before": 99.0,
+        "quality": 0.5
+      },
+      "after": {
+        "only_after": 99.0,
+        "quality": 0.75
+      },
+      "turn_id": "turn_1",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "S",
+      "previous": "external",
+      "clock": 1,
+      "before": {
+        "only_before": 99.0,
+        "quality": 0.5
+      },
+      "after": {
+        "only_after": 99.0,
+        "quality": 0.75
+      },
+      "turn_id": "turn_2",
+      "flags": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "current": "S",
+      "previous": "external",
+      "clock": 0,
+      "before": {
+        "quality": 0.25,
+        "shared": 1.0
+      },
+      "after": {
+        "shared": 0.5,
+        "quality": 0.75
+      },
+      "turn_id": "turn_3",
+      "flags": [
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "current": "S",
+      "previous": "external",
+      "clock": 2,
+      "before": {},
+      "after": {},
+      "turn_id": "turn_4",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "b:c",
+      "previous": "a",
+      "clock": 3,
+      "before": {
+        "x": 1.0
+      },
+      "after": {
+        "x": -1.0
+      },
+      "turn_id": "turn_5",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "c",
+      "previous": "a:b",
+      "clock": 4,
+      "before": {
+        "x": 1.0
+      },
+      "after": {
+        "x": 1.0,
+        "quality": 0.875
+      },
+      "turn_id": "turn_6",
+      "flags": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "current": "",
+      "previous": "S",
+      "clock": 5,
+      "before": {
+        "quality": 0.25
+      },
+      "after": {},
+      "turn_id": "turn_7",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "pluie / дождь / שלום",
+      "previous": "",
+      "clock": 6,
+      "before": {
+        "": 0.25,
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5,
+        "": 0.75
+      },
+      "turn_id": "turn_8",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "history": {
+    "logs": [
+      {
+        "id": 1,
+        "ts": 1.0,
+        "turn_id": "turn_1",
+        "prev_state_id": "",
+        "state_id": "S",
+        "metrics_before": {
+          "only_before": 99.0,
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "only_after": 99.0,
+          "quality": 0.75
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 2,
+        "ts": 1.0,
+        "turn_id": "turn_2",
+        "prev_state_id": "external",
+        "state_id": "S",
+        "metrics_before": {
+          "only_before": 99.0,
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "only_after": 99.0,
+          "quality": 0.75
+        },
+        "boredom": 1,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 3,
+        "ts": 0.0,
+        "turn_id": "turn_3",
+        "prev_state_id": "external",
+        "state_id": "S",
+        "metrics_before": {
+          "quality": 0.25,
+          "shared": 1.0
+        },
+        "metrics_after": {
+          "shared": 0.5,
+          "quality": 0.75
+        },
+        "boredom": 0,
+        "overwhelm": 1,
+        "stuck": 1
+      },
+      {
+        "id": 4,
+        "ts": 2.0,
+        "turn_id": "turn_4",
+        "prev_state_id": "external",
+        "state_id": "S",
+        "metrics_before": {},
+        "metrics_after": {},
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 5,
+        "ts": 3.0,
+        "turn_id": "turn_5",
+        "prev_state_id": "a",
+        "state_id": "b:c",
+        "metrics_before": {
+          "x": 1.0
+        },
+        "metrics_after": {
+          "x": -1.0
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 6,
+        "ts": 4.0,
+        "turn_id": "turn_6",
+        "prev_state_id": "a:b",
+        "state_id": "c",
+        "metrics_before": {
+          "x": 1.0
+        },
+        "metrics_after": {
+          "x": 1.0,
+          "quality": 0.875
+        },
+        "boredom": 1,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 7,
+        "ts": 5.0,
+        "turn_id": "turn_7",
+        "prev_state_id": "S",
+        "state_id": "",
+        "metrics_before": {
+          "quality": 0.25
+        },
+        "metrics_after": {},
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 8,
+        "ts": 6.0,
+        "turn_id": "turn_8",
+        "prev_state_id": "",
+        "state_id": "pluie / дождь / שלום",
+        "metrics_before": {
+          "": 0.25,
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5,
+          "": 0.75
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      }
+    ],
+    "states": [
+      {
+        "state_id": "S",
+        "last_metrics": {},
+        "activations_total": 4,
+        "last_updated": 2.0
+      },
+      {
+        "state_id": "b:c",
+        "last_metrics": {
+          "x": -1.0
+        },
+        "activations_total": 1,
+        "last_updated": 3.0
+      },
+      {
+        "state_id": "c",
+        "last_metrics": {
+          "x": 1.0,
+          "quality": 0.875
+        },
+        "activations_total": 1,
+        "last_updated": 4.0
+      },
+      {
+        "state_id": "",
+        "last_metrics": {},
+        "activations_total": 1,
+        "last_updated": 5.0
+      },
+      {
+        "state_id": "pluie / дождь / שלום",
+        "last_metrics": {
+          "quality": 0.5,
+          "": 0.75
+        },
+        "activations_total": 1,
+        "last_updated": 6.0
+      }
+    ],
+    "edges": [
+      {
+        "from_state_id": "external",
+        "to_state_id": "S",
+        "count": 3,
+        "sum_similarity": 1.7399400733959438,
+        "sum_quality_delta": 0.75,
+        "sum_overwhelm": 1.0,
+        "sum_boredom": 1.0,
+        "sum_stuck": 1.0
+      },
+      {
+        "from_state_id": "a",
+        "to_state_id": "b:c",
+        "count": 1,
+        "sum_similarity": -1.0,
+        "sum_quality_delta": 0.0,
+        "sum_overwhelm": 0.0,
+        "sum_boredom": 0.0,
+        "sum_stuck": 0.0
+      },
+      {
+        "from_state_id": "a:b",
+        "to_state_id": "c",
+        "count": 1,
+        "sum_similarity": 1.0,
+        "sum_quality_delta": 0.375,
+        "sum_overwhelm": 0.0,
+        "sum_boredom": 1.0,
+        "sum_stuck": 0.0
+      },
+      {
+        "from_state_id": "S",
+        "to_state_id": "",
+        "count": 1,
+        "sum_similarity": 0.0,
+        "sum_quality_delta": 0.25,
+        "sum_overwhelm": 0.0,
+        "sum_boredom": 0.0,
+        "sum_stuck": 0.0
+      }
+    ]
+  },
+  "histories": [
+    {
+      "state": "S",
+      "limit": 10,
+      "turns": [
+        "turn_4",
+        "turn_1",
+        "turn_2",
+        "turn_3"
+      ]
+    },
+    {
+      "state": "S",
+      "limit": 2,
+      "turns": [
+        "turn_4",
+        "turn_1"
+      ]
+    },
+    {
+      "state": "S",
+      "limit": 0,
+      "turns": []
+    },
+    {
+      "state": "S",
+      "limit": -1,
+      "turns": [
+        "turn_4",
+        "turn_1",
+        "turn_2",
+        "turn_3"
+      ]
+    },
+    {
+      "state": "missing",
+      "limit": 10,
+      "turns": []
+    }
+  ],
+  "suggestion_events": [
+    {
+      "current": "z",
+      "previous": "source",
+      "clock": 0,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_1",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "z",
+      "previous": "source",
+      "clock": 1,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_2",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "z",
+      "previous": "source",
+      "clock": 2,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_3",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "z",
+      "previous": "source",
+      "clock": 3,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_4",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "z",
+      "previous": "source",
+      "clock": 4,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_5",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "b",
+      "previous": "source",
+      "clock": 5,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_6",
+      "flags": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "b",
+      "previous": "source",
+      "clock": 6,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_7",
+      "flags": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "b",
+      "previous": "source",
+      "clock": 7,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_8",
+      "flags": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "b",
+      "previous": "source",
+      "clock": 8,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_9",
+      "flags": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "y",
+      "previous": "source",
+      "clock": 9,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_10",
+      "flags": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "current": "y",
+      "previous": "source",
+      "clock": 10,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_11",
+      "flags": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "current": "y",
+      "previous": "source",
+      "clock": 11,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_12",
+      "flags": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "current": "a",
+      "previous": "source",
+      "clock": 12,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_13",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "a",
+      "previous": "source",
+      "clock": 13,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_14",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "a",
+      "previous": "source",
+      "clock": 14,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.5
+      },
+      "turn_id": "turn_15",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "x",
+      "previous": "source",
+      "clock": 15,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.75
+      },
+      "turn_id": "turn_16",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "x",
+      "previous": "source",
+      "clock": 16,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 0.75
+      },
+      "turn_id": "turn_17",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "current": "c",
+      "previous": "source",
+      "clock": 17,
+      "before": {
+        "quality": 0.5
+      },
+      "after": {
+        "quality": 1.0
+      },
+      "turn_id": "turn_18",
+      "flags": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "suggestion_state": {
+    "logs": [
+      {
+        "id": 1,
+        "ts": 0.0,
+        "turn_id": "turn_1",
+        "prev_state_id": "source",
+        "state_id": "z",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 2,
+        "ts": 1.0,
+        "turn_id": "turn_2",
+        "prev_state_id": "source",
+        "state_id": "z",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 3,
+        "ts": 2.0,
+        "turn_id": "turn_3",
+        "prev_state_id": "source",
+        "state_id": "z",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 4,
+        "ts": 3.0,
+        "turn_id": "turn_4",
+        "prev_state_id": "source",
+        "state_id": "z",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 5,
+        "ts": 4.0,
+        "turn_id": "turn_5",
+        "prev_state_id": "source",
+        "state_id": "z",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 6,
+        "ts": 5.0,
+        "turn_id": "turn_6",
+        "prev_state_id": "source",
+        "state_id": "b",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 0,
+        "overwhelm": 1,
+        "stuck": 0
+      },
+      {
+        "id": 7,
+        "ts": 6.0,
+        "turn_id": "turn_7",
+        "prev_state_id": "source",
+        "state_id": "b",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 0,
+        "overwhelm": 1,
+        "stuck": 0
+      },
+      {
+        "id": 8,
+        "ts": 7.0,
+        "turn_id": "turn_8",
+        "prev_state_id": "source",
+        "state_id": "b",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 0,
+        "overwhelm": 1,
+        "stuck": 0
+      },
+      {
+        "id": 9,
+        "ts": 8.0,
+        "turn_id": "turn_9",
+        "prev_state_id": "source",
+        "state_id": "b",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 0,
+        "overwhelm": 1,
+        "stuck": 0
+      },
+      {
+        "id": 10,
+        "ts": 9.0,
+        "turn_id": "turn_10",
+        "prev_state_id": "source",
+        "state_id": "y",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 1,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 11,
+        "ts": 10.0,
+        "turn_id": "turn_11",
+        "prev_state_id": "source",
+        "state_id": "y",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 1,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 12,
+        "ts": 11.0,
+        "turn_id": "turn_12",
+        "prev_state_id": "source",
+        "state_id": "y",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 1,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 13,
+        "ts": 12.0,
+        "turn_id": "turn_13",
+        "prev_state_id": "source",
+        "state_id": "a",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 14,
+        "ts": 13.0,
+        "turn_id": "turn_14",
+        "prev_state_id": "source",
+        "state_id": "a",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 15,
+        "ts": 14.0,
+        "turn_id": "turn_15",
+        "prev_state_id": "source",
+        "state_id": "a",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.5
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 16,
+        "ts": 15.0,
+        "turn_id": "turn_16",
+        "prev_state_id": "source",
+        "state_id": "x",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.75
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 17,
+        "ts": 16.0,
+        "turn_id": "turn_17",
+        "prev_state_id": "source",
+        "state_id": "x",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 0.75
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      },
+      {
+        "id": 18,
+        "ts": 17.0,
+        "turn_id": "turn_18",
+        "prev_state_id": "source",
+        "state_id": "c",
+        "metrics_before": {
+          "quality": 0.5
+        },
+        "metrics_after": {
+          "quality": 1.0
+        },
+        "boredom": 0,
+        "overwhelm": 0,
+        "stuck": 0
+      }
+    ],
+    "states": [
+      {
+        "state_id": "z",
+        "last_metrics": {
+          "quality": 0.5
+        },
+        "activations_total": 5,
+        "last_updated": 4.0
+      },
+      {
+        "state_id": "b",
+        "last_metrics": {
+          "quality": 0.5
+        },
+        "activations_total": 4,
+        "last_updated": 8.0
+      },
+      {
+        "state_id": "y",
+        "last_metrics": {
+          "quality": 0.5
+        },
+        "activations_total": 3,
+        "last_updated": 11.0
+      },
+      {
+        "state_id": "a",
+        "last_metrics": {
+          "quality": 0.5
+        },
+        "activations_total": 3,
+        "last_updated": 14.0
+      },
+      {
+        "state_id": "x",
+        "last_metrics": {
+          "quality": 0.75
+        },
+        "activations_total": 2,
+        "last_updated": 16.0
+      },
+      {
+        "state_id": "c",
+        "last_metrics": {
+          "quality": 1.0
+        },
+        "activations_total": 1,
+        "last_updated": 17.0
+      }
+    ],
+    "edges": [
+      {
+        "from_state_id": "source",
+        "to_state_id": "z",
+        "count": 5,
+        "sum_similarity": 5.0,
+        "sum_quality_delta": 0.0,
+        "sum_overwhelm": 0.0,
+        "sum_boredom": 0.0,
+        "sum_stuck": 0.0
+      },
+      {
+        "from_state_id": "source",
+        "to_state_id": "b",
+        "count": 4,
+        "sum_similarity": 4.0,
+        "sum_quality_delta": 0.0,
+        "sum_overwhelm": 4.0,
+        "sum_boredom": 0.0,
+        "sum_stuck": 0.0
+      },
+      {
+        "from_state_id": "source",
+        "to_state_id": "y",
+        "count": 3,
+        "sum_similarity": 3.0,
+        "sum_quality_delta": 0.0,
+        "sum_overwhelm": 0.0,
+        "sum_boredom": 3.0,
+        "sum_stuck": 0.0
+      },
+      {
+        "from_state_id": "source",
+        "to_state_id": "a",
+        "count": 3,
+        "sum_similarity": 3.0,
+        "sum_quality_delta": 0.0,
+        "sum_overwhelm": 0.0,
+        "sum_boredom": 0.0,
+        "sum_stuck": 0.0
+      },
+      {
+        "from_state_id": "source",
+        "to_state_id": "x",
+        "count": 2,
+        "sum_similarity": 2.0,
+        "sum_quality_delta": 0.5,
+        "sum_overwhelm": 0.0,
+        "sum_boredom": 0.0,
+        "sum_stuck": 0.0
+      },
+      {
+        "from_state_id": "source",
+        "to_state_id": "c",
+        "count": 1,
+        "sum_similarity": 1.0,
+        "sum_quality_delta": 0.5,
+        "sum_overwhelm": 0.0,
+        "sum_boredom": 0.0,
+        "sum_stuck": 0.0
+      }
+    ]
+  },
+  "suggestions": [
+    {
+      "current": "source",
+      "minimum": 1,
+      "maximum": 2,
+      "flows": [
+        {
+          "from_state": "source",
+          "to_state": "z",
+          "statistics": [
+            5,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "from_state": "source",
+          "to_state": "a",
+          "statistics": [
+            3,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "current": "source",
+      "minimum": 1,
+      "maximum": 5,
+      "flows": [
+        {
+          "from_state": "source",
+          "to_state": "c",
+          "statistics": [
+            1,
+            1.0,
+            0.5,
+            0.0,
+            0.0,
+            0.0,
+            1.5
+          ]
+        },
+        {
+          "from_state": "source",
+          "to_state": "x",
+          "statistics": [
+            2,
+            1.0,
+            0.25,
+            0.0,
+            0.0,
+            0.0,
+            1.25
+          ]
+        },
+        {
+          "from_state": "source",
+          "to_state": "z",
+          "statistics": [
+            5,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "from_state": "source",
+          "to_state": "a",
+          "statistics": [
+            3,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "from_state": "source",
+          "to_state": "y",
+          "statistics": [
+            3,
+            1.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.7
+          ]
+        }
+      ]
+    },
+    {
+      "current": "source",
+      "minimum": 2,
+      "maximum": 3,
+      "flows": [
+        {
+          "from_state": "source",
+          "to_state": "x",
+          "statistics": [
+            2,
+            1.0,
+            0.25,
+            0.0,
+            0.0,
+            0.0,
+            1.25
+          ]
+        },
+        {
+          "from_state": "source",
+          "to_state": "z",
+          "statistics": [
+            5,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "from_state": "source",
+          "to_state": "a",
+          "statistics": [
+            3,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "current": "source",
+      "minimum": 4,
+      "maximum": 5,
+      "flows": [
+        {
+          "from_state": "source",
+          "to_state": "z",
+          "statistics": [
+            5,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "from_state": "source",
+          "to_state": "b",
+          "statistics": [
+            4,
+            1.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "current": "source",
+      "minimum": 1,
+      "maximum": 0,
+      "flows": []
+    },
+    {
+      "current": "source",
+      "minimum": 1,
+      "maximum": -1,
+      "flows": [
+        {
+          "from_state": "source",
+          "to_state": "c",
+          "statistics": [
+            1,
+            1.0,
+            0.5,
+            0.0,
+            0.0,
+            0.0,
+            1.5
+          ]
+        },
+        {
+          "from_state": "source",
+          "to_state": "x",
+          "statistics": [
+            2,
+            1.0,
+            0.25,
+            0.0,
+            0.0,
+            0.0,
+            1.25
+          ]
+        },
+        {
+          "from_state": "source",
+          "to_state": "z",
+          "statistics": [
+            5,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "from_state": "source",
+          "to_state": "a",
+          "statistics": [
+            3,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "from_state": "source",
+          "to_state": "y",
+          "statistics": [
+            3,
+            1.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.7
+          ]
+        }
+      ]
+    },
+    {
+      "current": "source",
+      "minimum": 1,
+      "maximum": -30,
+      "flows": []
+    },
+    {
+      "current": "missing",
+      "minimum": 1,
+      "maximum": 5,
+      "flows": []
+    }
+  ]
+}

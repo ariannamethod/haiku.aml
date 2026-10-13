@@ -1,0 +1,9 @@
+IMPORT "../../src/dream.aml"
+state = record_new()
+bootstrap = list_new()
+haiku_dream_init(state, bootstrap)
+haiku_dream_check(state)
+haiku_dream_init(state, haiku_words("ignored"))
+assert(list_len(record_get(state, "dream_fragments")) == 0, "Dream fragment count differs")
+weights = record_get(state, "dream_weights")
+PRINT "HAIKU_DREAM_OK"

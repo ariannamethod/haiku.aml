@@ -1,0 +1,31 @@
+IMPORT "../../src/dream.aml"
+state = record_new()
+haiku_dream_init(state, list_new())
+weights = zeros(1)
+item = ""
+item = text_concat(item, "rain")
+list_push(record_get(state, "dream_fragments"), item)
+weights[0] = 1
+record_set(state, "dream_weights", weights)
+source = ""
+haiku_dream_fragments(state, source)
+assert(list_len(record_get(state, "dream_fragments")) == 1, "Dream fragment count differs")
+weights = record_get(state, "dream_weights")
+item = ""
+item = text_concat(item, "rain")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 0), item), "Dream fragment text differs")
+assert(abs(weights[0] - 0.95) < 0.000002, "Dream fragment decay differs")
+source = ""
+cursor = 0
+while cursor < 10000:
+    source = text_concat(source, "\n")
+    cursor = cursor + 1
+haiku_dream_fragments(state, source)
+assert(list_len(record_get(state, "dream_fragments")) == 1, "Dream fragment count differs")
+weights = record_get(state, "dream_weights")
+item = ""
+item = text_concat(item, "rain")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 0), item), "Dream fragment text differs")
+assert(abs(weights[0] - 0.9025) < 0.000002, "Dream fragment decay differs")
+haiku_dream_check(state)
+PRINT "HAIKU_DREAM_OK"
