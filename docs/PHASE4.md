@@ -127,6 +127,12 @@ an already validated owner and return independent values. The session owns
 whole-record validation, saving, and publication; an unfinished candidate
 cannot publish its bridge memory.
 
+Within event admission, assigning `record_get(state, "phase4_metric_names")`
+to the local `names` list copies its container under AML's list-assignment
+rules. New dictionary entries remain local until `record_set` publishes the
+completed event. If a second unseen key exceeds the dictionary limit after
+the first was staged, the owner's original dictionary and history remain intact.
+
 ## Receipts
 
 `bash tests/run_phase4.sh` runs without Python:
@@ -137,9 +143,13 @@ cannot publish its bridge memory.
   snapshot, and aggregate, timestamp ties, and eight suggestion queries.
 - Interpreted and compiled execution, isolated owners, frozen accessor
   results, unchanged random streams, and a 40,000-scalar metric history.
-- Thirty malformed states and nine rejected calls, with C host inspection
+- Thirty malformed states and thirteen rejected calls, with C host inspection
   confirming that every inspected leaf retains its exact bytes.
 - A valid 10,000-event history and rejection of its next admission.
+- Dictionary overflow from 9,999 entries, including new keys split between
+  before/after maps, preserves all nine leaves and byte-identical checkpoints.
+  A shared new key fills the last slot once; existing keys remain usable at
+  full capacity. A direct-owner insertion mutation makes this regression fail.
 
 Strings, counts, map contents, and ordering compare exactly. Derived cosine
 and transition statistics use absolute tolerance 0.00001. The committed

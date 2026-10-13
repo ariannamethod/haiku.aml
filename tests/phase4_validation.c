@@ -54,6 +54,70 @@ static const struct BadCase cases[] = {
     {"values = record_get(broken, \"phase4_metric_rows\")\nrecord_set(broken, \"phase4_metric_rows\", haiku_phase4_extend(values, len(values), 2))", "trailing values"}
 };
 
+static void phase4_dictionary_limits(void) {
+    require(!phase4_execute(
+        "dictionary = record_new()\nhaiku_phase4_init(dictionary)\n"
+        "before = map_new()\nafter = map_new()\nflags = zeros(3)\ni = 0\n"
+        "while i < 9999:\n    name = text_concat(\"metric_\", text_fixed(i, 0))\n"
+        "    map_set(before, name, 0.5)\n    i = i + 1\n"
+        "haiku_phase4_record(dictionary, \"wide\", before, after, \"\", \"turn_1\", 1, flags)\n"
+        "haiku_phase4_check(dictionary)"), am_get_error());
+    AM_Record *original = am_record_clone(am_get_var_record("dictionary"));
+    require(original != NULL, "Phase4 near-full dictionary clone");
+    char path[4096], error[1024];
+    snprintf(path, sizeof(path), "%s/phase4-dictionary-before.state", work);
+    require(am_checkpoint_save(original, path, error, sizeof(error)) == 1, error);
+    size_t size = 0;
+    unsigned char *bytes = read_file(path, &size);
+
+    const char *overflow_maps[] = {
+        "before = map_new()\nafter = map_new()\n"
+        "map_set(before, \"new_first\", 0.5)\nmap_set(before, \"new_second\", 0.5)",
+        "before = map_new()\nafter = map_new()\n"
+        "map_set(before, \"new_first\", 0.5)\nmap_set(after, \"new_second\", 0.5)",
+        "before = map_new()\nafter = map_new()\n"
+        "map_set(before, \"metric_0\", 0.5)\nmap_set(before, \"new_first\", 0.5)\n"
+        "map_set(after, \"new_first\", 0.5)\nmap_set(after, \"new_second\", 0.5)"
+    };
+    for (size_t i = 0; i < sizeof(overflow_maps) / sizeof(overflow_maps[0]); ++i) {
+        require(am_set_var_record("dictionary", original) == 0, "Phase4 reset near-full dictionary");
+        require(!phase4_execute(overflow_maps[i]), am_get_error());
+        phase4_error("haiku_phase4_record(dictionary, \"wide\", before, after, \"\", \"turn_2\", 2, flags)", "metric dictionary is full");
+        require(same_record(am_get_var_record("dictionary"), original), "Phase4 dictionary overflow changed an owner");
+        snprintf(path, sizeof(path), "%s/phase4-dictionary-after.state", work);
+        require(am_checkpoint_save(am_get_var_record("dictionary"), path, error, sizeof(error)) == 1, error);
+        same_file(path, bytes, size);
+        require(!phase4_execute("assert(haiku_phase4_check(dictionary) == 1, \"rejected dictionary event was recorded\")"), am_get_error());
+    }
+
+    /* One shared new key occupies one slot even when both metric maps use it. */
+    require(!phase4_execute(
+        "before = map_new()\nafter = map_new()\n"
+        "map_set(before, \"last_name\", 0.5)\nmap_set(after, \"last_name\", 0.25)\n"
+        "map_set(after, \"metric_0\", 0.75)\n"
+        "haiku_phase4_record(dictionary, \"wide\", before, after, \"\", \"turn_2\", 2, flags)\n"
+        "assert(haiku_phase4_check(dictionary) == 2, \"last dictionary slot was rejected\")\n"
+        "assert(list_len(record_get(dictionary, \"phase4_metric_names\")) == 10000, \"shared new key used two slots\")\n"
+        "before = map_new()\nafter = map_new()\n"
+        "map_set(before, \"metric_0\", 0.5)\nmap_set(after, \"last_name\", 0.75)\n"
+        "haiku_phase4_record(dictionary, \"wide\", before, after, \"\", \"turn_3\", 3, flags)\n"
+        "assert(haiku_phase4_check(dictionary) == 3, \"full dictionary rejected existing keys\")"), am_get_error());
+    AM_Record *full = am_record_clone(am_get_var_record("dictionary"));
+    require(full != NULL, "Phase4 full dictionary clone");
+    snprintf(path, sizeof(path), "%s/phase4-full-dictionary-before.state", work);
+    require(am_checkpoint_save(full, path, error, sizeof(error)) == 1, error);
+    free(bytes);
+    bytes = read_file(path, &size);
+    require(!phase4_execute("before = map_new()\nafter = map_new()\nmap_set(after, \"overflow\", 1)"), am_get_error());
+    phase4_error("haiku_phase4_record(dictionary, \"wide\", before, after, \"\", \"turn_4\", 4, flags)", "metric dictionary is full");
+    require(same_record(am_get_var_record("dictionary"), full), "Phase4 full dictionary rejection changed an owner");
+    snprintf(path, sizeof(path), "%s/phase4-full-dictionary-after.state", work);
+    require(am_checkpoint_save(am_get_var_record("dictionary"), path, error, sizeof(error)) == 1, error);
+    same_file(path, bytes, size);
+    require(!phase4_execute("assert(haiku_phase4_check(dictionary) == 3, \"full dictionary rejection broke validation\")"), am_get_error());
+    am_record_free(full); am_record_free(original); free(bytes);
+}
+
 int main(int argc, char **argv) {
     require(argc == 3, "Phase4 root and temporary directory");
     root = argv[1]; work = argv[2];
@@ -111,8 +175,12 @@ int main(int argc, char **argv) {
     require(full != NULL, "Phase4 capacity clone");
     phase4_error("haiku_phase4_record(full, \"same\", before, after, \"same\", \"turn\", 10001, flags)", "history is full");
     require(same_record(am_get_var_record("full"), full), "Phase4 full history changed after rejection");
-    am_record_free(full); am_record_free(original); am_persistent_clear();
-    printf("PASS: %zu malformed Phase4 states and nine rejected calls preserve every inspected leaf\n", sizeof(cases) / sizeof(cases[0]));
+    am_record_free(full); am_record_free(original);
+    phase4_dictionary_limits();
+    am_persistent_clear();
+    printf("PASS: %zu malformed Phase4 states and thirteen rejected calls preserve every inspected leaf\n", sizeof(cases) / sizeof(cases[0]));
     puts("PASS: 10000 complete bridge events remain valid; the next admission fails before mutation");
+    puts("PASS: dictionary overflow across before/after maps preserves all nine leaves and exact checkpoint bytes");
+    puts("PASS: a shared new key fills the final dictionary slot once; full dictionaries accept existing keys");
     return 0;
 }
