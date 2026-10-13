@@ -18,17 +18,32 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   learning; retain their owners, shared draw order, and restart continuity.
 - [x] Complete Phase4 state-ID aggregation beyond the current metric handoff;
   connect dream events after reflection and rings.
-- [ ] Carry the complete exchange tail into a reusable AML worker with typed
-  results, one state publisher, revision checks, drain on quit/EOF, and a
-  durable pending experience. Preserve serial output and checkpoint bytes
-  under different schedules; the measured language work is in [ASYNC](docs/ASYNC.md).
+- [x] Carry the complete exchange tail into a reusable AML worker with typed
+  results, one state publisher and revision checks. Join before save, swap and
+  display; preserve serial output and checkpoint bytes under controlled
+  schedules. Quit/EOF has no outstanding turn in this profile. See
+  [ASYNC](docs/ASYNC.md).
+- [ ] Add early response display and overlap the next input with the owned
+  tail. First persist a pending experience, then implement exact restart replay,
+  next-input/quit/EOF drain and single publication of the completed job.
 
 ## Family experiments
 
 - [x] Audit Penelope, NanoJanus, Actually.life, Leo and caveLLMan; verify both
   PEN7 assets through existing NoTorch operations. Preserve source pins,
   executable receipts and the proposed [iceberg](docs/ICEBERG.md).
-- [ ] After the worker baseline, add optional PEN7 lexical sources with quiet
+- [x] Convert and retain the two immutable sources as Q8_0/F32 GGUF in
+  [weights](weights/README.md), with source revisions, licenses, hashes and
+  numerical conversion/forward receipts. NoTorch owns the converter and native
+  forward; matrices expand once to frozen F32.
+- [x] Audit DoE and LoRAGrad and implement an isolated AML
+  [parliament](docs/PARLIAMENT.md): D96, rank four, four-to-sixteen private
+  experts, 64 combined immune memories, 32 receipts, delayed human-witness
+  reward, owned cursors, lifecycle and complete restart state.
+- [ ] Connect the experimental parliament to real cloud, human, inner-voice,
+  friend and model features. Give each presence its own persistent organ;
+  measure pressure and word-admission changes before enabling it in chat.
+- [ ] Add AML immutable PEN7 handles and optional lexical sources with quiet
   missing-weight fallback, explicit word admission and immutable shared models.
 - [ ] Give both Haiku and the dream-friend their own retrospective/prospective
   trajectories, each mixing both sources through its own gamma/Janus field.

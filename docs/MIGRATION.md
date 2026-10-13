@@ -7,9 +7,11 @@ This document records the inspected sources, current behavior, and implementatio
 order. Numerical, text, lexical, cloud, memory, English form, candidate
 generation, MathBrain, RAE, tokenization, foreground exchange, and complete
 foreground checkpoints, MetaHaiku reflection, the three rings, Phase4 memory,
-dream dialogues and the exchange journal are implemented;
-the status below
-marks the boundary between those functions and the remaining organism.
+dream dialogues and the exchange journal are implemented. Their complete tail
+now runs in an owned worker, joined before save, swap and response display.
+Frozen GGUF sources and an experimental private parliament have their own
+checked foundations; they are not connected to the stable chat yet. The status
+below marks the boundary between those functions and the remaining organism.
 
 ## Source bodies
 
@@ -157,7 +159,7 @@ Each default learner owns 57 parameters. [MathBrain](MATHBRAIN.md) and
 | `overthinkg.py` | Echo/drift/meta rings with 5/7/3 candidate trigrams and coherence admission | `overthinkg.aml` |
 | `phase4_bridges.py` | Cosine matching, transition counts, quality change, boredom/overwhelm/stuck penalties | `bridges.aml`, `phase4.aml` |
 | `dream_haiku.py` | Trigger/cooldown, four recorded exchanges, friend T=1.2 / self T=0.9, fragment decay and chain feedback | `dream.aml` |
-| `chat.py`, `async_harmonix.py` | Foreground exchange orchestration; separate asynchronous observer with locks and async storage | `haiku.aml`, `life.aml`, `state.aml` |
+| `chat.py`, `async_harmonix.py` | Foreground exchange orchestration; separate asynchronous observer with locks and async storage | `haiku.aml`, `session.aml`, `state.aml` |
 
 The foreground entrypoint now preserves the serial chat event order as an
 explicit fixture: tokenize → cloud/trigram
@@ -183,9 +185,12 @@ Source inspection identifies these concrete integration tasks:
   The foreground default preserves this. Its explicit `train_rae` option also
   gives RAE the selected experience; this is a separately checked extension.
 - `chat.py` invokes reflection, expansion, and dreams synchronously after
-  printing. AML now stages reflection and rings after learning, saves their
-  complete state, and then displays the selected response. `async_harmonix.py`
-  supplies a separate async observer; background scheduling remains to connect.
+  printing. AML now executes the ordered learning and inner-life tail in an
+  owned worker, then joins, validates, saves, swaps and displays the selected
+  response. `async_harmonix.py` supplies a separate async observer. Early
+  response display and overlapping the next input still need a durable pending
+  experience and exact replay; [ASYNC](ASYNC.md) separates those next steps from
+  the implemented worker boundary.
 - `MetaHaiku.reflect()` builds `reflection_seed` but does not pass it to
   generation; `update_cloud_bias()` ends in `pass`. The AML baseline preserves
   those measured paths and saves bootstrap/history. Inner generation advances
@@ -219,7 +224,7 @@ lineage and its developments stay traceable.
 | Micrograd classes | Implemented: explicit AML forward/reverse composition through stateless NoTorch linear, tanh, MSE-gradient and SGD kernels; parameter clamp in AML |
 | SentencePiece package | Implemented: immutable native Unigram model and exact embedded normalization in NoTorch; AML owns lowercase, piece cleanup, explicit mode selection, and rolling triples |
 | `syllables` | English estimator and rule data implemented in AML; each later language supplies its own rules |
-| SQLite / aiosqlite | Implemented: one native checkpoint includes cloud, generator/observer memory, learners, streams, reflections, rings, Phase4 history/aggregates, dream fragments/dialogues and exchange journal. Worker scheduling follows separately |
+| SQLite / aiosqlite | Implemented: one native checkpoint includes cloud, generator/observer memory, learners, streams, reflections, rings, Phase4 history/aggregates, dream fragments/dialogues and exchange journal. The owned worker completes before the sole publisher saves and swaps this state |
 | Python collections/async/I/O | AML text values, collections, module exports, event transport, files, and host-facing I/O |
 
 NoTorch exposes linear/bias operations, tensor arithmetic, backward, and
@@ -253,14 +258,23 @@ typed records, versioned native checkpoints, atomic file replacement, and exact
 model-content identity. Haiku supplies its schema and whole-record validation
 in AML. AML v5.10.0 adds exact fixed-decimal text and room for 239 user functions;
 the full serial organism uses the native checkpoint for all its organs.
-Haiku still needs:
+AML v5.11.0 [PR #36](https://github.com/ariannamethod/ariannamethod.ai/pull/36)
+adds typed worker results, copied helper/local context, reusable joined slots,
+owned-child drain and explicit channel failures. It also bridges NoTorch's
+owned election, adapter injection and Oja operations. Haiku's worker now
+publishes complete turns through that boundary; [ASYNC](ASYNC.md) preserves the
+earlier audit and records the fixes.
 
-1. Typed event payloads and worker lifetime handling. Existing channels
-   carry floats; joined spawn slots are not reused. [ASYNC](ASYNC.md) records
-   the source inspection and executable probes.
-2. A small local HTTP/event interface over the organism's events.
-3. Lifecycle scheduling around the independent learner arrays: publish
-   completed snapshots at explicit foreground/background handoff points.
+The next integration work is:
+
+1. Immutable AML PEN7 model handles and explicit provider availability around
+   NoTorch's native GGUF sources. Keep model bodies outside per-turn snapshots;
+   connect bounded lexical proposals and representation features.
+2. Real cloud and encounter features for the private [parliament](PARLIAMENT.md),
+   with separate Haiku/friend owners and measured effects on glyph pressure.
+3. Early response display and input overlap, with durable pending experience,
+   exact restart replay and one completed-state publisher.
+4. A small local HTTP/event interface over the organism's events.
 
 Yent demonstrates the compiled/library connection through C-bodied BLOOD
 blocks. Haiku's application behavior will be expressed in AML; the language
@@ -480,12 +494,25 @@ The v3 upgrade is detached and draw-free. Existing v1/v2 histories retain
 their exact continuation until explicitly upgraded. Native defaults reached
 their first dream at turn 14 in the recorded [example](../examples/dream.txt).
 
-This stage uses AML v5.10.0 [PR #35](https://github.com/ariannamethod/ariannamethod.ai/pull/35),
+The serial dream milestone used AML v5.10.0 [PR #35](https://github.com/ariannamethod/ariannamethod.ai/pull/35),
 published as `9d12969267a39bcdcf70335fde3aa69f5c8a96c6`, and rebuilt scalar
 NoTorch `bfde06669ad34896421b86147e919ca902a0d337`. The existing numerical
-and tokenizer APIs suffice; no NoTorch source change is needed this stage.
-The [async audit](ASYNC.md) records the next worker primitives and the
-single-publisher handoff needed to carry this serial life into the background.
+and tokenizer APIs sufficed; that stage needed no NoTorch source change.
+These pins retain the original v5.10 audit history.
+
+The subsequent [owned-worker stage](ASYNC.md) uses AML v5.11 / PR #36 and
+preserves the same turn order and checkpoint schemas. Join, validation, save,
+swap and display form the current publication boundary. Early display,
+overlapping input and durable pending intent remain the next scheduling work.
+
+[NoTorch PR #168](https://github.com/ariannamethod/notorch/pull/168) supplies the
+native PEN7 converter/forward and parliament arithmetic. Haiku now retains two
+immutable **21,308,576-byte Q8_0/F32 GGUF assets** with
+[conversion receipts](../weights/README.md); NoTorch expands their matrices once
+to frozen F32 for execution. The isolated [AML parliament](PARLIAMENT.md) owns
+its adapters, pressure, immune memory and delayed reward. Stable-chat model
+loading, lexical admission, per-presence mixtures and the full glyph feedback
+loop remain the [next iceberg connections](ICEBERG.md).
 
 ### RAE development
 
@@ -507,11 +534,18 @@ metrics, and explicit asynchronous publication order.
    now run around the generator, cloud, and Harmonix. Retain explicit tokenizer
    mode, word ordering, random streams, initial state, and event-order fixtures.
 4. Reflection, rings, Phase4, dreams and the exchange journal now share one
-   versioned checkpoint. Carry that ordered tail into an AML worker next;
-   verify typed ownership, shutdown, pending restart and schedule independence.
-5. Add Klaus-inspired language packs with haiku-specific vocabulary and
+   versioned checkpoint and one owned worker tail. Serial, worker and compiled
+   schedules preserve responses and checkpoint bytes. Extend this boundary to
+   early display only with durable pending experience and exact restart replay.
+5. Connect the native frozen PEN7 sources through immutable AML handles and
+   bounded word admission, with quiet zero/one/two-source operation. Give both
+   presences their own two-direction histories and explicit mixing state.
+6. Connect actual cloud, model and encounter features to the experimental
+   parliament. Measure its private glyph pressure and later word influence;
+   add learned bindings and recursive glyphs through the staged [iceberg](ICEBERG.md).
+7. Add Klaus-inspired language packs with haiku-specific vocabulary and
    syllable behavior; preserve each language's own cloud.
-6. Add the local character interface, conversation, and event-driven animation.
+8. Add the local character interface, conversation, and event-driven animation.
    [TODO](../TODO.md) records the future visible conversation with the inner friend.
 
 ## Verification receipt

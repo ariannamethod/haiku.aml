@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "architecture": "penelope",
+  "gguf_version": 3,
+  "parameters": 19619280,
+  "tensors": 92,
+  "storage": {
+    "matrix_dtype": "Q8_0",
+    "quantized_tensors": 66,
+    "quantized_parameters": 19496960,
+    "other_dtype": "F32",
+    "other_tensors": 26,
+    "other_parameters": 122320,
+    "other_roles": [
+      "position embeddings",
+      "normalization weights",
+      "attention/resonance gate"
+    ]
+  },
+  "execution": "Q8_0 matrices expand once through NoTorch gguf_dequant to immutable owned F32; auxiliary F32 tensors borrow read-only mapping",
+  "converter": "ariannamethod/notorch/tools/pen7_to_gguf.c --q8_0",
+  "converter_revision": "4d0b807d6d545d8e25b25bebf425377d62833ede",
+  "tokenizer": {
+    "algorithm": "byte-rank-pass-v1",
+    "vocabulary": 2048,
+    "merges": 1792,
+    "sha256": "664afe692a006a54fc00406209042f6d452748d64a883ecfab9ef66d41f8bdf2",
+    "contract": "Penelope byte encoder, ASCII lowercase, maximum 8191 input bytes, no automatic BOS/EOS"
+  },
+  "assets": [
+    {
+      "file": "haiku1.gguf",
+      "body": "Penelope",
+      "bytes": 21308576,
+      "sha256": "50f159a2c34952bd9e6349880b4b20f8bbc0ac4b1f1dc2c1f6e4768732548b66",
+      "source_repository": "ariannamethod/1984",
+      "source_revision": "a0d20019587ff14e5516eb050ba0876d6edd0baa",
+      "source_file": "weights/penelope.bin",
+      "source_bytes": 78477152,
+      "source_sha256": "afff67c780a7c78fdc1f76e521dfda30d65e68b95fe5bd324bb392b84ba3cd38",
+      "source_license_url": "https://github.com/ariannamethod/1984/blob/a0d20019587ff14e5516eb050ba0876d6edd0baa/LICENSE",
+      "parameter_max_abs_error": 0.01707935333251953,
+      "parameter_rmse": 0.0011409128410848073
+    },
+    {
+      "file": "haiku2.gguf",
+      "body": "NanoJanus",
+      "bytes": 21308576,
+      "sha256": "16909b8590bd7fbbf15ab11b2dbf3743d612da8c617aca2dda03d640fef13e29",
+      "source_repository": "ariannamethod/janus",
+      "source_revision": "5a945a9d7c1dc9abfa217f685f0a81455f9ac493",
+      "source_file": "weights/nanojanus.bin",
+      "source_bytes": 78477152,
+      "source_sha256": "d675df2ee3a150d63bc73935a84060280d0f6b0aa84283e4b78ab905180b576c",
+      "source_license_url": "https://github.com/ariannamethod/janus/blob/5a945a9d7c1dc9abfa217f685f0a81455f9ac493/LICENSE",
+      "parameter_max_abs_error": 0.018326520919799805,
+      "parameter_rmse": 0.0011420459924364888
+    }
+  ]
+}

@@ -11,6 +11,9 @@ tokenizer_mode = "regex"
 train_rae = 0
 inner_life = 1
 dream_life = 1
+# Both schedules keep the same complete-turn checkpoint and random order.
+# The owned worker completes learning and inner life before save and display.
+owned_tail = 1
 
 # Existing foreground-only lives keep their exact continuation. Set this to 1
 # to grow their inner voice from the next completed exchange.
@@ -60,7 +63,10 @@ while listening:
             listening = 0
         if action == 1:
             next_state = record_clone(state)
-            spoken = haiku_session_turn(next_state, source, tokenizer_model)
+            if owned_tail:
+                spoken = haiku_session_worker_turn(next_state, source, tokenizer_model)
+            else:
+                spoken = haiku_session_turn(next_state, source, tokenizer_model)
             saved = 1
             if text_len(state_path) > 0:
                 saved = checkpoint_save(next_state, state_path)

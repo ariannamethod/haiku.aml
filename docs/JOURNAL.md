@@ -77,13 +77,16 @@ the journal and the complete turn together.
 The getter's record has format `haiku-experience`, version `1`, source,
 input/output, user/system trigrams, dissonance, temperatures, quality, both
 feature arrays and a metrics map. It exposes the logical turn/clock and the
-serial profile's publication identity: `base_revision = turn - 1`,
+complete-turn publication identity: `base_revision = turn - 1`,
 `state_revision = turn`, `publication_order = turn`. Mutating a returned
 context, feature array or metrics map leaves the journal unchanged.
 
-This completed experience is the handoff for later background learning.
-[ASYNC](ASYNC.md) records the worker facilities and next publication protocol.
-The current profile finishes the whole turn before publication.
+`haiku_session_prepare` now freezes the transient experience before launching
+the owned tail; that worker completes learning, reflection, rings, dreams and
+the journal together. [ASYNC](ASYNC.md) records the current
+join/validate/save/swap/display boundary and the next early-display protocol.
+The current profile finishes the whole turn before publication; a durable
+pending experience for early display and overlapping input remains later work.
 
 ## A measured context repair
 

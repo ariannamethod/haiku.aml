@@ -41,4 +41,8 @@ resonance, recursion, memory, and continuity throughout code and documentation.
   dreams, and persistence must agree on when an update becomes visible.
 - Keep documentation concise and playful. Carry the original README's voice.
 - Commit source and small reproducible fixtures. Keep credentials, generated
-  binaries, live state, and downloaded model weights out of git.
+  executables and live state out of git. Oleg explicitly approved the two
+  converted, immutable model assets `weights/haiku1.gguf` and
+  `weights/haiku2.gguf`; publish them sequentially with source revisions,
+  licenses, hashes and conversion receipts. Other downloaded weights stay
+  outside git.

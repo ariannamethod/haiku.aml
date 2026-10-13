@@ -1,0 +1,689 @@
+# Experimental living glyph parliament. Opt in by constructing an owner and
+# calling step; the stable chat imports none of this module. PEN7 assets never
+# enter this record. DoE supplies numerical election/injection/Oja; LoRAGrad
+# supplies the immune axis/credit/recall design. Haiku owns the adaptations:
+# D96, stable feature projection, delayed receipts, deduplication and retention.
+
+def haiku_parliament_vector(x, size, bound):
+    assert(len(x) == size and rows(x) == 0 and cols(x) == 0, "Parliament vector shape differs")
+    i = 0
+    while i < size:
+        assert(isfinite(x[i]) and abs(x[i]) <= bound, "Parliament vector must be finite and bounded")
+        i = i + 1
+    return 1
+
+# Feature coordinates have the builder's [0,1] domain; signatures, proposed
+# deltas and adapter values retain their separate signed numerical domains.
+def haiku_parliament_features_ok(x, size):
+    haiku_parliament_vector(x, size, 1)
+    i = 0
+    while i < size:
+        assert(x[i] >= 0, "Parliament features must be nonnegative")
+        i = i + 1
+    return 1
+
+def haiku_parliament_part(x, offset, size):
+    result = zeros(size)
+    i = 0
+    while i < size:
+        result[i] = x[offset + i]
+        i = i + 1
+    return result
+
+def haiku_parliament_dot(a, b):
+    out = nt_linear(a, zeros(1), b, 1, len(a))
+    return out[0]
+
+def haiku_parliament_unit(x):
+    length = sqrt(max(0, haiku_parliament_dot(x, x)))
+    assert(length > 0.0000001, "Parliament signature has no evidence")
+    result = zeros(len(x))
+    i = 0
+    while i < len(x):
+        result[i] = x[i] / length
+        i = i + 1
+    return result
+
+# Four observed climate values; arousal is nonnegative and can exceed one.
+# Missing rings have length one with value zero; masks remain receipt metadata.
+def haiku_parliament_features(glyphs, climate, rings, quality):
+    haiku_parliament_vector(glyphs, 88, 1)
+    haiku_parliament_vector(climate, 4, 1000000)
+    assert(climate[0] >= 0 and climate[0] <= 1 and climate[1] >= 0 and climate[1] <= 1, "Parliament climate is invalid")
+    assert(climate[2] >= 0 and climate[3] >= 0 and climate[3] <= 1, "Parliament climate is invalid")
+    assert(isfinite(quality) and quality >= 0 and quality <= 1, "Parliament quality is invalid")
+    assert(len(rings) == 1 or len(rings) == 3, "Parliament rings need zero or three observations")
+    haiku_parliament_vector(rings, len(rings), 1)
+    result = zeros(96)
+    i = 0
+    while i < 88:
+        assert(glyphs[i] >= 0, "Parliament glyph activation is negative")
+        result[i] = glyphs[i]
+        i = i + 1
+    result[88] = climate[0]
+    result[89] = climate[1]
+    result[90] = climate[2] / (1 + climate[2])
+    result[91] = climate[3]
+    if len(rings) == 3:
+        i = 0
+        while i < 3:
+            assert(rings[i] >= 0, "Parliament ring coherence is negative")
+            result[92 + i] = rings[i]
+            i = i + 1
+    else:
+        assert(rings[0] == 0, "Parliament absent rings need zero sentinel")
+    result[95] = quality
+    return result
+
+# Fixed feature-ID projection, never a hash of changing float bits. Explicit
+# source columns: human/cloud/A/B/mix/self/friend/dream. This returns a value;
+# source identity, replay, availability and chronology also stay in receipts.
+def haiku_parliament_signature(features, delta, source):
+    haiku_parliament_features_ok(features, 96)
+    haiku_parliament_vector(delta, 96, 10)
+    assert(source >= 0 and source <= 7 and source == floor(source), "Parliament source is invalid")
+    projection = zeros(6656)
+    input = zeros(104)
+    i = 0
+    while i < 104:
+        bin = i * 17 + 3
+        bin = bin - floor(bin / 64) * 64
+        sign = 1 - 2 * (i - floor(i / 2) * 2)
+        projection[bin * 104 + i] = sign
+        if i < 96:
+            input[i] = features[i] + 0.25 * clamp(delta[i], -1, 1)
+        i = i + 1
+    input[96 + source] = 0.125
+    return haiku_parliament_unit(nt_linear(projection, zeros(64), input, 64, 104))
+
+def haiku_parliament_new(owner, seed, origin, boundary):
+    assert(text_len(owner) > 0 and text_len(owner) <= 128, "Parliament owner name is invalid")
+    haiku_parliament_vector(origin, 64, 1)
+    haiku_parliament_vector(boundary, 64, 1)
+    origin = haiku_parliament_unit(origin)
+    boundary = haiku_parliament_unit(boundary)
+    assert(haiku_parliament_dot(origin, boundary) < 0.999, "Parliament anchors must differ")
+    state = record_new()
+    record_set(state, "format", "haiku-parliament")
+    record_set(state, "version", 1)
+    record_set(state, "owner", owner)
+    record_set(state, "revision", 0)
+    record_set(state, "clock", 0)
+    record_set(state, "next_id", 4)
+    record_set(state, "consensus", 0.5)
+    record_set(state, "rng", rng_new(seed))
+    record_set(state, "origin", origin)
+    record_set(state, "boundary", boundary)
+    alive = zeros(16)
+    ids = zeros(16)
+    vitality = zeros(16)
+    i = 0
+    while i < 4:
+        alive[i] = 1
+        ids[i] = i + 1
+        vitality[i] = 0.5
+        i = i + 1
+    record_set(state, "alive", alive)
+    record_set(state, "ids", ids)
+    record_set(state, "vitality", vitality)
+    record_set(state, "age", zeros(16))
+    record_set(state, "strikes", zeros(16))
+    record_set(state, "cursor", zeros(16))
+    record_set(state, "credit", zeros(16))
+    rng = record_get(state, "rng")
+    votes = rng_normal(rng, 1536)
+    immune = rng_normal(rng, 1024)
+    a = rng_normal(rng, 6144)
+    b = rng_normal(rng, 6144)
+    i = 0
+    while i < 6144:
+        a[i] = a[i] * 0.02
+        b[i] = b[i] * 0.02
+        i = i + 1
+    i = 0
+    while i < 1536:
+        votes[i] = votes[i] * 0.1
+        i = i + 1
+    e = 0
+    while e < 16:
+        direction = zeros(64)
+        i = 0
+        while i < 64:
+            direction[i] = origin[i] - (0.25 + e / 20) * boundary[i] + immune[e * 64 + i] * 0.05
+            i = i + 1
+        direction = haiku_parliament_unit(direction)
+        i = 0
+        while i < 64:
+            immune[e * 64 + i] = direction[i]
+            i = i + 1
+        e = e + 1
+    record_set(state, "vote_w", votes)
+    record_set(state, "immune_w", immune)
+    record_set(state, "a", a)
+    record_set(state, "b", b)
+    record_set(state, "field", zeros(88))
+    record_set(state, "seen", zeros(8))
+    record_set(state, "memory_sigs", zeros(4096))
+    record_set(state, "memory_rows", zeros(256))
+    record_set(state, "receipt_rows", zeros(288))
+    record_set(state, "receipt_x", zeros(3072))
+    record_set(state, "receipt_dy", zeros(3072))
+    record_set(state, "receipt_votes", zeros(512))
+    record_set(state, "receipt_gates", zeros(512))
+    record_set(state, "receipt_ids", zeros(512))
+    record_set(state, "receipt_cursor", 0)
+    haiku_parliament_check(state)
+    return state
+
+# A complete owned record, including all expert/reward/retention cursors.
+def haiku_parliament_check(state):
+    assert(list_len(record_keys(state)) == 32, "Parliament needs exactly thirty-two fields")
+    assert(text_equal(record_get(state, "format"), "haiku-parliament") and record_get(state, "version") == 1, "Parliament format is invalid")
+    assert(text_len(record_get(state, "owner")) > 0 and text_len(record_get(state, "owner")) <= 128, "Parliament owner name is invalid")
+    names = list_new()
+    list_push(names, "alive")
+    list_push(names, "ids")
+    list_push(names, "vitality")
+    list_push(names, "age")
+    list_push(names, "strikes")
+    list_push(names, "cursor")
+    list_push(names, "credit")
+    i = 0
+    while i < list_len(names):
+        haiku_parliament_vector(record_get(state, list_get(names, i)), 16, 1000000)
+        i = i + 1
+    haiku_parliament_vector(record_get(state, "origin"), 64, 1)
+    haiku_parliament_vector(record_get(state, "boundary"), 64, 1)
+    haiku_parliament_vector(record_get(state, "vote_w"), 1536, 2)
+    haiku_parliament_vector(record_get(state, "immune_w"), 1024, 1)
+    haiku_parliament_vector(record_get(state, "a"), 6144, 2)
+    haiku_parliament_vector(record_get(state, "b"), 6144, 2)
+    haiku_parliament_vector(record_get(state, "field"), 88, 5)
+    haiku_parliament_vector(record_get(state, "seen"), 8, 1000000)
+    haiku_parliament_vector(record_get(state, "memory_sigs"), 4096, 1)
+    haiku_parliament_vector(record_get(state, "memory_rows"), 256, 1000000)
+    haiku_parliament_vector(record_get(state, "receipt_rows"), 288, 1000000)
+    haiku_parliament_features_ok(record_get(state, "receipt_x"), 3072)
+    haiku_parliament_vector(record_get(state, "receipt_dy"), 3072, 10)
+    haiku_parliament_vector(record_get(state, "receipt_votes"), 512, 1)
+    haiku_parliament_vector(record_get(state, "receipt_gates"), 512, 1)
+    haiku_parliament_vector(record_get(state, "receipt_ids"), 512, 1000000)
+    alive = record_get(state, "alive")
+    vitality = record_get(state, "vitality")
+    ids = record_get(state, "ids")
+    age = record_get(state, "age")
+    strikes = record_get(state, "strikes")
+    cursor = record_get(state, "cursor")
+    credit = record_get(state, "credit")
+    count = 0
+    i = 0
+    while i < 16:
+        assert(alive[i] == 0 or alive[i] == 1, "Parliament active flag is invalid")
+        assert(vitality[i] >= 0 and vitality[i] <= 1 and abs(credit[i]) <= 10, "Parliament expert climate is invalid")
+        assert(cursor[i] >= 0 and cursor[i] < 4 and cursor[i] == floor(cursor[i]), "Parliament expert cursor is invalid")
+        assert(age[i] >= 0 and age[i] == floor(age[i]) and strikes[i] >= 0 and strikes[i] == floor(strikes[i]), "Parliament lifecycle counter is invalid")
+        assert(ids[i] >= 0 and ids[i] == floor(ids[i]), "Parliament identity is invalid")
+        count = count + alive[i]
+        i = i + 1
+    assert(count >= 4 and count <= 16, "Parliament active population is invalid")
+    revision = record_get(state, "revision")
+    clock = record_get(state, "clock")
+    next_id = record_get(state, "next_id")
+    pos = record_get(state, "receipt_cursor")
+    c = record_get(state, "consensus")
+    assert(isfinite(revision) and revision >= 0 and revision < 1000000 and revision == floor(revision), "Parliament revision is invalid")
+    assert(isfinite(clock) and clock >= 0 and clock < 1000000 and clock == floor(clock), "Parliament clock is invalid")
+    assert(isfinite(next_id) and next_id >= 4 and next_id < 1000000 and next_id == floor(next_id), "Parliament next identity is invalid")
+    assert(isfinite(pos) and pos >= 0 and pos < 32 and pos == floor(pos), "Parliament receipt cursor is invalid")
+    assert(isfinite(c) and c >= 0 and c <= 1, "Parliament consensus is invalid")
+    origin = record_get(state, "origin")
+    boundary = record_get(state, "boundary")
+    assert(abs(haiku_parliament_dot(origin, origin) - 1) < 0.00001 and abs(haiku_parliament_dot(boundary, boundary) - 1) < 0.00001, "Parliament anchors must be unit vectors")
+    assert(haiku_parliament_dot(origin, boundary) < 0.999, "Parliament anchors must differ")
+    rng = record_get(state, "rng")
+    assert(map_len(rng) == 5 and map_get(rng, "algorithm") == 1, "Parliament RNG format is invalid")
+    i = 0
+    while i < 4:
+        key = text_concat("state", text_fixed(i, 0))
+        word = map_get(rng, key)
+        assert(word >= 0 and word <= 65535 and word == floor(word), "Parliament RNG state is invalid")
+        i = i + 1
+    e = 0
+    while e < 16:
+        assert(ids[e] <= next_id, "Parliament expert identity exceeds its allocator")
+        if alive[e] == 1:
+            assert(ids[e] >= 1, "Parliament active expert has no identity")
+            i = e + 1
+            while i < 16:
+                assert(alive[i] == 0 or ids[e] != ids[i], "Parliament active identities collide")
+                i = i + 1
+        immune = haiku_parliament_part(record_get(state, "immune_w"), e * 64, 64)
+        assert(abs(haiku_parliament_dot(immune, immune) - 1) < 0.00001, "Parliament expert signature is not normalized")
+        e = e + 1
+    seen = record_get(state, "seen")
+    i = 0
+    while i < 8:
+        assert(seen[i] >= 0 and seen[i] == floor(seen[i]), "Parliament seen event is invalid")
+        i = i + 1
+    memory = record_get(state, "memory_rows")
+    i = 0
+    while i < 64:
+        kind = memory[i * 4]
+        assert(kind == 0 or kind == 3 or kind == 4, "Parliament memory verdict is invalid")
+        if kind > 0:
+            time = memory[i * 4 + 1]
+            hits = memory[i * 4 + 2]
+            source = memory[i * 4 + 3]
+            assert(time >= 0 and time <= clock and time == floor(time), "Parliament memory turn is invalid")
+            assert(hits >= 1 and hits == floor(hits), "Parliament memory hit count is invalid")
+            assert(source >= 0 and source <= 7 and source == floor(source), "Parliament memory source is invalid")
+            signature = haiku_parliament_part(record_get(state, "memory_sigs"), i * 64, 64)
+            assert(abs(haiku_parliament_dot(signature, signature) - 1) < 0.00001, "Parliament memory signature is not normalized")
+        i = i + 1
+    receipts = record_get(state, "receipt_rows")
+    i = 0
+    while i < 32:
+        event = receipts[i * 9]
+        assert(event >= 0 and event == floor(event), "Parliament receipt event is invalid")
+        if event > 0:
+            time = receipts[i * 9 + 1]
+            source = receipts[i * 9 + 2]
+            verdict = receipts[i * 9 + 3]
+            alpha = receipts[i * 9 + 4]
+            rewarded = receipts[i * 9 + 5]
+            mask = receipts[i * 9 + 6]
+            revision_id = receipts[i * 9 + 7]
+            evidence = receipts[i * 9 + 8]
+            assert(source >= 0 and source <= 7 and source == floor(source), "Parliament receipt source is invalid")
+            assert(event <= seen[source], "Parliament receipt precedes source admission")
+            assert(time >= 0 and time <= clock and time == floor(time), "Parliament receipt turn is invalid")
+            assert(verdict >= 0 and verdict <= 5 and verdict == floor(verdict), "Parliament receipt verdict is invalid")
+            assert(alpha >= 0 and alpha <= 1 and (verdict < 2 or alpha == 0), "Parliament receipt attenuation is invalid")
+            assert(verdict != 0 or alpha == 1, "Parliament PASS attenuation differs")
+            assert(rewarded == 0 or rewarded == 1, "Parliament receipt reward flag is invalid")
+            assert(mask >= 0 and mask <= 7 and mask == floor(mask), "Parliament receipt availability is invalid")
+            rings_present = mask - floor(mask / 2) * 2
+            a_present = floor(mask / 2) - floor(mask / 4) * 2
+            b_present = floor(mask / 4)
+            assert(source != 2 or a_present == 1, "Parliament receipt A source is unavailable")
+            assert(source != 3 or b_present == 1, "Parliament receipt B source is unavailable")
+            assert(source != 4 or (a_present == 1 and b_present == 1), "Parliament receipt mixed source is unavailable")
+            rx = record_get(state, "receipt_x")
+            assert(rings_present == 1 or (rx[i * 96 + 92] == 0 and rx[i * 96 + 93] == 0 and rx[i * 96 + 94] == 0), "Parliament receipt absent rings carry values")
+            assert(revision_id >= 1 and revision_id <= revision and revision_id == floor(revision_id), "Parliament receipt revision is invalid")
+            assert((rewarded == 0 and evidence == 0) or (rewarded == 1 and evidence >= 1 and evidence == floor(evidence)), "Parliament receipt independent evidence is invalid")
+            gates = record_get(state, "receipt_gates")
+            receipt_ids = record_get(state, "receipt_ids")
+            mass = 0
+            j = 0
+            while j < 16:
+                gate = gates[i * 16 + j]
+                identity = receipt_ids[i * 16 + j]
+                assert(gate >= 0, "Parliament receipt gate is negative")
+                assert(identity >= 0 and identity <= next_id and identity == floor(identity), "Parliament receipt expert identity is invalid")
+                assert(gate == 0 or identity > 0, "Parliament receipt gate has no expert")
+                mass = mass + gate
+                j = j + 1
+            assert(abs(mass - 1) < 0.00001, "Parliament receipt gates are not normalized")
+            if rewarded == 1:
+                witness = 0
+                j = 0
+                while j < 32:
+                    if receipts[j * 9] == evidence and receipts[j * 9 + 2] == 0 and receipts[j * 9 + 1] > time:
+                        witness = 1
+                    j = j + 1
+                assert(witness == 1, "Parliament rewarded receipt lost its observed witness")
+        i = i + 1
+    return count
+
+# Six LoRAGrad decisions: PASS=0 WEAKEN=1 FREEZE=2 SCAR=3 DARK=4 SILENCE=5.
+# They govern a semantic update. Source labels do not determine a verdict.
+def haiku_parliament_vote(state, signature):
+    haiku_parliament_vector(signature, 64, 1)
+    origin = record_get(state, "origin")
+    boundary = record_get(state, "boundary")
+    axis = zeros(64)
+    i = 0
+    while i < 64:
+        axis[i] = origin[i] - boundary[i]
+        i = i + 1
+    axis = haiku_parliament_unit(axis)
+    delta = haiku_parliament_dot(axis, signature)
+    votes = nt_tanh(nt_linear(record_get(state, "immune_w"), zeros(16), signature, 16, 64))
+    credits = record_get(state, "credit")
+    alive = record_get(state, "alive")
+    total = 0
+    consensus = 0
+    e = 0
+    while e < 16:
+        if alive[e] == 1:
+            weight = log(1 + exp(credits[e]))
+            consensus = consensus + weight * votes[e]
+            total = total + weight
+        e = e + 1
+    score = 0.7 * delta + 0.3 * consensus / total
+    verdict = 5
+    alpha = 0
+    if score >= -0.1:
+        verdict = 2
+    if score >= 0.1:
+        verdict = 1
+        alpha = clamp((score - 0.1) / 0.3, 0, 1)
+    if score >= 0.4:
+        verdict = 0
+        alpha = 1
+    if -delta >= 0.25:
+        verdict = 3
+        alpha = 0
+    if -delta >= 0.5:
+        verdict = 4
+        alpha = 0
+    memory = record_get(state, "memory_rows")
+    sigs = record_get(state, "memory_sigs")
+    slot = 0
+    while slot < 64:
+        if memory[slot * 4] > 0:
+            known = haiku_parliament_part(sigs, slot * 64, 64)
+            if haiku_parliament_dot(known, signature) >= 0.9:
+                verdict = memory[slot * 4]
+                alpha = 0
+        slot = slot + 1
+    result = record_new()
+    record_set(result, "verdict", verdict)
+    record_set(result, "alpha", alpha)
+    record_set(result, "votes", votes)
+    return result
+
+# 64 entries shared by SCAR/DARK, exact-signature dedup and least-recently-used
+# retention. Four columns: verdict, last turn, bounded hit count, source.
+def haiku_parliament_remember(state, signature, verdict, turn, source):
+    assert(verdict == 3 or verdict == 4, "Parliament memory needs SCAR or DARK")
+    rows = record_get(state, "memory_rows")
+    sigs = record_get(state, "memory_sigs")
+    slot = -1
+    oldest = 0
+    i = 0
+    while i < 64:
+        if rows[i * 4] == 0 and slot < 0:
+            slot = i
+        if rows[i * 4] > 0:
+            known = haiku_parliament_part(sigs, i * 64, 64)
+            if haiku_parliament_dot(known, signature) >= 0.98:
+                rows[i * 4 + 1] = turn
+                rows[i * 4 + 2] = min(1000000, rows[i * 4 + 2] + 1)
+                return i
+        if rows[i * 4 + 1] < rows[oldest * 4 + 1]:
+            oldest = i
+        i = i + 1
+    if slot < 0:
+        slot = oldest
+    rows[slot * 4] = verdict
+    rows[slot * 4 + 1] = turn
+    rows[slot * 4 + 2] = 1
+    rows[slot * 4 + 3] = source
+    i = 0
+    while i < 64:
+        sigs[slot * 64 + i] = signature[i]
+        i = i + 1
+    return slot
+
+# One bounded birth per admitted event; minimum four voices survives starvation.
+# Every Oja cursor belongs to its expert and resets when that slot is reborn.
+def haiku_parliament_lifecycle(state, gates):
+    alive = record_get(state, "alive")
+    vitality = record_get(state, "vitality")
+    age = record_get(state, "age")
+    strikes = record_get(state, "strikes")
+    ids = record_get(state, "ids")
+    count = 0
+    i = 0
+    while i < 16:
+        count = count + alive[i]
+        i = i + 1
+    e = 0
+    parent = -1
+    free_slot = -1
+    while e < 16:
+        if alive[e] == 1:
+            age[e] = min(999999, age[e] + 1)
+            vitality[e] = clamp(vitality[e] + 0.01 * (gates[e] * count - 1), 0, 1)
+            if vitality[e] < 0.1:
+                strikes[e] = min(999999, strikes[e] + 1)
+            else:
+                strikes[e] = 0
+            if strikes[e] >= 8 and count > 4:
+                alive[e] = 0
+                count = count - 1
+            if alive[e] == 1 and vitality[e] > 0.8 and age[e] > 20 and parent < 0:
+                parent = e
+        if alive[e] == 0 and free_slot < 0:
+            free_slot = e
+        e = e + 1
+    if parent >= 0 and free_slot >= 0:
+        a = record_get(state, "a")
+        b = record_get(state, "b")
+        noise = rng_normal(record_get(state, "rng"), 768)
+        i = 0
+        while i < 384:
+            a[free_slot * 384 + i] = clamp(a[parent * 384 + i] + 0.002 * noise[i], -2, 2)
+            b[free_slot * 384 + i] = clamp(b[parent * 384 + i] + 0.002 * noise[384 + i], -2, 2)
+            i = i + 1
+        votes = record_get(state, "vote_w")
+        immune = record_get(state, "immune_w")
+        i = 0
+        while i < 96:
+            votes[free_slot * 96 + i] = votes[parent * 96 + i]
+            i = i + 1
+        i = 0
+        while i < 64:
+            immune[free_slot * 64 + i] = immune[parent * 64 + i]
+            i = i + 1
+        alive[free_slot] = 1
+        age[free_slot] = 0
+        strikes[free_slot] = 0
+        vitality[free_slot] = 0.5
+        vitality[parent] = 0.5
+        cursor = record_get(state, "cursor")
+        cursor[free_slot] = 0
+        credit = record_get(state, "credit")
+        credit[free_slot] = 0
+        next_id = record_get(state, "next_id") + 1
+        ids[free_slot] = next_id
+        record_set(state, "next_id", next_id)
+    return 1
+
+# Receipt rows (32 slots, nine columns): event, turn, source, verdict, alpha,
+# rewarded, availability mask, revision, independent evidence event.
+def haiku_parliament_receipt(state, event, source, turn, proposal, features, mask):
+    slot = record_get(state, "receipt_cursor")
+    rows = record_get(state, "receipt_rows")
+    rows[slot * 9] = event
+    rows[slot * 9 + 1] = turn
+    rows[slot * 9 + 2] = source
+    rows[slot * 9 + 3] = record_get(proposal, "verdict")
+    rows[slot * 9 + 4] = record_get(proposal, "alpha")
+    rows[slot * 9 + 5] = 0
+    rows[slot * 9 + 6] = mask
+    rows[slot * 9 + 7] = record_get(state, "revision") + 1
+    rows[slot * 9 + 8] = 0
+    x = record_get(state, "receipt_x")
+    dy = record_get(state, "receipt_dy")
+    delta = record_get(proposal, "delta")
+    i = 0
+    while i < 96:
+        x[slot * 96 + i] = features[i]
+        dy[slot * 96 + i] = delta[i]
+        i = i + 1
+    votes = record_get(state, "receipt_votes")
+    gates = record_get(state, "receipt_gates")
+    ids = record_get(state, "receipt_ids")
+    own_ids = record_get(state, "ids")
+    pv = record_get(proposal, "votes")
+    pg = record_get(proposal, "gates")
+    i = 0
+    while i < 16:
+        votes[slot * 16 + i] = pv[i]
+        gates[slot * 16 + i] = pg[i]
+        ids[slot * 16 + i] = own_ids[i]
+        i = i + 1
+    record_set(state, "receipt_cursor", slot + 1 - floor((slot + 1) / 32) * 32)
+    return slot
+
+# replay=1 or an already seen source/event is a draw-free complete no-op.
+# mask is an explicit availability bitmask: rings=1, model A=2, model B=4.
+def haiku_parliament_step(state, features, source, event, turn, replay, mask):
+    haiku_parliament_check(state)
+    haiku_parliament_features_ok(features, 96)
+    assert(source >= 0 and source <= 7 and source == floor(source), "Parliament source is invalid")
+    assert(isfinite(event) and event >= 1 and event < 1000000 and event == floor(event), "Parliament event is invalid")
+    assert(isfinite(turn) and turn >= record_get(state, "clock") and turn < 1000000 and turn == floor(turn), "Parliament turn is invalid")
+    assert(replay == 0 or replay == 1, "Parliament replay flag is invalid")
+    assert(mask >= 0 and mask <= 7 and mask == floor(mask), "Parliament availability is invalid")
+    rings_present = mask - floor(mask / 2) * 2
+    a_present = floor(mask / 2) - floor(mask / 4) * 2
+    b_present = floor(mask / 4)
+    assert(source != 2 or a_present == 1, "Parliament A source is unavailable")
+    assert(source != 3 or b_present == 1, "Parliament B source is unavailable")
+    assert(source != 4 or (a_present == 1 and b_present == 1), "Parliament mixed source needs both models")
+    assert(rings_present == 1 or (features[92] == 0 and features[93] == 0 and features[94] == 0), "Parliament absent rings carry observed values")
+    proposal = record_new()
+    record_set(proposal, "committed", 0)
+    record_set(proposal, "verdict", 5)
+    seen = record_get(state, "seen")
+    if replay == 1 or event <= seen[source]:
+        return proposal
+    pending = record_clone(state)
+    alive = record_get(pending, "alive")
+    vdot = nt_linear(record_get(pending, "vote_w"), zeros(16), features, 16, 96)
+    resonance = zeros(16)
+    credits = record_get(pending, "credit")
+    i = 0
+    while i < 16:
+        resonance[i] = 0.1 * credits[i] * (features[89] - features[88])
+        i = i + 1
+    election = nt_parliament_elect(vdot, resonance, alive, 2, record_get(pending, "consensus"))
+    gates = haiku_parliament_part(election, 0, 16)
+    mixed = nt_parliament_inject(record_get(pending, "a"), record_get(pending, "b"), gates, features, 4, 0.1)
+    delta = zeros(96)
+    i = 0
+    while i < 96:
+        delta[i] = clamp(mixed[i] - features[i], -1, 1)
+        i = i + 1
+    signature = haiku_parliament_signature(features, delta, source)
+    immune = haiku_parliament_vote(pending, signature)
+    verdict = record_get(immune, "verdict")
+    alpha = record_get(immune, "alpha")
+    record_set(proposal, "verdict", verdict)
+    record_set(proposal, "alpha", alpha)
+    record_set(proposal, "delta", delta)
+    record_set(proposal, "signature", signature)
+    record_set(proposal, "votes", record_get(immune, "votes"))
+    record_set(proposal, "gates", gates)
+    field = record_get(pending, "field")
+    norm = sqrt(max(0, haiku_parliament_dot(delta, delta)))
+    scale = alpha / max(1, norm)
+    i = 0
+    while i < 88:
+        field[i] = clamp(field[i] + scale * delta[i], -5, 5)
+        i = i + 1
+    if verdict == 3 or verdict == 4:
+        haiku_parliament_remember(pending, signature, verdict, turn, source)
+    haiku_parliament_receipt(pending, event, source, turn, proposal, features, mask)
+    if alpha > 0:
+        haiku_parliament_lifecycle(pending, gates)
+    seen = record_get(pending, "seen")
+    seen[source] = event
+    record_set(pending, "clock", turn)
+    record_set(pending, "consensus", election[16])
+    record_set(pending, "revision", record_get(pending, "revision") + 1)
+    haiku_parliament_check(pending)
+    record_replace(state, pending)
+    record_set(proposal, "committed", 1)
+    return proposal
+
+# Metric reward is bound to a retained later human receipt. It compares
+# quality, ring coherence, and balanced novelty with the saved prior climate.
+# Approval is absent from this reward equation. A human encounter can assess
+# several earlier proposals, each once. Its features and turn are checked
+# against that encounter; a dream or an invented receipt cannot act as witness.
+def haiku_parliament_reward(state, event, source, evidence, turn, later):
+    haiku_parliament_check(state)
+    haiku_parliament_features_ok(later, 96)
+    assert(isfinite(event) and event >= 1 and event < 1000000 and event == floor(event), "Parliament reward event is invalid")
+    assert(source >= 0 and source <= 7 and source == floor(source), "Parliament reward source is invalid")
+    rows = record_get(state, "receipt_rows")
+    slot = -1
+    i = 0
+    while i < 32:
+        if rows[i * 9] == event and rows[i * 9 + 2] == source:
+            slot = i
+        i = i + 1
+    assert(slot >= 0, "Parliament reward receipt is absent or expired")
+    assert(rows[slot * 9 + 5] == 0, "Parliament receipt was already rewarded")
+    assert(isfinite(evidence) and evidence >= 1 and evidence < 1000000 and evidence == floor(evidence), "Parliament reward evidence is invalid")
+    assert(isfinite(turn) and turn > rows[slot * 9 + 1] and turn >= record_get(state, "clock") and turn < 1000000 and turn == floor(turn), "Parliament reward needs a later turn")
+    witness = -1
+    i = 0
+    while i < 32:
+        if rows[i * 9] == evidence and rows[i * 9 + 2] == 0:
+            witness = i
+        i = i + 1
+    assert(witness >= 0 and rows[witness * 9 + 1] == turn, "Parliament reward needs a retained observed witness")
+    saved = record_get(state, "receipt_x")
+    i = 0
+    while i < 96:
+        assert(later[i] == saved[witness * 96 + i], "Parliament reward climate differs from its witness")
+        i = i + 1
+    pending = record_clone(state)
+    rows = record_get(pending, "receipt_rows")
+    x = haiku_parliament_part(record_get(pending, "receipt_x"), slot * 96, 96)
+    dy = haiku_parliament_part(record_get(pending, "receipt_dy"), slot * 96, 96)
+    reward = later[95] - x[95]
+    before_mask = rows[slot * 9 + 6]
+    after_mask = rows[witness * 9 + 6]
+    before_rings = before_mask - floor(before_mask / 2) * 2
+    after_rings = after_mask - floor(after_mask / 2) * 2
+    if before_rings == 1 and after_rings == 1:
+        reward = reward + (later[92] + later[93] + later[94] - x[92] - x[93] - x[94]) / 6
+    reward = clamp(reward + 0.25 * (abs(2 * x[89] - 1) - abs(2 * later[89] - 1)), -1, 1)
+    gates = record_get(pending, "receipt_gates")
+    votes = record_get(pending, "receipt_votes")
+    receipt_ids = record_get(pending, "receipt_ids")
+    ids = record_get(pending, "ids")
+    alive = record_get(pending, "alive")
+    credit = record_get(pending, "credit")
+    cursor = record_get(pending, "cursor")
+    a = record_get(pending, "a")
+    b = record_get(pending, "b")
+    alpha = rows[slot * 9 + 4]
+    e = 0
+    while e < 16:
+        if alive[e] == 1 and ids[e] == receipt_ids[slot * 16 + e] and alpha > 0:
+            credit[e] = clamp(credit[e] + 0.05 * reward * votes[slot * 16 + e], -10, 10)
+            signal = reward * gates[slot * 16 + e] * alpha
+            if abs(signal) >= 0.00000001:
+                noise = rng_normal(record_get(pending, "rng"), 1)
+                update = nt_oja(haiku_parliament_part(a, e * 384, 384), haiku_parliament_part(b, e * 384, 384), x, dy, noise, cursor[e], 0.001, signal)
+                i = 0
+                while i < 384:
+                    a[e * 384 + i] = clamp(update[i], -2, 2)
+                    b[e * 384 + i] = clamp(update[384 + i], -2, 2)
+                    i = i + 1
+                cursor[e] = update[768]
+        e = e + 1
+    rows[slot * 9 + 5] = 1
+    rows[slot * 9 + 8] = evidence
+    record_set(pending, "clock", turn)
+    record_set(pending, "revision", record_get(pending, "revision") + 1)
+    haiku_parliament_check(pending)
+    record_replace(state, pending)
+    return reward
+
+def haiku_parliament_save(state, path):
+    haiku_parliament_check(state)
+    return checkpoint_save(state, path)
+
+def haiku_parliament_load(path):
+    state = checkpoint_load(path)
+    haiku_parliament_check(state)
+    return state

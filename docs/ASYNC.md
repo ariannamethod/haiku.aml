@@ -3,10 +3,10 @@
 2026-10-13. Governed by the
 [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 
-The current organism publishes one completed exchange: a detached candidate
-passes validation, its checkpoint is saved, and the live record is swapped.
-The next asynchronous stage will carry that ownership across workers. First,
-Phase4 and dreams follow the Python chat's complete event order.
+The current organism carries the complete learning and inner-life tail through
+an owned AML worker. One completed exchange crosses the publication boundary:
+**join → validate → save → swap → display**. The next input waits for that
+boundary. The worker preserves Python's event order, including Phase4 and dreams.
 
 ## The Python path
 
@@ -53,139 +53,121 @@ This command uses the Python reference environment described in
 [MIGRATION](MIGRATION.md). The organism's runtime dependencies remain AML and
 NoTorch.
 
-## What AML already owns
+## The owned worker boundary
 
-AML source inspected at `0d8a28304cb528d8a714899dea66efc3ebef03b5`:
+This profile requires [AML 5.11 / PR #36](https://github.com/ariannamethod/ariannamethod.ai/pull/36).
+Its [worker contract](https://github.com/ariannamethod/ariannamethod.ai/blob/8a5d449195ed8d45eecf08279001802aee12673a/docs/WORKERS.md)
+supplies the generic language work:
 
-- `SPAWN` takes a launch-time copy of mutable record, array, list and map
-  globals. Immutable strings and tokenizers retain atomic references.
-- Workers have their own persistent-global stores and release them on exit.
-- Named and bare `AWAIT` propagate worker execution errors to the awaiting
-  program, including source diagnostics.
-- Haiku's numerical operations use caller-owned arrays and random streams.
-  Its learners share no numerical tape.
-- Native typed checkpoints and `record_swap` already support a single
-  publisher of a complete life. See [STATE](STATE.md).
+- `SPAWN` snapshots prepared functions and their source origins, mutable
+  globals, and the visible caller-local frame. Helpers retain their ordinary
+  scope; a captured local does not become a helper's global.
+- Records, arrays, lists, maps and owned RNG values become worker-owned copies.
+  Immutable text and native tokenizer models retain references.
+- `AWAIT name INTO value` transfers a typed result beyond worker teardown.
+  Joined slots can be reused, and program teardown drains owned children.
+- Worker failures reach the awaiting program with source diagnostics. Channel
+  creation, lookup, close and blocked operations have synchronized ownership
+  and explicit failures.
 
-These contracts are in `core/ariannamethod.c`: the worker entry/launch code,
-`symtab_copy_value`, `symtab_snapshot`, and the spawn join functions.
+Haiku's learners use caller-owned numerical arrays and random streams without
+a numerical tape. This worker path uses those owned operations. The language's
+legacy global field and autograd interfaces have their own separate contracts.
 
-## Measured worker boundaries
+[`src/session.aml`](../src/session.aml) now splits the accepted exchange into
+three boundaries:
 
-The following small programs were run with the AML runner on 2026-10-13.
-Source inspection identifies the corresponding execution paths.
+| Function | Work and owner |
+|---|---|
+| `haiku_session_prepare` | Mutates a detached candidate through cloud observation, candidate generation and RAE selection. Freezes input, response, contexts, features, climate, quality and base revision in an experience record. |
+| `haiku_session_tail` | Applies Phase4, learner updates, reflection, rings, dreams and journaling in the existing order, then validates the candidate. Both serial and worker schedules call this same function. |
+| `haiku_session_result_check` | Checks base/completed revisions, profile, learner mode, tokenizer identity and, for inner-life profiles, the retained input/response before publication. |
 
-| Probe | Observed result | Runtime path |
+`haiku_session_worker_turn` launches one `haiku_tail` worker with the detached
+candidate and experience, then joins its typed record. A launch-time snapshot
+keeps later parent mutations out of that work. Worker code never opens the live
+checkpoint. The serial `haiku_session_turn` remains available as a comparison
+schedule.
+
+The [`haiku.aml`](../haiku.aml) entrypoint passes its own detached `next_state`
+to that call, saves the complete result, swaps it into the live owner without
+allocation, then prints the response. Failed saving leaves the old live record
+and checkpoint together and withholds the response. Native checkpoint status 2
+means replacement succeeded but storage could not confirm durability; the CLI
+publishes that written state and reports the status. See [STATE](STATE.md).
+
+`owned_tail = 1` is the default. Set it to `0` for serial scheduling. This
+setting changes scheduling without changing stable v1/v2/v3 checkpoint schemas
+or their draw order. Each accepted turn is joined before display or the next
+input. Blank input, quit and EOF therefore have no outstanding turn to drain in
+this profile.
+
+## Historical findings, now fixed in the worker path
+
+The original audit ran on 2026-10-13 against AML
+`0d8a28304cb528d8a714899dea66efc3ebef03b5`. These measured defects motivated the
+language update; they are retained here as observations of that pinned source.
+
+| Probe | Pinned source result | AML 5.11 contract |
 |---|---|---|
-| Seventeen sequential spawn/join pairs | Launch 17 fails with `cannot launch worker` | Joined slots are retained; `g_spawn_count` reaches `AM_MAX_SPAWNS = 16`. |
-| A worker calls a function defined by its parent | The expression returns `0` | The worker receives globals and its block text; the parent's function table is absent. |
-| A worker inside a function reads that function's argument | The expression returns `0` | Launch copies `ctx->globals`, not the caller's local bindings. |
-| Parent finishes while its worker waits on an empty channel | Runner exits before the worker finishes | Runner/program teardown does not await outstanding workers. |
-| Write to a nonexistent channel | AML proceeds without an error | The command discards `am_channel_write`'s failure result. |
-| Read from a nonexistent channel | Destination keeps its previous value | The command does not propagate `am_channel_read`'s failure. |
+| Seventeen sequential spawn/join pairs | Launch 17 failed because joined slots remained occupied | Joined slots are reusable; repeated jobs are covered beyond sixteen launches |
+| Worker calls a parent-defined function | Returned `0`; the worker lacked the function table | Prepared functions and source origins are inherited |
+| Worker reads its launching function's argument | Returned `0`; only globals were copied | The visible local frame is copied with distinct local scope |
+| Parent finishes with a worker blocked on a channel | Runner exited before the worker finished | Teardown joins owned children and propagates failure |
+| Write to a nonexistent channel | Failure was discarded | The AML command reports the channel error |
+| Read from a nonexistent channel | Previous destination survived without an error | The AML command reports the error and preserves the destination |
 
-For example, the slot limit is reached even though every worker was joined:
+Channel queues still carry floats. Complete records travel through typed
+`AWAIT`, so the organism does not encode a state into a queue of scalar values.
+The original source's retained spawn slots, absent function/local snapshots
+and unreported channel errors are no longer the boundaries of this profile.
 
-```aml
-i = 0
-while i < 17:
-    SPAWN worker:
-        result = 1
-    AWAIT worker
-    i = i + 1
-PRINT i
+AML's resumable C API still yields between top-level statements. A `while` or
+function call completes inside one step. The existing REPL therefore needs an
+explicit input/worker schedule for the next stage.
+
+## Executed organism gates
+
+```sh
+make test-owned-tail
 ```
 
-This program prints `0`, showing the function-table boundary:
+[`tests/run_owned_tail.sh`](../tests/run_owned_tail.sh) compares **24 native
+turns** across serial, worker and compiled execution. Responses and complete
+checkpoint bytes agree, including the first dream and restart from turn 13.
+Separate variants cover old v1/v2 profiles, native SentencePiece, coupled RAE
+learning, and blank/quit/EOF.
 
-```aml
-def twice(x):
-    return x * 2
-SPAWN calculation:
-    PRINT twice(3)
-AWAIT calculation
-```
+[`owned_tail_schedule.aml`](../tests/fixtures/owned_tail_schedule.aml) blocks
+the real tail, mutates parent launch values, releases the worker, and delays
+joining an already completed result. The published owner stays unchanged;
+the final record matches the serial dream, learner and checkpoint exactly.
 
-The other probes can be reproduced independently:
+[`owned_tail_state.c`](../tests/owned_tail_state.c) inspects all 55 live leaves.
+A changed receipt, stale base, duplicate completion, exhausted draw tape during
+the inner tail and failed save preserve their required owners and previous
+checkpoint. A successful worker after the failed job verifies slot recovery.
+The returned record remains independent after its thread exits.
 
-```aml
-# A function-local argument does not enter the worker's global snapshot.
-def start(value):
-    SPAWN local:
-        PRINT value
-    AWAIT local
-start(7)
-```
+The language's own worker gates cover repeated jobs, typed result kinds,
+nested ownership, scope, imported source origins, shutdown, channels and
+allocation/thread-launch failures. These complement the actual Haiku schedule.
 
-```aml
-# The runner prints PARENT_EXIT and exits while this worker is waiting.
-CHANNEL CREATE ready 1
-SPAWN worker:
-    CHANNEL READ ready signal
-    ECHO WORKER_FINISHED
-ECHO PARENT_EXIT
-```
+## The next publication rhythm
 
-```aml
-# A missing channel currently leaves both command failures unreported.
-CHANNEL WRITE absent 7
-value = 99
-CHANNEL READ absent value
-PRINT value
-```
+Early response display, reading the next input while the tail runs, and durable
+pending intent remain [TODO](../TODO.md). Before displaying a response early,
+persist the previous complete state plus accepted input, selected response and
+base revision. Restart must replay that detached experience, check the same
+response, complete its tail and publish once. Learning and dream feedback stay
+outside the live owner until that boundary.
 
-Channel payloads are floats, so the current queues cannot return an experience
-or a learned state. Worker globals are released on exit. Reusable worker slots,
-typed result transport, explicit channel errors and orderly shutdown are the
-next language work for this path. Channel creation/individual closure also need
-the same registry synchronization as reads and writes. A worker can currently
-`INCLUDE` an entry file that imports its own modules; inherited parent functions
-are not part of its execution context.
+That profile needs explicit next-input, quit and EOF drain behavior. Its gates
+must vary worker completion around input arrival, restart from a pending intent,
+and fail launch, execution or saving while preserving the last complete state
+and the pending experience. Optional future model sources also need retained
+provider results so an accepted event can finish after an asset disappears.
 
-AML's resumable C API yields between top-level statements. A `while` or function
-call completes inside one step (`am_program_step` and its source comment).
-Haiku's existing REPL loop therefore cannot become an event loop just by placing
-that program behind `am_program_step`.
-
-## The next publication boundary
-
-The first worker profile should have one job in flight and one live-state
-publisher. A job freezes the accepted turn, source, selected response, contexts,
-scoring features, climate, quality and base revision with its detached state.
-Its worker executes the same ordered tail as the serial profile. The parent
-validates a completed result against its base revision, saves it and swaps it
-into the live owner. Workers never write the live checkpoint.
-
-The next foreground exchange, quit and EOF drain the preceding job. Completing
-a worker sooner changes waiting time; it does not choose the next experience
-or random draw. Reading the next input can overlap with the worker's work.
-
-If a response is displayed before learning and the inner tail finish, a durable
-pending-experience intent must precede display. One compact restart boundary
-keeps the previous complete state plus the accepted input, selected response and
-revision. Restart replays that input from the saved state, checks the same
-response, completes the tail and commits it once. Replay remains detached;
-partial learning and dream feedback never enter the published owner.
-
-This profile needs its own explicit upgrade. Existing checkpoint profiles keep
-their current continuation. The [TODO](../TODO.md) tracks the shared experience
-record and later worker integration.
-
-## Gates for that stage
-
-- Fixed inputs and draws produce identical responses and final checkpoint bytes
-  through the serial and worker schedules.
-- Controlled completion before, during and after the next input preserves the
-  same publication order; quit and EOF drain work and surface errors.
-- Restart from a pending intent reproduces the selected response, parameters,
-  random position and dream feedback exactly once.
-- Duplicate and wrong-revision results leave live state and its checkpoint
-  unchanged.
-- Launch, copying, worker execution, validation and saving failures retain the
-  last complete owner and any durable pending intent.
-- More than sixteen completed jobs, close while blocked, typed-result ownership
-  after worker teardown, and shutdown with a failed worker have direct tests.
-- Interpreted, compiled and host execution retain the same contracts.
-
-These are the next worker gates. The current sequential milestone is checked
-at its complete-turn boundary.
+The current profile has a complete-turn checkpoint and no pending-intent file.
+It establishes the owned worker and deterministic publication needed for this
+next rhythm.

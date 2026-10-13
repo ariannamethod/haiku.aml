@@ -226,14 +226,31 @@ Sessions now save after learning, reflection, rings, dreams and journaling, and 
 logical-turn clock.
 [Continuity](docs/STATE.md) records the complete schema, restore validation,
 and restart checks. [Phase4](docs/PHASE4.md), [dreams](docs/DREAM.md) and the
-[journal](docs/JOURNAL.md) complete the serial Python chat path. The next step
-is to carry this ordered work into background workers; the [async audit](docs/ASYNC.md)
-records the measured AML changes and publication rules it needs.
+[journal](docs/JOURNAL.md) complete the Python chat path. Its ordered tail now
+runs in an owned AML worker by default: **join → validate → save → swap → display**.
+The response appears after its memory is published. Set `owned_tail = 0` for
+the serial schedule; both preserve the same words, draws and checkpoint bytes.
+Early display and overlapping the next input remain later work in
+[asynchronous life](docs/ASYNC.md).
 
-Build the sibling **AML v5.10.0** toolchain
-([language update](https://github.com/ariannamethod/ariannamethod.ai/pull/35))
-and NoTorch with native Unigram,
-model identities, numerical values, and owned sampling, then run the organism's checks:
+Below that life, an experimental [glyph parliament](docs/PARLIAMENT.md) now has
+four experts, room for sixteen, private immune memory, and a field that changes
+under their proposals. A later recorded human encounter can reward a proposal;
+birth, retirement and learning leave their own history. It runs in isolated
+AML fixtures and is not imported by the stable chat yet. The little cloud has
+more rooms under construction.
+
+Penelope and NanoJanus now have their two bodies in [weights](weights/README.md):
+**two 21,308,576-byte GGUF files**, with Q8_0 matrices and F32 auxiliary tensors.
+NoTorch expands their packed matrices once to frozen F32 for inference.
+Parliamentary learning changes its own small adapters; the two sources stay
+frozen. Lexical admission, two directions within each presence, parameter
+mixing and the full glyph feedback loop follow this foundation.
+
+Build the sibling **AML v5.11.0** toolchain
+([PR #36: owned workers and parliament values](https://github.com/ariannamethod/ariannamethod.ai/pull/36))
+and [NoTorch PR #168: PEN7 and parliament](https://github.com/ariannamethod/notorch/pull/168),
+then run the organism's checks:
 
 ```sh
 make -C ../notorch lib BLAS_FLAGS= BLAS_LIBS= X86_SIMD=0 ARM_SIMD=0
@@ -321,7 +338,17 @@ Reference checks completed on 2026-10-07–08; dream-life follow-up on 2026-10-1
   upgrades, blank/quit/EOF and the recorded dream dialogue pass in interpreter
   and compiled execution. Fifteen frozen v1/v2 configurations also retain
   their exact pre-upgrade responses and checkpoint bytes.
-- AML runtime: **550 tests passed**.
+- The owned-tail gate compares 24 serial, worker and compiled turns, complete
+  checkpoint bytes and restart before the first dream. Controlled completion,
+  parent mutation after launch, stale/duplicate results, failed learning-tail
+  execution and failed saving preserve the published owner. Old profiles,
+  SentencePiece and coupled learner mode retain their continuation.
+- The standalone parliament gate compares interpreted and compiled life/memory
+  fixtures, then inspects all owned state through replay, rejected calls,
+  thirteen malformed records and exact checkpoint continuation through delayed
+  reward. Its pressure, lifecycle and immune memory run without model assets.
+- Earlier AML runtime baseline: **550 tests passed**; the 5.11 worker and
+  parliament additions have their own upstream gates in PR #36.
 - AML compiler: scope, source origins, nested failures, worker branches and
   errors, scalar builds, and literal program arguments are covered by regressions.
 - NoTorch: native tanh/backward and SGD are merged in
@@ -343,8 +370,11 @@ experiments for Haiku's future memory.
 Oleg's [iceberg](docs/ICEBERG.md) brings Penelope's words, Janus's two directions,
 and the glyph lives of Actually.life, Leo and caveLLMan underneath that small
 surface. Both Haiku and the friend will carry their own duality. The source
-audit and NoTorch proof are ready; these deeper organs are the next family
-experiments after the worker baseline.
+audits now include [DoE](docs/research/iceberg/DOE.md) and
+[LoRAGrad](docs/research/iceberg/LORAGRAD.md). Their living experts and immune
+field meet in the experimental parliament. The owned worker baseline and
+native frozen sources are ready; connecting these deeper organs to the cloud
+is the next family experiment.
 See [the audit and implementation order](docs/MIGRATION.md).
 
 ## Lineage
@@ -361,7 +391,9 @@ See [the audit and implementation order](docs/MIGRATION.md).
 [Janus](https://github.com/ariannamethod/janus) ·
 [Actually.life](https://github.com/ariannamethod/actually.life) ·
 [Leo](https://github.com/ariannamethod/leo) ·
-[caveLLMan](https://github.com/ariannamethod/caveLLMan)
+[caveLLMan](https://github.com/ariannamethod/caveLLMan) ·
+[DoE](https://github.com/ariannamethod/doe) ·
+[LoRAGrad](https://github.com/ariannamethod/loragrad)
 
 GNU GPL v3 — see [LICENSE](LICENSE).
 

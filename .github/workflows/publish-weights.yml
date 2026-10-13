@@ -1,0 +1,32 @@
+name: Publish the two verified Haiku bodies
+
+on:
+  push:
+    branches:
+      - codex/haiku-gguf-parliament
+    paths:
+      - .github/workflows/publish-weights.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: haiku-verified-weight-publication
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'ariannamethod/haiku.aml' && github.ref == 'refs/heads/codex/haiku-gguf-parliament'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out the authorized topic branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6, verified from the official repository
+        with:
+          ref: codex/haiku-gguf-parliament
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Reproduce, verify and publish each body separately
+        env:
+          NOTORCH_REVISION: 4d0b807d6d545d8e25b25bebf425377d62833ede
+        run: bash scripts/publish-weights.sh
