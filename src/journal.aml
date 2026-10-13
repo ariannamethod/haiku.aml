@@ -1,0 +1,222 @@
+# Complete exchange shards, metrics and frozen learning experience.
+# Python harmonix.py/chat.py at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+IMPORT "phase4.aml"
+IMPORT "rae.aml"
+
+# Inverse of AML list_key for bounded trigram contexts. Prefixes count UTF-8
+# bytes; text_slice counts codepoints. Binary search retains each exact token.
+def haiku_journal_unpack(encoded):
+    result = list_new()
+    size = text_len(encoded)
+    cursor = 0
+    count = -1
+    item = 0
+    while count < 0 or item < count:
+        amount = 0
+        digits = 0
+        start = cursor
+        reading = 1
+        while reading:
+            assert(cursor < size, "Haiku journal context has a truncated prefix")
+            code = text_codepoint(encoded, cursor)
+            cursor = cursor + 1
+            if code == 58:
+                reading = 0
+            else:
+                assert(code >= 48 and code <= 57 and digits < 7, "Haiku journal context prefix is invalid")
+                amount = amount * 10 + code - 48
+                digits = digits + 1
+                assert(amount <= 1048576, "Haiku journal context prefix exceeds its bound")
+        assert(digits > 0, "Haiku journal context prefix is empty")
+        if digits > 1:
+            assert(text_codepoint(encoded, start) != 48, "Haiku journal context prefix has a leading zero")
+        if count < 0:
+            count = amount
+            assert(count <= 9999 and count / 3 == floor(count / 3), "Haiku journal context needs complete bounded triples")
+        else:
+            low = 0
+            high = min(amount, size - cursor)
+            while low < high:
+                middle = floor((low + high) / 2)
+                if text_bytes(text_slice(encoded, cursor, cursor + middle)) < amount:
+                    low = middle + 1
+                else:
+                    high = middle
+            token = text_slice(encoded, cursor, cursor + low)
+            assert(text_bytes(token) == amount, "Haiku journal context has a truncated UTF-8 token")
+            list_push(result, token)
+            cursor = cursor + low
+            item = item + 1
+    assert(cursor == size, "Haiku journal context has trailing data")
+    assert(text_equal(list_key(result), encoded), "Haiku journal context is not canonical")
+    return result
+
+# Capture before learning and before dreams change the chain. The cloud-size
+# slot is completed by append after dream feedback; this packet is transient.
+def haiku_journal_capture(state, source, spoken, user, system, temperatures, turn):
+    assert(text_len(source) <= 10000 and text_len(spoken) <= 10000, "Haiku journal text limit is 10000 codepoints")
+    assert(isfinite(turn) and turn >= 1 and turn <= 16777216 and turn == floor(turn), "Haiku journal turn is invalid")
+    assert(list_len(user) <= 9999 and list_len(system) <= 30, "Haiku journal context exceeds its bound")
+    haiku_trigram_count(user)
+    haiku_trigram_count(system)
+    assert(len(temperatures) == 2, "Haiku journal needs two temperatures")
+    assert(isfinite(temperatures[0]) and temperatures[0] >= 0.3 and temperatures[0] <= 1.5, "Haiku journal voice temperature is invalid")
+    assert(temperatures[1] == 0.3, "Haiku journal observer temperature is invalid")
+    learned = haiku_mathbrain_features(spoken, record_get(state, "rows"), record_get(state, "counts"), user)
+    selected = haiku_rae_features(spoken, user)
+    values = zeros(13)
+    values[0] = temperatures[0]
+    values[1] = temperatures[1]
+    cursor = 0
+    while cursor < 5:
+        values[3 + cursor] = learned[cursor]
+        values[8 + cursor] = selected[cursor]
+        cursor = cursor + 1
+    captured = record_new()
+    record_set(captured, "turn", turn)
+    record_set(captured, "input", source)
+    record_set(captured, "output", spoken)
+    record_set(captured, "source", "foreground")
+    record_set(captured, "user_key", list_key(user))
+    record_set(captured, "system_key", list_key(system))
+    record_set(captured, "values", values)
+    return captured
+
+# The caller owns a detached turn. Phase4 and MetaHaiku must already contain
+# this turn. Metrics count the observer's words after the complete dream path;
+# dream fragments and generator-only words retain their separate owners.
+def haiku_journal_append(state, captured):
+    texts = record_get(state, "journal_text")
+    count = list_len(texts) / 3
+    assert(count == floor(count) and count < 10000, "Haiku exchange journal is full or incomplete")
+    assert(list_len(record_get(state, "phase4_log")) == (count + 1) * 3, "Haiku journal and Phase4 event order differ")
+    turn = record_get(captured, "turn")
+    assert(turn == record_get(state, "turn"), "Haiku journal capture belongs to another turn")
+    assert(turn == record_get(state, "phase4_started_turn") + count + 1, "Haiku journal turn order differs")
+    source = record_get(captured, "source")
+    assert(text_equal(source, "foreground"), "Haiku journal source is unsupported")
+    entry = haiku_phase4_entry(state, count)
+    assert(record_get(entry, "clock") == turn, "Haiku journal clock differs from Phase4")
+    meta = record_get(state, "meta_history")
+    meta_index = (turn - record_get(state, "inner_started_turn") - 1) * 3
+    assert(meta_index >= 0 and meta_index + 2 < list_len(meta), "Haiku journal has no matching reflection")
+    assert(text_equal(record_get(captured, "input"), list_get(meta, meta_index)), "Haiku journal input differs from its reflection")
+    assert(text_equal(record_get(captured, "output"), list_get(meta, meta_index + 1)), "Haiku journal output differs from its reflection")
+    user_key = record_get(captured, "user_key")
+    system_key = record_get(captured, "system_key")
+    user = haiku_journal_unpack(user_key)
+    system = haiku_journal_unpack(system_key)
+    assert(list_len(system) <= 30, "Haiku journal system context exceeds ten triples")
+    sample = record_get(captured, "values")
+    assert(rows(sample) == 0 and cols(sample) == 0 and len(sample) == 13, "Haiku journal capture requires thirteen values")
+    after = record_get(entry, "metrics_after")
+    temperatures = haiku_temperatures(map_get(after, "dissonance"))
+    assert(sample[0] == temperatures[0] and sample[1] == temperatures[1] and sample[2] == 0, "Haiku journal capture temperatures differ")
+    cursor = 3
+    while cursor < 13:
+        assert(isfinite(sample[cursor]) and sample[cursor] >= 0 and sample[cursor] <= 1, "Haiku journal feature is outside [0, 1]")
+        cursor = cursor + 1
+    assert(sample[8] == 0.5, "Haiku journal RAE perplexity feature differs")
+    values = haiku_phase4_extend(record_get(state, "journal_values"), count * 13, 13)
+    cursor = 0
+    while cursor < 13:
+        values[count * 13 + cursor] = sample[cursor]
+        cursor = cursor + 1
+    values[count * 13 + 2] = map_len(record_get(state, "weights"))
+    next_texts = list_clone(texts)
+    list_push(next_texts, source)
+    list_push(next_texts, user_key)
+    list_push(next_texts, system_key)
+    record_set(state, "journal_text", next_texts)
+    record_set(state, "journal_values", values)
+    return count + 1
+
+# One independent, versioned experience assembled from its canonical owners.
+# Serial publication uses completed turns as revisions and publication order.
+def haiku_journal_get(state, index):
+    texts = record_get(state, "journal_text")
+    count = list_len(texts) / 3
+    assert(isfinite(index) and index >= 0 and index < count and index == floor(index), "Haiku journal index is invalid")
+    entry = haiku_phase4_entry(state, index)
+    turn = record_get(entry, "clock")
+    after = record_get(entry, "metrics_after")
+    meta = record_get(state, "meta_history")
+    meta_index = (turn - record_get(state, "inner_started_turn") - 1) * 3
+    assert(meta_index >= 0 and meta_index + 2 < list_len(meta), "Haiku journal has no matching reflection")
+    values = record_get(state, "journal_values")
+    slot = index * 13
+    learned = zeros(5)
+    selected = zeros(5)
+    cursor = 0
+    while cursor < 5:
+        learned[cursor] = values[slot + 3 + cursor]
+        selected[cursor] = values[slot + 8 + cursor]
+        cursor = cursor + 1
+    metrics = map_new()
+    map_set(metrics, "perplexity", 0.5)
+    map_set(metrics, "entropy", map_get(after, "entropy"))
+    map_set(metrics, "resonance", 1 - map_get(after, "dissonance"))
+    map_set(metrics, "cloud_size", values[slot + 2])
+    result = record_new()
+    record_set(result, "format", "haiku-experience")
+    record_set(result, "version", 1)
+    record_set(result, "source", list_get(texts, index * 3))
+    record_set(result, "turn", turn)
+    record_set(result, "clock", turn)
+    record_set(result, "clock_kind", "turn")
+    record_set(result, "base_revision", turn - 1)
+    record_set(result, "state_revision", turn)
+    record_set(result, "publication_order", turn)
+    record_set(result, "input", list_get(meta, meta_index))
+    record_set(result, "output", list_get(meta, meta_index + 1))
+    record_set(result, "user_trigrams", haiku_journal_unpack(list_get(texts, index * 3 + 1)))
+    record_set(result, "system_trigrams", haiku_journal_unpack(list_get(texts, index * 3 + 2)))
+    record_set(result, "dissonance", map_get(after, "dissonance"))
+    record_set(result, "haiku_temp", values[slot])
+    record_set(result, "harmonix_temp", values[slot + 1])
+    record_set(result, "quality", map_get(after, "quality"))
+    record_set(result, "mathbrain_features", learned)
+    record_set(result, "rae_features", selected)
+    record_set(result, "metrics", metrics)
+    return result
+
+# Shapes, exact context framing, frozen numerical domains and history alignment.
+# An upgrade starts an empty journal; earlier turns remain in their own history.
+def haiku_journal_check(state):
+    assert(text_equal(record_kind(state, "journal_text"), "list"), "Haiku journal text must be a list")
+    assert(text_equal(record_kind(state, "journal_values"), "array"), "Haiku journal values must be an array")
+    texts = record_get(state, "journal_text")
+    values = record_get(state, "journal_values")
+    count = list_len(texts) / 3
+    assert(count == floor(count) and count <= 10000, "Haiku journal requires bounded complete rows")
+    assert(rows(values) == 0 and cols(values) == 0 and len(values) == max(1, count * 13), "Haiku journal values/history lengths differ")
+    assert(list_len(record_get(state, "phase4_log")) == count * 3, "Haiku journal and Phase4 histories differ")
+    start = record_get(state, "phase4_started_turn")
+    assert(count == record_get(state, "turn") - start, "Haiku journal count differs from its turn boundary")
+    if count == 0:
+        assert(values[0] == 0, "Haiku empty journal retains values")
+    previous_cloud = 0
+    cursor = 0
+    while cursor < count:
+        slot = cursor * 13
+        assert(text_equal(list_get(texts, cursor * 3), "foreground"), "Haiku journal source is unsupported")
+        item = haiku_journal_get(state, cursor)
+        turn = record_get(item, "turn")
+        assert(turn == start + cursor + 1, "Haiku journal turn order differs")
+        assert(list_len(record_get(item, "system_trigrams")) <= 30, "Haiku journal system context exceeds ten triples")
+        temperatures = haiku_temperatures(record_get(item, "dissonance"))
+        assert(values[slot] == temperatures[0] and values[slot + 1] == temperatures[1], "Haiku journal temperatures differ from their climate")
+        cloud = values[slot + 2]
+        assert(isfinite(cloud) and cloud >= previous_cloud and cloud <= 10000 and cloud == floor(cloud), "Haiku journal cloud count is invalid")
+        previous_cloud = cloud
+        offset = 3
+        while offset < 13:
+            value = values[slot + offset]
+            assert(isfinite(value) and value >= 0 and value <= 1, "Haiku journal feature is outside [0, 1]")
+            offset = offset + 1
+        assert(values[slot + 8] == 0.5, "Haiku journal RAE perplexity feature differs")
+        assert(text_len(record_get(item, "input")) <= 10000 and text_len(record_get(item, "output")) <= 10000, "Haiku journal text exceeds its bound")
+        cursor = cursor + 1
+    if count > 0:
+        assert(previous_cloud == map_len(record_get(state, "weights")), "Haiku latest journal cloud count differs")
+    return count

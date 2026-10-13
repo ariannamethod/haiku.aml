@@ -2,10 +2,12 @@
 
 2026-10-07. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 Tokenization, foreground, continuity, and inner-life follow-up: 2026-10-08.
+Phase4, dreams, exchange journal and worker audit: 2026-10-13.
 This document records the inspected sources, current behavior, and implementation
 order. Numerical, text, lexical, cloud, memory, English form, candidate
 generation, MathBrain, RAE, tokenization, foreground exchange, and complete
-foreground checkpoints, MetaHaiku reflection, and the three rings are implemented;
+foreground checkpoints, MetaHaiku reflection, the three rings, Phase4 memory,
+dream dialogues and the exchange journal are implemented;
 the status below
 marks the boundary between those functions and the remaining organism.
 
@@ -89,8 +91,8 @@ commit `df08aa2bc8b5c3e3bc3ecf777567d893a6913f01`.
 
 `src/harmonix.aml` implements pulse, count-based dissonance, and the two
 temperatures. `src/bridges.aml` implements the aggregate transition score.
-The complete cloud now persists in the versioned checkpoint; full cosine/state
-aggregation remains separate work. [NUMERICAL_PARITY.md](NUMERICAL_PARITY.md) records **49 cases /
+The complete cloud now persists in the versioned checkpoint; [Phase4](PHASE4.md)
+adds shared-key cosine and named-state aggregation. [NUMERICAL_PARITY.md](NUMERICAL_PARITY.md) records **49 cases /
 130 scalar values** obtained by direct calls to the pinned Python implementation.
 Both interpreted and compiled AML pass with tolerance 0.000002.
 
@@ -153,16 +155,16 @@ Each default learner owns 57 parameters. [MathBrain](MATHBRAIN.md) and
 | `rae.py`, `rae_recursive.py` | Rule fallback and a second 57-parameter MLP; three refinement passes and online observation API | `rae.aml` |
 | `metahaiku.py` | Eight-snippet bootstrap buffer; internal candidate at T=0.7; reflection history | `metahaiku.aml` |
 | `overthinkg.py` | Echo/drift/meta rings with 5/7/3 candidate trigrams and coherence admission | `overthinkg.aml` |
-| `phase4_bridges.py` | Cosine matching, transition counts, quality change, boredom/overwhelm/stuck penalties | `bridges.aml` |
+| `phase4_bridges.py` | Cosine matching, transition counts, quality change, boredom/overwhelm/stuck penalties | `bridges.aml`, `phase4.aml` |
 | `dream_haiku.py` | Trigger/cooldown, four recorded exchanges, friend T=1.2 / self T=0.9, fragment decay and chain feedback | `dream.aml` |
 | `chat.py`, `async_harmonix.py` | Foreground exchange orchestration; separate asynchronous observer with locks and async storage | `haiku.aml`, `life.aml`, `state.aml` |
 
-The foreground entrypoint now preserves this prefix of the event order as an
+The foreground entrypoint now preserves the serial chat event order as an
 explicit fixture: tokenize → cloud/trigram
 update → generator chain update → recent-trigram read → dissonance → five
-candidates → RAE choice → response → quality/bridge handoff → MathBrain
-observation → reflection → rings. Phase4 state-ID aggregation and dream →
-shard/metrics remain later steps. In particular,
+candidates → RAE choice → quality/Phase4 → MathBrain observation → reflection →
+rings → dream dialogue/feedback → journal/metrics → complete-state publication.
+The selected response is displayed after successful publication. In particular,
 `update_chain()` updates recent trigrams before dissonance reads them.
 
 `src/state.aml` gathers each cloud column, observer/generator memory, recent
@@ -195,8 +197,13 @@ Source inspection identifies these concrete integration tasks:
   deeper learned feedback is a separately measured extension.
 - Dream code computes friend/response seeds without using them in generation.
   The newer C sibling provides a useful distinct-friend design.
-- Dream `last_run_turn` is incremented by one after a dialog. Store the actual
-  foreground turn in AML and test the intended ten-turn cooldown.
+- Dream `last_run_turn` is incremented by one after a dialog in Python. AML
+  stores the actual foreground turn and checks the intended ten-turn cooldown.
+  The [dream receipt](DREAM.md) records this repair and the literal-LF
+  normalization needed before SentencePiece dream feedback.
+- Python's live `system_trigrams` alias acquires the first dream's triples
+  before shard creation. AML's journal retains the actual context used for
+  scoring; [JOURNAL](JOURNAL.md) records the measured alias and this snapshot repair.
 
 These changes should carry their own before/after observations so the port's
 lineage and its developments stay traceable.
@@ -207,12 +214,12 @@ lineage and its developments stay traceable.
 |---|---|
 | NumPy transition sampling | Implemented through canonical NoTorch: stable positive-temperature weights and owned PCG32 state, exposed by AML's optional sampling bridge |
 | NumPy clip/dot/norm | Scalar bounds in AML; vector operations through NoTorch |
-| NumPy object shards | Versioned exchange records in the native state format |
+| NumPy object shards | Implemented: versioned exchange records in the native state format, exact contexts and frozen scoring features, logical turn identity, metrics and publication revision |
 | SciPy `csgraph/eigsh` | Both observer files import them; neither calls them. No eigensolver is needed for the current path |
 | Micrograd classes | Implemented: explicit AML forward/reverse composition through stateless NoTorch linear, tanh, MSE-gradient and SGD kernels; parameter clamp in AML |
 | SentencePiece package | Implemented: immutable native Unigram model and exact embedded normalization in NoTorch; AML owns lowercase, piece cleanup, explicit mode selection, and rolling triples |
 | `syllables` | English estimator and rule data implemented in AML; each later language supplies its own rules |
-| SQLite / aiosqlite | Implemented: native versioned foreground snapshots covering words, counts, recent trigrams, metrics, learners, streams, and session state. Event journals, bridge aggregation, and dream/lifecycle state follow their organs |
+| SQLite / aiosqlite | Implemented: one native checkpoint includes cloud, generator/observer memory, learners, streams, reflections, rings, Phase4 history/aggregates, dream fragments/dialogues and exchange journal. Worker scheduling follows separately |
 | Python collections/async/I/O | AML text values, collections, module exports, event transport, files, and host-facing I/O |
 
 NoTorch exposes linear/bias operations, tensor arithmetic, backward, and
@@ -244,14 +251,15 @@ immutable native model values, an optional tokenizer backend, Unicode scalar
 classification, and line input with a distinct EOF result. AML v5.8.0 adds flat
 typed records, versioned native checkpoints, atomic file replacement, and exact
 model-content identity. Haiku supplies its schema and whole-record validation
-in AML. Haiku still needs:
+in AML. AML v5.10.0 adds exact fixed-decimal text and room for 239 user functions;
+the full serial organism uses the native checkpoint for all its organs.
+Haiku still needs:
 
-1. Durable event history for the later organs. The foreground's native
-   save/restart format now preserves every current state owner together.
-2. Text/array event payloads and worker lifetime handling. Existing channels
-   carry floats; the default slot limits are 16 spawns and 16 channels.
-3. A small local HTTP/event interface over the organism's events.
-4. Lifecycle scheduling around the new independent learner arrays: publish
+1. Typed event payloads and worker lifetime handling. Existing channels
+   carry floats; joined spawn slots are not reused. [ASYNC](ASYNC.md) records
+   the source inspection and executable probes.
+2. A small local HTTP/event interface over the organism's events.
+3. Lifecycle scheduling around the independent learner arrays: publish
    completed snapshots at explicit foreground/background handoff points.
 
 Yent demonstrates the compiled/library connection through C-bodied BLOOD
@@ -445,10 +453,39 @@ that never entered the speaking vocabulary.
 
 Version 2 saves these organs with the foreground. An explicit, draw-free
 upgrade marks `inner_started_turn`; earlier v1 state and its random streams
-are copied intact. New lives use v2, existing v1 lives continue their saved
-profile until upgraded. The RAE review repair also requires its observation
+are copied intact. The v2 profile remains available; new lives now use v3.
+Existing lives continue their saved profile until upgraded. The RAE review repair also requires its observation
 count to equal `turn * train_rae`; both formerly accepted inconsistent histories
 now fail before replacing live state or an existing checkpoint.
+
+### Dreams remember their bridges
+
+Version 3, `english-dream-v3`, holds 55 typed leaves. Phase4 records the
+before/after metric maps, named-state activations, transition aggregates and
+their ordered history before learning. The previous state ID survives restart.
+Shared-key cosine uses canonical NoTorch dot products, with scaled vectors
+covering extreme finite float32 magnitudes. SQL shortlist order and stable
+suggestion ties are retained; suggestions remain diagnostic as in Python chat.
+
+After reflection and rings, dream eligibility uses the original climate and
+probability test. The four recorded voices retain the original unused final
+generation and its random draws. Feedback preserves duplicate fragments,
+weight decay and generator updates. New SentencePiece dream words carry their
+first dream turn independently of the observer cloud. The journal preserves
+the actual scoring contexts and features alongside quality, metrics and
+publication revision. [PHASE4](PHASE4.md), [DREAM](DREAM.md), and
+[JOURNAL](JOURNAL.md) contain source receipts and explicit repair boundaries.
+
+The v3 upgrade is detached and draw-free. Existing v1/v2 histories retain
+their exact continuation until explicitly upgraded. Native defaults reached
+their first dream at turn 14 in the recorded [example](../examples/dream.txt).
+
+This stage uses AML v5.10.0 [PR #35](https://github.com/ariannamethod/ariannamethod.ai/pull/35),
+published as `9d12969267a39bcdcf70335fde3aa69f5c8a96c6`, and rebuilt scalar
+NoTorch `bfde06669ad34896421b86147e919ca902a0d337`. The existing numerical
+and tokenizer APIs suffice; no NoTorch source change is needed this stage.
+The [async audit](ASYNC.md) records the next worker primitives and the
+single-publisher handoff needed to carry this serial life into the background.
 
 ### RAE development
 
@@ -469,9 +506,9 @@ metrics, and explicit asynchronous publication order.
 3. The English tokenizer, foreground exchange, and save/restart continuity
    now run around the generator, cloud, and Harmonix. Retain explicit tokenizer
    mode, word ordering, random streams, initial state, and event-order fixtures.
-4. Reflection, rings, and their versioned restart continuity now run after
-   foreground learning. Connect full bridge aggregation, dreams, and background
-   learning next; extend the state for those organs and verify worker shutdown.
+4. Reflection, rings, Phase4, dreams and the exchange journal now share one
+   versioned checkpoint. Carry that ordered tail into an AML worker next;
+   verify typed ownership, shutdown, pending restart and schedule independence.
 5. Add Klaus-inspired language packs with haiku-specific vocabulary and
    syllable behavior; preserve each language's own cloud.
 6. Add the local character interface, conversation, and event-driven animation.

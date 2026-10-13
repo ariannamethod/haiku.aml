@@ -1,0 +1,54 @@
+# Detached ownership and generic metric keys, alongside the Python receipts.
+IMPORT "../../src/phase4.aml"
+state = record_new()
+haiku_phase4_init(state)
+record_set(state, "voice_rng", rng_new(575))
+random_before = record_get(state, "voice_rng")
+before = map_new()
+after = map_new()
+map_set(before, "quality", 0.5)
+map_set(after, "quality", 0.75)
+flags = zeros(3)
+haiku_phase4_record(state, "first", before, after, "", "turn_1", 1, flags)
+other = record_clone(state)
+haiku_phase4_record(other, "second", before, after, "first", "turn_2", 2, flags)
+assert(haiku_phase4_check(state) == 1, "Another bridge life changed the first")
+assert(haiku_phase4_check(other) == 2, "Detached bridge event was lost")
+assert(text_equal(record_get(state, "phase4_prev"), "first"), "Previous state escaped its owner")
+assert(list_len(record_get(state, "phase4_edges")) == 0, "First event created an edge")
+assert(list_len(record_get(other, "phase4_edges")) == 2, "Second event lost its edge")
+entry = haiku_phase4_entry(other, 1)
+map_set(record_get(entry, "metrics_after"), "quality", 0)
+assert(map_get(haiku_phase4_metrics(other, 1, 1), "quality") == 0.75, "Entry accessor returned a live map")
+snapshot = haiku_phase4_snapshot(other, "second")
+map_set(record_get(snapshot, "last_metrics"), "quality", 0)
+assert(map_get(haiku_phase4_metrics(other, 1, 1), "quality") == 0.75, "Snapshot accessor returned a live map")
+result = haiku_phase4_suggest(other, "first", 1, 5)
+list_set(record_get(result, "to"), 0, "rewritten")
+statistics = record_get(result, "statistics")
+statistics[0] = 99
+assert(haiku_phase4_check(other) == 2, "Suggestion accessor changed bridge memory")
+map_set(before, "quality", 0)
+map_set(after, "new_metric", 1)
+assert(map_get(haiku_phase4_metrics(other, 0, 0), "quality") == 0.5, "Later caller changed recorded metrics")
+assert(map_len(haiku_phase4_metrics(other, 0, 1)) == 1, "Later caller added recorded metrics")
+names = map_keys(random_before)
+cursor = 0
+while cursor < list_len(names):
+    name = list_get(names, cursor)
+    assert(map_get(record_get(other, "voice_rng"), name) == map_get(random_before, name), "Bridge event consumed voice randomness")
+    cursor = cursor + 1
+
+# A flat numeric history beyond one loop's 10000-iteration budget still copies.
+values = zeros(20003)
+values[0] = 1
+values[9999] = 2
+values[10000] = 3
+values[19999] = 4
+values[20000] = 5
+values[20002] = 6
+grown = haiku_phase4_extend(values, 20003, 1)
+assert(len(grown) == 20004 and grown[20003] == 0, "Large history copy shape differs")
+assert(grown[0] == 1 and grown[9999] == 2 and grown[10000] == 3, "Large history first boundary differs")
+assert(grown[19999] == 4 and grown[20000] == 5 and grown[20002] == 6, "Large history second boundary differs")
+PRINT "HAIKU_PHASE4_OK"

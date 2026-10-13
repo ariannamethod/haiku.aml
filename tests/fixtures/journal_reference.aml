@@ -1,0 +1,316 @@
+IMPORT "journal_support.aml"
+state = journal_test_new()
+assert(haiku_journal_check(state) == 0, "Journal upgrade invented earlier rows")
+# Python exchange 4: freeze before the first dream changes the chain.
+source = "rain cloud wind"
+spoken = "rain cloud wind\nlight moon warm dream\nnight cloud rain"
+user = list_new()
+list_push(user, "rain")
+list_push(user, "cloud")
+list_push(user, "wind")
+recent = haiku_chain_update(record_get(state, 'rows'), record_get(state, 'counts'), record_get(state, 'vocab'), record_get(state, 'recent'), user)
+record_set(state, 'recent', recent)
+system = list_clone(recent)
+expected_context = list_new()
+list_push(expected_context, "rain")
+list_push(expected_context, "cloud")
+list_push(expected_context, "wind")
+journal_test_list(system, expected_context)
+map_set(record_get(state, 'weights'), "rain", 1)
+map_set(record_get(state, 'weights'), "cloud", 1)
+map_set(record_get(state, 'weights'), "wind", 1)
+observation = zeros(4)
+observation[0] = 0.5
+observation[1] = 0.25
+observation[2] = 0.125
+observation[3] = 0.5
+temperatures = haiku_temperatures(observation[0])
+captured = haiku_journal_capture(state, source, spoken, user, system, temperatures, 4)
+quality = haiku_foreground_quality(observation)
+event = haiku_foreground_bridge(observation, quality, 4, 4)
+haiku_phase4_turn(state, event)
+record_set(state, 'turn', 4)
+list_push(record_get(state, 'meta_history'), source)
+list_push(record_get(state, 'meta_history'), spoken)
+list_push(record_get(state, 'meta_history'), "the\ninner\nvoice")
+feedback = list_new()
+list_push(feedback, "rain")
+list_push(feedback, "cloud")
+list_push(feedback, "wind")
+list_push(feedback, "dream4")
+list_push(feedback, "new")
+list_push(feedback, "voice")
+recent = haiku_chain_update(record_get(state, 'rows'), record_get(state, 'counts'), record_get(state, 'vocab'), record_get(state, 'recent'), feedback)
+record_set(state, 'recent', recent)
+feedback = list_new()
+list_push(feedback, "later")
+list_push(feedback, "dream4")
+list_push(feedback, "voice")
+recent = haiku_chain_update(record_get(state, 'rows'), record_get(state, 'counts'), record_get(state, 'vocab'), record_get(state, 'recent'), feedback)
+record_set(state, 'recent', recent)
+assert(haiku_journal_append(state, captured) == 1, 'Journal append count differs')
+assert(haiku_journal_check(state) == 1, 'Journal validation count differs')
+entry = haiku_journal_get(state, 0)
+journal_test_list(record_get(entry, 'system_trigrams'), expected_context)
+journal_test_list(record_get(entry, 'user_trigrams'), user)
+expected = zeros(5)
+expected[0] = 0.089999999999999997
+expected[1] = 0.80000000000000004
+expected[2] = 1
+expected[3] = 0.58823529411764708
+expected[4] = 0.80000000000000004
+journal_test_vector(record_get(entry, 'mathbrain_features'), expected)
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0.80000000000000004
+expected[2] = 1
+expected[3] = 0.80000000000000004
+expected[4] = 0.81818181818181812
+journal_test_vector(record_get(entry, 'rae_features'), expected)
+expected = zeros(5)
+expected[0] = 0.10249999999999999
+expected[1] = 0.80000000000000004
+expected[2] = 1
+expected[3] = 0.58823529411764708
+expected[4] = 0.80000000000000004
+journal_test_vector(haiku_mathbrain_features(spoken, record_get(state, 'rows'), record_get(state, 'counts'), user), expected)
+frozen = record_get(entry, 'mathbrain_features')
+assert(abs(frozen[0] - expected[0]) > 0.001, 'Journal recomputed a feature after dream feedback')
+metrics = record_get(entry, 'metrics')
+assert(abs(map_get(metrics, 'perplexity') - 0.5) <= 0.000002, 'Journal metric differs from Python')
+assert(abs(map_get(metrics, 'entropy') - 0.5) <= 0.000002, 'Journal metric differs from Python')
+assert(abs(map_get(metrics, 'resonance') - 0.5) <= 0.000002, 'Journal metric differs from Python')
+assert(abs(map_get(metrics, 'cloud_size') - 8) <= 0.000002, 'Journal metric differs from Python')
+assert(map_get(metrics, 'cloud_size') < list_len(record_get(state, 'vocab')), 'Journal confused observer and generator words')
+assert(abs(record_get(entry, 'haiku_temp') - 0.89999999999999991) <= 0.000002, 'Journal haiku temperature differs from Python')
+assert(abs(record_get(entry, 'harmonix_temp') - 0.29999999999999999) <= 0.000002, 'Journal observer temperature differs from Python')
+assert(abs(record_get(entry, 'dissonance') - 0.5) <= 0.000002, 'Journal dissonance differs from Python')
+assert(text_equal(record_get(entry, 'format'), 'haiku-experience') and record_get(entry, 'version') == 1, 'Journal experience version differs')
+assert(text_equal(record_get(entry, 'source'), 'foreground') and text_equal(record_get(entry, 'clock_kind'), 'turn'), 'Journal experience source/clock differs')
+assert(record_get(entry, 'base_revision') == 3, 'Journal base revision differs')
+assert(record_get(entry, 'state_revision') == 4, 'Journal state revision differs')
+assert(record_get(entry, 'publication_order') == 4, 'Journal publication order differs')
+assert(text_equal(record_get(entry, 'input'), source), 'Journal upgrade input index differs')
+assert(text_equal(record_get(entry, 'output'), spoken), 'Journal upgrade output index differs')
+assert(abs(record_get(entry, 'quality') - 0.84999999999999998) <= 0.000002, 'Journal quality differs')
+# Python exchange 5: freeze before the first dream changes the chain.
+source = "雨 mémoire שלום"
+spoken = "rain cloud wind\nlight moon warm dream\nnight cloud rain"
+user = list_new()
+list_push(user, "雨")
+list_push(user, "mémoire")
+list_push(user, "שלום")
+recent = haiku_chain_update(record_get(state, 'rows'), record_get(state, 'counts'), record_get(state, 'vocab'), record_get(state, 'recent'), user)
+record_set(state, 'recent', recent)
+system = list_clone(recent)
+expected_context = list_new()
+list_push(expected_context, "rain")
+list_push(expected_context, "cloud")
+list_push(expected_context, "wind")
+list_push(expected_context, "rain")
+list_push(expected_context, "cloud")
+list_push(expected_context, "wind")
+list_push(expected_context, "dream4")
+list_push(expected_context, "new")
+list_push(expected_context, "voice")
+list_push(expected_context, "later")
+list_push(expected_context, "dream4")
+list_push(expected_context, "voice")
+list_push(expected_context, "雨")
+list_push(expected_context, "mémoire")
+list_push(expected_context, "שלום")
+journal_test_list(system, expected_context)
+map_set(record_get(state, 'weights'), "雨", 1)
+map_set(record_get(state, 'weights'), "mémoire", 1)
+map_set(record_get(state, 'weights'), "שלום", 1)
+observation = zeros(4)
+observation[0] = 0.84999999999999998
+observation[1] = 0.75
+observation[2] = 0.625
+observation[3] = 0.80000000000000004
+temperatures = haiku_temperatures(observation[0])
+captured = haiku_journal_capture(state, source, spoken, user, system, temperatures, 5)
+quality = haiku_foreground_quality(observation)
+event = haiku_foreground_bridge(observation, quality, 5, 5)
+haiku_phase4_turn(state, event)
+record_set(state, 'turn', 5)
+list_push(record_get(state, 'meta_history'), source)
+list_push(record_get(state, 'meta_history'), spoken)
+list_push(record_get(state, 'meta_history'), "the\ninner\nvoice")
+feedback = list_new()
+list_push(feedback, "rain")
+list_push(feedback, "cloud")
+list_push(feedback, "wind")
+list_push(feedback, "dream5")
+list_push(feedback, "new")
+list_push(feedback, "voice")
+recent = haiku_chain_update(record_get(state, 'rows'), record_get(state, 'counts'), record_get(state, 'vocab'), record_get(state, 'recent'), feedback)
+record_set(state, 'recent', recent)
+feedback = list_new()
+list_push(feedback, "later")
+list_push(feedback, "dream5")
+list_push(feedback, "voice")
+recent = haiku_chain_update(record_get(state, 'rows'), record_get(state, 'counts'), record_get(state, 'vocab'), record_get(state, 'recent'), feedback)
+record_set(state, 'recent', recent)
+assert(haiku_journal_append(state, captured) == 2, 'Journal append count differs')
+assert(haiku_journal_check(state) == 2, 'Journal validation count differs')
+entry = haiku_journal_get(state, 1)
+journal_test_list(record_get(entry, 'system_trigrams'), expected_context)
+journal_test_list(record_get(entry, 'user_trigrams'), user)
+expected = zeros(5)
+expected[0] = 0.10249999999999999
+expected[1] = 0.80000000000000004
+expected[2] = 0
+expected[3] = 0.58823529411764708
+expected[4] = 0.80000000000000004
+journal_test_vector(record_get(entry, 'mathbrain_features'), expected)
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0.80000000000000004
+expected[2] = 0
+expected[3] = 0.80000000000000004
+expected[4] = 0.81818181818181812
+journal_test_vector(record_get(entry, 'rae_features'), expected)
+expected = zeros(5)
+expected[0] = 0.11499999999999999
+expected[1] = 0.80000000000000004
+expected[2] = 0
+expected[3] = 0.58823529411764708
+expected[4] = 0.80000000000000004
+journal_test_vector(haiku_mathbrain_features(spoken, record_get(state, 'rows'), record_get(state, 'counts'), user), expected)
+frozen = record_get(entry, 'mathbrain_features')
+assert(abs(frozen[0] - expected[0]) > 0.001, 'Journal recomputed a feature after dream feedback')
+metrics = record_get(entry, 'metrics')
+assert(abs(map_get(metrics, 'perplexity') - 0.5) <= 0.000002, 'Journal metric differs from Python')
+assert(abs(map_get(metrics, 'entropy') - 0.80000000000000004) <= 0.000002, 'Journal metric differs from Python')
+assert(abs(map_get(metrics, 'resonance') - 0.15000000000000002) <= 0.000002, 'Journal metric differs from Python')
+assert(abs(map_get(metrics, 'cloud_size') - 11) <= 0.000002, 'Journal metric differs from Python')
+assert(map_get(metrics, 'cloud_size') < list_len(record_get(state, 'vocab')), 'Journal confused observer and generator words')
+assert(abs(record_get(entry, 'haiku_temp') - 1.3200000000000001) <= 0.000002, 'Journal haiku temperature differs from Python')
+assert(abs(record_get(entry, 'harmonix_temp') - 0.29999999999999999) <= 0.000002, 'Journal observer temperature differs from Python')
+assert(abs(record_get(entry, 'dissonance') - 0.84999999999999998) <= 0.000002, 'Journal dissonance differs from Python')
+assert(text_equal(record_get(entry, 'format'), 'haiku-experience') and record_get(entry, 'version') == 1, 'Journal experience version differs')
+assert(text_equal(record_get(entry, 'source'), 'foreground') and text_equal(record_get(entry, 'clock_kind'), 'turn'), 'Journal experience source/clock differs')
+assert(record_get(entry, 'base_revision') == 4, 'Journal base revision differs')
+assert(record_get(entry, 'state_revision') == 5, 'Journal state revision differs')
+assert(record_get(entry, 'publication_order') == 5, 'Journal publication order differs')
+assert(text_equal(record_get(entry, 'input'), source), 'Journal upgrade input index differs')
+assert(text_equal(record_get(entry, 'output'), spoken), 'Journal upgrade output index differs')
+assert(abs(record_get(entry, 'quality') - 0.5) <= 0.000002, 'Journal quality differs')
+# Python exchange 6: freeze before the first dream changes the chain.
+source = "!!!"
+spoken = "rain cloud wind\nlight moon warm dream\nnight cloud rain"
+user = list_new()
+recent = haiku_chain_update(record_get(state, 'rows'), record_get(state, 'counts'), record_get(state, 'vocab'), record_get(state, 'recent'), user)
+record_set(state, 'recent', recent)
+system = list_clone(recent)
+expected_context = list_new()
+list_push(expected_context, "rain")
+list_push(expected_context, "cloud")
+list_push(expected_context, "wind")
+list_push(expected_context, "rain")
+list_push(expected_context, "cloud")
+list_push(expected_context, "wind")
+list_push(expected_context, "dream4")
+list_push(expected_context, "new")
+list_push(expected_context, "voice")
+list_push(expected_context, "later")
+list_push(expected_context, "dream4")
+list_push(expected_context, "voice")
+list_push(expected_context, "雨")
+list_push(expected_context, "mémoire")
+list_push(expected_context, "שלום")
+list_push(expected_context, "rain")
+list_push(expected_context, "cloud")
+list_push(expected_context, "wind")
+list_push(expected_context, "dream5")
+list_push(expected_context, "new")
+list_push(expected_context, "voice")
+list_push(expected_context, "later")
+list_push(expected_context, "dream5")
+list_push(expected_context, "voice")
+journal_test_list(system, expected_context)
+observation = zeros(4)
+observation[0] = 0.5
+observation[1] = 0
+observation[2] = 0
+observation[3] = 0
+temperatures = haiku_temperatures(observation[0])
+captured = haiku_journal_capture(state, source, spoken, user, system, temperatures, 6)
+quality = haiku_foreground_quality(observation)
+event = haiku_foreground_bridge(observation, quality, 6, 6)
+haiku_phase4_turn(state, event)
+record_set(state, 'turn', 6)
+list_push(record_get(state, 'meta_history'), source)
+list_push(record_get(state, 'meta_history'), spoken)
+list_push(record_get(state, 'meta_history'), "the\ninner\nvoice")
+feedback = list_new()
+list_push(feedback, "rain")
+list_push(feedback, "cloud")
+list_push(feedback, "wind")
+list_push(feedback, "dream6")
+list_push(feedback, "new")
+list_push(feedback, "voice")
+recent = haiku_chain_update(record_get(state, 'rows'), record_get(state, 'counts'), record_get(state, 'vocab'), record_get(state, 'recent'), feedback)
+record_set(state, 'recent', recent)
+feedback = list_new()
+list_push(feedback, "later")
+list_push(feedback, "dream6")
+list_push(feedback, "voice")
+recent = haiku_chain_update(record_get(state, 'rows'), record_get(state, 'counts'), record_get(state, 'vocab'), record_get(state, 'recent'), feedback)
+record_set(state, 'recent', recent)
+assert(haiku_journal_append(state, captured) == 3, 'Journal append count differs')
+assert(haiku_journal_check(state) == 3, 'Journal validation count differs')
+entry = haiku_journal_get(state, 2)
+journal_test_list(record_get(entry, 'system_trigrams'), expected_context)
+journal_test_list(record_get(entry, 'user_trigrams'), user)
+expected = zeros(5)
+expected[0] = 0.11499999999999999
+expected[1] = 0.80000000000000004
+expected[2] = 0
+expected[3] = 0.58823529411764708
+expected[4] = 0.80000000000000004
+journal_test_vector(record_get(entry, 'mathbrain_features'), expected)
+expected = zeros(5)
+expected[0] = 0.5
+expected[1] = 0.80000000000000004
+expected[2] = 0
+expected[3] = 0.80000000000000004
+expected[4] = 0.81818181818181812
+journal_test_vector(record_get(entry, 'rae_features'), expected)
+expected = zeros(5)
+expected[0] = 0.1275
+expected[1] = 0.80000000000000004
+expected[2] = 0
+expected[3] = 0.58823529411764708
+expected[4] = 0.80000000000000004
+journal_test_vector(haiku_mathbrain_features(spoken, record_get(state, 'rows'), record_get(state, 'counts'), user), expected)
+frozen = record_get(entry, 'mathbrain_features')
+assert(abs(frozen[0] - expected[0]) > 0.001, 'Journal recomputed a feature after dream feedback')
+metrics = record_get(entry, 'metrics')
+assert(abs(map_get(metrics, 'perplexity') - 0.5) <= 0.000002, 'Journal metric differs from Python')
+assert(abs(map_get(metrics, 'entropy') - 0) <= 0.000002, 'Journal metric differs from Python')
+assert(abs(map_get(metrics, 'resonance') - 0.5) <= 0.000002, 'Journal metric differs from Python')
+assert(abs(map_get(metrics, 'cloud_size') - 11) <= 0.000002, 'Journal metric differs from Python')
+assert(map_get(metrics, 'cloud_size') < list_len(record_get(state, 'vocab')), 'Journal confused observer and generator words')
+assert(abs(record_get(entry, 'haiku_temp') - 0.89999999999999991) <= 0.000002, 'Journal haiku temperature differs from Python')
+assert(abs(record_get(entry, 'harmonix_temp') - 0.29999999999999999) <= 0.000002, 'Journal observer temperature differs from Python')
+assert(abs(record_get(entry, 'dissonance') - 0.5) <= 0.000002, 'Journal dissonance differs from Python')
+assert(text_equal(record_get(entry, 'format'), 'haiku-experience') and record_get(entry, 'version') == 1, 'Journal experience version differs')
+assert(text_equal(record_get(entry, 'source'), 'foreground') and text_equal(record_get(entry, 'clock_kind'), 'turn'), 'Journal experience source/clock differs')
+assert(record_get(entry, 'base_revision') == 5, 'Journal base revision differs')
+assert(record_get(entry, 'state_revision') == 6, 'Journal state revision differs')
+assert(record_get(entry, 'publication_order') == 6, 'Journal publication order differs')
+assert(text_equal(record_get(entry, 'input'), source), 'Journal upgrade input index differs')
+assert(text_equal(record_get(entry, 'output'), spoken), 'Journal upgrade output index differs')
+assert(abs(record_get(entry, 'quality') - 0.69999999999999996) <= 0.000002, 'Journal quality differs')
+# Getter results own their mutable contexts/features independently.
+list_push(record_get(entry, 'user_trigrams'), 'caller mutation')
+features = record_get(entry, 'mathbrain_features')
+features[0] = 99
+map_set(record_get(entry, 'metrics'), 'cloud_size', 999)
+assert(haiku_journal_check(state) == 3, 'Journal getter aliases persistent history')
+# Earlier rows still refer to their own turn, before the upgrade's offset.
+entry = haiku_journal_get(state, 0)
+assert(text_equal(record_get(entry, 'input'), 'rain cloud wind'), 'Earlier journal input changed')
+assert(record_get(entry, 'turn') == 4, 'Earlier journal turn changed')

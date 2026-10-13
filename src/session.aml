@@ -6,7 +6,7 @@ IMPORT "state.aml"
 def haiku_session_turn(state, source, model):
     haiku_state_check(state, model)
     assert(haiku_input_action(source) == 1, "Haiku session needs an accepted input")
-    if record_get(state, "version") == 2:
+    if record_get(state, "version") >= 2:
         assert(list_len(record_get(state, "meta_history")) < 30000, "Haiku reflection history limit is 10000")
     words = haiku_tokenize(source, record_get(state, "tokenizer_mode"), model)
     user = haiku_trigrams(words)
@@ -31,18 +31,25 @@ def haiku_session_turn(state, source, model):
 
     quality = haiku_foreground_quality(observation)
     bridge_event = haiku_foreground_bridge(observation, quality, turn, clock)
+    if record_get(pending, "version") == 3:
+        experience = haiku_journal_capture(pending, source, spoken, user, system, temperatures, turn)
+        haiku_phase4_turn(pending, bridge_event)
     haiku_mathbrain_observe(record_get(pending, "mathbrain"), record_get(pending, "mathbrain_state"), spoken, quality, record_get(pending, "rows"), record_get(pending, "counts"), user)
     if record_get(pending, "train_rae"):
         haiku_rae_observe(record_get(pending, "rae"), record_get(pending, "rae_state"), spoken, quality, user)
     record_set(pending, "bridge_event", bridge_event)
     record_set(pending, "turn", turn)
     record_set(pending, "clock", clock)
-    if record_get(pending, "version") == 2:
+    if record_get(pending, "version") >= 2:
         haiku_meta_reflect(pending, source, spoken, observation, turn)
         rings = haiku_overthinkg(pending, user)
         record_set(pending, "ring_trigrams", record_get(rings, "trigrams"))
         record_set(pending, "ring_coherence", record_get(rings, "coherence"))
         record_set(pending, "ring_admission", record_get(rings, "admission"))
+    if record_get(pending, "version") == 3:
+        if haiku_dream_should(pending, bridge_event):
+            haiku_dream_run(pending, spoken, model)
+        haiku_journal_append(pending, experience)
     haiku_state_check(pending, model)
     record_replace(state, pending)
     return spoken

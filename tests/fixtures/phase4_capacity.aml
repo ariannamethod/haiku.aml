@@ -1,0 +1,26 @@
+# One wide event preserves every finite metric, beyond 10000 scalar entries.
+IMPORT "../../src/phase4.aml"
+state = record_new()
+haiku_phase4_init(state)
+before = map_new()
+after = map_new()
+cursor = 0
+while cursor < 10000:
+    name = text_concat("metric_", text_fixed(cursor, 0))
+    map_set(before, name, 0.5)
+    map_set(after, name, 0.25)
+    cursor = cursor + 1
+flags = zeros(3)
+haiku_phase4_record(state, "wide", before, after, "outside", "turn_1", 1, flags)
+assert(haiku_phase4_check(state) == 1, "Wide bridge record was lost")
+assert(len(record_get(state, "phase4_metric_rows")) == 40000, "Wide bridge metrics were truncated")
+assert(map_len(haiku_phase4_metrics(state, 0, 0)) == 10000, "Wide before map was truncated")
+assert(map_get(haiku_phase4_metrics(state, 0, 1), "metric_9999") == 0.25, "Wide after map was truncated")
+before = map_new()
+after = map_new()
+haiku_phase4_record(state, "wide", before, after, "outside", "turn_2", 2, flags)
+assert(haiku_phase4_check(state) == 2, "Wide numeric history could not grow")
+assert(len(record_get(state, "phase4_metric_rows")) == 40000, "Empty maps changed metric history")
+totals = record_get(state, "phase4_totals")
+assert(totals[0] == 2 and abs(totals[1] - 1) < 0.00001, "Wide cosine aggregate differs")
+PRINT "HAIKU_PHASE4_OK"

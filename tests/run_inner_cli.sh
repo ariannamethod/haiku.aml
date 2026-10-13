@@ -35,7 +35,7 @@ haiku_replies() {
 for haiku_case in full compiled split old-full old-split upgrade blank; do
     mkdir -p "$haiku_work/$haiku_case"
     ln -s "$haiku_root/src" "$haiku_work/$haiku_case/src"
-    cp "$haiku_root/haiku.aml" "$haiku_work/$haiku_case/haiku.aml"
+    sed 's/^dream_life = 1$/dream_life = 0/' "$haiku_root/haiku.aml" > "$haiku_work/$haiku_case/haiku.aml"
 done
 printf 'what is love\nquit\n' > "$haiku_work/a.input"
 printf 'the cloud remembers our words\nbetween us silence\nquit\n' > "$haiku_work/b.input"

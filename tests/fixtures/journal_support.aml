@@ -1,0 +1,37 @@
+IMPORT "../../src/journal.aml"
+IMPORT "../../src/foreground.aml"
+
+# Earlier reflections predate an explicit journal/Phase4 upgrade at turn three.
+def journal_test_new():
+    state = record_new()
+    haiku_phase4_init(state)
+    record_set(state, "phase4_started_turn", 3)
+    record_set(state, "inner_started_turn", 1)
+    record_set(state, "turn", 3)
+    record_set(state, "journal_text", list_new())
+    record_set(state, "journal_values", zeros(1))
+    record_set(state, "meta_history", haiku_words("earlier-input earlier-output earlier-inner older-input older-output older-inner"))
+    record_set(state, "rows", list_new())
+    record_set(state, "counts", map_new())
+    record_set(state, "vocab", list_new())
+    record_set(state, "recent", list_new())
+    record_set(state, "weights", map_new())
+    seeds = haiku_words("rain cloud wind light moon warm dream night")
+    haiku_chain_seed(record_get(state, "rows"), record_get(state, "counts"), record_get(state, "vocab"), seeds)
+    cursor = 0
+    while cursor < list_len(seeds):
+        map_set(record_get(state, "weights"), list_get(seeds, cursor), 1)
+        cursor = cursor + 1
+    return state
+
+def journal_test_vector(actual, expected):
+    assert(len(actual) == len(expected), "Journal feature lengths differ")
+    cursor = 0
+    while cursor < len(actual):
+        assert(abs(actual[cursor] - expected[cursor]) <= 0.000002, "Journal feature differs from Python")
+        cursor = cursor + 1
+    return 1
+
+def journal_test_list(actual, expected):
+    assert(text_equal(list_key(actual), list_key(expected)), "Journal exact list differs from Python")
+    return 1

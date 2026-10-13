@@ -3,7 +3,7 @@
 
 struct BadCase { const char *name, *change, *error; };
 static const struct BadCase cases[] = {
-    {"version", "record_set(broken, \"version\", 3)", "version is unsupported"},
+    {"version", "record_set(broken, \"version\", 4)", "version is unsupported"},
     {"profile", "record_set(broken, \"profile\", \"other-profile\")", "profile is unsupported"},
     {"extra", "record_set(broken, \"extra\", 0)", "twenty-nine fields"},
     {"missing", "keys = record_keys(broken)\nsmall = record_new()\ni = 0\nwhile i < list_len(keys):\n    key = list_get(keys, i)\n    if text_equal(key, \"clock\") == 0:\n        record_set(small, key, record_get(broken, key))\n    i = i + 1\nbroken = small", "twenty-nine fields"},

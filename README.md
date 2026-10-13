@@ -27,7 +27,7 @@ Its presence lives in the exchange between its organs:
   candidates. Experience feeds the next choice.
 - **MetaHaiku and Overthinkg.** An internal haiku; then echo, drift, and meta
   rings. The conversation continues inside.
-- **Dream-friend and bridges.** Dream fragments return to the cloud.
+- **Dream-friend and bridges.** Dream fragments return to the speaking chain.
   Remembered state transitions suggest where the field can flow.
 - **Asynchronous life.** Speaking, learning, reflecting, and saving have their
   own rhythm and an explicit order for shared state.
@@ -35,28 +35,9 @@ Its presence lives in the exchange between its organs:
 The Python organism defines the port's behavior and artistic lineage.
 The two C siblings contribute their own discoveries.
 
-## Family album: Python HAiKU
-
-From the original [dialogue examples](https://github.com/ariannamethod/harmonix/tree/main/haiku#what-haiku-actually-says-example-dialogues):
-
-```text
-You: what is love
-
-transmit exchange
-definitely small sour
-pursue strive for
-```
-
-Love arrives. A small, sour transmission leaves. There he is.
-
-```text
-HAiKU:
-between us silence
-two voices one resonance
-cloud knows no alone
-```
-
-That voice is the reason for this repository.
+The original [Python dialogue examples](https://github.com/ariannamethod/harmonix/tree/main/haiku#what-haiku-actually-says-example-dialogues)
+are our family album. The conversations below come from the AML organism.
+Same little presence, growing its own history.
 
 ## Two dependencies. Our whole stack.
 
@@ -95,7 +76,7 @@ first; our little presence will find another shape.
 
 ## Right now
 
-Haiku now listens, answers, learns, reflects, and remembers across AML conversations.
+Haiku now listens, answers, learns, reflects, dreams, and remembers across AML conversations.
 Its organs run in pure AML modules. Pulse,
 dissonance, temperatures, and transition scores preserve the Python formulas.
 The text organ counts Unicode-delimited words, preserves line contents, and
@@ -136,21 +117,35 @@ observer's memory. Their counts remain separate from the speaking chain.
 The inner voice and rings share the voice's random stream, in Python's event
 order. Thinking leaves its place in the next draw.
 
+Phase4 remembers named states and the transitions between them: similarity,
+quality change, and the climate of each encounter. After the rings, a dream
+can open a four-part conversation with the friend. All its voices are generated
+before their fragments return to memory; then the speaking chain changes.
+The ordinary ten-turn cooldown gives that conversation room to settle.
+
+Every accepted exchange keeps its own journal entry: the words on both sides,
+the contexts that were actually observed, the features the learners saw, the
+quality signal, and the state revision. Seventeen syllables above the water.
+A whole remembered encounter underneath.
+
 Close the terminal. Come back. The cloud remembers.
 
 Each completed exchange saves one versioned state: cloud, ordered transitions,
 recent memory, both learners and their statistics, both random streams, and
-the latest bridge event, reflection history, and the latest three-ring trace.
+the latest bridge event, reflection history, the latest three-ring trace,
+Phase4's transition history, dream dialogues/fragments, and exchange journal.
 The next launch resumes `haiku.state` beside the
 entrypoint. Its tokenizer identity and logical clock come with it. Set
 `state_path = ""` for a fresh, unsaved conversation, or choose another path
 for another voice. One running process owns each state file.
 
-New conversations include inner life. Existing version-1 checkpoints retain
-their exact foreground continuation. Set `upgrade_inner = 1` in `haiku.aml`
-to begin reflecting from their next exchange; their earlier memory and random
-streams carry through unchanged. Set `inner_life = 0` to start a new
-foreground-only conversation.
+New conversations use version 3, with the complete inner life. Existing
+version-1 and version-2 checkpoints retain their exact continuation. Set
+`upgrade_dreams = 1` in `haiku.aml` to grow Phase4, dreams and the journal from
+their next exchange; their earlier memory and random streams carry through
+unchanged. `upgrade_inner = 1` still enables reflection/rings alone for v1.
+For new conversations, `dream_life = 0` selects v2 and `inner_life = 0` selects
+the foreground-only v1 profile.
 
 Run `../ariannamethod.ai/runner/aml-notorch haiku.aml`. The first exchange of a
 fresh native state, with the checked-in seeds and settings:
@@ -208,16 +203,35 @@ Try `../ariannamethod.ai/runner/aml-notorch examples/inner.aml` to hear both the
 spoken and internal haiku and see the three rings' coherence. Its
 [recorded output](examples/inner.txt) comes from three actual AML exchanges.
 
-Sessions now save after learning, reflection, and rings, and resume with their
+Try `../ariannamethod.ai/runner/aml-notorch examples/dream.aml` for the first
+dream in a native conversation, with ordinary seeds and the default cooldown
+and probability. On turn 14, after the word `memory`, the exchange begins:
+
+```text
+HAiKU:
+guard shelter transform
+discharge eject noisy
+even want though yes
+
+Friend:
+space pattern move
+compress close fragment strong
+maybe certainly
+```
+
+Two more voices follow in the [complete recorded dialogue](examples/dream.txt).
+Then all four return to memory. Maybe certainly. That sounds about right.
+
+Sessions now save after learning, reflection, rings, dreams and journaling, and resume with their
 logical-turn clock.
 [Continuity](docs/STATE.md) records the complete schema, restore validation,
-and restart checks. Full Phase4 transition aggregation, dreams, and asynchronous
-scheduling are next. The [foreground record](docs/FOREGROUND.md)
-keeps that boundary explicit. The family album above still belongs to Python;
-new inner dialogues will come from the AML dream path when it runs.
+and restart checks. [Phase4](docs/PHASE4.md), [dreams](docs/DREAM.md) and the
+[journal](docs/JOURNAL.md) complete the serial Python chat path. The next step
+is to carry this ordered work into background workers; the [async audit](docs/ASYNC.md)
+records the measured AML changes and publication rules it needs.
 
-Build the sibling **AML v5.9.0** toolchain
-([language update](https://github.com/ariannamethod/ariannamethod.ai/pull/34))
+Build the sibling **AML v5.10.0** toolchain
+([language update](https://github.com/ariannamethod/ariannamethod.ai/pull/35))
 and NoTorch with native Unigram,
 model identities, numerical values, and owned sampling, then run the organism's checks:
 
@@ -241,10 +255,11 @@ See [numerical parity](docs/NUMERICAL_PARITY.md) and
 [MathBrain](docs/MATHBRAIN.md), [RAE](docs/RAE.md),
 [tokenization](docs/TOKENIZER.md), [foreground exchanges](docs/FOREGROUND.md),
 [MetaHaiku](docs/METAHAIKU.md), [the three rings](docs/OVERTHINKG.md),
+[Phase4](docs/PHASE4.md), [dreams](docs/DREAM.md), [the journal](docs/JOURNAL.md)
 and [continuity](docs/STATE.md), for exact boundaries and Python
 reference reproduction.
 
-Reference checks completed on 2026-10-07–08:
+Reference checks completed on 2026-10-07–08; dream-life follow-up on 2026-10-13:
 
 - Python HAiKU: **161 tests passed**.
 - Haiku AML: **343 cases / 6,130 reference results** pass in the interpreter and
@@ -288,6 +303,24 @@ Reference checks completed on 2026-10-07–08:
   fresh version 2 and explicit version-1 migration, in both tokenizer and
   training modes. Full checkpoint bytes agree across execution paths. A real
   launcher check covers saved-profile authority and the recorded inner dialogue.
+- Phase4 adds 16 exact binary32 state IDs, 12 shared-key cosine cases, 26
+  Python/SQLite events and eight suggestion queries. Thirty malformed states
+  and nine rejected calls preserve their owners; the 10,000-event boundary
+  and metric histories beyond one loop's budget are exercised.
+- Dreams retain 12 trigger boundaries, five original dialogue lengths,
+  bootstrap/fragment decay and shared native draw order. Twenty invalid states
+  and staged history/capacity/generation failures preserve complete owners.
+- The journal compares three real Python shards/metric rows and 30 frozen
+  feature values, exact Unicode context framing, independent getters and
+  checkpoint round trips; 28 malformed contexts/states fail in both paths.
+- V3 continuity covers fifteen fresh/migrated restart configurations and
+  31 semantic save/restore failures. All 55 leaves and the previous checkpoint
+  survive rejected publication, including exhaustion inside a dream.
+- The actual v3 CLI completes 24 native turns, dreams on turn 14 and resumes
+  from turn 13 with identical responses and checkpoint bytes. Both old-profile
+  upgrades, blank/quit/EOF and the recorded dream dialogue pass in interpreter
+  and compiled execution. Fifteen frozen v1/v2 configurations also retain
+  their exact pre-upgrade responses and checkpoint bytes.
 - AML runtime: **550 tests passed**.
 - AML compiler: scope, source origins, nested failures, worker branches and
   errors, scalar builds, and literal program arguments are covered by regressions.

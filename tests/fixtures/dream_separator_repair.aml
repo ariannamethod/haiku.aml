@@ -1,0 +1,216 @@
+IMPORT "dream_support.aml"
+model = tokenizer_load("../../models/haiku_sp.model")
+state = dream_test_new(1, "sentencepiece")
+record_set(state, "dream_config", [10, 0.25, 1])
+record_set(state, "turn", 10)
+spoken = ""
+spoken = text_concat(spoken, "sweet sour doubt stable\nmore least appear frequently\nto and reinforce")
+original = haiku_tokenize_sentencepiece(spoken, model)
+expected = list_new()
+item = ""
+item = text_concat(item, "s")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "wee")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "t")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "s")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "our")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "do")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ubt")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "sta")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ble")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "\n")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "m")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "o")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "re")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "least")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "app")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ear")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "fre")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "qu")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ent")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ly")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "\n")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "t")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "o")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "and")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "re")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "in")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "for")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ce")
+list_push(expected, item)
+assert(text_equal(list_key(original), list_key(expected)), "Dream ordered text differs from Python")
+haikus = haiku_dream_run(state, spoken, model)
+assert(list_len(haikus) == 1, "Dream separator repair changed recorded exchanges")
+expected = list_new()
+item = ""
+item = text_concat(item, "app")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ear")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "fre")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ear")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "fre")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "qu")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "fre")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "qu")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ent")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "qu")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ent")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ly")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ent")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ly")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "to")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ly")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "to")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "and")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "to")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "and")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "re")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "and")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "re")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "in")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "re")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "in")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "for")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "in")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "for")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "ce")
+list_push(expected, item)
+assert(text_equal(list_key(record_get(state, "recent")), list_key(expected)), "Dream ordered text differs from Python")
+assert(map_get(record_get(state, "dream_vocab"), "s") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "wee") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "t") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "our") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "do") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "ubt") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "sta") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "ble") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "mor") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "e") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "least") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "app") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "ear") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "fre") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "qu") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "ent") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "ly") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "to") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "and") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "re") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "in") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "for") == 10, "Dream-only piece provenance differs")
+assert(map_get(record_get(state, "dream_vocab"), "ce") == 10, "Dream-only piece provenance differs")
+assert(list_find(record_get(state, "vocab"), "\n") < 0, "Dream newline entered the speaking vocabulary")
+assert(map_len(record_get(state, "weights")) == 8, "Dream pieces changed the living cloud")
+haiku_gen_check(record_get(state, "rows"), record_get(state, "counts"), record_get(state, "vocab"), record_get(state, "syllables"))
+haiku_dream_check(state)
+PRINT "HAIKU_DREAM_OK"

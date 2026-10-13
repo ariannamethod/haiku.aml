@@ -1,0 +1,285 @@
+IMPORT "dream_support.aml"
+state = dream_test_new(1, "regex")
+record_set(state, "dream_config", [10, 0.25, 4])
+record_set(state, "turn", 10)
+spoken = ""
+spoken = text_concat(spoken, "rain holds the cloud\nour two voices move through night\nlight remembers us")
+haikus = haiku_dream_run(state, spoken, 0)
+expected = list_new()
+item = ""
+item = text_concat(item, "rain holds the cloud\nour two voices move through night\nlight remembers us")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "cloud light dream cloud light\ndream rain light warm rain wind warm\nnight wind moon night cloud")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "moon dream cloud light dream\nrain light warm rain wind warm night\nwind moon night cloud moon")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "dream cloud light dream rain\nlight warm rain wind warm night wind\nmoon dream cloud moon dream")
+list_push(expected, item)
+assert(text_equal(list_key(haikus), list_key(expected)), "Dream ordered text differs from Python")
+expected = list_new()
+item = ""
+item = text_concat(item, "rain holds the cloud\nour two voices move through night\nlight remembers us")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "cloud light dream cloud light\ndream rain light warm rain wind warm\nnight wind moon night cloud")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "moon dream cloud light dream\nrain light warm rain wind warm night\nwind moon night cloud moon")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "dream cloud light dream rain\nlight warm rain wind warm night wind\nmoon dream cloud moon dream")
+list_push(expected, item)
+assert(text_equal(list_key(record_get(state, "dream_history")), list_key(expected)), "Dream ordered text differs from Python")
+tape = record_get(state, "draws")
+assert(tape[0] == 68, "Dream final unrecorded response draw order differs")
+assert(record_get(state, "dream_last_turn") == 10, "Dream cooldown must save the actual foreground turn")
+dialogs = record_get(state, "dream_dialogs")
+assert(len(dialogs) == 3 and dialogs[0] == 10 and dialogs[1] == 0 and dialogs[2] == 4, "Dream dialog metadata differs")
+assert(list_len(record_get(state, "dream_fragments")) == 12, "Dream fragment count differs")
+weights = record_get(state, "dream_weights")
+item = ""
+item = text_concat(item, "rain holds the cloud")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 0), item), "Dream fragment text differs")
+assert(abs(weights[0] - 0.8573749999999999) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "our two voices move through night")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 1), item), "Dream fragment text differs")
+assert(abs(weights[1] - 0.8573749999999999) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "light remembers us")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 2), item), "Dream fragment text differs")
+assert(abs(weights[2] - 0.8573749999999999) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "cloud light dream cloud light")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 3), item), "Dream fragment text differs")
+assert(abs(weights[3] - 0.9025) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "dream rain light warm rain wind warm")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 4), item), "Dream fragment text differs")
+assert(abs(weights[4] - 0.9025) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "night wind moon night cloud")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 5), item), "Dream fragment text differs")
+assert(abs(weights[5] - 0.9025) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "moon dream cloud light dream")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 6), item), "Dream fragment text differs")
+assert(abs(weights[6] - 0.95) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "rain light warm rain wind warm night")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 7), item), "Dream fragment text differs")
+assert(abs(weights[7] - 0.95) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "wind moon night cloud moon")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 8), item), "Dream fragment text differs")
+assert(abs(weights[8] - 0.95) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "dream cloud light dream rain")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 9), item), "Dream fragment text differs")
+assert(abs(weights[9] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "light warm rain wind warm night wind")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 10), item), "Dream fragment text differs")
+assert(abs(weights[10] - 1.0) < 0.000002, "Dream fragment decay differs")
+item = ""
+item = text_concat(item, "moon dream cloud moon dream")
+assert(text_equal(list_get(record_get(state, "dream_fragments"), 11), item), "Dream fragment text differs")
+assert(abs(weights[11] - 1.0) < 0.000002, "Dream fragment decay differs")
+expected = list_new()
+item = ""
+item = text_concat(item, "rain")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "cloud")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "wind")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "light")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "moon")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "warm")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "dream")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "night")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "holds")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "the")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "our")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "two")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "voices")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "move")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "through")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "remembers")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "us")
+list_push(expected, item)
+assert(text_equal(list_key(record_get(state, "vocab")), list_key(expected)), "Dream ordered text differs from Python")
+expected = list_new()
+item = ""
+item = text_concat(item, "light")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "warm")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "rain")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "warm")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "rain")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "wind")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "rain")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "wind")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "warm")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "wind")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "warm")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "night")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "warm")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "night")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "wind")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "night")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "wind")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "moon")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "wind")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "moon")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "dream")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "moon")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "dream")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "cloud")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "dream")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "cloud")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "moon")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "cloud")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "moon")
+list_push(expected, item)
+item = ""
+item = text_concat(item, "dream")
+list_push(expected, item)
+assert(text_equal(list_key(record_get(state, "recent")), list_key(expected)), "Dream ordered text differs from Python")
+assert(haiku_chain_count(record_get(state, "counts"), "rain", "cloud", "wind") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "cloud", "wind", "light") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "wind", "light", "moon") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "light", "moon", "warm") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "moon", "warm", "dream") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "warm", "dream", "night") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "rain", "cloud", "light") == 3, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "rain", "holds", "the") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "holds", "the", "cloud") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "the", "cloud", "our") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "cloud", "our", "two") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "our", "two", "voices") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "two", "voices", "move") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "voices", "move", "through") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "move", "through", "night") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "through", "night", "light") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "night", "light", "remembers") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "light", "remembers", "us") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "cloud", "light", "dream") == 4, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "light", "dream", "cloud") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "dream", "cloud", "light") == 3, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "light", "dream", "rain") == 3, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "dream", "rain", "light") == 3, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "rain", "light", "warm") == 3, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "light", "warm", "rain") == 3, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "warm", "rain", "wind") == 3, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "rain", "wind", "warm") == 3, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "wind", "warm", "night") == 3, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "warm", "night", "wind") == 3, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "night", "wind", "moon") == 3, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "wind", "moon", "night") == 2, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "moon", "night", "cloud") == 2, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "moon", "dream", "cloud") == 2, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "night", "cloud", "moon") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "wind", "moon", "dream") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "dream", "cloud", "moon") == 1, "Dream feedback transition differs")
+assert(haiku_chain_count(record_get(state, "counts"), "cloud", "moon", "dream") == 1, "Dream feedback transition differs")
+assert(map_len(record_get(state, "counts")) == 37, "Dream feedback added extra transitions")
+assert(map_len(record_get(state, "weights")) == 8, "Dream changed the living cloud")
+event = map_new()
+map_set(event, "quality_after", 0.5)
+map_set(event, "novelty", 0)
+map_set(event, "dissonance", 0.5)
+map_set(event, "turn", 19)
+assert(haiku_dream_should(state, event) == 0, "Dream actual-turn cooldown ended early")
+record_set(state, "dream_config", [10, 1, 4])
+map_set(event, "turn", 20)
+assert(haiku_dream_should(state, event) == 1, "Dream actual-turn cooldown failed to reopen")
+haiku_dream_check(state)
+PRINT "HAIKU_DREAM_OK"

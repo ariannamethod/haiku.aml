@@ -10,14 +10,18 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
 - [x] Connect input, cloud/transition memory, five candidates, RAE selection,
   quality, and MathBrain learning in an AML foreground session. Keep additional
   RAE learning an explicit option; Python chat trains MathBrain alone.
-- [ ] Give foreground and background work one versioned experience record with
+- [x] Give foreground and background work one versioned experience record with
   source, scoring features, quality, state revision, and publication order.
 - [x] Save and restore learner parameters, statistics, and owned random
   streams together with the cloud and conversation state.
 - [x] Connect MetaHaiku reflection and echo/drift/meta rings after foreground
   learning; retain their owners, shared draw order, and restart continuity.
-- [ ] Complete Phase4 state-ID aggregation beyond the current metric handoff;
+- [x] Complete Phase4 state-ID aggregation beyond the current metric handoff;
   connect dream events after reflection and rings.
+- [ ] Carry the complete exchange tail into a reusable AML worker with typed
+  results, one state publisher, revision checks, drain on quit/EOF, and a
+  durable pending experience. Preserve serial output and checkpoint bytes
+  under different schedules; the measured language work is in [ASYNC](docs/ASYNC.md).
 
 ## Family experiments
 
@@ -32,7 +36,7 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
 
 ## Future interface
 
-- [ ] Replace the README's Python dialogue examples with recorded conversations
+- [x] Replace the README's Python dialogue examples with recorded conversations
   from the new AML organism once its speaking and dream paths are running.
 - [ ] Give Haiku and its inner dream-friend a visible conversation: two
   characters, alternating lines, pauses, and distinct movement. Render the

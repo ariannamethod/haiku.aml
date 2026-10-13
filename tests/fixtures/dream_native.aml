@@ -1,0 +1,48 @@
+IMPORT "dream_support.aml"
+state = dream_test_new(0, "regex")
+record_set(state, "turn", 10)
+before = record_clone(state)
+other = record_clone(state)
+haiku_dream_fragments(other, "a different friend\na different memory\na different cloud")
+spoken = "rain holds the cloud\nour two voices move through night\nlight remembers us"
+haikus = haiku_dream_run(state, spoken, 0)
+alternate = haiku_dream_run(other, spoken, 0)
+assert(text_equal(list_key(haikus), list_key(alternate)), "Dream unused seeds changed the measured generation path")
+# Replay all four calls against the untouched generator. The last is unseen.
+expected = list_new()
+list_push(expected, spoken)
+cursor = 0
+while cursor < 4:
+    temperature = 1.2
+    if cursor == 1 or cursor == 3:
+        temperature = 0.9
+    generated = haiku_generate_candidates(record_get(before, "rows"), record_get(before, "counts"), record_get(before, "vocab"), record_get(before, "syllables"), 1, temperature, record_get(before, "voice_rng"), record_get(before, "draws"))
+    if cursor < 3:
+        list_push(expected, list_get(generated, 0))
+    cursor = cursor + 1
+assert(text_equal(list_key(haikus), list_key(expected)), "Dream generated after premature feedback")
+names = map_keys(record_get(before, "voice_rng"))
+cursor = 0
+while cursor < list_len(names):
+    name = list_get(names, cursor)
+    assert(map_get(record_get(state, "voice_rng"), name) == map_get(record_get(before, "voice_rng"), name), "Dream discarded response lost its native draws")
+    assert(map_get(record_get(state, "voice_rng"), name) == map_get(record_get(other, "voice_rng"), name), "Dream unused seeds changed its native stream")
+    assert(map_get(record_get(state, "model_rng"), name) == map_get(record_get(before, "model_rng"), name), "Dream touched the model initialization stream")
+    cursor = cursor + 1
+assert(text_equal(list_key(map_keys(record_get(state, "weights"))), list_key(map_keys(record_get(before, "weights")))), "Dream changed the living word cloud")
+cursor = 0
+while cursor < list_len(map_keys(record_get(state, "weights"))):
+    assert(map_get(record_get(state, "weights"), list_get(map_keys(record_get(state, "weights")), cursor)) == 1, "Dream changed cloud weights")
+    cursor = cursor + 1
+assert(map_get(record_get(state, "dream_vocab"), "holds") == 10, "Dream-only word has no first-turn provenance")
+# Later user admission into the cloud retains the word's dream origin.
+map_set(record_get(state, "weights"), "holds", 2)
+record_set(state, "turn", 20)
+record_set(state, "dream_config", [10, 0.25, 1])
+haiku_dream_run(state, spoken, 0)
+assert(map_get(record_get(state, "dream_vocab"), "holds") == 10, "Later use erased the first dream origin")
+assert(map_get(record_get(state, "weights"), "holds") == 2, "Later dream changed admitted cloud weight")
+dialogs = record_get(state, "dream_dialogs")
+assert(len(dialogs) == 6 and dialogs[3] == 20 and dialogs[4] == 4 and dialogs[5] == 1, "Variable dialog metadata lost its text boundary")
+assert(haiku_dream_check(state) == 2, "Dream lost its earlier dialog")
+PRINT "HAIKU_DREAM_OK"

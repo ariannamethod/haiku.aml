@@ -9,8 +9,9 @@ NOTORCH_LIB ?= $(NOTORCH_ROOT)/libnotorch.a
 
 .PHONY: test test-numerical test-text test-lexical test-cloud test-form test-generator test-mathbrain test-rae test-tokenizer test-tokenizer-setup test-foreground test-state
 .PHONY: test-inner test-metahaiku test-overthinkg test-inner-state test-inner-cli
+.PHONY: test-dream-life test-phase4 test-dream test-journal test-dream-state test-dream-cli
 
-test: test-numerical test-text test-lexical test-cloud test-form test-generator test-mathbrain test-rae test-tokenizer test-foreground test-state test-inner
+test: test-numerical test-text test-lexical test-cloud test-form test-generator test-mathbrain test-rae test-tokenizer test-foreground test-state test-inner test-dream-life
 
 test-numerical:
 	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" bash tests/run_numerical.sh
@@ -61,3 +62,8 @@ test-inner-state:
 
 test-inner-cli:
 	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" HAIKU_AML_INCLUDE="$(abspath $(AML_INCLUDE))" HAIKU_AML_BRIDGE_LIB="$(abspath $(AML_BRIDGE_LIB))" HAIKU_NOTORCH_LIB="$(abspath $(NOTORCH_LIB))" bash tests/run_inner_cli.sh
+
+test-dream-life: test-phase4 test-dream test-journal test-dream-state test-dream-cli
+
+test-phase4 test-dream test-journal test-dream-state test-dream-cli:
+	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" HAIKU_AML_INCLUDE="$(abspath $(AML_INCLUDE))" HAIKU_AML_BRIDGE_LIB="$(abspath $(AML_BRIDGE_LIB))" HAIKU_NOTORCH_LIB="$(abspath $(NOTORCH_LIB))" bash tests/run_$(subst -,_,$(@:test-%=%)).sh

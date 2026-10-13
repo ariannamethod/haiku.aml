@@ -1,0 +1,241 @@
+# Dream dialogue and its returning fragments. Python dream_haiku.py / chat.py
+# at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39; see docs/DREAM.md for repairs.
+IMPORT "foreground.aml"
+IMPORT "metahaiku.aml"
+
+# Literal LF separates fragments; Python whitespace strips each resulting line.
+# Scan once, including the final empty line without an extra loop iteration.
+def haiku_dream_lines(source):
+    assert(text_len(source) <= 10000, "Haiku dream text limit is 10000 codepoints")
+    result = list_new()
+    start = 0
+    cursor = 0
+    while cursor < text_len(source):
+        if text_codepoint(source, cursor) == 10:
+            value = haiku_input_strip(text_slice(source, start, cursor))
+            if text_len(value) > 0:
+                list_push(result, value)
+            start = cursor + 1
+        cursor = cursor + 1
+    value = haiku_input_strip(text_slice(source, start, text_len(source)))
+    if text_len(value) > 0:
+        list_push(result, value)
+    return result
+
+# The launch path supplies no bootstrap. A direct caller can seed the first
+# ten haikus, retaining duplicate nonempty stripped lines exactly as Python.
+def haiku_dream_init(state, bootstrap):
+    if record_has(state, "dream_config"):
+        return haiku_dream_check(state)
+    fragments = list_new()
+    cursor = 0
+    while cursor < min(10, list_len(bootstrap)):
+        lines = haiku_dream_lines(list_get(bootstrap, cursor))
+        line = 0
+        while line < list_len(lines):
+            assert(list_len(fragments) < 10000, "Haiku dream fragment limit is 10000")
+            list_push(fragments, list_get(lines, line))
+            line = line + 1
+        cursor = cursor + 1
+    weights = zeros(max(1, list_len(fragments)))
+    cursor = 0
+    while cursor < list_len(fragments):
+        weights[cursor] = 1
+        cursor = cursor + 1
+    record_set(state, "dream_config", [10, 0.25, 4])
+    record_set(state, "dream_fragments", fragments)
+    record_set(state, "dream_weights", weights)
+    record_set(state, "dream_history", list_new())
+    record_set(state, "dream_dialogs", zeros(1))
+    record_set(state, "dream_last_turn", 0)
+    record_set(state, "dream_vocab", map_new())
+    return 0
+
+# Dialog rows are actual turn / text offset / exchange count. Speakers alternate
+# haiku, friend; their source quality is always 0.5. Empty arrays use [0].
+def haiku_dream_check(state):
+    names = haiku_words("dream_config dream_weights dream_dialogs")
+    cursor = 0
+    while cursor < list_len(names):
+        assert(text_equal(record_kind(state, list_get(names, cursor)), "array"), "Haiku dream numeric leaf must be an array")
+        value = record_get(state, list_get(names, cursor))
+        assert(rows(value) == 0 and cols(value) == 0, "Haiku dream numeric leaf must be a vector")
+        cursor = cursor + 1
+    assert(text_equal(record_kind(state, "dream_fragments"), "list"), "Haiku dream fragments must be a list")
+    assert(text_equal(record_kind(state, "dream_history"), "list"), "Haiku dream history must be a list")
+    assert(text_equal(record_kind(state, "dream_last_turn"), "float"), "Haiku dream last turn must be numeric")
+    assert(text_equal(record_kind(state, "dream_vocab"), "map"), "Haiku dream provenance must be a map")
+    config = record_get(state, "dream_config")
+    assert(len(config) == 3, "Haiku dream config requires three values")
+    assert(isfinite(config[0]) and config[0] >= 1 and config[0] <= 16777216 and config[0] == floor(config[0]), "Haiku dream interval is invalid")
+    assert(isfinite(config[1]) and config[1] >= 0 and config[1] <= 1, "Haiku dream probability is invalid")
+    assert(isfinite(config[2]) and config[2] >= 1 and config[2] <= 16 and config[2] == floor(config[2]), "Haiku dream exchange count is invalid")
+    fragments = record_get(state, "dream_fragments")
+    weights = record_get(state, "dream_weights")
+    assert(list_len(fragments) <= 10000, "Haiku dream fragment limit is 10000")
+    assert(len(weights) == max(1, list_len(fragments)), "Haiku dream fragment/weight lengths differ")
+    if list_len(fragments) == 0:
+        assert(weights[0] == 0, "Haiku empty dream fragments need their zero sentinel")
+    cursor = 0
+    while cursor < list_len(fragments):
+        source = list_get(fragments, cursor)
+        assert(text_len(source) > 0 and text_len(source) <= 10000, "Haiku dream fragment text is invalid")
+        assert(haiku_line_count(source) == 1 and text_equal(haiku_input_strip(source), source), "Haiku dream fragment must be one stripped line")
+        assert(isfinite(weights[cursor]) and weights[cursor] >= 0.1 and weights[cursor] <= 1, "Haiku dream fragment weight is invalid")
+        cursor = cursor + 1
+    history = record_get(state, "dream_history")
+    dialogs = record_get(state, "dream_dialogs")
+    last = record_get(state, "dream_last_turn")
+    assert(isfinite(last) and last >= 0 and last <= 16777216 and last == floor(last), "Haiku dream last turn is invalid")
+    count = 0
+    if len(dialogs) != 1:
+        count = len(dialogs) / 3
+        assert(count == floor(count) and count <= 10000, "Haiku dream dialogs require at most 10000 complete rows")
+    else:
+        assert(dialogs[0] == 0, "Haiku empty dream dialogs need their zero sentinel")
+    offset = 0
+    previous = 0
+    cursor = 0
+    while cursor < count:
+        turn = dialogs[cursor * 3]
+        assert(isfinite(turn) and turn > previous and turn <= 16777216 and turn == floor(turn), "Haiku dream dialog turn order is invalid")
+        assert(dialogs[cursor * 3 + 1] == offset, "Haiku dream dialog text offset differs")
+        size = dialogs[cursor * 3 + 2]
+        assert(isfinite(size) and size >= 1 and size <= 16 and size == floor(size), "Haiku dream dialog exchange count is invalid")
+        part = 0
+        while part < size:
+            source = list_get(history, offset + part)
+            assert(text_len(source) <= 10000, "Haiku dream text limit is 10000 codepoints")
+            if part > 0:
+                assert(haiku_line_count(source) == 3, "Haiku dream generated voice must have three lines")
+            part = part + 1
+        offset = offset + size
+        previous = turn
+        cursor = cursor + 1
+    assert(offset == list_len(history), "Haiku dream dialog/history lengths differ")
+    assert(last == previous, "Haiku dream last turn differs from its history")
+    return count
+
+# Cooldown and climate failures consume no draw. Python rejects random > p,
+# so the exact probability boundary is accepted, including zero when p is zero.
+def haiku_dream_should(state, event):
+    haiku_dream_check(state)
+    config = record_get(state, "dream_config")
+    turn = map_get(event, "turn")
+    quality = map_get(event, "quality_after")
+    novelty = map_get(event, "novelty")
+    dissonance = map_get(event, "dissonance")
+    assert(isfinite(turn) and turn >= 0 and turn <= 16777216 and turn == floor(turn), "Haiku dream trigger turn is invalid")
+    assert(isfinite(quality) and quality >= 0 and quality <= 1, "Haiku dream trigger quality is invalid")
+    assert(isfinite(novelty) and novelty >= 0 and novelty <= 1, "Haiku dream trigger novelty is invalid")
+    assert(isfinite(dissonance) and dissonance >= 0 and dissonance <= 1, "Haiku dream trigger dissonance is invalid")
+    if turn - record_get(state, "dream_last_turn") < config[0]:
+        return 0
+    if quality < 0.45 or novelty > 0.7 or (dissonance > 0.4 and dissonance < 0.7):
+        return haiku_inner_draw(record_get(state, "voice_rng"), record_get(state, "draws")) <= config[1]
+    return 0
+
+# Each returned haiku first decays old lines, then appends its nonempty stripped
+# lines. The source's fragment_buffer_size setting never caps this memory.
+def haiku_dream_fragments(state, source):
+    lines = haiku_dream_lines(source)
+    old = record_get(state, "dream_fragments")
+    weights = record_get(state, "dream_weights")
+    fragments = list_new()
+    pending = zeros(max(1, list_len(old) + list_len(lines)))
+    cursor = 0
+    while cursor < list_len(old):
+        weight = weights[cursor]
+        if weight > 0.1:
+            weight = weight * 0.95
+        if weight >= 0.1:
+            pending[list_len(fragments)] = weight
+            list_push(fragments, list_get(old, cursor))
+        cursor = cursor + 1
+    cursor = 0
+    while cursor < list_len(lines):
+        assert(list_len(fragments) < 10000, "Haiku dream fragment limit is 10000")
+        pending[list_len(fragments)] = 1
+        list_push(fragments, list_get(lines, cursor))
+        cursor = cursor + 1
+    weights = zeros(max(1, list_len(fragments)))
+    cursor = 0
+    while cursor < list_len(fragments):
+        weights[cursor] = pending[cursor]
+        cursor = cursor + 1
+    record_set(state, "dream_fragments", fragments)
+    record_set(state, "dream_weights", weights)
+    return list_len(fragments)
+
+# The caller owns a detached turn. Generate the entire dialog before feedback.
+# Python generates one final, unrecorded response: preserve its consumed draws.
+def haiku_dream_run(state, spoken, model):
+    count = haiku_dream_check(state)
+    config = record_get(state, "dream_config")
+    history = record_get(state, "dream_history")
+    offset = list_len(history)
+    assert(count < 10000, "Haiku dream dialog history is full")
+    assert(offset + config[2] <= 65536, "Haiku dream exchange history is full")
+    turn = record_get(state, "turn")
+    assert(isfinite(turn) and turn > record_get(state, "dream_last_turn") and turn <= 16777216 and turn == floor(turn), "Haiku dream run turn is invalid")
+    assert(text_len(spoken) <= 10000, "Haiku dream text limit is 10000 codepoints")
+    haikus = list_new()
+    source = spoken
+    speaker = 0
+    cursor = 0
+    while cursor < config[2]:
+        list_push(haikus, source)
+        temperature = 1.2
+        if speaker == 1:
+            temperature = 0.9
+        candidates = haiku_generate_candidates(record_get(state, "rows"), record_get(state, "counts"), record_get(state, "vocab"), record_get(state, "syllables"), 1, temperature, record_get(state, "voice_rng"), record_get(state, "draws"))
+        source = list_get(candidates, 0)
+        speaker = 1 - speaker
+        cursor = cursor + 1
+    cursor = 0
+    while cursor < list_len(haikus):
+        source = list_get(haikus, cursor)
+        haiku_dream_fragments(state, source)
+        # LF is the generated line separator. Flatten it before re-tokenizing
+        # so native SentencePiece cannot put a newline inside a speaking word.
+        flat = ""
+        start = 0
+        part = 0
+        while part < text_len(source):
+            if text_codepoint(source, part) == 10:
+                flat = text_concat(flat, text_slice(source, start, part))
+                flat = text_concat(flat, " ")
+                start = part + 1
+            part = part + 1
+        flat = text_concat(flat, text_slice(source, start, text_len(source)))
+        words = haiku_tokenize(flat, record_get(state, "tokenizer_mode"), model)
+        triples = haiku_trigrams(words)
+        haiku_foreground_input(words, triples)
+        recent = haiku_chain_update(record_get(state, "rows"), record_get(state, "counts"), record_get(state, "vocab"), record_get(state, "recent"), triples)
+        record_set(state, "recent", recent)
+        if list_len(triples) > 0:
+            part = 0
+            while part < list_len(words):
+                word = list_get(words, part)
+                if map_has(record_get(state, "weights"), word) == 0 and map_has(record_get(state, "dream_vocab"), word) == 0:
+                    map_set(record_get(state, "dream_vocab"), word, turn)
+                part = part + 1
+        list_push(record_get(state, "dream_history"), source)
+        cursor = cursor + 1
+    haiku_foreground_cache(record_get(state, "syllables"), record_get(state, "vocab"))
+    old = record_get(state, "dream_dialogs")
+    dialogs = zeros((count + 1) * 3)
+    cursor = 0
+    while cursor < count:
+        part = 0
+        while part < 3:
+            dialogs[cursor * 3 + part] = old[cursor * 3 + part]
+            part = part + 1
+        cursor = cursor + 1
+    dialogs[count * 3] = turn
+    dialogs[count * 3 + 1] = offset
+    dialogs[count * 3 + 2] = config[2]
+    record_set(state, "dream_dialogs", dialogs)
+    record_set(state, "dream_last_turn", turn)
+    haiku_dream_check(state)
+    return haikus

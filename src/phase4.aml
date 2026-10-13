@@ -1,0 +1,558 @@
+# Island bridges: current before/after climate, remembered between named states.
+# Python phase4_bridges.py at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+IMPORT "bridges.aml"
+IMPORT "lexicon.aml"
+
+# Fixed decimal formatting belongs to AML; state naming belongs to this organ.
+def haiku_bridge_id(dissonance, entropy, quality):
+    result = text_concat("d", text_fixed(dissonance, 1))
+    result = text_concat(result, text_concat("_e", text_fixed(entropy, 1)))
+    return text_concat(result, text_concat("_q", text_fixed(quality, 1)))
+
+# Only shared keys contribute to either norm. Extra dimensions are absent.
+def haiku_bridge_cosine(before, after):
+    names = map_keys(before)
+    assert(list_len(names) <= 10000 and map_len(after) <= 10000, "Haiku bridge metric limit is 10000")
+    size = 0
+    cursor = 0
+    while cursor < list_len(names):
+        if map_has(after, list_get(names, cursor)):
+            size = size + 1
+        cursor = cursor + 1
+    if size == 0:
+        return 0
+    left = zeros(size)
+    right = zeros(size)
+    left_scale = 0
+    right_scale = 0
+    cursor = 0
+    slot = 0
+    while cursor < list_len(names):
+        key = list_get(names, cursor)
+        if map_has(after, key):
+            left[slot] = map_get(before, key)
+            right[slot] = map_get(after, key)
+            left_scale = max(left_scale, abs(left[slot]))
+            right_scale = max(right_scale, abs(right[slot]))
+            slot = slot + 1
+        cursor = cursor + 1
+    if left_scale == 0 or right_scale == 0:
+        return 0
+    cursor = 0
+    while cursor < size:
+        left[cursor] = left[cursor] / left_scale
+        right[cursor] = right[cursor] / right_scale
+        cursor = cursor + 1
+    bias = zeros(1)
+    first = nt_linear(left, bias, left, 1, size)
+    second = nt_linear(right, bias, right, 1, size)
+    assert(isfinite(first[0]) and isfinite(second[0]), "Haiku bridge norm exceeds finite float32")
+    if first[0] == 0 or second[0] == 0:
+        return 0
+    product = nt_linear(left, bias, right, 1, size)
+    similarity = product[0] / (sqrt(first[0]) * sqrt(second[0]))
+    assert(isfinite(similarity), "Haiku bridge similarity exceeds finite float32")
+    return similarity
+
+def haiku_phase4_pair(first, second):
+    prefix = text_concat(text_fixed(text_len(first), 0), ":")
+    return text_concat(text_concat(prefix, first), second)
+
+def haiku_bridge_quality(metrics):
+    if map_has(metrics, "quality"):
+        return map_get(metrics, "quality")
+    return 0.5
+
+# Numeric leaves can outgrow 10000 scalars while each bounded copy loop cannot.
+def haiku_phase4_extend(values, used, extra):
+    assert(isfinite(used) and isfinite(extra), "Haiku bridge copy lengths must be finite")
+    assert(used == floor(used) and extra == floor(extra) and extra >= 0, "Haiku bridge copy lengths must be nonnegative integers")
+    assert(used >= 0 and used <= len(values), "Haiku bridge copy length is invalid")
+    assert(used + extra <= 1000000, "Haiku bridge numeric history is full")
+    result = zeros(max(1, used + extra))
+    block = 0
+    while block < used:
+        cursor = block
+        end = min(used, block + 10000)
+        while cursor < end:
+            result[cursor] = values[cursor]
+            cursor = cursor + 1
+        block = end
+    return result
+
+# Offsets count metric pairs, not scalar positions. Empty maps stay empty.
+def haiku_phase4_metrics(state, index, after):
+    assert(after == 0 or after == 1, "Haiku bridge metric side must be zero or one")
+    count = list_len(record_get(state, "phase4_log")) / 3
+    assert(index >= 0 and index < count and index == floor(index), "Haiku bridge history index is invalid")
+    rows = record_get(state, "phase4_log_rows")
+    start = rows[index * 8 + 1 + after * 2]
+    size = rows[index * 8 + 2 + after * 2]
+    values = record_get(state, "phase4_metric_rows")
+    names = record_get(state, "phase4_metric_names")
+    result = map_new()
+    cursor = 0
+    while cursor < size:
+        slot = (start + cursor) * 2
+        map_set(result, list_get(names, values[slot]), values[slot + 1])
+        cursor = cursor + 1
+    return result
+
+# Nine independent leaves fit the same flat checkpoint as the other organs.
+def haiku_phase4_init(state):
+    record_set(state, "phase4_prev", "")
+    record_set(state, "phase4_log", list_new())
+    record_set(state, "phase4_log_rows", zeros(1))
+    record_set(state, "phase4_metric_names", list_new())
+    record_set(state, "phase4_metric_rows", zeros(1))
+    record_set(state, "phase4_states", list_new())
+    record_set(state, "phase4_snapshots", zeros(1))
+    record_set(state, "phase4_edges", list_new())
+    record_set(state, "phase4_totals", zeros(1))
+    return 1
+
+# Validate both tables against the retained events, in their original order.
+def haiku_phase4_check(state):
+    assert(text_equal(record_kind(state, "phase4_prev"), "string"), "Haiku bridge previous state must be text")
+    fields = haiku_words("phase4_log phase4_metric_names phase4_states phase4_edges")
+    cursor = 0
+    while cursor < 4:
+        assert(text_equal(record_kind(state, list_get(fields, cursor)), "list"), "Haiku bridge history needs string lists")
+        cursor = cursor + 1
+    fields = haiku_words("phase4_log_rows phase4_metric_rows phase4_snapshots phase4_totals")
+    cursor = 0
+    while cursor < 4:
+        key = list_get(fields, cursor)
+        assert(text_equal(record_kind(state, key), "array"), "Haiku bridge history needs numeric vectors")
+        values = record_get(state, key)
+        assert(rows(values) == 0 and cols(values) == 0, "Haiku bridge history must be a vector")
+        cursor = cursor + 1
+    log = record_get(state, "phase4_log")
+    rows = record_get(state, "phase4_log_rows")
+    metrics = record_get(state, "phase4_metric_rows")
+    names = record_get(state, "phase4_metric_names")
+    states = record_get(state, "phase4_states")
+    snapshots = record_get(state, "phase4_snapshots")
+    edges = record_get(state, "phase4_edges")
+    totals = record_get(state, "phase4_totals")
+    count = list_len(log) / 3
+    edge_count = list_len(edges) / 2
+    assert(count == floor(count) and count <= 10000, "Haiku bridge history needs at most 10000 complete rows")
+    assert(edge_count == floor(edge_count) and edge_count <= count, "Haiku bridge edges need complete pairs")
+    assert(list_len(states) <= count and list_len(names) <= 10000, "Haiku bridge dictionary is too large")
+    assert(len(rows) == max(1, count * 8), "Haiku bridge history row lengths differ")
+    assert(len(snapshots) == max(1, list_len(states) * 2), "Haiku bridge snapshot lengths differ")
+    assert(len(totals) == max(1, edge_count * 6), "Haiku bridge aggregate lengths differ")
+    named = map_new()
+    cursor = 0
+    while cursor < list_len(names):
+        name = list_get(names, cursor)
+        assert(map_has(named, name) == 0, "Haiku bridge metric dictionary has duplicates")
+        map_set(named, name, cursor)
+        cursor = cursor + 1
+    indexed = map_new()
+    cursor = 0
+    while cursor < edge_count:
+        key = haiku_phase4_pair(list_get(edges, cursor * 2), list_get(edges, cursor * 2 + 1))
+        assert(map_has(indexed, key) == 0, "Haiku bridge aggregate has duplicate edges")
+        map_set(indexed, key, cursor)
+        cursor = cursor + 1
+    expected_totals = zeros(max(1, edge_count * 6))
+    expected_snapshots = zeros(max(1, list_len(states) * 2))
+    activated = map_new()
+    seen_edges = map_new()
+    used_names = map_new()
+    offset = 0
+    cursor = 0
+    while cursor < count:
+        slot = cursor * 8
+        part = 0
+        while part < 3:
+            assert(text_len(list_get(log, cursor * 3 + part)) <= 10000, "Haiku bridge identifier limit is 10000")
+            part = part + 1
+        assert(isfinite(rows[slot]), "Haiku bridge clock must be finite")
+        part = 0
+        while part < 2:
+            start = rows[slot + 1 + part * 2]
+            size = rows[slot + 2 + part * 2]
+            assert(start == offset, "Haiku bridge metric offsets are not contiguous")
+            assert(size >= 0 and size <= 10000 and size == floor(size), "Haiku bridge metric count is invalid")
+            assert((start + size) * 2 <= len(metrics), "Haiku bridge metric history is truncated")
+            present = map_new()
+            item = 0
+            while item < size:
+                at = (start + item) * 2
+                name_index = metrics[at]
+                assert(isfinite(name_index) and name_index >= 0 and name_index < list_len(names), "Haiku bridge metric index is invalid")
+                assert(name_index == floor(name_index) and isfinite(metrics[at + 1]), "Haiku bridge metric value is invalid")
+                name = list_get(names, name_index)
+                assert(map_has(present, name) == 0, "Haiku bridge metric map has duplicate keys")
+                if map_has(used_names, name) == 0:
+                    assert(name_index == map_len(used_names), "Haiku bridge metric dictionary order differs")
+                    map_set(used_names, name, name_index)
+                map_set(present, name, 1)
+                item = item + 1
+            offset = offset + size
+            part = part + 1
+        part = 5
+        while part < 8:
+            assert(rows[slot + part] == 0 or rows[slot + part] == 1, "Haiku bridge flags must be boolean")
+            part = part + 1
+        current = list_get(log, cursor * 3)
+        previous = list_get(log, cursor * 3 + 1)
+        if map_has(activated, current) == 0:
+            at = map_len(activated)
+            assert(at < list_len(states), "Haiku bridge snapshot is missing")
+            assert(text_equal(list_get(states, at), current), "Haiku bridge snapshot order differs")
+            map_set(activated, current, at)
+        at = map_get(activated, current) * 2
+        expected_snapshots[at] = expected_snapshots[at] + 1
+        expected_snapshots[at + 1] = cursor
+        if text_len(previous) > 0:
+            key = haiku_phase4_pair(previous, current)
+            assert(map_has(indexed, key), "Haiku bridge aggregate is missing")
+            edge = map_get(indexed, key)
+            if map_has(seen_edges, key) == 0:
+                assert(edge == map_len(seen_edges), "Haiku bridge aggregate order differs")
+                map_set(seen_edges, key, edge)
+            before = haiku_phase4_metrics(state, cursor, 0)
+            after = haiku_phase4_metrics(state, cursor, 1)
+            values = zeros(6)
+            values[0] = 1
+            values[1] = haiku_bridge_cosine(before, after)
+            values[2] = haiku_bridge_quality(after) - haiku_bridge_quality(before)
+            values[3] = rows[slot + 5]
+            values[4] = rows[slot + 6]
+            values[5] = rows[slot + 7]
+            part = 0
+            while part < 6:
+                expected_totals[edge * 6 + part] = expected_totals[edge * 6 + part] + values[part]
+                part = part + 1
+        cursor = cursor + 1
+    assert(len(metrics) == max(1, offset * 2), "Haiku bridge metric history has trailing values")
+    assert(map_len(used_names) == list_len(names), "Haiku bridge metric dictionary has unused keys")
+    assert(map_len(activated) == list_len(states), "Haiku bridge snapshot has unused states")
+    assert(map_len(seen_edges) == edge_count, "Haiku bridge aggregate has unused edges")
+    cursor = 0
+    while cursor < list_len(states):
+        assert(snapshots[cursor * 2] == expected_snapshots[cursor * 2], "Haiku bridge activation count differs")
+        assert(snapshots[cursor * 2 + 1] == expected_snapshots[cursor * 2 + 1], "Haiku bridge latest snapshot differs")
+        cursor = cursor + 1
+    cursor = 0
+    while cursor < edge_count:
+        part = 0
+        while part < 6:
+            assert(isfinite(totals[cursor * 6 + part]), "Haiku bridge aggregate must be finite")
+            assert(totals[cursor * 6 + part] == expected_totals[cursor * 6 + part], "Haiku bridge aggregate differs from history")
+            part = part + 1
+        cursor = cursor + 1
+    previous = ""
+    if count > 0:
+        previous = list_get(log, (count - 1) * 3)
+    assert(text_equal(record_get(state, "phase4_prev"), previous), "Haiku bridge previous state differs from history")
+    if count == 0:
+        assert(rows[0] == 0 and snapshots[0] == 0, "Haiku empty bridge history has retained rows")
+    if edge_count == 0:
+        assert(totals[0] == 0, "Haiku empty bridge aggregate has retained values")
+    if offset == 0:
+        assert(metrics[0] == 0, "Haiku empty bridge metrics have retained values")
+    return count
+
+# The caller provides a detached turn; all capacity checks precede publication.
+# Flags are [overwhelm, boredom, stuck]. No random stream is read here.
+def haiku_phase4_record(state, current, before, after, previous, turn_id, clock, flags):
+    count = haiku_phase4_check(state)
+    assert(count < 10000, "Haiku bridge history is full")
+    assert(isfinite(clock), "Haiku bridge clock must be finite")
+    assert(text_len(current) <= 10000 and text_len(previous) <= 10000 and text_len(turn_id) <= 10000, "Haiku bridge identifier limit is 10000")
+    assert(map_len(before) <= 10000 and map_len(after) <= 10000, "Haiku bridge metric limit is 10000")
+    assert(len(flags) == 3, "Haiku bridge requires three flags")
+    assert(rows(flags) == 0 and cols(flags) == 0, "Haiku bridge flags must be a vector")
+    cursor = 0
+    while cursor < 3:
+        assert(flags[cursor] == 0 or flags[cursor] == 1, "Haiku bridge flags must be boolean")
+        cursor = cursor + 1
+    addition = zeros(6)
+    addition[0] = 1
+    if text_len(previous) > 0:
+        addition[1] = haiku_bridge_cosine(before, after)
+        addition[2] = haiku_bridge_quality(after) - haiku_bridge_quality(before)
+        assert(isfinite(addition[2]), "Haiku bridge quality change exceeds finite float32")
+    cursor = 0
+    while cursor < 3:
+        addition[cursor + 3] = flags[cursor]
+        cursor = cursor + 1
+    log_rows = record_get(state, "phase4_log_rows")
+    used = 0
+    if count > 0:
+        used = log_rows[(count - 1) * 8 + 3] + log_rows[(count - 1) * 8 + 4]
+    metrics = haiku_phase4_extend(record_get(state, "phase4_metric_rows"), used * 2, (map_len(before) + map_len(after)) * 2)
+    names = record_get(state, "phase4_metric_names")
+    named = map_new()
+    cursor = 0
+    while cursor < list_len(names):
+        map_set(named, list_get(names, cursor), cursor)
+        cursor = cursor + 1
+    part = 0
+    offset = used
+    while part < 2:
+        source = before
+        if part == 1:
+            source = after
+        keys = map_keys(source)
+        cursor = 0
+        while cursor < list_len(keys):
+            name = list_get(keys, cursor)
+            if map_has(named, name) == 0:
+                assert(list_len(names) < 10000, "Haiku bridge metric dictionary is full")
+                map_set(named, name, list_len(names))
+                list_push(names, name)
+            metrics[offset * 2] = map_get(named, name)
+            metrics[offset * 2 + 1] = map_get(source, name)
+            offset = offset + 1
+            cursor = cursor + 1
+        part = part + 1
+    rows = haiku_phase4_extend(log_rows, count * 8, 8)
+    rows[count * 8] = clock
+    rows[count * 8 + 1] = used
+    rows[count * 8 + 2] = map_len(before)
+    rows[count * 8 + 3] = used + map_len(before)
+    rows[count * 8 + 4] = map_len(after)
+    cursor = 0
+    while cursor < 3:
+        rows[count * 8 + 5 + cursor] = flags[cursor]
+        cursor = cursor + 1
+    states = record_get(state, "phase4_states")
+    selected = -1
+    cursor = 0
+    while cursor < list_len(states):
+        if text_equal(list_get(states, cursor), current):
+            selected = cursor
+        cursor = cursor + 1
+    extra = 0
+    if selected < 0:
+        selected = list_len(states)
+        extra = 2
+    snapshots = haiku_phase4_extend(record_get(state, "phase4_snapshots"), list_len(states) * 2, extra)
+    snapshots[selected * 2] = snapshots[selected * 2] + 1
+    snapshots[selected * 2 + 1] = count
+    if extra > 0:
+        list_push(states, current)
+    edges = record_get(state, "phase4_edges")
+    edge_count = list_len(edges) / 2
+    totals = record_get(state, "phase4_totals")
+    if text_len(previous) > 0:
+        selected = -1
+        cursor = 0
+        while cursor < edge_count:
+            if text_equal(list_get(edges, cursor * 2), previous) and text_equal(list_get(edges, cursor * 2 + 1), current):
+                selected = cursor
+            cursor = cursor + 1
+        extra = 0
+        if selected < 0:
+            selected = edge_count
+            extra = 6
+        totals = haiku_phase4_extend(totals, edge_count * 6, extra)
+        cursor = 0
+        while cursor < 6:
+            at = selected * 6 + cursor
+            totals[at] = totals[at] + addition[cursor]
+            assert(isfinite(totals[at]), "Haiku bridge aggregate exceeds finite float32")
+            cursor = cursor + 1
+        if extra > 0:
+            list_push(edges, previous)
+            list_push(edges, current)
+    list_push(record_get(state, "phase4_log"), current)
+    list_push(record_get(state, "phase4_log"), previous)
+    list_push(record_get(state, "phase4_log"), turn_id)
+    record_set(state, "phase4_log_rows", rows)
+    record_set(state, "phase4_metric_names", names)
+    record_set(state, "phase4_metric_rows", metrics)
+    record_set(state, "phase4_states", states)
+    record_set(state, "phase4_snapshots", snapshots)
+    record_set(state, "phase4_edges", edges)
+    record_set(state, "phase4_totals", totals)
+    record_set(state, "phase4_prev", current)
+    return current
+
+# The chat handoff changes quality while retaining this turn's four metrics.
+def haiku_phase4_turn(state, event):
+    before = map_new()
+    after = map_new()
+    names = haiku_words("dissonance entropy novelty arousal")
+    cursor = 0
+    while cursor < 4:
+        name = list_get(names, cursor)
+        value = map_get(event, name)
+        map_set(before, name, value)
+        map_set(after, name, value)
+        cursor = cursor + 1
+    map_set(before, "quality", map_get(event, "quality_before"))
+    map_set(after, "quality", map_get(event, "quality_after"))
+    current = haiku_bridge_id(map_get(event, "dissonance"), map_get(event, "entropy"), map_get(event, "quality_after"))
+    flags = zeros(3)
+    flags[0] = map_get(event, "overwhelm")
+    flags[1] = map_get(event, "boredom")
+    flags[2] = map_get(event, "stuck")
+    turn_id = text_concat("turn_", text_fixed(map_get(event, "turn"), 0))
+    previous = record_get(state, "phase4_prev")
+    return haiku_phase4_record(state, current, before, after, previous, turn_id, map_get(event, "clock"), flags)
+
+# count, similarity, quality delta, overwhelm, boredom, stuck, composite score.
+def haiku_phase4_transition(totals, index):
+    result = zeros(7)
+    count = totals[index * 6]
+    result[0] = count
+    cursor = 1
+    while cursor < 6:
+        result[cursor] = totals[index * 6 + cursor] / count
+        cursor = cursor + 1
+    result[6] = haiku_bridge_score(result[1], result[2], result[3], result[4], result[5])
+    return result
+
+# SQL shortlist first: descending count, insertion-order ties, at most 2N.
+# Stable score sorting happens only inside that shortlist.
+def haiku_phase4_suggest(state, current, min_count, max_results):
+    haiku_phase4_check(state)
+    assert(isfinite(min_count) and isfinite(max_results), "Haiku bridge suggestion limits must be finite")
+    assert(max_results == floor(max_results) and abs(max_results) <= 10000, "Haiku bridge result limit is invalid")
+    edges = record_get(state, "phase4_edges")
+    totals = record_get(state, "phase4_totals")
+    edge_count = list_len(edges) / 2
+    capacity = min(edge_count, max_results * 2)
+    if max_results < 0:
+        capacity = edge_count
+    order = zeros(max(1, capacity))
+    size = 0
+    cursor = 0
+    while cursor < edge_count:
+        if text_equal(list_get(edges, cursor * 2), current) and totals[cursor * 6] >= min_count and capacity > 0:
+            place = 0
+            searching = 1
+            while place < size and searching:
+                if totals[order[place] * 6] < totals[cursor * 6]:
+                    searching = 0
+                else:
+                    place = place + 1
+            if place < capacity:
+                shift = min(size, capacity - 1)
+                while shift > place:
+                    order[shift] = order[shift - 1]
+                    shift = shift - 1
+                order[place] = cursor
+                size = min(capacity, size + 1)
+        cursor = cursor + 1
+    scores = zeros(max(1, size))
+    cursor = 0
+    while cursor < size:
+        values = haiku_phase4_transition(totals, order[cursor])
+        scores[cursor] = values[6]
+        cursor = cursor + 1
+    cursor = 1
+    while cursor < size:
+        selected = order[cursor]
+        score = scores[cursor]
+        place = cursor
+        searching = 1
+        while place > 0 and searching:
+            if scores[place - 1] >= score:
+                searching = 0
+            else:
+                order[place] = order[place - 1]
+                scores[place] = scores[place - 1]
+                place = place - 1
+        order[place] = selected
+        scores[place] = score
+        cursor = cursor + 1
+    if max_results < 0:
+        size = max(0, size + max_results)
+    else:
+        size = min(size, max_results)
+    result = record_new()
+    record_set(result, "from", list_new())
+    record_set(result, "to", list_new())
+    statistics = zeros(max(1, size * 7))
+    cursor = 0
+    while cursor < size:
+        edge = order[cursor]
+        list_push(record_get(result, "from"), list_get(edges, edge * 2))
+        list_push(record_get(result, "to"), list_get(edges, edge * 2 + 1))
+        values = haiku_phase4_transition(totals, edge)
+        part = 0
+        while part < 7:
+            statistics[cursor * 7 + part] = values[part]
+            part = part + 1
+        cursor = cursor + 1
+    record_set(result, "statistics", statistics)
+    return result
+
+# History is timestamp-descending with insertion order for equal timestamps.
+# Negative limits preserve SQLite's unbounded LIMIT behavior.
+def haiku_phase4_history(state, current, limit):
+    haiku_phase4_check(state)
+    assert(isfinite(limit) and limit == floor(limit) and abs(limit) <= 10000, "Haiku bridge history limit is invalid")
+    log = record_get(state, "phase4_log")
+    rows = record_get(state, "phase4_log_rows")
+    count = list_len(log) / 3
+    capacity = min(count, limit)
+    if limit < 0:
+        capacity = count
+    order = zeros(max(1, capacity))
+    size = 0
+    cursor = 0
+    while cursor < count:
+        if text_equal(list_get(log, cursor * 3), current) and capacity > 0:
+            place = 0
+            searching = 1
+            while place < size and searching:
+                if rows[order[place] * 8] < rows[cursor * 8]:
+                    searching = 0
+                else:
+                    place = place + 1
+            if place < capacity:
+                shift = min(size, capacity - 1)
+                while shift > place:
+                    order[shift] = order[shift - 1]
+                    shift = shift - 1
+                order[place] = cursor
+                size = min(capacity, size + 1)
+        cursor = cursor + 1
+    result = record_new()
+    record_set(result, "count", size)
+    record_set(result, "indices", haiku_phase4_extend(order, size, 0))
+    return result
+
+def haiku_phase4_entry(state, index):
+    count = list_len(record_get(state, "phase4_log")) / 3
+    assert(index >= 0 and index < count and index == floor(index), "Haiku bridge history index is invalid")
+    log = record_get(state, "phase4_log")
+    rows = record_get(state, "phase4_log_rows")
+    result = record_new()
+    record_set(result, "state_id", list_get(log, index * 3))
+    record_set(result, "prev_state_id", list_get(log, index * 3 + 1))
+    record_set(result, "turn_id", list_get(log, index * 3 + 2))
+    record_set(result, "clock", rows[index * 8])
+    record_set(result, "metrics_before", haiku_phase4_metrics(state, index, 0))
+    record_set(result, "metrics_after", haiku_phase4_metrics(state, index, 1))
+    record_set(result, "overwhelm", rows[index * 8 + 5])
+    record_set(result, "boredom", rows[index * 8 + 6])
+    record_set(result, "stuck", rows[index * 8 + 7])
+    return result
+
+# A missing state returns an empty record, without creating a snapshot.
+def haiku_phase4_snapshot(state, current):
+    states = record_get(state, "phase4_states")
+    snapshots = record_get(state, "phase4_snapshots")
+    result = record_new()
+    cursor = 0
+    while cursor < list_len(states):
+        if text_equal(list_get(states, cursor), current):
+            index = snapshots[cursor * 2 + 1]
+            rows = record_get(state, "phase4_log_rows")
+            record_set(result, "state_id", current)
+            record_set(result, "activations_total", snapshots[cursor * 2])
+            record_set(result, "last_updated", rows[index * 8])
+            record_set(result, "last_metrics", haiku_phase4_metrics(state, index, 1))
+            return result
+        cursor = cursor + 1
+    return result
