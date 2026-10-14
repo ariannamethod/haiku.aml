@@ -203,8 +203,10 @@ forward or an invalidated cache; cached keys/values computed under an earlier
 mixture are not the state of the new one.
 
 The dream-friend's utterances still originate in Haiku's established dream
-machinery. The experimental 185-field checkpoint now gives it separate lexical
-contexts, a mixing preference and a complete private parliament. Its history
+machinery. The experimental checkpoint gives it separate lexical
+contexts, a mixing preference and a complete private parliament. Version 2
+adds its own [Janus calendar and expectation debt](JANUS_BALANCE.md), bringing
+the complete checkpoint from 185 to 227 fields. Its history
 advances only through its own events and explicitly delivered encounters.
 
 Each presence may come to favor the two lexical sources differently through
@@ -437,7 +439,7 @@ revisions so the port can choose an explicit contract:
 | Frozen lexical bodies | Implemented NoTorch converter, GGUF loader/forward and two Q8_0/F32 assets | Source pins, all-tensor conversion, multiple lengths, chunking and numerical controls recorded with weights |
 | Private parliament | Implemented AML field, experts, immunity and delayed reward; actual contact in the experimental conversation | Two private owners, real encounter order, measured prototype contribution and exact restart checked |
 | Optional lexical sources | Implemented immutable AML handles, 48-word reviewed pool, bounded admission and 448-value representations | Zero/one/two sources, quiet absence, exact hashes and unchanged disabled-profile draws checked |
-| Duality in each presence | Implemented separate owners, four retained contexts and all-parameter mixing; calendar/debt remain planned | Four histories survive restart; delivered/withheld context interventions and parameter endpoints checked |
+| Duality in each presence | Implemented separate owners, four retained contexts, all-parameter mixing, private calendars and witnessed debt | Explicit captured day, fixed/dynamic controls, delayed external witnesses and complete restart; Janus contract records the boundaries |
 | Conceptual attraction | Implemented named aliases, reviewed bindings, model prototypes and tagged exchange; learned concept structure remains planned | Model contribution changes measured features; private pressure ranks later admission |
 | Returning thoughts | Implemented one bounded text-context return per selected boundary; direction injection remains planned | Source ancestry, replay, exact disabled behavior, serial/worker equality and one publication checked |
 | Dream-born glyphs | Bounded recursive symbol formation and stable structure across both owners | Creation threshold, recursive identity, save/restart, adoption and replay provenance |

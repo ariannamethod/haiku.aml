@@ -55,8 +55,10 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   separate balance preferences and explicit exchanges while sharing immutable
   weight handles. Keep readiness, hashes and effective one-source coefficients
   explicit at the AML/NoTorch boundary.
-- [ ] Evolve each presence's Gamma/Janus balance, calendar and operative debt
+- [x] Evolve each presence's Gamma/Janus balance, calendar and operative debt
   through its history; compare dynamic mixing with the fixed-alpha controls.
+  [Private Janus](docs/JANUS_BALANCE.md) captures one UTC day, retains the full
+  reviewed score pool, and waits for a later eligible external witness.
 - [ ] Add a conceptual field beneath the words: persistent glyph attraction,
   learned word bindings, then recursive symbols born during dream consolidation.
   Keep external observations, peer exchange and internal replay distinct.

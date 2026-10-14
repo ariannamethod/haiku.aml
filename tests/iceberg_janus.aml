@@ -1,0 +1,59 @@
+# Explicit Janus growth leaves the established v1 and absent-body voice exact.
+IMPORT "../src/iceberg_session.aml"
+
+# 2026-10-14 at 00:00 UTC, days since the POSIX epoch.
+day = 20740
+missing = model_try_load("")
+core = haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0)
+legacy = haiku_iceberg_new(core, [1, 1, 2, 1])
+original = record_clone(legacy)
+live = haiku_iceberg_enable_janus(legacy, day, 1, 0)
+assert(record_equal(original, legacy), "Janus growth changed the original v1 owner")
+assert(record_get(legacy, "version") == 1 and list_len(record_keys(legacy)) == 185, "Established iceberg v1 schema changed")
+assert(record_get(live, "version") == 2 and list_len(record_keys(live)) == 227, "Janus iceberg v2 schema differs")
+assert(record_has(legacy, "haiku_janus:keys") == 0, "V1 silently acquired a Janus namespace")
+again = haiku_iceberg_enable_janus(live, day + 90, 0, 0)
+assert(record_equal(live, again), "Explicit Janus upgrade is not idempotent")
+record_set(again, "haiku_janus:fixed_alpha", 0.75)
+assert(record_get(live, "haiku_janus:fixed_alpha") == 0.5, "Idempotent upgrade returned mutable aliases")
+
+old_request = haiku_iceberg_request_at(legacy, "rain", missing, missing, day)
+request = haiku_iceberg_request_at(live, "rain", missing, missing, day)
+assert(list_len(record_keys(old_request)) == 7 and record_has(old_request, "day") == 0, "V1 request acquired a calendar input")
+assert(list_len(record_keys(request)) == 8 and record_get(request, "day") == day, "V2 request did not freeze the supplied civil day")
+
+baseline = record_clone(core)
+other_legacy = record_clone(legacy)
+off = haiku_iceberg_enable_janus(haiku_iceberg_new(core, [0, 0, 0, 0]), day, 1, 0)
+before_hlex = haiku_iceberg_part(live, "haiku_lexical")
+before_flex = haiku_iceberg_part(live, "friend_lexical")
+before_friend = haiku_iceberg_part(live, "friend_janus")
+messages = haiku_words("rain memory")
+i = 0
+while i < list_len(messages):
+    text = list_get(messages, i)
+    expected = haiku_session_turn(baseline, text, 0)
+    old = haiku_iceberg_turn_at(legacy, text, 0, missing, missing, 0, day + i)
+    old_other_day = haiku_iceberg_turn_at(other_legacy, text, 0, missing, missing, 1, day + i + 90)
+    actual = haiku_iceberg_turn_at(live, text, 0, missing, missing, 1, day + i)
+    disabled = haiku_iceberg_turn_at(off, text, 0, missing, missing, 1, day + i)
+    assert(text_equal(expected, old) and text_equal(expected, old_other_day), "V1 calendar argument changed the established voice")
+    assert(record_equal(legacy, other_legacy), "V1 calendar argument changed a checkpoint leaf")
+    assert(text_equal(expected, actual) and text_equal(expected, disabled), "Absent or disabled Janus bodies changed spoken continuation")
+    assert(record_equal(baseline, haiku_iceberg_part(live, "voice")), "Absent Janus bodies changed foreground draws or memory")
+    assert(record_equal(baseline, haiku_iceberg_part(off, "voice")), "Disabled Janus life changed foreground draws or memory")
+    i = i + 1
+assert(record_equal(before_hlex, haiku_iceberg_part(live, "haiku_lexical")), "Missing bodies changed Haiku's lexical owner")
+assert(record_equal(before_flex, haiku_iceberg_part(live, "friend_lexical")), "Missing bodies changed the friend's lexical owner")
+assert(record_equal(before_friend, haiku_iceberg_part(live, "friend_janus")), "Waking human turns reached an unheard friend")
+assert(list_len(record_get(live, "admission_text")) == 0, "Absent bodies admitted words")
+haiku_iceberg_check(live, 0)
+
+checkpoint_save(live, "iceberg-janus.state")
+resumed = checkpoint_load("iceberg-janus.state")
+haiku_iceberg_check(resumed, 0)
+assert(record_equal(live, resumed), "Janus checkpoint changed a private leaf")
+first = haiku_iceberg_turn_at(live, "a quiet tree remembers", 0, missing, missing, 0, day + 3)
+second = haiku_iceberg_turn_at(resumed, "a quiet tree remembers", 0, missing, missing, 1, day + 3)
+assert(text_equal(first, second) and record_equal(live, resumed), "Captured-day Janus restart differs from serial life")
+PRINT "HAIKU_ICEBERG_JANUS_LIFE_OK"

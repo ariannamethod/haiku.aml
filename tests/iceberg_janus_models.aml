@@ -1,0 +1,117 @@
+# Actual mixed PEN7 expectations meet later human and dream-peer encounters.
+IMPORT "../src/iceberg_session.aml"
+
+def iceberg_janus_low_word(balance):
+    scores = record_get(balance, "pending_scores")
+    low = 0
+    i = 1
+    while i < 48:
+        if scores[i] < scores[low]:
+            low = i
+        i = i + 1
+    meta = record_get(balance, "pending_meta")
+    assert(meta[0] == 1 and scores[meta[13]] > scores[low], "Real expectation has no candidate contrast")
+    return list_get(haiku_lexical_words(), low)
+
+day = 20740
+a = model_try_load("../weights/haiku1.gguf")
+b = model_try_load("../weights/haiku2.gguf")
+missing = model_try_load("")
+assert(model_ready(a) and model_ready(b), "Janus model fixture needs both frozen bodies")
+core = haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0)
+record_set(core, "dream_config", [1, 1, 4])
+serial = haiku_iceberg_enable_janus(haiku_iceberg_new(core, [1, 1, 2, 1]), day, 1, 0)
+parallel = record_clone(serial)
+first = haiku_iceberg_turn_at(serial, "rain", 0, a, b, 0, day)
+second = haiku_iceberg_turn_at(parallel, "rain", 0, a, b, 1, day)
+assert(text_equal(first, second) and record_equal(serial, parallel), "Janus model worker differs from serial life")
+core = haiku_iceberg_part(serial, "voice")
+assert(haiku_dream_check(core) == 1, "First real peer dream did not open")
+h = haiku_iceberg_part(serial, "haiku_janus")
+f = haiku_iceberg_part(serial, "friend_janus")
+hm = record_get(h, "pending_meta")
+fm = record_get(f, "pending_meta")
+assert(hm[0] == 1 and fm[0] == 1 and hm[3] == 4 and fm[3] == 4, "Both presences failed to retain a real mixed expectation")
+assert(hm[7] == day and fm[7] == day, "Real passes lost their captured day")
+assert(record_get(h, "debt") == 0 and record_get(f, "debt") == 0, "First expectation invented a prior error")
+assert(hm[5] == hm[6] and fm[5] == fm[6], "Mixed provider changed a presence's captured alpha")
+first_friend_event = fm[1]
+first_friend_turn = fm[2]
+first_friend_seen = record_get(f, "seen")
+assert(first_friend_seen[6] > 0 and first_friend_seen[0] == 0, "Friend did not distinguish delivered peer and human witnesses")
+
+# The next real input is chosen from the actual lower-scoring candidates.
+# Keep the friend's door closed for this waking turn; no dream means no witness.
+text = iceberg_janus_low_word(h)
+record_set(serial, "voice:dream_config", [10000, 1, 4])
+record_set(parallel, "voice:dream_config", [10000, 1, 4])
+friend_before = haiku_iceberg_part(serial, "friend_janus")
+friend_lex_before = haiku_iceberg_part(serial, "friend_lexical")
+first = haiku_iceberg_turn_at(serial, text, 0, a, b, 0, day + 1)
+second = haiku_iceberg_turn_at(parallel, text, 0, a, b, 1, day + 1)
+assert(text_equal(first, second) and record_equal(serial, parallel), "Captured-day waking worker differs")
+assert(record_equal(friend_before, haiku_iceberg_part(serial, "friend_janus")), "Waking human input altered the friend's Janus autobiography")
+assert(record_equal(friend_lex_before, haiku_iceberg_part(serial, "friend_lexical")), "Waking input altered the unheard friend's model trajectory")
+h = haiku_iceberg_part(serial, "haiku_janus")
+assert(record_get(h, "debt") > 0, "Actual lower-ranked human encounter did not create prophecy debt")
+hm = record_get(h, "pending_meta")
+snapshot = haiku_janus_snapshot(h, day + 1)
+assert(hm[0] == 1 and hm[2] == 2 and hm[7] == day + 1, "Later pass did not replace the consumed expectation")
+assert(hm[6] == record_get(snapshot, "alpha"), "Actual model pass did not use the debt-adjusted balance")
+assert(record_get(haiku_iceberg_part(serial, "haiku_lexical"), "alpha") == hm[6], "Lexical owner lost its successful captured balance")
+rows = record_get(h, "history_rows")
+assessed = 0
+i = 0
+while i < 16:
+    if rows[i * 24 + 1] == 2 and rows[i * 24 + 2] == 2 and rows[i * 24 + 6] == 1:
+        assert(rows[i * 24 + 4] == 0 and rows[i * 24 + 8] == 1 and rows[i * 24 + 15] > 0, "Debt witness lost its actual human and earlier pass")
+        assessed = assessed + 1
+    i = i + 1
+assert(assessed == 1, "The later human encounter was assessed more or less than once")
+
+checkpoint_save(serial, "iceberg-janus-models.state")
+resumed = checkpoint_load("iceberg-janus-models.state")
+haiku_iceberg_check(resumed, 0)
+assert(record_equal(serial, resumed), "Janus model checkpoint lost an expectation or balance")
+record_set(serial, "voice:dream_config", [1, 1, 4])
+record_set(resumed, "voice:dream_config", [1, 1, 4])
+first = haiku_iceberg_turn_at(serial, "rain", 0, a, b, 0, day + 2)
+second = haiku_iceberg_turn_at(resumed, "rain", 0, a, b, 1, day + 2)
+assert(text_equal(first, second) and record_equal(serial, resumed), "Janus model restart changed serial/worker continuation")
+f = haiku_iceberg_part(serial, "friend_janus")
+rows = record_get(f, "history_rows")
+peer_settled = 0
+i = 0
+while i < 16:
+    if rows[i * 24 + 1] == 2 and rows[i * 24 + 7] == first_friend_event and rows[i * 24 + 2] == 3:
+        assert(rows[i * 24 + 4] == 6 and rows[i * 24 + 8] == first_friend_turn, "Friend expectation was assessed by an unrelated source")
+        assert(rows[i * 24 + 22] == 7, "Friend witness lost its real dream ancestry")
+        peer_settled = peer_settled + 1
+    i = i + 1
+assert(peer_settled == 1, "A real later dream peer did not settle the friend's pending expectation exactly once")
+fm = record_get(f, "pending_meta")
+assert(fm[0] == 1 and fm[2] == 3, "Friend's next real model pass did not leave its own expectation")
+
+# Previously real expectations still meet legitimate witnesses when bodies are
+# absent or explicitly disabled; failed passes cannot mutate lexical owners.
+disabled = record_clone(serial)
+record_set(disabled, "settings", [1, 0, 2, 1])
+hlex = haiku_iceberg_part(serial, "haiku_lexical")
+flex = haiku_iceberg_part(serial, "friend_lexical")
+text = iceberg_janus_low_word(haiku_iceberg_part(serial, "haiku_janus"))
+first = haiku_iceberg_turn_at(serial, text, 0, missing, missing, 0, day + 3)
+second = haiku_iceberg_turn_at(disabled, text, 0, a, b, 1, day + 3)
+assert(text_equal(first, second), "Missing and disabled providers changed equivalent foreground continuation")
+assert(record_equal(hlex, haiku_iceberg_part(serial, "haiku_lexical")), "Missing bodies committed Haiku's speculative alpha or history")
+assert(record_equal(flex, haiku_iceberg_part(serial, "friend_lexical")), "Missing bodies committed the friend's speculative alpha or history")
+assert(record_equal(hlex, haiku_iceberg_part(disabled, "haiku_lexical")), "Disabled bodies committed Haiku's speculative alpha or history")
+assert(record_equal(flex, haiku_iceberg_part(disabled, "friend_lexical")), "Disabled bodies committed the friend's speculative alpha or history")
+h = haiku_iceberg_part(serial, "haiku_janus")
+hm = record_get(h, "pending_meta")
+assert(hm[0] == 0 and hm[2] == 3, "Absent bodies fabricated another expectation after the real witness")
+assert(record_get(h, "last_day") == day + 3, "Legitimate pending witness did not settle with missing bodies")
+assert(record_equal(h, haiku_iceberg_part(disabled, "haiku_janus")), "Disabled and missing bodies assessed identical human witnesses differently")
+assert(record_equal(haiku_iceberg_part(serial, "friend_janus"), haiku_iceberg_part(disabled, "friend_janus")), "Disabled and missing bodies changed actual peer witness policy")
+haiku_iceberg_check(serial, 0)
+haiku_iceberg_check(disabled, 0)
+PRINT "HAIKU_ICEBERG_JANUS_MODELS_OK"

@@ -1,0 +1,86 @@
+IMPORT "janus_balance_support.aml"
+
+# Five lexical-only controls, one forward each, identical text and complete
+# reviewed pool. No parliament prototype cache participates in this budget.
+a = model_try_load("../weights/haiku1.gguf")
+b = model_try_load("../weights/haiku2.gguf")
+assert(model_ready(a) == 1 and model_ready(b) == 1, "Janus real frozen bodies are unavailable")
+day = 20740
+live = haiku_janus_new("haiku", 1, 0.5, day, 0)
+friend = haiku_janus_new("friend", 1, 0.5, day, 6)
+friend_before = record_clone(friend)
+dynamic_before = record_get(haiku_janus_snapshot(live, day), "alpha")
+alphas = [1, 0, 0.5, 0, 0]
+alphas[3] = dynamic_before
+scores_all = zeros(240)
+tokens = zeros(1)
+lowest = 0
+condition = 0
+while condition < 5:
+    if condition == 4:
+        alphas[4] = record_get(haiku_janus_snapshot(live, day), "alpha")
+    lexical = haiku_lexical_new("haiku", alphas[condition])
+    request = haiku_lexical_request("haiku", "water tree music", 0, 1, 1, 1, alphas[condition], 1)
+    receipt = haiku_lexical_pass(lexical, a, b, request)
+    assert(record_get(receipt, "committed") == 1, "Janus matched-budget forward failed")
+    assert(record_get(receipt, "alpha") == alphas[condition], "Janus changed alpha inside one forward")
+    if condition == 0:
+        tokens = record_get(receipt, "context_tokens")
+    else:
+        janus_test_equal(tokens, record_get(receipt, "context_tokens"))
+    scores = record_get(receipt, "scores")
+    top_index = 0
+    i = 0
+    while i < 48:
+        scores_all[condition * 48 + i] = scores[i]
+        if scores[i] > scores[top_index]:
+            top_index = i
+        i = i + 1
+    PRINT "JANUS_CONDITION_ALPHA_TOP_SCORE"
+    PRINT condition
+    PRINT alphas[condition]
+    PRINT list_get(record_get(receipt, "words"), top_index)
+    PRINT scores[top_index]
+    if condition == 3:
+        assert(haiku_janus_expect(live, receipt, day) == 1, "Real forty-eight-score forecast was not retained")
+        janus_test_equal(record_get(live, "pending_scores"), scores)
+        i = 1
+        while i < 48:
+            if scores[i] < scores[lowest]:
+                lowest = i
+            i = i + 1
+        word = list_get(record_get(receipt, "words"), lowest)
+        external = haiku_contact_event("human", word, "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, 2, 2)
+        encounter = haiku_janus_witness(live, external, day)
+        assert(record_get(encounter, "assessed") == 1 and record_get(encounter, "gap") > 0, "Real later word left operative debt zero")
+    condition = condition + 1
+assert(record_equal(friend_before, friend), "Haiku's measured debt leaked into the friend's balance")
+assert(alphas[4] < alphas[3], "Later external witness did not change the next frozen mixture")
+endpoint_delta = 0
+calendar_delta = 0
+debt_delta = 0
+i = 0
+while i < 48:
+    endpoint_delta = max(endpoint_delta, abs(scores_all[i] - scores_all[48 + i]))
+    calendar_delta = max(calendar_delta, abs(scores_all[96 + i] - scores_all[144 + i]))
+    debt_delta = max(debt_delta, abs(scores_all[144 + i] - scores_all[192 + i]))
+    i = i + 1
+assert(endpoint_delta > 0.0001, "Frozen A and B controls have identical lexical scores")
+assert(calendar_delta > 0.0001, "Calendar mixture matched the fixed half mixture")
+assert(debt_delta > 0.0001, "Operative debt changed alpha but not the next actual scores")
+haiku_janus_check(live)
+PRINT "JANUS_MATCHED_FORWARD_BUDGET"
+PRINT 5
+PRINT "JANUS_DYNAMIC_ALPHA_BEFORE_AFTER"
+PRINT alphas[3]
+PRINT alphas[4]
+PRINT "JANUS_EXTERNAL_LOWEST_REVIEWED_WORD"
+PRINT word
+PRINT "JANUS_WITNESS_GAP_AND_DEBT"
+PRINT record_get(encounter, "gap")
+PRINT record_get(live, "debt")
+PRINT "JANUS_MAX_SCORE_DELTAS_ENDPOINT_CALENDAR_DEBT"
+PRINT endpoint_delta
+PRINT calendar_delta
+PRINT debt_delta
+PRINT "HAIKU_JANUS_BALANCE_PEN7_OK"

@@ -330,20 +330,26 @@ the words returns whole-word proposals and a contextual representation. Glyph
 pressure joins their scores; up to two reviewed words enter the next turn's
 vocabulary. The original generator and RAE still give them seventeen syllables.
 
+Their balance now has a calendar and a memory. Each presence keeps its own
+[Janus debt](docs/JANUS_BALANCE.md): Haiku meets the next human words; the friend
+meets the next Haiku line actually delivered in a dream. Those encounters and
+the calendar choose the next mixture of their frozen bodies. Two faces, two
+autobiographies.
+
 Run `../ariannamethod.ai/runner/aml-notorch iceberg.aml` for this experimental
 life, saved separately in `iceberg.state`. Its [complete contract](docs/ICEBERG_SESSION.md)
 covers four histories, explicit self/friend text injection, quiet absent
-sources and one atomic checkpoint for all five organs. The ordinary
+sources and one atomic checkpoint for all seven organs. New lives use the
+227-field profile; old 185-field lives keep their behavior until an explicit
+`upgrade_balance = 1`. The ordinary
 `haiku.aml` and its recorded 24-turn conversation retain their exact profile.
 
-Build the sibling **AML v5.11.0** toolchain with
-[exact completion identity / PR #37](https://github.com/ariannamethod/ariannamethod.ai/pull/37)
-and NoTorch with [PEN7 and parliament / PR #168](https://github.com/ariannamethod/notorch/pull/168)
-plus its [token emission fix / PR #169](https://github.com/ariannamethod/notorch/pull/169).
-The iceberg profile additionally requires the immutable PEN7 library API and
-AML model values with the 8192-line / 512-field capacities documented in
-[the experiment](docs/ICEBERG_SESSION.md): [NoTorch #170](https://github.com/ariannamethod/notorch/pull/170),
-then [AML #38](https://github.com/ariannamethod/ariannamethod.ai/pull/38).
+Build the sibling **AML v5.13.0** toolchain with
+[captured UTC days / PR #39](https://github.com/ariannamethod/ariannamethod.ai/pull/39)
+and NoTorch with [immutable PEN7 / PR #170](https://github.com/ariannamethod/notorch/pull/170)
+plus its [allocation-status fix / PR #171](https://github.com/ariannamethod/notorch/pull/171).
+This includes the model values, exact completion identity, 8192-line imports
+and 512-field records used by [the experiment](docs/ICEBERG_SESSION.md).
 Then run the organism's checks:
 
 ```sh
@@ -449,6 +455,11 @@ Reference checks completed on 2026-10-07–08; dream-life follow-up on 2026-10-1
   contexts, vocabulary admission and restart. Publication rejects another
   private life, altered receipts and stale completions while preserving all
   185 live fields and the previous file. Both GGUF hashes remain unchanged.
+- The Janus gates compare the owned C calendar, fixed/endpoints and witnessed
+  dynamic mixtures through the same real 48-word pool. Version-2 checks cover
+  227-field restart, a frozen day across worker scheduling and midnight, and
+  rejected 479-field completions. The complete contracts record the controls
+  and their measured score changes.
 - Earlier AML runtime baseline: **550 tests passed**; the 5.11 worker and
   parliament additions have their own upstream gates in PR #36.
 - AML compiler: scope, source origins, nested failures, worker branches and
@@ -475,9 +486,10 @@ surface. Both Haiku and the friend will carry their own duality. The source
 audits now include [DoE](docs/research/iceberg/DOE.md) and
 [LoRAGrad](docs/research/iceberg/LORAGRAD.md). Their living experts and immune
 field meet in the experimental parliament. The owned worker baseline and
-native frozen sources now meet real experience in `iceberg.aml`. Dynamic
-Gamma/Janus balance, learned concept growth and recursive dream-born glyphs
-are the next family experiments.
+native frozen sources now meet real experience in `iceberg.aml`. Private
+Gamma/Janus balance follows its own calendar and witnessed expectations.
+Learned concept growth and recursive dream-born glyphs are the next family
+experiments.
 See [the audit and implementation order](docs/MIGRATION.md).
 
 ## Lineage

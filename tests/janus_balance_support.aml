@@ -1,0 +1,32 @@
+IMPORT "../src/janus_balance.aml"
+
+# Declared numerical fixture: 48 known scores, not a generated model receipt.
+def janus_test_receipt(owner, alpha, event, turn, direction):
+    lexical = haiku_lexical_new(owner, alpha)
+    request = haiku_lexical_request(owner, "water tree", 5, event, turn, direction, alpha, 1)
+    receipt = haiku_lexical_receipt(lexical, request)
+    record_set(receipt, "committed", 1)
+    record_set(receipt, "source", 4)
+    record_set(receipt, "availability", 6)
+    record_set(receipt, "identity_a", "50f159a2c34952bd9e6349880b4b20f8bbc0ac4b1f1dc2c1f6e4768732548b66")
+    record_set(receipt, "identity_b", "16909b8590bd7fbbf15ab11b2dbf3743d612da8c617aca2dda03d640fef13e29")
+    record_set(receipt, "tokenizer", "664afe692a006a54fc00406209042f6d452748d64a883ecfab9ef66d41f8bdf2")
+    record_set(receipt, "words", haiku_lexical_words())
+    scores = zeros(48)
+    i = 0
+    while i < 48:
+        scores[i] = i
+        i = i + 1
+    record_set(receipt, "scores", scores)
+    return receipt
+
+def janus_test_equal(a, b):
+    assert(len(a) == len(b), "Janus fixture array lengths differ")
+    i = 0
+    while i < len(a):
+        assert(a[i] == b[i], "Janus fixture array values differ")
+        i = i + 1
+    return 1
+
+def janus_test_save(state, name):
+    return haiku_janus_save(state, text_concat(janus_test_prefix, name))
