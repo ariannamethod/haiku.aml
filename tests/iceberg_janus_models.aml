@@ -1,4 +1,6 @@
 # Actual mixed PEN7 expectations meet later human and dream-peer encounters.
+# Both schedules include independent source-backed transition verification;
+# compiled execution must preserve the entire resulting checkpoint exactly.
 IMPORT "../src/iceberg_session.aml"
 
 def iceberg_janus_low_word(balance):
