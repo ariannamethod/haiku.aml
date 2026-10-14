@@ -147,6 +147,23 @@ each Janus owner's mode, activation day, calendar and witness policy. An
 advanced owner must record the request's captured day and turn; an idle owner
 must remain identical.
 
+Version-2 publication also reconstructs both Janus transitions from the exact
+predecessor, frozen human input and newly accepted dream deliveries. It preserves
+earlier dream text and boundaries, then independently repeats the relevant
+lexical passes using the supplied immutable model handles. The worker and
+verifier share one pure parent/context/graft planner. Every Janus and lexical
+leaf must equal the independently computed result; an independently valid
+replacement score pool, debt or history is insufficient.
+
+Verification repeats each enabled lexical pass, at most two additional model
+forwards per turn. Missing or disabled bodies perform no verification
+forward. Learners, dream generation, prototype forwards, vocabulary admission
+and random draws are not repeated, and the source weights remain immutable.
+The original five-argument `haiku_iceberg_result_check` accepts version 1 only.
+Version 2 uses `haiku_iceberg_check_sources(life, result, experience, request,
+tokenizer, body_a, body_b)`, which also checks both handle identities against the
+captured request. The 227-field checkpoint and 479-field completion are unchanged.
+
 ## Quiet absence and controls
 
 New-life settings at the top of `iceberg.aml` are saved with the checkpoint:

@@ -49,6 +49,22 @@ static void unchanged(const AM_Record *expected, const char *detail) {
     same_file(saved_path, saved_bytes, saved_size);
 }
 
+static AM_Record *retain_fixture(void) {
+    am_record_free(owner_before); am_record_free(result_before);
+    am_record_free(experience_before); am_record_free(request_before);
+    owner_before = am_record_clone(am_get_var_record("live"));
+    result_before = am_record_clone(am_get_var_record("result"));
+    experience_before = am_record_clone(am_get_var_record("experience"));
+    request_before = am_record_clone(am_get_var_record("request"));
+    AM_Record *checked = am_record_clone(am_get_var_record("checked"));
+    require(owner_before && result_before && experience_before && request_before && checked,
+            "retain exact transition fixtures");
+    char error[1024] = {0};
+    require(am_checkpoint_save(owner_before, saved_path, error, sizeof(error)) == 1, error);
+    free(saved_bytes); saved_bytes = read_file(saved_path, &saved_size);
+    return checked;
+}
+
 static void reject_publish(const char *change, const char *diagnostic) {
     restore_inputs();
     if (change && *change) require(!janus_execute(change), am_get_error());
@@ -57,7 +73,7 @@ static void reject_publish(const char *change, const char *diagnostic) {
     char source[10000];
     snprintf(source, sizeof(source),
         "IMPORT \"%s/src/iceberg_session.aml\"\n"
-        "checked = haiku_iceberg_result_check(live, result, experience, request, 0)\n"
+        "checked = haiku_iceberg_check_sources(live, result, experience, request, 0, verify_a, verify_b)\n"
         "checkpoint_save(checked, \"%s\")\nrecord_swap(live, checked)\n", root, saved_path);
     expect_error(source, diagnostic);
     unchanged(owner_before, "rejected completion changed a Janus owner leaf");
@@ -88,6 +104,7 @@ int main(int argc, char **argv) {
     am_init(); am_use_notorch(); am_persistent_mode(1);
     require(!janus_execute(
         "missing = model_try_load(\"\")\n"
+        "verify_a = missing\nverify_b = missing\n"
         "core = haiku_state_enable_dreams(haiku_state_new(\"regex\", 0, 0, 575, 57), 0)\n"
         "legacy = haiku_iceberg_new(core, [1,0,0,0])\n"
         "live = haiku_iceberg_enable_janus(legacy, 20740, 1, 0)\n"
@@ -99,7 +116,7 @@ int main(int argc, char **argv) {
         "SPAWN complete:\n"
         "    return haiku_iceberg_tail(pending, before, experience, request, 0, missing, missing)\n"
         "AWAIT complete INTO result\n"
-        "checked = haiku_iceberg_result_check(live, result, experience, request, 0)\n"
+        "checked = haiku_iceberg_check_sources(live, result, experience, request, 0, verify_a, verify_b)\n"
         "assert(record_get(checked, \"haiku_janus:revision\") > 0, \"publication fixture did not meet its human witness\")\n"
         "assert(record_get(checked, \"friend_janus:revision\") == 0, \"publication fixture unexpectedly dreamed\")\n"), am_get_error());
     owner_before = am_record_clone(am_get_var_record("live"));
@@ -172,7 +189,7 @@ int main(int argc, char **argv) {
     restore_inputs();
     char failed_save[8192];
     snprintf(failed_save, sizeof(failed_save),
-        "checked = haiku_iceberg_result_check(live, result, experience, request, 0)\n"
+        "checked = haiku_iceberg_check_sources(live, result, experience, request, 0, verify_a, verify_b)\n"
         "checkpoint_save(checked, \"%s/no-such-parent/never.state\")\n"
         "record_swap(live, checked)", work);
     require(janus_execute(failed_save) != 0 && strstr(am_get_error(), "temporary create failed"),
@@ -183,7 +200,7 @@ int main(int argc, char **argv) {
     restore_inputs();
     char publish[8192];
     snprintf(publish, sizeof(publish),
-        "checked = haiku_iceberg_result_check(live, result, experience, request, 0)\n"
+        "checked = haiku_iceberg_check_sources(live, result, experience, request, 0, verify_a, verify_b)\n"
         "checkpoint_save(checked, \"%s\")\nrecord_swap(live, checked)", saved_path);
     require(!janus_execute(publish), am_get_error());
     require(same_record(am_get_var_record("live"), checked_before), "published Janus differs from checked result");
@@ -209,12 +226,111 @@ int main(int argc, char **argv) {
     unchanged(checked_before, "clock probes changed the published owner");
 #endif
 
+    /* A successful real forward does not make every valid score pool genuine.
+       Retain a pending forecast in both presences, then capture a later turn. */
+    char weighted[12000];
+    snprintf(weighted, sizeof(weighted),
+        "model_a = model_try_load(\"%s/weights/haiku1.gguf\")\n"
+        "model_b = model_try_load(\"%s/weights/haiku2.gguf\")\n"
+        "assert(model_ready(model_a) and model_ready(model_b), \"transition fixture needs both real models\")\n"
+        "verify_a = model_a\nverify_b = model_b\n"
+        "core = haiku_state_enable_dreams(haiku_state_new(\"regex\", 0, 0, 575, 57), 0)\n"
+        "record_set(core, \"dream_config\", [1,1,4])\n"
+        "live = haiku_iceberg_enable_janus(haiku_iceberg_new(core, [1,1,2,1]), 20740, 1, 0)\n"
+        "haiku_iceberg_turn_at(live, \"rain\", 0, model_a, model_b, 1, 20740)\n"
+        "settlement_base = record_clone(live)\n"
+        "before = haiku_iceberg_part(live, \"voice\")\n"
+        "candidate = record_clone(before)\n"
+        "experience = haiku_session_prepare(candidate, \"moon\", 0)\n"
+        "request = haiku_iceberg_request_at(live, \"moon\", model_a, model_b, 20741)\n"
+        "pending = record_clone(live)\nhaiku_iceberg_put(pending, \"voice\", candidate)\n"
+        "result = haiku_iceberg_tail(pending, before, experience, request, 0, model_a, model_b)\n"
+        "raw_result = record_clone(result)\n"
+        "checked = haiku_iceberg_check_sources(live, result, experience, request, 0, verify_a, verify_b)\n"
+        "assert(record_equal(result, raw_result) and record_equal(live, settlement_base), \"verification mutated its frozen inputs\")\n"
+        "assert(record_equal(checked, haiku_iceberg_part(raw_result, \"life\")), \"verification changed completed draws or other organs\")\n"
+        "assert(haiku_dream_check(haiku_iceberg_part(checked, \"voice\")) == 2, \"transition fixture missed later peer delivery\")\n",
+        root, root);
+    require(!janus_execute(weighted), am_get_error());
+    am_record_free(checked_before); checked_before = retain_fixture();
+
+    reject_publish(
+        "scores = record_get(result, \"life:haiku_janus:pending_scores\")\n"
+        "meta = record_get(result, \"life:haiku_janus:pending_meta\")\n"
+        "index = 0\nif meta[13] == 0:\n    index = 1\n"
+        "scores[index] = scores[index] - 1\n"
+        "haiku_janus_check(haiku_iceberg_part(haiku_iceberg_part(result, \"life\"), \"haiku_janus\"))",
+        "differs from its witnessed transition");
+    reject_publish(
+        "rows = record_get(result, \"life:haiku_janus:history_rows\")\n"
+        "slot = record_get(result, \"life:haiku_janus:history_cursor\") - 1\nif slot < 0:\n    slot = 15\n"
+        "rows[slot * 24 + 12] = 0.7\nrows[slot * 24 + 13] = 0.7\n"
+        "record_set(result, \"life:haiku_janus:debt\", 0.7)\n"
+        "haiku_janus_check(haiku_iceberg_part(haiku_iceberg_part(result, \"life\"), \"haiku_janus\"))",
+        "differs from its witnessed transition");
+    reject_publish(
+        "rows = record_get(result, \"life:haiku_janus:history_rows\")\n"
+        "rows[17] = rows[17] + 0.25\n"
+        "haiku_janus_check(haiku_iceberg_part(haiku_iceberg_part(result, \"life\"), \"haiku_janus\"))",
+        "differs from its witnessed transition");
+    reject_publish(
+        "meta = record_get(result, \"life:friend_janus:pending_meta\")\nmeta[11] = meta[11] + 123\n"
+        "haiku_janus_check(haiku_iceberg_part(haiku_iceberg_part(result, \"life\"), \"friend_janus\"))",
+        "differs from its witnessed transition");
+    reject_publish("record_set(result, \"life:haiku_lexical:alpha\", 0.7)",
+                   "differs from its immutable source transition");
+    reject_publish("verify_a = missing", "provider availability differs");
+    require(!janus_execute("verify_a = model_a"), am_get_error());
+    reject_publish("verify_b = model_a", "provider identity differs");
+    require(!janus_execute("verify_b = model_b"), am_get_error());
+    restore_inputs();
+    require(janus_execute("checked = haiku_iceberg_result_check(live, result, experience, request, 0)") != 0 &&
+            strstr(am_get_error(), "requires immutable source validation"),
+            "legacy five-argument entry accepted a Janus completion");
+    unchanged(owner_before, "legacy entry changed a Janus owner");
+    ++rejected;
+
+    /* The later encounter still settles old, real scores with no live body.
+       Recomputing this transition requires no replacement or invented model. */
+    require(!janus_execute(
+        "live = record_clone(settlement_base)\nverify_a = missing\nverify_b = missing\n"
+        "before = haiku_iceberg_part(live, \"voice\")\ncandidate = record_clone(before)\n"
+        "experience = haiku_session_prepare(candidate, \"moon\", 0)\n"
+        "request = haiku_iceberg_request_at(live, \"moon\", missing, missing, 20741)\n"
+        "pending = record_clone(live)\nhaiku_iceberg_put(pending, \"voice\", candidate)\n"
+        "result = haiku_iceberg_tail(pending, before, experience, request, 0, missing, missing)\n"
+        "checked = haiku_iceberg_check_sources(live, result, experience, request, 0, verify_a, verify_b)\n"
+        "h = haiku_iceberg_part(checked, \"haiku_janus\")\n"
+        "rows = record_get(h, \"history_rows\")\nslot = record_get(h, \"history_cursor\") - 1\n"
+        "assert(rows[slot * 24 + 6] == 1, \"missing-body fixture did not assess its actual human witness\")\n"
+        "assert(record_equal(haiku_iceberg_part(live, \"haiku_lexical\"), haiku_iceberg_part(checked, \"haiku_lexical\")), \"missing body changed lexical history\")\n"), am_get_error());
+    am_record_free(checked_before); checked_before = retain_fixture();
+    reject_publish(
+        "rows = record_get(result, \"life:haiku_janus:history_rows\")\n"
+        "slot = record_get(result, \"life:haiku_janus:history_cursor\") - 1\nif slot < 0:\n    slot = 15\n"
+        "rows[slot * 24 + 14] = 0.333\n"
+        "debt = 0.9 * rows[slot * 24 + 12] + 0.1 * rows[slot * 24 + 14]\n"
+        "rows[slot * 24 + 13] = debt\nrecord_set(result, \"life:haiku_janus:debt\", debt)\n"
+        "haiku_janus_check(haiku_iceberg_part(haiku_iceberg_part(result, \"life\"), \"haiku_janus\"))",
+        "differs from its witnessed transition");
+    reject_publish(
+        "meta = record_get(result, \"life:haiku_janus:pending_meta\")\nmeta[0] = 1\n"
+        "haiku_janus_check(haiku_iceberg_part(haiku_iceberg_part(result, \"life\"), \"haiku_janus\"))",
+        "differs from its witnessed transition");
+    reject_publish(
+        "rows = record_get(result, \"life:friend_janus:history_rows\")\n"
+        "slot = record_get(result, \"life:friend_janus:history_cursor\") - 1\nif slot < 0:\n    slot = 15\n"
+        "rows[slot * 24 + 22] = 2\n"
+        "haiku_janus_check(haiku_iceberg_part(haiku_iceberg_part(result, \"life\"), \"friend_janus\"))",
+        "differs from its witnessed transition");
+
     am_persistent_clear();
     am_record_free(owner_before); am_record_free(result_before);
     am_record_free(experience_before); am_record_free(request_before);
     am_record_free(checked_before); free(saved_bytes);
-    printf("PASS: %d Janus day/profile/base/envelope/stale refusals preserve all 227 leaves and checkpoint bytes\n", rejected);
+    printf("PASS: %d Janus transition/day/profile/base/envelope/stale refusals preserve all 227 leaves and checkpoint bytes\n", rejected);
     puts("PASS: 479-field detached completion, failed save, and one-time Janus save/swap");
+    puts("PASS: real-score, debt/history, source identity and absent-body witness transitions are independently checked");
 #ifdef HAIKU_WRAP_CLOCK
     puts("PASS: v1 reads no calendar; v2 captures once in foreground across worker midnight; supplied day reads none");
 #else
