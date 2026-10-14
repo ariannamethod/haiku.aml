@@ -9,6 +9,10 @@ lexical_bodies = 1
 admission_budget = 2
 self_injection = 1
 owned_tail = 1
+# New lives own a dynamic Janus calendar. Existing v1 checkpoints keep their
+# profile until this explicit one-time upgrade is selected.
+janus_balance = 1
+upgrade_balance = 0
 resuming = 0
 if text_len(state_path) > 0:
     resuming = file_exists(state_path)
@@ -29,6 +33,10 @@ tokenizer_model = 0
 if text_equal(record_get(core, "tokenizer_mode"), "sentencepiece"):
     tokenizer_model = tokenizer_load("models/haiku_sp.model")
 haiku_iceberg_check(life, tokenizer_model)
+if resuming == 0 and janus_balance:
+    life = haiku_iceberg_enable_janus(life, utc_day(), 1, tokenizer_model)
+if resuming and upgrade_balance:
+    life = haiku_iceberg_enable_janus(life, utc_day(), 1, tokenizer_model)
 
 path_a = ""
 path_b = ""

@@ -1,4 +1,4 @@
-# Five organs, one remembered evening
+# Seven organs, one remembered evening
 
 Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 
@@ -24,10 +24,12 @@ Haiku owns contact, history, word admission and the moment a result becomes
 part of its life. The two dependencies remain AML and NoTorch.
 
 The launcher opens `weights/haiku1.gguf` and `weights/haiku2.gguf` independently.
-Each presence can use both. Their initial parameter coefficient is **alpha=.5**,
-where `alpha=1` selects A and `alpha=0` selects B. The selected coefficient is
+Each presence can use both. New lives select their coefficient through a
+private [Janus calendar and expectation history](JANUS_BALANCE.md), where
+`alpha=1` selects A and `alpha=0` selects B. The selected coefficient is
 fixed for one pass. Each presence persists its own preference; an A-only pass
 records effective alpha=1 and a B-only pass records effective alpha=0.
+Version-1 checkpoints retain their previous fixed preference, initially .5.
 
 | Owner | Retained lexical contexts | Contact organ |
 |---|---|---|
@@ -49,8 +51,17 @@ direction has its own retained context. Runtime forward scratch and immutable
 handles stay outside conversation checkpoints. The [lexical source contract](LEXICAL_SOURCES.md)
 records fragment budgets, source identities, failure outcomes and history rows.
 
-Gamma season evolution, expectation debt, embedding-direction injection and
-recursive dream-born glyphs are the following experiments in [TODO](../TODO.md).
+Each presence now owns a Janus balance record. One UTC civil day is captured
+before launching the turn's worker. Calendar dissonance, drift since this
+organ's activation day, and its own expectation debt select the mixture.
+The previous expectation is assessed against the next eligible encounter:
+native human text for Haiku, an actually delivered Haiku dream line for the
+friend. The complete 48-word score pool is retained; unique matching words
+determine the discrepancy. An encounter with no reviewed words consumes the
+expectation without changing its debt. Internal echoes cannot settle it.
+
+Embedding-direction injection and recursive dream-born glyphs remain in
+[TODO](../TODO.md).
 
 ## Events that actually happened
 
@@ -59,19 +70,22 @@ learning/reflection/dream tail:
 
 1. The actual human input, with the exchange's observation, quality and
    completed ring coherences. This later human encounter can reward retained
-   earlier parliamentary receipts.
+   earlier parliamentary receipts and settle Haiku's earlier Janus expectation.
 2. The actual recent cloud triples, followed by the actual internal haiku.
 3. Every newly recorded dream line in its original alternating order. The
    speaker records its own event; the other presence receives a derived event
-   with the speaker and original event still attached.
+   with the speaker and original event still attached. A later Haiku-to-friend
+   dream delivery can settle the friend's earlier expectation.
 4. Haiku's lexical excursion and its returned model proposal; then bounded
    vocabulary admission. The friend's own excursion follows when it spoke in
-   this dream.
+   this dream. Each successful pass installs that presence's next expectation,
+   after all of this turn's external witnesses have already arrived.
 
 Human, cloud, self, peer, dream and model encounters keep separate source
 clocks. A returned model proposal preserves its parent and original source.
 Only a native human encounter can be a parliamentary reward witness. The
-friend acquires no direct human history during a waking turn without a dream.
+friend's peer-based Janus debt remains a separate mechanism. It acquires no
+direct human history during a waking turn without a dream.
 
 The [contact bridge](PARLIAMENT_CONTACT.md) gives these events the shared
 88 concept coordinates. Named aliases and reviewed private bindings preserve
@@ -102,18 +116,21 @@ Its frozen learning features and original human observation retain their values.
 
 ## One publication, one checkpoint
 
-The experimental checkpoint has **185 flat fields**:
+Version 2 has **227 flat fields**; version 1 retains its **185**:
 
 | Component | Fields |
 |---|---:|
 | Existing version-3 voice | 55 |
 | Haiku and friend lexical owners | 18 each |
 | Haiku and friend contact owners | 42 each |
-| Envelope, component key lists, settings and admission ledger | 10 |
+| Haiku and friend Janus owners, version 2 | 20 each |
+| Envelope, component key lists, settings and admission ledger | 12 in v2; 10 in v1 |
 
 The existing voice's 55-field schema is unchanged. `iceberg.state` is a separate
 complete checkpoint. It holds all four contexts, both parliaments, identities,
 prototype caches and admission history together with the original inner life.
+Version 2 adds both calendars, debts, pending complete score pools and bounded
+expectation/witness receipts. Model weights remain outside the saved life.
 
 The worker completion carries the entire exact predecessor, completed life,
 frozen foreground experience and provider request. Publication compares every
@@ -125,7 +142,10 @@ workers finish.
 
 The full module uses AML's bounded 8192-line import capacity, 16-argument
 functions and 512-field flat records. Its complete predecessor and successor
-fit in one transient result; the saved schema remains 185 fields.
+fit in one transient result: 479 fields for version 2. Publication also freezes
+each Janus owner's mode, activation day, calendar and witness policy. An
+advanced owner must record the request's captured day and turn; an idle owner
+must remain identical.
 
 ## Quiet absence and controls
 
@@ -138,16 +158,32 @@ New-life settings at the top of `iceberg.aml` are saved with the checkpoint:
 | `admission_budget` | 2 | Allows zero, one or two future vocabulary admissions |
 | `self_injection` | 1 | Adds explicit self/peer fragments to each selected context |
 | `owned_tail` | 1 | Selects worker scheduling; zero runs the same tail serially |
+| `janus_balance` | 1 | Gives a new life the version-2 dynamic balance |
+| `upgrade_balance` | 0 | Explicitly activates Janus for an existing version-1 life |
 
 An existing checkpoint retains its first four settings. The scheduling choice
 can change without changing the complete result. For a new control condition,
 choose a new state path. Set `state_path=""` for an unsaved conversation.
+Resuming a version-1 checkpoint preserves version 1 until `upgrade_balance=1`.
+Activation returns a detached candidate and records today's day as the new
+organ's birth; it preserves the existing voice and histories. A version-2
+checkpoint retains its saved balance mode. For fixed-alpha experiments,
+`haiku_iceberg_enable_janus(life, day, 0, tokenizer)` captures each existing
+lexical preference. Mode 1 selects dynamic balance. Both modes use the same
+expectation and witness budget.
+
+`haiku_iceberg_turn_at(..., worker, day)` accepts an explicit day for replay and
+controlled experiments. The ordinary turn samples AML's `utc_day()` once for
+version 2; version 1 never reads the clock. The worker uses its frozen request.
 
 Empty paths create explicit unavailable handles. Missing or invalid files
 remain inspectable through `model_ready` / `model_error`; they add no fallback
 lines to poems. With zero available bodies, lexical owners and the admission
 ledger stay unchanged while the enabled weightless contact field can continue.
 The original voice retains its exact weightless continuation and draws.
+An existing Janus expectation can still meet a legitimate later witness, but
+absence creates no new expectation or missed-model penalty. A failed or
+disabled pass leaves its lexical owner unchanged, including its preference.
 
 An available source must match its recorded byte identity and tokenizer.
 A previously available source may disappear without erasing its contexts or
@@ -161,14 +197,15 @@ Tested upstream trees are published in this dependency order:
 
 | Dependency | Pull request | Revision |
 |---|---|---|
-| NoTorch immutable PEN7 | [#170](https://github.com/ariannamethod/notorch/pull/170) | `6f95f8ab1d1f0f5b2dd0e21a4eac0368aa0a2651` |
-| AML v5.12 model values and capacity | [#38](https://github.com/ariannamethod/ariannamethod.ai/pull/38) | `dcfd4395582c5897a8134e420068f3233c2c2066` |
+| NoTorch immutable PEN7 with allocation-status fix | [#171](https://github.com/ariannamethod/notorch/pull/171) | `f6504cf8e8799c6a01b26a75ab90f004a6a3d804` |
+| AML v5.13 captured UTC day, model values and capacity | [#39](https://github.com/ariannamethod/ariannamethod.ai/pull/39) | `90684ad3784726f54a5c4d19cdadc93b00a224b0` |
 
 Build NoTorch, then AML, before running this profile. Both published trees
 match the locally tested contents exactly.
 
 ```sh
 make test-lexical-sources test-parliament-contact test-iceberg
+make test-janus-balance test-iceberg-janus
 make test-owned-tail
 ```
 
@@ -188,7 +225,24 @@ altered provider or experience receipts, malformed envelopes and duplicate
 publication. Every rejection preserves all 185 live fields and the prior file.
 It also checks detached results and failure before the save/swap boundary.
 
+`tests/iceberg_janus.aml` and `tests/iceberg_janus_models.aml` add explicit
+activation, preserved version-1 continuation, quiet/disabled owners, two real
+model sources, later human and delivered dream witnesses, serial/worker
+equality and complete restart. Their gate compares interpreted and compiled
+output and checkpoint bytes. The version-2 C publication gate rejects changed
+private histories, profiles, days, stale results and failed saves; its Linux
+clock wrapper verifies zero reads for version 1 and exactly one foreground
+read for version 2, even across a simulated midnight.
+
 The separate lexical and contact gates isolate source availability, context
 interventions, actual representation pressure, source ancestry, delayed reward
 and rejected updates. The ordinary `examples/evolution.aml` recording remains
 the stable voice's independent 24-turn regression.
+
+The 2026-10-14 launcher smoke run used the two shipped bodies and two process
+lifetimes: `rain remembers the window`, then after restart,
+`the tree keeps a little light`. The saved life has 227 fields and turn 2.
+Both encounters fell on UTC day 20740. Haiku's debt became `0.0706241131`,
+moving its requested alpha from `0.415521741` to `0.40139693` on the same day.
+The ordinary launcher displayed the remembered-session greeting and completed
+both save/swap boundaries.

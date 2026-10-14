@@ -4,6 +4,7 @@
 Tokenization, foreground, continuity, and inner-life follow-up: 2026-10-08.
 Phase4, dreams, exchange journal and worker audit: 2026-10-13.
 Immutable lexical bodies and live private contact: 2026-10-14.
+Owned Janus calendars and witnessed expectation debt: 2026-10-14.
 This document records the inspected sources, current behavior, and implementation
 order. Numerical, text, lexical, cloud, memory, English form, candidate
 generation, MathBrain, RAE, tokenization, foreground exchange, and complete
@@ -11,7 +12,11 @@ foreground checkpoints, MetaHaiku reflection, the three rings, Phase4 memory,
 dream dialogues and the exchange journal are implemented. Their complete tail
 now runs in an owned worker, joined before save, swap and response display.
 Frozen GGUF sources and private parliaments now meet real encounters in the
-separate [iceberg conversation](ICEBERG_SESSION.md). The stable chat retains its
+separate [iceberg conversation](ICEBERG_SESSION.md). Its version-2 profile adds
+two private [Janus balance organs](JANUS_BALANCE.md), a captured UTC day and
+future-witness debt. Version 1 retains its fixed profile until explicit
+activation; its existing histories survive that detached upgrade.
+The stable chat retains its
 Python-lineage profile. The status below marks the boundary between those
 functions and the remaining organism.
 

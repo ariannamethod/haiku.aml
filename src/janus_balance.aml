@@ -1,0 +1,491 @@
+# Owned Gamma/Janus balance. Frozen model bodies remain in NoTorch; this record
+# remembers when a private expectation meets the next external encounter.
+IMPORT "parliament_contact.aml"
+
+# UTC civil ordinal (floor(POSIX seconds/86400)), represented at 00:00 UTC.
+# The pinned Janus epoch is 2024-10-03 12:00 UTC = ordinal 19999.5.
+# Truncation and signed remainder follow janus.c, not Python's modulo.
+def haiku_janus_calendar(day):
+    haiku_lexical_integer(day, -1000000, 1000000)
+    relative = day - 19999.5
+    elapsed = floor(abs(relative))
+    if relative < 0:
+        elapsed = -elapsed
+    years = elapsed / 365.25
+    cycles = floor(abs(years / 19))
+    if years < 0:
+        cycles = -cycles
+    partial = years - cycles * 19
+    year_in_cycle = floor(abs(partial))
+    if partial < 0:
+        year_in_cycle = -year_in_cycle
+    year_in_cycle = year_in_cycle + 1
+    corrections = cycles * 7 * 30
+    leap_years = [3, 6, 8, 11, 14, 17, 19]
+    i = 0
+    while i < 7:
+        if leap_years[i] <= year_in_cycle:
+            corrections = corrections + 30
+        i = i + 1
+    drift = years * 11.25 - corrections
+    quotient = floor(abs(drift) / 33)
+    if quotient * 33 > abs(drift):
+        quotient = quotient - 1
+    remainder = abs(drift) - quotient * 33
+    if remainder >= 33:
+        remainder = remainder - 33
+    result = zeros(3)
+    result[0] = elapsed
+    result[1] = drift
+    result[2] = clamp(remainder / 33, 0, 1)
+    return result
+
+# Full Janus orientation: alpha=1 selects A, alpha=0 selects B.
+def haiku_janus_alpha(calendar, personal, debt, mode, fixed):
+    if mode == 0:
+        return fixed
+    return clamp(0.5 + 0.3 * (calendar - 0.5) - 0.2 * debt + 0.1 * personal, 0, 1)
+
+def haiku_janus_new(owner, mode, fixed_alpha, birth_day, witness_source):
+    state = record_new()
+    record_set(state, "format", "haiku-janus-balance")
+    record_set(state, "version", 1)
+    record_set(state, "owner", owner)
+    record_set(state, "mode", mode)
+    record_set(state, "fixed_alpha", fixed_alpha)
+    record_set(state, "birth_day", birth_day)
+    record_set(state, "calendar", "janus-c-utc-day-v1")
+    record_set(state, "clock", 0)
+    record_set(state, "last_day", birth_day)
+    record_set(state, "debt", 0)
+    record_set(state, "seen", zeros(24))
+    record_set(state, "pending_scores", zeros(48))
+    record_set(state, "pending_meta", zeros(16))
+    identities = list_new()
+    list_push(identities, "")
+    list_push(identities, "")
+    list_push(identities, "")
+    record_set(state, "pending_identity", identities)
+    record_set(state, "history_rows", zeros(384))
+    texts = list_new()
+    i = 0
+    while i < 64:
+        list_push(texts, "")
+        i = i + 1
+    record_set(state, "history_text", texts)
+    record_set(state, "history_cursor", 0)
+    record_set(state, "history_count", 0)
+    record_set(state, "revision", 0)
+    record_set(state, "witness_source", witness_source)
+    haiku_janus_check(state)
+    return state
+
+def haiku_janus_check(state):
+    assert(list_len(record_keys(state)) == 20, "Janus balance needs twenty fields")
+    assert(text_equal(record_get(state, "format"), "haiku-janus-balance") and record_get(state, "version") == 1, "Janus balance format differs")
+    owner = record_get(state, "owner")
+    witness = record_get(state, "witness_source")
+    valid_owner = text_equal(owner, "haiku") and witness == 0
+    valid_owner = valid_owner or (text_equal(owner, "friend") and witness == 6)
+    assert(valid_owner, "Janus balance witness role differs")
+    haiku_lexical_integer(record_get(state, "mode"), 0, 1)
+    fixed = record_get(state, "fixed_alpha")
+    debt = record_get(state, "debt")
+    assert(isfinite(fixed) and fixed >= 0 and fixed <= 1, "Janus fixed alpha is invalid")
+    assert(isfinite(debt) and debt >= 0 and debt <= 1, "Janus prophecy debt is invalid")
+    birth = haiku_lexical_integer(record_get(state, "birth_day"), -1000000, 1000000)
+    day = haiku_lexical_integer(record_get(state, "last_day"), birth, 1000000)
+    assert(text_equal(record_get(state, "calendar"), "janus-c-utc-day-v1"), "Janus calendar identity differs")
+    clock = haiku_lexical_integer(record_get(state, "clock"), 0, 999999)
+    revision = haiku_lexical_integer(record_get(state, "revision"), 0, 999999)
+    cursor = haiku_lexical_integer(record_get(state, "history_cursor"), 0, 15)
+    count = haiku_lexical_integer(record_get(state, "history_count"), 0, 16)
+    assert(count == min(revision, 16) and cursor == revision - floor(revision / 16) * 16, "Janus history position differs")
+    seen = record_get(state, "seen")
+    haiku_lexical_vector(seen, 24, 999999)
+    i = 0
+    while i < 24:
+        haiku_lexical_integer(seen[i], 0, 999999)
+        allowed = i == witness or (i >= 10 and i <= 12) or (i >= 18 and i <= 20)
+        assert(allowed or seen[i] == 0, "Janus source clock belongs to another lane")
+        i = i + 1
+    scores = record_get(state, "pending_scores")
+    meta = record_get(state, "pending_meta")
+    identities = record_get(state, "pending_identity")
+    haiku_lexical_vector(scores, 48, 1000000)
+    haiku_lexical_vector(meta, 16, 1000000)
+    assert(list_len(identities) == 3, "Janus pending identities differ")
+    i = 0
+    while i < 3:
+        haiku_lexical_identity(list_get(identities, i))
+        i = i + 1
+    haiku_lexical_integer(meta[0], 0, 1)
+    if meta[1] > 0:
+        event = haiku_lexical_integer(meta[1], 1, 999999)
+        haiku_lexical_integer(meta[2], 1, clock)
+        source = haiku_lexical_integer(meta[3], 2, 4)
+        direction = haiku_lexical_integer(meta[4], 0, 1)
+        assert(event <= seen[8 + direction * 8 + source], "Janus expectation precedes its source clock")
+        assert(meta[5] >= 0 and meta[5] <= 1 and meta[6] >= 0 and meta[6] <= 1, "Janus pending alpha is invalid")
+        haiku_lexical_integer(meta[7], birth, day)
+        haiku_lexical_integer(meta[8], 0, 7)
+        haiku_lexical_integer(meta[9], 1, 999999)
+        haiku_lexical_integer(meta[10], 0, 7)
+        haiku_lexical_integer(meta[11], 1, 999999)
+        haiku_lexical_integer(meta[12], 1, revision)
+        top = haiku_lexical_integer(meta[13], 0, 47)
+        mask = meta[14]
+        assert((source == 2 and mask == 2) or (source == 3 and mask == 4) or (source == 4 and mask == 6), "Janus pending source availability differs")
+        assert(source != 2 or meta[5] == 1, "Janus pending A alpha differs")
+        assert(source != 3 or meta[5] == 0, "Janus pending B alpha differs")
+        assert(source != 4 or meta[5] == meta[6], "Janus pending mixture alpha differs")
+        assert(text_len(list_get(identities, 2)) == 64, "Janus pending tokenizer is absent")
+        assert((source == 3) == (text_len(list_get(identities, 0)) == 0), "Janus pending A identity differs")
+        assert((source == 2) == (text_len(list_get(identities, 1)) == 0), "Janus pending B identity differs")
+        i = 0
+        while i < 48:
+            assert(scores[top] >= scores[i], "Janus leading expectation differs from its scores")
+            assert(i >= top or scores[top] > scores[i], "Janus leading expectation tie order differs")
+            i = i + 1
+        assert(meta[15] == 0, "Janus reserved pending coordinate differs")
+    else:
+        i = 0
+        while i < 16:
+            assert(meta[i] == 0, "Janus empty expectation has metadata")
+            i = i + 1
+        i = 0
+        while i < 48:
+            assert(scores[i] == 0, "Janus empty expectation has scores")
+            i = i + 1
+        assert(text_len(list_get(identities, 0)) + text_len(list_get(identities, 1)) + text_len(list_get(identities, 2)) == 0, "Janus empty expectation has identities")
+    rows = record_get(state, "history_rows")
+    texts = record_get(state, "history_text")
+    haiku_lexical_vector(rows, 384, 1000000)
+    assert(list_len(texts) == 64, "Janus history text shape differs")
+    used = 0
+    slot = 0
+    while slot < 16:
+        r = slot * 24
+        row_revision = haiku_lexical_integer(rows[r], 0, revision)
+        j = 0
+        while j < 4:
+            assert(text_len(list_get(texts, slot * 4 + j)) <= 1024, "Janus retained text is too long")
+            j = j + 1
+        if row_revision > 0:
+            used = used + 1
+            expected = revision - cursor + slot + 1
+            if slot >= cursor:
+                expected = expected - 16
+            assert(row_revision == expected, "Janus retained revision is out of order")
+            kind = haiku_lexical_integer(rows[r + 1], 1, 2)
+            haiku_lexical_integer(rows[r + 2], 1, clock)
+            haiku_lexical_integer(rows[r + 3], birth, day)
+            source = haiku_lexical_integer(rows[r + 4], 0, 7)
+            haiku_lexical_integer(rows[r + 5], 1, 999999)
+            haiku_lexical_integer(rows[r + 6], 0, 1)
+            haiku_lexical_integer(rows[r + 7], 0, 999999)
+            haiku_lexical_integer(rows[r + 8], 0, clock)
+            haiku_lexical_integer(rows[r + 9], 0, 4)
+            haiku_lexical_integer(rows[r + 10], 0, 1)
+            assert(rows[r + 11] >= 0 and rows[r + 11] <= 1, "Janus retained expectation alpha differs")
+            j = 12
+            while j <= 14:
+                assert(rows[r + j] >= 0 and rows[r + j] <= 1, "Janus retained debt or gap is invalid")
+                j = j + 1
+            haiku_lexical_integer(rows[r + 15], 0, 48)
+            j = 18
+            while j <= 20:
+                assert(rows[r + j] >= 0 and rows[r + j] <= 1, "Janus retained calendar or alpha is invalid")
+                j = j + 1
+            haiku_lexical_integer(rows[r + 21], 0, 2)
+            haiku_lexical_integer(rows[r + 22], 0, 7)
+            haiku_lexical_integer(rows[r + 23], 1, 999999)
+            if kind == 1:
+                assert(source >= 2 and source <= 4 and rows[r + 6] == 0, "Janus expectation row has witness evidence")
+                assert(rows[r + 12] == rows[r + 13] and rows[r + 14] == 0 and rows[r + 15] == 0, "Janus expectation changed debt")
+            else:
+                assert(source == witness, "Janus retained witness source differs")
+                if rows[r + 7] > 0:
+                    assert(rows[r + 2] > rows[r + 8], "Janus witness is not later than its expectation")
+                if rows[r + 6] == 1:
+                    assert(rows[r + 7] > 0 and rows[r + 15] > 0, "Janus assessed witness has no matched expectation")
+                    expected_debt = 0.9 * rows[r + 12] + 0.1 * rows[r + 14]
+                    assert(rows[r + 13] == expected_debt, "Janus retained debt update differs")
+                else:
+                    assert(rows[r + 12] == rows[r + 13] and rows[r + 14] == 0, "Janus unassessed witness changed debt")
+        else:
+            j = 0
+            while j < 24:
+                assert(rows[r + j] == 0, "Janus unused history has numbers")
+                j = j + 1
+            j = 0
+            while j < 4:
+                assert(text_len(list_get(texts, slot * 4 + j)) == 0, "Janus unused history has text")
+                j = j + 1
+        slot = slot + 1
+    assert(used == count, "Janus retained count differs")
+    if revision > 0:
+        latest = cursor - 1
+        if latest < 0:
+            latest = 15
+        assert(rows[latest * 24 + 13] == debt, "Janus current debt differs from its latest receipt")
+        assert(rows[latest * 24 + 2] == clock and rows[latest * 24 + 3] == day, "Janus current clock differs from its receipt")
+    else:
+        assert(clock == 0 and day == birth and debt == 0, "Janus empty history has lived state")
+        i = 0
+        while i < 24:
+            assert(seen[i] == 0, "Janus empty history has source encounters")
+            i = i + 1
+    return 1
+
+# Pure captured choice. Neither this owner nor the lexical owner is mutated.
+def haiku_janus_snapshot(state, day):
+    haiku_janus_check(state)
+    assert(day >= record_get(state, "last_day"), "Janus snapshot day moved backward")
+    calendar = haiku_janus_calendar(day)
+    birth = haiku_janus_calendar(record_get(state, "birth_day"))
+    personal = clamp(abs(calendar[1] - birth[1]) / 33, 0, 1)
+    debt = record_get(state, "debt")
+    alpha = haiku_janus_alpha(calendar[2], personal, debt, record_get(state, "mode"), record_get(state, "fixed_alpha"))
+    result = record_new()
+    record_set(result, "owner", record_get(state, "owner"))
+    record_set(result, "revision", record_get(state, "revision"))
+    record_set(result, "day", day)
+    record_set(result, "elapsed", calendar[0])
+    record_set(result, "drift", calendar[1])
+    record_set(result, "calendar_dissonance", calendar[2])
+    record_set(result, "personal_dissonance", personal)
+    record_set(result, "debt", debt)
+    record_set(result, "alpha", alpha)
+    record_set(result, "janus_blend", 1 - alpha)
+    return result
+
+# Internal publication into a detached candidate, preserving bounded receipts.
+def haiku_janus_remember(state, row, text):
+    assert(len(row) == 24 and list_len(text) == 4, "Janus receipt shape differs")
+    slot = record_get(state, "history_cursor")
+    revision = record_get(state, "revision") + 1
+    rows = record_get(state, "history_rows")
+    texts = record_get(state, "history_text")
+    row[0] = revision
+    i = 0
+    while i < 24:
+        rows[slot * 24 + i] = row[i]
+        i = i + 1
+    i = 0
+    while i < 4:
+        list_set(texts, slot * 4 + i, list_get(text, i))
+        i = i + 1
+    record_set(state, "history_text", texts)
+    record_set(state, "revision", revision)
+    record_set(state, "history_cursor", revision - floor(revision / 16) * 16)
+    record_set(state, "history_count", min(16, revision))
+    return revision
+
+# One later external witness consumes one forecast. No-overlap is recorded as
+# unassessed, and never manufactures a score for a word outside the pool.
+def haiku_janus_witness(state, event, day):
+    haiku_janus_check(state)
+    haiku_contact_event_check(event)
+    haiku_lexical_integer(day, -1000000, 1000000)
+    source = record_get(event, "source")
+    number = record_get(event, "event")
+    turn = record_get(event, "turn")
+    old_debt = record_get(state, "debt")
+    result = record_new()
+    record_set(result, "committed", 0)
+    record_set(result, "assessed", 0)
+    record_set(result, "consumed", 0)
+    record_set(result, "matched", 0)
+    record_set(result, "gap", 0)
+    record_set(result, "debt_before", old_debt)
+    record_set(result, "debt_after", old_debt)
+    if source != record_get(state, "witness_source"):
+        return result
+    if source == 6:
+        legitimate = text_equal(record_get(event, "owner"), "friend")
+        legitimate = legitimate and text_equal(record_get(event, "parent_owner"), "haiku") and text_equal(record_get(event, "origin_owner"), "haiku")
+        legitimate = legitimate and record_get(event, "parent_source") == 7 and record_get(event, "origin_source") == 7
+        legitimate = legitimate and record_get(event, "parent_event") == record_get(event, "origin_event")
+        legitimate = legitimate and number == record_get(event, "origin_event")
+        if legitimate == 0:
+            return result
+    seen = record_get(state, "seen")
+    if record_get(event, "replay") == 1 or number <= seen[source]:
+        return result
+    meta = record_get(state, "pending_meta")
+    if meta[0] == 1 and turn <= meta[2]:
+        return result
+    assert(day >= record_get(state, "last_day"), "Janus witness day moved backward")
+    assert(turn >= record_get(state, "clock"), "Janus witness turn moved backward")
+    snapshot = haiku_janus_snapshot(state, day)
+    pending = record_clone(state)
+    row = zeros(24)
+    row[1] = 2
+    row[2] = turn
+    row[3] = day
+    row[4] = source
+    row[5] = number
+    row[12] = old_debt
+    row[13] = old_debt
+    row[18] = record_get(snapshot, "calendar_dissonance")
+    row[19] = record_get(snapshot, "personal_dissonance")
+    row[22] = record_get(event, "origin_source")
+    row[23] = record_get(event, "origin_event")
+    matched_text = ""
+    expected_word = ""
+    if meta[0] == 1:
+        record_set(result, "consumed", 1)
+        row[7] = meta[1]
+        row[8] = meta[2]
+        row[9] = meta[3]
+        row[10] = meta[4]
+        row[11] = meta[5]
+        row[21] = 2
+        words = haiku_lexical_words()
+        scores = record_get(state, "pending_scores")
+        expected_word = list_get(words, meta[13])
+        row[17] = scores[meta[13]]
+        tokens = haiku_unique(haiku_tokenize_regex(record_get(event, "text")))
+        i = 0
+        while i < list_len(tokens):
+            word = list_get(tokens, i)
+            index = list_find(words, word)
+            if index >= 0 and text_equal(record_get(event, "language"), "en"):
+                row[15] = row[15] + 1
+                row[16] = row[16] + scores[index]
+                if text_len(matched_text) > 0:
+                    matched_text = text_concat(matched_text, " ")
+                matched_text = text_concat(matched_text, word)
+            i = i + 1
+        if row[15] > 0:
+            row[6] = 1
+            row[16] = row[16] / row[15]
+            difference = max(0, row[17] - row[16])
+            row[14] = difference / (1 + difference)
+            row[13] = 0.9 * old_debt + 0.1 * row[14]
+            row[21] = 1
+            record_set(result, "assessed", 1)
+        updated_meta = record_get(pending, "pending_meta")
+        updated_meta[0] = 0
+    row[20] = haiku_janus_alpha(row[18], row[19], row[13], record_get(state, "mode"), record_get(state, "fixed_alpha"))
+    texts = list_new()
+    list_push(texts, haiku_lexical_tail(record_get(event, "text"), 256))
+    list_push(texts, expected_word)
+    list_push(texts, matched_text)
+    sender = record_get(event, "owner")
+    if source == 6:
+        sender = record_get(event, "parent_owner")
+    list_push(texts, sender)
+    seen = record_get(pending, "seen")
+    seen[source] = number
+    record_set(pending, "debt", row[13])
+    record_set(pending, "clock", turn)
+    record_set(pending, "last_day", day)
+    haiku_janus_remember(pending, row, texts)
+    haiku_janus_check(pending)
+    record_replace(state, pending)
+    record_set(result, "committed", 1)
+    record_set(result, "matched", row[15])
+    record_set(result, "gap", row[14])
+    record_set(result, "debt_after", row[13])
+    return result
+
+# Only a completed lexical pass can install the next expectation. Fixed and
+# dynamic controls use this same complete 48-score memory and witness budget.
+def haiku_janus_expect(state, receipt, day):
+    haiku_janus_check(state)
+    if record_get(receipt, "committed") == 0:
+        return 0
+    assert(record_get(receipt, "committed") == 1, "Janus expectation completion flag differs")
+    assert(text_equal(record_get(receipt, "owner"), record_get(state, "owner")), "Janus expectation belongs to another presence")
+    source = haiku_lexical_integer(record_get(receipt, "source"), 2, 4)
+    event = haiku_lexical_integer(record_get(receipt, "event"), 1, 999999)
+    turn = haiku_lexical_integer(record_get(receipt, "turn"), 1, 999999)
+    direction = haiku_lexical_integer(record_get(receipt, "direction"), 0, 1)
+    seen = record_get(state, "seen")
+    if event <= seen[8 + direction * 8 + source]:
+        return 0
+    assert(turn >= record_get(state, "clock"), "Janus expectation turn moved backward")
+    snapshot = haiku_janus_snapshot(state, day)
+    assert(record_get(receipt, "requested_alpha") == record_get(snapshot, "alpha"), "Janus pass did not freeze its captured balance")
+    assert(text_equal(record_get(receipt, "language"), "en"), "Janus expectation language differs")
+    words = haiku_lexical_words()
+    assert(text_equal(list_key(record_get(receipt, "words")), list_key(words)), "Janus expectation must retain the complete reviewed pool")
+    input_scores = record_get(receipt, "scores")
+    haiku_lexical_vector(input_scores, 48, 1000000)
+    scores = zeros(48)
+    top = 0
+    i = 0
+    while i < 48:
+        scores[i] = input_scores[i]
+        if scores[i] > scores[top]:
+            top = i
+        i = i + 1
+    pending = record_clone(state)
+    meta = zeros(16)
+    meta[0] = 1
+    meta[1] = event
+    meta[2] = turn
+    meta[3] = source
+    meta[4] = direction
+    meta[5] = record_get(receipt, "alpha")
+    meta[6] = record_get(receipt, "requested_alpha")
+    meta[7] = day
+    meta[8] = record_get(receipt, "origin_source")
+    meta[9] = record_get(receipt, "origin_event")
+    meta[10] = record_get(receipt, "parent_source")
+    meta[11] = record_get(receipt, "parent_event")
+    meta[12] = record_get(state, "revision") + 1
+    meta[13] = top
+    meta[14] = record_get(receipt, "availability")
+    identities = list_new()
+    list_push(identities, record_get(receipt, "identity_a"))
+    list_push(identities, record_get(receipt, "identity_b"))
+    list_push(identities, record_get(receipt, "tokenizer"))
+    record_set(pending, "pending_scores", scores)
+    record_set(pending, "pending_meta", meta)
+    record_set(pending, "pending_identity", identities)
+    seen = record_get(pending, "seen")
+    seen[8 + direction * 8 + source] = event
+    row = zeros(24)
+    row[1] = 1
+    row[2] = turn
+    row[3] = day
+    row[4] = source
+    row[5] = event
+    row[7] = event
+    row[8] = turn
+    row[9] = source
+    row[10] = direction
+    row[11] = meta[5]
+    row[12] = record_get(state, "debt")
+    row[13] = row[12]
+    row[17] = scores[top]
+    row[18] = record_get(snapshot, "calendar_dissonance")
+    row[19] = record_get(snapshot, "personal_dissonance")
+    row[20] = record_get(snapshot, "alpha")
+    previous_meta = record_get(state, "pending_meta")
+    row[21] = previous_meta[0]
+    row[22] = meta[8]
+    row[23] = meta[9]
+    texts = list_new()
+    list_push(texts, record_get(receipt, "fragment"))
+    list_push(texts, list_get(words, top))
+    list_push(texts, "")
+    list_push(texts, record_get(state, "owner"))
+    record_set(pending, "clock", turn)
+    record_set(pending, "last_day", day)
+    haiku_janus_remember(pending, row, texts)
+    haiku_janus_check(pending)
+    record_replace(state, pending)
+    return 1
+
+def haiku_janus_save(state, path):
+    haiku_janus_check(state)
+    return checkpoint_save(state, path)
+
+def haiku_janus_load(path):
+    state = checkpoint_load(path)
+    haiku_janus_check(state)
+    return state
