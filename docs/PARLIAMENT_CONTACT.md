@@ -31,7 +31,7 @@ on 2026-10-14; the source's approximate character router is not ported.
 | `tree`, `forest`, `leaf` — English | 4, tree |
 | `AI`, `computer`, `machine` — English | 15, AI |
 | `music`, `song`, `melody` — English | 82, music |
-| A word outside its language's binding table | Unbound; exact source text retained |
+| A word without a reviewed or available learned binding | Unbound; exact source text retained |
 
 The existing Unicode regex tokenizer supplies lowercase words. A binding key
 contains both language and spelling. For a concept seen `n` times in an event,
@@ -44,6 +44,14 @@ a retained encounter containing that exact normalized word and language; its
 history keeps the source, event, original text and chosen anchor. Existing seed
 or private choices cannot be overwritten. This operation is explicit; model
 similarity contributes to current features without silently naming an unknown.
+
+Version-2 contact adds a private [learned word layer](LEARNED_WORDS.md).
+Repeated accepted external contexts can earn a bounded association while the
+reviewed table keeps priority. Its five additional leaves retain candidate
+spellings, counts, activation clocks and the exact contexts behind them.
+Contact features are frozen before the confirming encounter updates this layer;
+later glyph extraction and ranking use the new strength. The 42-field v1
+contact retains its exact previous profile.
 
 The remaining feature columns keep the [parliament contract](PARLIAMENT.md):
 actual dissonance, novelty, normalized arousal and entropy at 88–91, completed
@@ -73,10 +81,12 @@ requested balance remains its separate preference. A failed reference forward
 returns an event with representation availability zero and no contribution;
 it publishes no partial cache. An absent lexical provider produces no event.
 
-`haiku_contact_rank` adds `.15 * field[glyph]` to an exactly bound candidate's
-base score. Parliament bounds its field to `[-5,5]`, hence each correction is
-within `[-.75,.75]`. Unknown words keep their base scores. The experimental
-session uses the resulting order when admitting its bounded lexical proposals.
+`haiku_contact_rank` adds `.15 * strength * field[glyph]` to a bound candidate's
+base score. Reviewed bindings have strength 1; available learned associations
+have at most .5. Parliament bounds its field to `[-5,5]`, so corrections stay
+within `[-.75,.75]` for reviewed words and `[-.375,.375]` for learned ones.
+Unresolved words keep their base scores. The experimental session uses the
+resulting order when admitting its bounded lexical proposals.
 
 ## A voice keeps its ancestry
 
@@ -104,12 +114,13 @@ precedes model enrichment, so replay also leaves the reference cache untouched.
 
 ## Flat ownership and entry points
 
-The contact checkpoint has **42 fields**: 32 namespaced parliamentary leaves,
+The version-1 contact checkpoint has **42 fields**: 32 namespaced parliamentary leaves,
 format/version and the namespace list, binding map/history, two provenance
 tables, and three prototype-cache leaves. The 32 receipt slots retain six
 strings (emitter, exact text, language, root owner, parent owner, model identity)
 and eight numbers (parent/root source and event, alpha, representation gain and
 availability, complete availability mask). They rotate with parliament receipts.
+Version 2 retains those leaves and adds the five learned-word leaves, for **47**.
 
 | Entry point | Result |
 |---|---|

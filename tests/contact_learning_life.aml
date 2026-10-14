@@ -1,0 +1,253 @@
+IMPORT "../src/parliament_contact.aml"
+
+# Detached five-leaf snapshot: parliamentary pressure may move on an ignored
+# teaching source, while the private learning record must remain identical.
+def learning_test_part(contact):
+    part = record_new()
+    names = haiku_words("learn_clock learn_words learn_counts learn_rows learn_text")
+    i = 0
+    while i < list_len(names):
+        name = list_get(names, i)
+        record_set(part, name, record_get(contact, name))
+        i = i + 1
+    return record_clone(part)
+
+# Declared external teacher fixtures. Each window has two different reviewed
+# aliases; each target starts outside the binding table.
+teachers = list_new()
+list_push(teachers, "stream water river")
+list_push(teachers, "stream sea ocean")
+list_push(teachers, "stream rain lake")
+list_push(teachers, "branch tree forest")
+list_push(teachers, "branch wood leaf")
+list_push(teachers, "branch forest leaf")
+list_push(teachers, "glow light sun")
+list_push(teachers, "glow sunrise dawn")
+list_push(teachers, "glow bright sun")
+list_push(teachers, "rhythm music song")
+list_push(teachers, "rhythm melody guitar")
+list_push(teachers, "rhythm piano drum")
+targets = haiku_words("stream branch glow rhythm")
+anchors = [0, 4, 6, 82]
+legacy = haiku_contact_new("haiku", 42)
+legacy_before = record_clone(legacy)
+live = haiku_contact_enable_learning(legacy)
+assert(record_equal(legacy_before, legacy), "Detached learning activation changed v1")
+assert(record_get(legacy, "version") == 1 and list_len(record_keys(legacy)) == 42, "Legacy contact schema changed")
+assert(record_get(live, "version") == 2 and list_len(record_keys(live)) == 47, "Learning contact schema differs")
+assert(record_equal(live, haiku_contact_enable_learning(live)), "Learning activation is not idempotent")
+friend = haiku_contact_enable_learning(haiku_contact_new("friend", 43))
+friend_before = record_clone(friend)
+i = 0
+while i < 12:
+    group = floor(i / 3)
+    within = i - group * 3
+    word = list_get(targets, group)
+    anchor = anchors[group]
+    before = haiku_contact_learning_lookup(live, "en", word)
+    assert(before[0] == -1 and before[1] == 0, "A target activated before three distinct teacher turns")
+    unbound = haiku_contact_glyphs(live, word, "en")
+    assert(haiku_parliament_dot(unbound, unbound) == 0, "Tentative word acquired feature pressure")
+    rank_control = record_clone(live)
+    field = record_get(rank_control, "p:field")
+    field[anchor] = 2
+    ranked = haiku_contact_rank(rank_control, haiku_words(word), [1], "en")
+    assert(ranked[0] == 1, "Tentative word acquired rank pressure")
+    event = haiku_contact_event("human", list_get(teachers, i), "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, i + 1, i + 1)
+    frozen = haiku_contact_features(live, event)
+    published = haiku_contact_publish(live, event)
+    receipt_features = record_get(published, "features")
+    j = 0
+    while j < 96:
+        assert(receipt_features[j] == frozen[j], "A teaching event retroactively changed its own frozen features")
+        j = j + 1
+    if i >= 2:
+        haiku_contact_publish(resumed, event)
+        assert(record_equal(live, resumed), "Restart after two witnesses changed later learning")
+    if i == 1:
+        haiku_contact_save(live, text_concat(learning_test_prefix, "two"))
+        resumed = haiku_contact_load(text_concat(learning_test_prefix, "two"))
+        assert(record_equal(live, resumed), "Pending learning restart changed owned state")
+    lookup = haiku_contact_learning_lookup(live, "en", word)
+    if within < 2:
+        assert(lookup[0] == -1 and lookup[1] == 0, "Two witnesses prematurely promoted a word")
+    else:
+        assert(lookup[0] == anchor and lookup[1] == 0.5, "Three independent teacher windows did not activate their word")
+        glyphs = haiku_contact_glyphs(live, word, "en")
+        assert(abs(glyphs[anchor] - 1 / 3) < 0.000001, "Learned-only feature strength differs")
+        rank_control = record_clone(live)
+        field = record_get(rank_control, "p:field")
+        field[anchor] = 2
+        ranked = haiku_contact_rank(rank_control, haiku_words(word), [1], "en")
+        assert(abs(ranked[0] - 1.15) < 0.000001, "Learned held-out rank delta differs")
+        future_features = haiku_contact_glyphs(live, record_get(event, "text"), "en")
+        assert(receipt_features[anchor] < future_features[anchor], "Activation did not wait until after the event")
+    i = i + 1
+assert(record_equal(friend_before, friend), "Waking human teachers leaked into the friend")
+haiku_contact_save(live, text_concat(learning_test_prefix, "full"))
+haiku_contact_save(resumed, text_concat(learning_test_prefix, "resumed"))
+other_language = haiku_contact_learning_lookup(live, "fr", "stream")
+assert(other_language[0] == -1, "Learned spelling crossed its language namespace")
+before = record_clone(live)
+haiku_contact_publish(live, event)
+record_set(event, "replay", 1)
+record_set(event, "event", 100)
+record_set(event, "origin_event", 100)
+haiku_contact_publish(live, event)
+assert(record_equal(before, live), "Teacher replay changed any contact state or RNG")
+
+# An upgrade starts after its captured encounter boundary.
+old = haiku_contact_new("haiku", 44)
+old_event = haiku_contact_event("human", "stream water river", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, 7, 7)
+haiku_contact_publish(old, old_event)
+old_before = record_clone(old)
+active = haiku_contact_enable_learning(old)
+assert(record_equal(old_before, old), "Upgrading lived contact changed its original")
+before = learning_test_part(active)
+haiku_contact_learn(active, old_event)
+boundary = haiku_contact_event("human", "stream sea ocean", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, 8, 7)
+haiku_contact_publish(active, boundary)
+assert(record_equal(before, learning_test_part(active)), "Activation reused its old encounter or same-turn boundary")
+next = haiku_contact_event("human", "stream rain lake", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, 9, 8)
+haiku_contact_publish(active, next)
+index = floor(list_find(record_get(active, "learn_words"), "stream") / 2)
+counts = record_get(active, "learn_counts")
+assert(index >= 0 and counts[index * 88] == 1, "New post-activation encounter did not count once")
+
+# Same-turn alternatives and normalized duplicate windows are not new votes.
+repeat = haiku_contact_enable_learning(haiku_contact_new("haiku", 45))
+repetitions = list_new()
+list_push(repetitions, "stream water river")
+list_push(repetitions, "stream sea ocean")
+list_push(repetitions, "STREAM water, river!")
+list_push(repetitions, "stream water river")
+list_push(repetitions, "stream river water")
+list_push(repetitions, "water stream river")
+turns = [1, 1, 2, 3, 4, 5]
+i = 0
+while i < 6:
+    event = haiku_contact_event("human", list_get(repetitions, i), "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, i + 1, turns[i])
+    haiku_contact_publish(repeat, event)
+    i = i + 1
+index = floor(list_find(record_get(repeat, "learn_words"), "stream") / 2)
+counts = record_get(repeat, "learn_counts")
+assert(counts[index * 88] == 1, "Same-turn or reordered teacher context inflated evidence")
+lookup = haiku_contact_learning_lookup(repeat, "en", "stream")
+assert(lookup[0] == -1, "Repeated window promoted itself")
+i = 1
+while i < 3:
+    event = haiku_contact_event("human", list_get(teachers, i), "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, i + 6, i + 5)
+    haiku_contact_publish(repeat, event)
+    i = i + 1
+lookup = haiku_contact_learning_lookup(repeat, "en", "stream")
+assert(lookup[0] == 0, "Later distinct teacher windows did not complete the evidence")
+conflicts = list_new()
+list_push(conflicts, "stream light sun")
+list_push(conflicts, "stream sunrise dawn")
+list_push(conflicts, "stream bright sun")
+i = 0
+while i < 3:
+    event = haiku_contact_event("human", list_get(conflicts, i), "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, i + 9, i + 8)
+    haiku_contact_publish(repeat, event)
+    i = i + 1
+lookup = haiku_contact_learning_lookup(repeat, "en", "stream")
+assert(lookup[0] == -1 and lookup[1] == 0, "Conflicting external evidence did not suspend the learned binding")
+before = learning_test_part(repeat)
+haiku_contact_bind(repeat, "en", "stream", 0, 0, 11)
+lookup = haiku_contact_learning_lookup(repeat, "en", "stream")
+assert(lookup[0] == 0 and lookup[1] == 1, "Explicit reviewed binding lost authority over learned conflict")
+assert(record_equal(before, learning_test_part(repeat)), "Reviewed correction rewrote its learning history")
+
+ambiguous = haiku_contact_enable_learning(haiku_contact_new("haiku", 46))
+event = haiku_contact_event("human", "water river nebula tree forest", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, 1, 1)
+haiku_contact_publish(ambiguous, event)
+lookup = haiku_contact_learning_lookup(ambiguous, "en", "nebula")
+assert(lookup[0] == -1, "Tied local teacher anchors guessed a binding")
+counts = record_get(ambiguous, "learn_counts")
+assert(haiku_parliament_dot(counts, counts) == 0, "Ambiguous teacher window cast an anchor vote")
+event = haiku_contact_event("human", "water river nebula and the and tree forest nebula", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, 2, 2)
+haiku_contact_publish(ambiguous, event)
+counts = record_get(ambiguous, "learn_counts")
+assert(haiku_parliament_dot(counts, counts) == 0, "The first occurrence hid a contradictory later word window")
+event = haiku_contact_event("human", "stream the and the and the water river", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, 3, 3)
+haiku_contact_publish(ambiguous, event)
+counts = record_get(ambiguous, "learn_counts")
+assert(haiku_parliament_dot(counts, counts) == 0, "Distant teachers crossed the local word window")
+
+# Learned spellings are not teacher seeds for a new chain of bindings.
+chain = record_clone(live)
+chain_texts = list_new()
+list_push(chain_texts, "spray stream stream")
+list_push(chain_texts, "stream spray water")
+list_push(chain_texts, "spray stream river")
+i = 0
+while i < 3:
+    event = haiku_contact_event("human", list_get(chain_texts, i), "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, i + 13, i + 13)
+    haiku_contact_publish(chain, event)
+    i = i + 1
+lookup = haiku_contact_learning_lookup(chain, "en", "spray")
+assert(lookup[0] == -1, "Learned-only neighbors recursively taught another spelling")
+
+# These declared model envelopes test ancestry; they perform no neural call.
+before = learning_test_part(live)
+source = 1
+while source <= 7:
+    number = source + 12
+    parent = haiku_contact_event("human", "mist water river", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, number, number)
+    if source == 7:
+        forbidden = haiku_contact_event("haiku", "mist water river", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 7, number, number)
+    else:
+        if source == 6:
+            parent = haiku_contact_event("friend", "mist water river", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 7, number, number)
+        forbidden = haiku_contact_derive(parent, "haiku", record_get(parent, "text"), source, number, number)
+    if source >= 2 and source <= 4:
+        record_set(forbidden, "identity", "declared-model-provenance")
+        record_set(forbidden, "availability", 6)
+        record_set(forbidden, "alpha", 0.5)
+        if source == 2:
+            record_set(forbidden, "alpha", 1)
+        if source == 3:
+            record_set(forbidden, "alpha", 0)
+        projection = zeros(88)
+        projection[0] = 1
+        record_set(forbidden, "representation", projection)
+        record_set(forbidden, "representation_available", 1)
+        record_set(forbidden, "representation_gain", 0.25)
+    haiku_contact_publish(live, forbidden)
+    assert(record_equal(before, learning_test_part(live)), "Internal/model/friend ancestry became Haiku's external teaching evidence")
+    source = source + 1
+
+# Friend learns only a delivered later Haiku line, in its own record.
+speaker = haiku_contact_enable_learning(haiku_contact_new("haiku", 47))
+speaker_learning = learning_test_part(speaker)
+i = 0
+while i < 3:
+    asleep = record_clone(friend)
+    native = haiku_contact_event("haiku", list_get(teachers, i), "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 7, i + 1, i + 1)
+    haiku_contact_publish(speaker, native)
+    assert(record_equal(asleep, friend), "Undelivered Haiku line changed the friend")
+    sender = record_clone(speaker)
+    delivery = haiku_contact_derive(native, "friend", record_get(native, "text"), 6, i + 1, i + 1)
+    haiku_contact_publish(friend, delivery)
+    assert(record_equal(sender, speaker), "Friend's learned overlay leaked back into the speaker")
+    i = i + 1
+lookup = haiku_contact_learning_lookup(friend, "en", "stream")
+assert(lookup[0] == 0 and lookup[1] == 0.5, "Actual peer deliveries did not teach the friend's private word")
+assert(record_equal(speaker_learning, learning_test_part(speaker)), "Own utterances became the speaker's teachers")
+friend_controls = record_clone(friend)
+before = learning_test_part(friend_controls)
+human = haiku_contact_event("human", "mist water river", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, 4, 4)
+haiku_contact_publish(friend_controls, human)
+reminted = haiku_contact_derive(native, "friend", record_get(native, "text"), 6, 5, 5)
+haiku_contact_publish(friend_controls, reminted)
+model = haiku_contact_derive(human, "haiku", record_get(human, "text"), 4, 6, 6)
+record_set(model, "availability", 6)
+record_set(model, "identity", "declared-model-provenance")
+record_set(model, "alpha", 0.5)
+model_delivery = haiku_contact_derive(model, "friend", record_get(model, "text"), 6, 6, 6)
+haiku_contact_publish(friend_controls, model_delivery)
+assert(record_equal(before, learning_test_part(friend_controls)), "Human delivery, reminted peer or model-derived peer became a friend teacher")
+haiku_contact_check(live)
+haiku_contact_check(friend)
+haiku_contact_save(friend, text_concat(learning_test_prefix, "friend"))
+PRINT "HAIKU_CONTACT_LEARNING_LIFE_OK"

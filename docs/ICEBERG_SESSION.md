@@ -60,6 +60,12 @@ friend. The complete 48-word score pool is retained; unique matching words
 determine the discrepancy. An encounter with no reviewed words consumes the
 expectation without changing its debt. Internal echoes cannot settle it.
 
+Version 3 adds [private word associations](LEARNED_WORDS.md) to each contact
+organ. Repeated local contexts with reviewed seed teachers can give an
+unbound English word a shared anchor. Haiku learns from accepted human input;
+the friend learns from the Haiku dream lines actually delivered to it. Each
+retains its own bounded evidence, confidence and conflicts.
+
 Embedding-direction injection and recursive dream-born glyphs remain in
 [TODO](../TODO.md).
 
@@ -71,6 +77,7 @@ learning/reflection/dream tail:
 1. The actual human input, with the exchange's observation, quality and
    completed ring coherences. This later human encounter can reward retained
    earlier parliamentary receipts and settle Haiku's earlier Janus expectation.
+   In version 3, its frozen contact features precede the word-learning update.
 2. The actual recent cloud triples, followed by the actual internal haiku.
 3. Every newly recorded dream line in its original alternating order. The
    speaker records its own event; the other presence receives a derived event
@@ -89,7 +96,9 @@ direct human history during a waking turn without a dream.
 
 The [contact bridge](PARLIAMENT_CONTACT.md) gives these events the shared
 88 concept coordinates. Named aliases and reviewed private bindings preserve
-the original words. Unknown words remain unbound. Four named prototypes—water,
+the original words. In version 3, later contact and ranking can also use a
+word's independently earned association, at strength no greater than .5.
+Unresolved words remain unbound. Four named prototypes—water,
 tree, light and music—provide the first measured representation contribution.
 Their cache belongs to the receiving presence and names the exact model pair,
 tokenizer and effective coefficient. A changed identity or coefficient rebuilds
@@ -116,21 +125,23 @@ Its frozen learning features and original human observation retain their values.
 
 ## One publication, one checkpoint
 
-Version 2 has **227 flat fields**; version 1 retains its **185**:
+Version 3 has **237 flat fields**; version 2 retains **227** and version 1 **185**:
 
 | Component | Fields |
 |---|---:|
 | Existing version-3 voice | 55 |
 | Haiku and friend lexical owners | 18 each |
-| Haiku and friend contact owners | 42 each |
-| Haiku and friend Janus owners, version 2 | 20 each |
-| Envelope, component key lists, settings and admission ledger | 12 in v2; 10 in v1 |
+| Haiku and friend contact owners | 47 each in v3; 42 each in v1/v2 |
+| Haiku and friend Janus owners, versions 2/3 | 20 each |
+| Envelope, component key lists, settings and admission ledger | 12 in v2/v3; 10 in v1 |
 
 The existing voice's 55-field schema is unchanged. `iceberg.state` is a separate
 complete checkpoint. It holds all four contexts, both parliaments, identities,
 prototype caches and admission history together with the original inner life.
 Version 2 adds both calendars, debts, pending complete score pools and bounded
 expectation/witness receipts. Model weights remain outside the saved life.
+Version 3 adds five learned-word leaves per contact: activation/encounter
+clocks, candidate words, anchor counts, evidence rows and original context text.
 
 The worker completion carries the entire exact predecessor, completed life,
 frozen foreground experience and provider request. Publication compares every
@@ -142,12 +153,13 @@ workers finish.
 
 The full module uses AML's bounded 8192-line import capacity, 16-argument
 functions and 512-field flat records. Its complete predecessor and successor
-fit in one transient result: 479 fields for version 2. Publication also freezes
+fit in one transient result: 499 fields for version 3, 479 for version 2.
+Publication also freezes
 each Janus owner's mode, activation day, calendar and witness policy. An
 advanced owner must record the request's captured day and turn; an idle owner
 must remain identical.
 
-Version-2 publication also reconstructs both Janus transitions from the exact
+Versions 2 and 3 also reconstruct both Janus transitions from the exact
 predecessor, frozen human input and newly accepted dream deliveries. It preserves
 earlier dream text and boundaries, then independently repeats the relevant
 lexical passes using the supplied immutable model handles. The worker and
@@ -157,12 +169,21 @@ replacement score pool, debt or history is insufficient.
 
 Verification repeats each enabled lexical pass, at most two additional model
 forwards per turn. Missing or disabled bodies perform no verification
-forward. Learners, dream generation, prototype forwards, vocabulary admission
+forward. Voice learners, dream generation, prototype forwards, vocabulary admission
 and random draws are not repeated, and the source weights remain immutable.
 The original five-argument `haiku_iceberg_result_check` accepts version 1 only.
-Version 2 uses `haiku_iceberg_check_sources(life, result, experience, request,
+Versions 2 and 3 use `haiku_iceberg_check_sources(life, result, experience, request,
 tokenizer, body_a, body_b)`, which also checks both handle identities against the
-captured request. The 227-field checkpoint and 479-field completion are unchanged.
+captured request. Version-2's 227-field checkpoint and 479-field completion
+remain unchanged.
+
+Version-3 publication independently replays only word evidence from the exact
+predecessor and accepted human/dream events. All five learned leaves and the
+unchanged reviewed bindings must match. It also reconstructs contact source
+clocks, receipt cursor, retained text and ancestry in the original order.
+Native receipt features are reconstructed before the corresponding learning
+step, so the confirming encounter cannot claim the meaning it just taught.
+The word-learning replay adds no model forward, parliament step or random draw.
 
 ## Quiet absence and controls
 
@@ -175,8 +196,10 @@ New-life settings at the top of `iceberg.aml` are saved with the checkpoint:
 | `admission_budget` | 2 | Allows zero, one or two future vocabulary admissions |
 | `self_injection` | 1 | Adds explicit self/peer fragments to each selected context |
 | `owned_tail` | 1 | Selects worker scheduling; zero runs the same tail serially |
-| `janus_balance` | 1 | Gives a new life the version-2 dynamic balance |
+| `janus_balance` | 1 | Gives a new life its owned dynamic balance |
 | `upgrade_balance` | 0 | Explicitly activates Janus for an existing version-1 life |
+| `word_learning` | 1 | Gives a new Janus life version-3 private word associations |
+| `upgrade_words` | 0 | Explicitly activates word learning for an existing Janus life |
 
 An existing checkpoint retains its first four settings. The scheduling choice
 can change without changing the complete result. For a new control condition,
@@ -189,15 +212,24 @@ checkpoint retains its saved balance mode. For fixed-alpha experiments,
 lexical preference. Mode 1 selects dynamic balance. Both modes use the same
 expectation and witness budget.
 
+`haiku_iceberg_enable_words(life, tokenizer)` returns a detached, idempotent
+version-3 upgrade from a Janus life. It captures the current contact clocks;
+old receipts cannot teach the new learner. An existing v1 checkpoint requires
+both `upgrade_balance=1` and `upgrade_words=1` to activate both organs together.
+An existing v2 requires only `upgrade_words=1`. With both upgrade controls at
+zero, saved v1/v2 profiles continue exactly as before.
+
 `haiku_iceberg_turn_at(..., worker, day)` accepts an explicit day for replay and
 controlled experiments. The ordinary turn samples AML's `utc_day()` once for
-version 2; version 1 never reads the clock. The worker uses its frozen request.
+versions 2/3; version 1 never reads the clock. The worker uses its frozen request.
 
 Empty paths create explicit unavailable handles. Missing or invalid files
 remain inspectable through `model_ready` / `model_error`; they add no fallback
 lines to poems. With zero available bodies, lexical owners and the admission
 ledger stay unchanged while the enabled weightless contact field can continue.
 The original voice retains its exact weightless continuation and draws.
+Version-3 word evidence continues to learn from eligible external encounters
+without model bodies. Turning off `deeper_life` leaves both contacts unchanged.
 An existing Janus expectation can still meet a legitimate later witness, but
 absence creates no new expectation or missed-model penalty. A failed or
 disabled pass leaves its lexical owner unchanged, including its preference.
@@ -214,8 +246,8 @@ Tested upstream trees are published in this dependency order:
 
 | Dependency | Pull request | Revision |
 |---|---|---|
-| NoTorch immutable PEN7 with allocation-status fix | [#171](https://github.com/ariannamethod/notorch/pull/171) | `f6504cf8e8799c6a01b26a75ab90f004a6a3d804` |
-| AML v5.13 captured UTC day, model values and capacity | [#39](https://github.com/ariannamethod/ariannamethod.ai/pull/39) | `90684ad3784726f54a5c4d19cdadc93b00a224b0` |
+| NoTorch immutable PEN7 with allocation-status fix | [#171](https://github.com/ariannamethod/notorch/pull/171) | `ca3e17a24852ad1db08a6e6b908fb37036011d2d` |
+| AML v5.13, with opened-file and test-buffer fixes | [#40](https://github.com/ariannamethod/ariannamethod.ai/pull/40) | `b05e845d9d6c5c74959c2a22cc56f7b31b8cdc77` |
 
 Build NoTorch, then AML, before running this profile. Both published trees
 match the locally tested contents exactly.
@@ -223,6 +255,7 @@ match the locally tested contents exactly.
 ```sh
 make test-lexical-sources test-parliament-contact test-iceberg
 make test-janus-balance test-iceberg-janus
+make test-contact-learning test-iceberg-learning
 make test-owned-tail
 ```
 
@@ -250,6 +283,14 @@ output and checkpoint bytes. The version-2 C publication gate rejects changed
 private histories, profiles, days, stale results and failed saves; its Linux
 clock wrapper verifies zero reads for version 1 and exactly one foreground
 read for version 2, even across a simulated midnight.
+
+The word-learning gate adds version-3 activation, three distinct contexts,
+held-out word features, save after the second encounter, old-profile
+continuation and complete worker/serial/interpreted/compiled agreement.
+Its publication fixture rejects forged but internally valid word histories,
+counts and contact receipts while preserving all 237 fields and the previous
+checkpoint. Real models and a 16-line dream exercise both private owners.
+Exact executed results are recorded in [HAIKULOG](../HAIKULOG.md).
 
 The separate lexical and contact gates isolate source availability, context
 interventions, actual representation pressure, source ancestry, delayed reward

@@ -59,13 +59,18 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   through its history; compare dynamic mixing with the fixed-alpha controls.
   [Private Janus](docs/JANUS_BALANCE.md) captures one UTC day, retains the full
   reviewed score pool, and waits for a later eligible external witness.
-- [ ] Add a conceptual field beneath the words: persistent glyph attraction,
-  learned word bindings, then recursive symbols born during dream consolidation.
-  Keep external observations, peer exchange and internal replay distinct.
+- [x] Give each presence persistent glyph attraction and private
+  [learned word associations](docs/LEARNED_WORDS.md), with repeated external
+  contexts, conflict, bounded pressure and exact publication/restart evidence.
+- [ ] Grow recursive symbols during dream consolidation. Keep external
+  observations, peer exchange and internal replay distinct.
 - [ ] Let model representations contribute to glyph formation and learned
   concept bindings; let that field influence later parameter mixing and words.
   Use NoTorch for numerical work, retain shared concept identities and each
   presence's own experience, and compare with the working weightless field.
+  The [four-anchor PEN7 probe](docs/research/iceberg/WORD_ANCHOR_PROBE.md)
+  records 2/16 held-out matches; its raw hidden similarities supply no binding
+  vote in the current external-context learner.
 - [x] Let each presence send a selected human/self/friend fragment into
   its owned lexical trajectory and receive word/glyph proposals at a declared
   boundary. Preserve source ancestry, frozen bodies, private histories and

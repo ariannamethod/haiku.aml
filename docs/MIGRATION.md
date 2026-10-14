@@ -5,6 +5,7 @@ Tokenization, foreground, continuity, and inner-life follow-up: 2026-10-08.
 Phase4, dreams, exchange journal and worker audit: 2026-10-13.
 Immutable lexical bodies and live private contact: 2026-10-14.
 Owned Janus calendars and witnessed expectation debt: 2026-10-14.
+Private learned word associations and the HAIKULOG split: 2026-10-14.
 This document records the inspected sources, current behavior, and implementation
 order. Numerical, text, lexical, cloud, memory, English form, candidate
 generation, MathBrain, RAE, tokenization, foreground exchange, and complete
@@ -16,6 +17,10 @@ separate [iceberg conversation](ICEBERG_SESSION.md). Its version-2 profile adds
 two private [Janus balance organs](JANUS_BALANCE.md), a captured UTC day and
 future-witness debt. Version 1 retains its fixed profile until explicit
 activation; its existing histories survive that detached upgrade.
+Version 3 adds [private word associations](LEARNED_WORDS.md) from repeated
+accepted human/peer encounters. Each older profile stays unchanged until its
+explicit upgrade. [HAIKULOG](../HAIKULOG.md) carries the chronological technical
+account and measured verification, keeping README focused on the organism.
 The stable chat retains its
 Python-lineage profile. The status below marks the boundary between those
 functions and the remaining organism.
@@ -530,8 +535,9 @@ adapters, pressure, immune memory and delayed reward. The experimental
 [iceberg](ICEBERG_SESSION.md) connects both sources to each presence through
 immutable handles and all-parameter mixing. Four retained contexts, actual
 cloud/inner/dream encounters, model prototypes and bounded word admission now
-share one complete checkpoint. Dynamic balance and recursive glyph formation
-remain in the [iceberg research plan](ICEBERG.md).
+share one complete checkpoint. Private Janus balance and externally learned
+word associations extend that profile through explicit activation. Recursive
+glyph formation remains in the [iceberg research plan](ICEBERG.md).
 
 ### RAE development
 
