@@ -1,0 +1,112 @@
+# Read-only fixed .5/both-body word attribution probe. See WORD_ANCHOR_PROBE.md.
+IMPORT "../../../src/parliament_contact.aml"
+a = model_try_load("../../../weights/haiku1.gguf")
+b = model_try_load("../../../weights/haiku2.gguf")
+assert(model_ready(a) == 1 and model_ready(b) == 1, "Real PEN7 bodies absent")
+assert(haiku_lexical_availability(a, b) == 6, "Provider mask changed")
+alpha = 0.5
+names = haiku_words("water tree light music")
+prototypes = zeros(1792)
+i = 0
+while i < 4:
+    ids = model_encode(a, list_get(names, i), 16)
+    output = haiku_lexical_forward(a, b, alpha, ids)
+    assert(record_get(output, "ok") == 1, "Anchor forward failed")
+    hidden = record_get(output, "hidden")
+    j = 0
+    while j < 448:
+        prototypes[i * 448 + j] = hidden[j]
+        j = j + 1
+    i = i + 1
+PRINT "IDENTITY_A"
+PRINT model_identity(a)
+PRINT "IDENTITY_B"
+PRINT model_identity(b)
+PRINT "TOKENIZER"
+PRINT model_tokenizer_identity(a)
+samples = list_new()
+list_push(samples, "water")
+list_push(samples, "tree")
+list_push(samples, "light")
+list_push(samples, "music")
+list_push(samples, "river")
+list_push(samples, "rain")
+list_push(samples, "forest")
+list_push(samples, "leaf")
+list_push(samples, "sun")
+list_push(samples, "bright")
+list_push(samples, "song")
+list_push(samples, "piano")
+list_push(samples, "stream")
+list_push(samples, "wave")
+list_push(samples, "tide")
+list_push(samples, "droplet")
+list_push(samples, "oak")
+list_push(samples, "birch")
+list_push(samples, "branch")
+list_push(samples, "bark")
+list_push(samples, "glow")
+list_push(samples, "lamp")
+list_push(samples, "photon")
+list_push(samples, "radiance")
+list_push(samples, "rhythm")
+list_push(samples, "violin")
+list_push(samples, "harmony")
+list_push(samples, "concert")
+list_push(samples, "invoice")
+list_push(samples, "tax")
+list_push(samples, "sandwich")
+list_push(samples, "wrench")
+list_push(samples, "bank")
+list_push(samples, "pitch")
+list_push(samples, "scale")
+list_push(samples, "river bank")
+list_push(samples, "savings bank")
+list_push(samples, "tree bark")
+list_push(samples, "dogs bark")
+list_push(samples, "musical pitch")
+list_push(samples, "dark pitch")
+list_push(samples, "musical scale")
+list_push(samples, "fish scale")
+list_push(samples, "quorvex")
+list_push(samples, "zzzap")
+list_push(samples, "water quorvex")
+list_push(samples, "tree quorvex")
+list_push(samples, "light quorvex")
+list_push(samples, "music quorvex")
+list_push(samples, "stream")
+bindings = haiku_contact_bindings()
+saved = zeros(448)
+n = 0
+while n < list_len(samples):
+    sample = list_get(samples, n)
+    ids = model_encode(a, sample, 32)
+    output = haiku_lexical_forward(a, b, alpha, ids)
+    assert(record_get(output, "ok") == 1, "Sample forward failed")
+    hidden = record_get(output, "hidden")
+    if text_equal(sample, "stream"):
+        j = 0
+        while j < 448:
+            if n == 12:
+                saved[j] = hidden[j]
+            else:
+                assert(saved[j] == hidden[j], "Repeated word hidden changed")
+            j = j + 1
+    PRINT "ROW"
+    PRINT n
+    PRINT sample
+    PRINT len(ids)
+    PRINT map_has(bindings, haiku_contact_key("en", sample))
+    magnitude = sqrt(haiku_parliament_dot(hidden, hidden))
+    p = 0
+    while p < 4:
+        prototype = haiku_parliament_part(prototypes, p * 448, 448)
+        size = sqrt(haiku_parliament_dot(prototype, prototype))
+        value = haiku_parliament_dot(hidden, prototype) / (magnitude * size)
+        PRINT value
+        p = p + 1
+    n = n + 1
+missing = model_try_load("word-anchor-intentionally-absent.gguf")
+none = haiku_lexical_forward(missing, missing, alpha, [1])
+assert(record_get(none, "ok") == 0, "Absent source created a representation")
+PRINT "QUIET_ABSENCE_AND_EXACT_REPEAT_OK"

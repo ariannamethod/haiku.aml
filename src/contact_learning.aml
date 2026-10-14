@@ -1,0 +1,462 @@
+# Private word associations earned from accepted external encounters.
+# Shared reviewed aliases teach; learned words and model activations never do.
+# Imported by parliament_contact.aml; its event and binding contracts are reused.
+
+def haiku_contact_enable_learning(state):
+    haiku_contact_check(state)
+    pending = record_clone(state)
+    if record_get(state, "version") == 2:
+        return pending
+    owner = record_get(state, "p:owner")
+    assert(text_equal(owner, "haiku") or text_equal(owner, "friend"), "Contact learning owner is unsupported")
+    source = 0
+    if text_equal(owner, "friend"):
+        source = 6
+    seen = record_get(state, "p:seen")
+    clock = zeros(5)
+    clock[0] = seen[source]
+    clock[1] = record_get(state, "p:clock")
+    clock[2] = clock[0]
+    clock[3] = clock[1]
+    words = list_new()
+    i = 0
+    while i < 64:
+        list_push(words, "")
+        i = i + 1
+    texts = list_new()
+    i = 0
+    while i < 768:
+        list_push(texts, "")
+        i = i + 1
+    record_set(pending, "version", 2)
+    record_set(pending, "learn_clock", clock)
+    record_set(pending, "learn_words", words)
+    record_set(pending, "learn_counts", zeros(2816))
+    record_set(pending, "learn_rows", zeros(2304))
+    record_set(pending, "learn_text", texts)
+    haiku_contact_check(pending)
+    return pending
+
+# The initial learned surface is English letters. Function words keep their
+# ordinary grammatical work; neither this list nor a spelling supplies a glyph.
+def haiku_contact_learning_word(language, word):
+    if text_equal(language, "en") == 0 or text_len(word) < 3 or text_len(word) > 64:
+        return 0
+    i = 0
+    while i < text_len(word):
+        cp = text_codepoint(word, i)
+        if cp < 97 or cp > 122:
+            return 0
+        i = i + 1
+    stop = " a an the and or but for of to in on at by from with as is are was were be been being am i me my mine we us our ours you your yours he him his she her hers it its they them their theirs "
+    stop = text_concat(stop, "this that these those there here not no yes do does did done have has had having will would shall should can could may might must very just so too than then when where why how what which who whom whose ")
+    stop = text_concat(stop, "all any both each either few many most much neither other several some such nor only own same also into onto upon about above below between through during before after under over out off up down again once still ")
+    return text_find(stop, text_concat(text_concat(" ", word), " ")) < 0
+
+# Every occurrence gets its own +/-3-token window. Several occurrences still
+# make one encounter; incompatible local labels make that encounter ambiguous.
+def haiku_contact_learning_window(tokens, index, teachers):
+    target = list_get(tokens, index)
+    windows = list_new()
+    chosen = -2
+    support = 0
+    position = index
+    while position < list_len(tokens):
+        if text_equal(list_get(tokens, position), target):
+            values = zeros(88)
+            spellings = list_new()
+            local = list_new()
+            cursor = max(0, position - 3)
+            end = min(list_len(tokens), position + 4)
+            while cursor < end:
+                word = list_get(tokens, cursor)
+                if list_find(local, word) < 0:
+                    list_push(local, word)
+                key = haiku_contact_key("en", word)
+                if text_equal(word, target) == 0 and map_has(teachers, key) and list_find(spellings, word) < 0:
+                    id = map_get(teachers, key)
+                    values[id] = values[id] + 1
+                    list_push(spellings, word)
+                cursor = cursor + 1
+            best = 0
+            runner = 0
+            glyph = -1
+            i = 0
+            while i < 88:
+                if values[i] > best:
+                    runner = best
+                    best = values[i]
+                    glyph = i
+                else:
+                    runner = max(runner, values[i])
+                i = i + 1
+            support = max(support, best)
+            if best >= 2:
+                # Preserve local context while removing order and multiplicity.
+                # This is a spelling-level dedupe, not a semantic paraphrase test.
+                local = list_sorted(local)
+                window = ""
+                i = 0
+                while i < list_len(local):
+                    if text_len(window) > 0:
+                        window = text_concat(window, " ")
+                    window = text_concat(window, list_get(local, i))
+                    i = i + 1
+                if list_find(windows, window) < 0:
+                    list_push(windows, window)
+                if best == runner:
+                    chosen = -1
+                else:
+                    if chosen == -2:
+                        chosen = glyph
+                    else:
+                        if chosen != glyph:
+                            chosen = -1
+        position = position + 1
+    windows = list_sorted(windows)
+    signature = ""
+    i = 0
+    while i < list_len(windows):
+        if i > 0:
+            signature = text_concat(signature, " | ")
+        signature = text_concat(signature, list_get(windows, i))
+        i = i + 1
+    result = record_new()
+    record_set(result, "window", signature)
+    record_set(result, "glyph", -1)
+    record_set(result, "support", support)
+    record_set(result, "outcome", 0)
+    # A bounded normalized context has a complete retained spelling, never a
+    # truncated fragment which could hide a conflicting occurrence.
+    if chosen >= -1 and text_len(signature) <= 4096:
+        record_set(result, "glyph", chosen)
+        record_set(result, "outcome", 1 + (chosen == -1))
+    return result
+
+# Reviewed bindings remain authoritative. Confidence belongs to the private
+# overlay and can disappear when newer, independently heard contexts conflict.
+def haiku_contact_learning_lookup(state, language, word):
+    key = haiku_contact_key(language, word)
+    bindings = record_get(state, "bindings")
+    result = [-1, 0]
+    if map_has(bindings, key):
+        result[0] = map_get(bindings, key)
+        result[1] = 1
+        return result
+    if record_get(state, "version") != 2:
+        return result
+    words = record_get(state, "learn_words")
+    slot = -1
+    i = 0
+    while i < 32:
+        if text_equal(list_get(words, i * 2), language) and text_equal(list_get(words, i * 2 + 1), text_lower(word)):
+            slot = i
+        i = i + 1
+    if slot < 0:
+        return result
+    counts = record_get(state, "learn_counts")
+    rows = record_get(state, "learn_rows")
+    best = 0
+    runner = 0
+    glyph = -1
+    i = 0
+    while i < 88:
+        value = counts[slot * 88 + i]
+        if value > best:
+            runner = best
+            best = value
+            glyph = i
+        else:
+            runner = max(runner, value)
+        i = i + 1
+    total = 0
+    i = 0
+    while i < 6:
+        if rows[(slot * 6 + i) * 12] > 0:
+            total = total + 1
+        i = i + 1
+    if best >= 3 and best - runner >= 2 and best / max(1, total) >= 0.75:
+        result[0] = glyph
+        result[1] = 0.5 * best / total
+    return result
+
+# Counts are an index of the retained receipts, not an independent claim.
+# This checker is also usable on a replay shadow whose parliament is older.
+def haiku_contact_learning_check(state):
+    owner = record_get(state, "p:owner")
+    assert(text_equal(owner, "haiku") or text_equal(owner, "friend"), "Contact learning owner is unsupported")
+    policy = 0
+    if text_equal(owner, "friend"):
+        policy = 6
+    clock = record_get(state, "learn_clock")
+    counts = record_get(state, "learn_counts")
+    rows = record_get(state, "learn_rows")
+    texts = record_get(state, "learn_text")
+    words = record_get(state, "learn_words")
+    haiku_parliament_vector(clock, 5, 999999)
+    haiku_parliament_vector(counts, 2816, 6)
+    haiku_parliament_vector(rows, 2304, 999999)
+    assert(list_len(words) == 64 and list_len(texts) == 768, "Contact learning text shape differs")
+    i = 0
+    while i < 5:
+        haiku_contact_integer(clock[i], 0, 999999)
+        i = i + 1
+    assert(clock[2] >= clock[0] and clock[3] >= clock[1], "Contact learning clock precedes activation")
+    assert(clock[4] <= clock[2] - clock[0], "Contact learning revision exceeds its encounters")
+    if clock[4] == 0:
+        assert(clock[2] == clock[0] and clock[3] == clock[1], "Contact learning empty clock has encounters")
+    else:
+        assert(clock[2] > clock[0] and clock[3] > clock[1], "Contact learning lived clock is empty")
+    teachers = haiku_contact_bindings()
+    keys = list_new()
+    encounter_rows = map_new()
+    revision_events = map_new()
+    empty = 0
+    slot = 0
+    while slot < 32:
+        language = list_get(words, slot * 2)
+        word = list_get(words, slot * 2 + 1)
+        occupied = text_len(language) > 0
+        if occupied:
+            assert(empty == 0 and haiku_contact_learning_word(language, word), "Contact learning candidate is invalid")
+            key = haiku_contact_key(language, word)
+            assert(list_find(keys, key) < 0 and map_has(teachers, key) == 0, "Contact learning candidate repeats a reviewed seed")
+            list_push(keys, key)
+        else:
+            empty = 1
+            assert(text_len(word) == 0, "Contact learning empty candidate has a word")
+        expected = zeros(88)
+        used = 0
+        history = 0
+        while history < 6:
+            row = (slot * 6 + history) * 12
+            text_row = (slot * 6 + history) * 4
+            if rows[row] > 0:
+                used = used + 1
+                assert(occupied and clock[4] > 0, "Contact learning evidence has no candidate")
+                event = haiku_contact_integer(rows[row], clock[0] + 1, clock[2])
+                turn = haiku_contact_integer(rows[row + 1], max(1, clock[1] + 1), clock[3])
+                revision = haiku_contact_integer(rows[row + 2], 1, clock[4])
+                assert(revision <= event - clock[0], "Contact learning evidence revision exceeds its encounter")
+                assert(rows[row + 3] == policy, "Contact learning evidence has another source")
+                if policy == 0:
+                    assert(rows[row + 4] == 0 and rows[row + 5] == event and rows[row + 6] == -1 and rows[row + 7] == 0, "Contact learning human ancestry differs")
+                    assert(text_equal(list_get(texts, text_row + 2), "human") and text_len(list_get(texts, text_row + 3)) == 0, "Contact learning human owner differs")
+                else:
+                    assert(rows[row + 4] == 7 and rows[row + 5] == event and rows[row + 6] == 7 and rows[row + 7] == event, "Contact learning peer ancestry differs")
+                    assert(text_equal(list_get(texts, text_row + 2), "haiku") and text_equal(list_get(texts, text_row + 3), "haiku"), "Contact learning peer owner differs")
+                source = list_get(texts, text_row)
+                assert(text_len(source) <= 10000, "Contact learning witness is too long")
+                # One external encounter can teach several candidates, but
+                # those receipts must agree on the text and learning clock.
+                event_key = text_fixed(event, 0)
+                if map_has(encounter_rows, event_key):
+                    prior = map_get(encounter_rows, event_key)
+                    assert(rows[prior * 12 + 1] == turn and rows[prior * 12 + 2] == revision, "Contact learning shared encounter clock differs")
+                    assert(text_equal(list_get(texts, prior * 4), source), "Contact learning shared encounter text differs")
+                else:
+                    map_set(encounter_rows, event_key, slot * 6 + history)
+                revision_key = text_fixed(revision, 0)
+                if map_has(revision_events, revision_key):
+                    assert(map_get(revision_events, revision_key) == event, "Contact learning revision names another encounter")
+                else:
+                    map_set(revision_events, revision_key, event)
+                tokens = haiku_tokenize_regex(source)
+                index = haiku_contact_integer(rows[row + 8], 0, list_len(tokens) - 1)
+                assert(text_equal(list_get(tokens, index), word) and list_find(tokens, word) == index, "Contact learning witness lost its word position")
+                observed = haiku_contact_learning_window(tokens, index, teachers)
+                assert(record_get(observed, "outcome") > 0, "Contact learning evidence has no reviewed context")
+                assert(rows[row + 9] == record_get(observed, "glyph") and rows[row + 10] == record_get(observed, "outcome") and rows[row + 11] == record_get(observed, "support"), "Contact learning evidence label differs")
+                assert(text_equal(list_get(texts, text_row + 1), record_get(observed, "window")), "Contact learning normalized context differs")
+                if rows[row + 10] == 1:
+                    glyph = haiku_contact_integer(rows[row + 9], 0, 87)
+                    expected[glyph] = expected[glyph] + 1
+                earlier = 0
+                while earlier < history:
+                    old = (slot * 6 + earlier) * 12
+                    old_text = (slot * 6 + earlier) * 4
+                    if rows[old] > 0:
+                        assert(rows[old] != event and rows[old + 1] != turn and rows[old + 2] != revision, "Contact learning evidence repeats an encounter")
+                        assert(text_equal(list_get(texts, old_text + 1), list_get(texts, text_row + 1)) == 0, "Contact learning evidence repeats a context")
+                    earlier = earlier + 1
+            else:
+                i = 0
+                while i < 12:
+                    assert(rows[row + i] == 0, "Contact learning empty receipt has numbers")
+                    i = i + 1
+                i = 0
+                while i < 4:
+                    assert(text_len(list_get(texts, text_row + i)) == 0, "Contact learning empty receipt has text")
+                    i = i + 1
+            history = history + 1
+        assert(occupied == (used > 0), "Contact learning candidate has no retained context")
+        i = 0
+        while i < 88:
+            assert(counts[slot * 88 + i] == expected[i], "Contact learning counts differ from evidence")
+            i = i + 1
+        slot = slot + 1
+    return 1
+
+# Deterministic replay kernel. Its caller supplies an independently established
+# encounter. Normal publication goes through the sealed wrapper below; result
+# validation reconstructs foreground/dream events and compares all five leaves.
+def haiku_contact_learning_step(state, event):
+    result = record_new()
+    record_set(result, "committed", 0)
+    record_set(result, "observed", 0)
+    record_set(result, "duplicates", 0)
+    record_set(result, "refused", 0)
+    haiku_contact_event_check(event)
+    if record_get(state, "version") != 2:
+        return result
+    owner = record_get(state, "p:owner")
+    source = record_get(event, "source")
+    number = record_get(event, "event")
+    legitimate = text_equal(owner, "haiku") and source == 0 and text_equal(record_get(event, "owner"), "human")
+    if text_equal(owner, "friend") and source == 6:
+        legitimate = text_equal(record_get(event, "owner"), "friend")
+        legitimate = legitimate and text_equal(record_get(event, "parent_owner"), "haiku") and text_equal(record_get(event, "origin_owner"), "haiku")
+        legitimate = legitimate and record_get(event, "parent_source") == 7 and record_get(event, "origin_source") == 7
+        legitimate = legitimate and record_get(event, "parent_event") == number and record_get(event, "origin_event") == number
+    clock = record_get(state, "learn_clock")
+    if legitimate == 0 or record_get(event, "replay") == 1 or number <= clock[2] or record_get(event, "turn") <= clock[1]:
+        return result
+    haiku_contact_learning_check(state)
+    turn = record_get(event, "turn")
+    assert(turn >= clock[3], "Contact learning encounter moved backward")
+    assert(clock[4] < 999999, "Contact learning revision is full")
+    pending = record_clone(state)
+    clock = record_get(pending, "learn_clock")
+    clock[2] = number
+    clock[3] = turn
+    clock[4] = clock[4] + 1
+    words = record_get(pending, "learn_words")
+    counts = record_get(pending, "learn_counts")
+    rows = record_get(pending, "learn_rows")
+    texts = record_get(pending, "learn_text")
+    bindings = record_get(pending, "bindings")
+    teachers = haiku_contact_bindings()
+    language = record_get(event, "language")
+    tokens = haiku_tokenize_regex(record_get(event, "text"))
+    processed = list_new()
+    index = 0
+    while index < list_len(tokens):
+        word = list_get(tokens, index)
+        key = haiku_contact_key(language, word)
+        if haiku_contact_learning_word(language, word) and map_has(bindings, key) == 0 and list_find(processed, word) < 0:
+            list_push(processed, word)
+            observed = haiku_contact_learning_window(tokens, index, teachers)
+            if record_get(observed, "outcome") > 0:
+                slot = -1
+                free_slot = -1
+                i = 0
+                while i < 32:
+                    if text_len(list_get(words, i * 2)) == 0 and free_slot < 0:
+                        free_slot = i
+                    if text_equal(list_get(words, i * 2), language) and text_equal(list_get(words, i * 2 + 1), word):
+                        slot = i
+                    i = i + 1
+                if slot < 0:
+                    slot = free_slot
+                if slot < 0:
+                    record_set(result, "refused", record_get(result, "refused") + 1)
+                else:
+                    duplicate = 0
+                    oldest = 0
+                    smallest = 1000000
+                    i = 0
+                    while i < 6:
+                        row = (slot * 6 + i) * 12
+                        text_row = (slot * 6 + i) * 4
+                        if rows[row] > 0:
+                            if rows[row + 1] == turn or text_equal(list_get(texts, text_row + 1), record_get(observed, "window")):
+                                duplicate = 1
+                        if rows[row + 2] < smallest:
+                            smallest = rows[row + 2]
+                            oldest = i
+                        i = i + 1
+                    if duplicate:
+                        record_set(result, "duplicates", record_get(result, "duplicates") + 1)
+                    else:
+                        list_set(words, slot * 2, language)
+                        list_set(words, slot * 2 + 1, word)
+                        row = (slot * 6 + oldest) * 12
+                        text_row = (slot * 6 + oldest) * 4
+                        if rows[row] > 0 and rows[row + 10] == 1:
+                            old_glyph = rows[row + 9]
+                            counts[slot * 88 + old_glyph] = counts[slot * 88 + old_glyph] - 1
+                        rows[row] = number
+                        rows[row + 1] = turn
+                        rows[row + 2] = clock[4]
+                        rows[row + 3] = source
+                        rows[row + 4] = record_get(event, "origin_source")
+                        rows[row + 5] = record_get(event, "origin_event")
+                        rows[row + 6] = record_get(event, "parent_source")
+                        rows[row + 7] = record_get(event, "parent_event")
+                        rows[row + 8] = index
+                        rows[row + 9] = record_get(observed, "glyph")
+                        rows[row + 10] = record_get(observed, "outcome")
+                        rows[row + 11] = record_get(observed, "support")
+                        if rows[row + 10] == 1:
+                            glyph = rows[row + 9]
+                            counts[slot * 88 + glyph] = counts[slot * 88 + glyph] + 1
+                        list_set(texts, text_row, record_get(event, "text"))
+                        list_set(texts, text_row + 1, record_get(observed, "window"))
+                        list_set(texts, text_row + 2, record_get(event, "origin_owner"))
+                        list_set(texts, text_row + 3, record_get(event, "parent_owner"))
+                        record_set(result, "observed", record_get(result, "observed") + 1)
+        index = index + 1
+    record_set(pending, "learn_words", words)
+    record_set(pending, "learn_text", texts)
+    haiku_contact_learning_check(pending)
+    leaves = haiku_words("learn_clock learn_words learn_counts learn_rows learn_text")
+    i = 0
+    while i < 5:
+        name = list_get(leaves, i)
+        record_set(state, name, record_get(pending, name))
+        i = i + 1
+    record_set(result, "committed", 1)
+    return result
+
+# A normal observer requires the exact receipt already sealed by publish.
+# An old or explicit replay remains an exact no-op even after receipt expiry.
+def haiku_contact_learn(state, event):
+    haiku_contact_check(state)
+    haiku_contact_event_check(event)
+    if record_get(state, "version") != 2:
+        return haiku_contact_learning_step(state, event)
+    clock = record_get(state, "learn_clock")
+    if record_get(event, "replay") == 1 or record_get(event, "event") <= clock[2]:
+        return haiku_contact_learning_step(state, event)
+    rows = record_get(state, "p:receipt_rows")
+    texts = record_get(state, "contact_text")
+    meta = record_get(state, "contact_meta")
+    slot = -1
+    i = 0
+    while i < 32:
+        if rows[i * 9] == record_get(event, "event") and rows[i * 9 + 2] == record_get(event, "source"):
+            slot = i
+        i = i + 1
+    assert(slot >= 0, "Contact learning published witness is absent")
+    latest = record_get(state, "p:receipt_cursor") - 1
+    if latest < 0:
+        latest = 31
+    assert(slot == latest, "Contact learning witness is not the latest publication")
+    assert(rows[slot * 9 + 1] == record_get(event, "turn") and rows[slot * 9 + 6] == record_get(event, "availability"), "Contact learning published witness clock differs")
+    names = haiku_words("owner text language origin_owner parent_owner identity")
+    i = 0
+    while i < 6:
+        assert(text_equal(list_get(texts, slot * 6 + i), record_get(event, list_get(names, i))), "Contact learning published witness text differs")
+        i = i + 1
+    names = haiku_words("parent_source parent_event origin_source origin_event alpha representation_gain representation_available availability")
+    i = 0
+    while i < 8:
+        assert(meta[slot * 8 + i] == record_get(event, list_get(names, i)), "Contact learning published witness ancestry differs")
+        i = i + 1
+    features = haiku_contact_features(state, event)
+    published = record_get(state, "p:receipt_x")
+    i = 0
+    while i < 96:
+        assert(features[i] == published[slot * 96 + i], "Contact learning published witness features differ")
+        i = i + 1
+    return haiku_contact_learning_step(state, event)

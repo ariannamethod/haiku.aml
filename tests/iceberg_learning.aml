@@ -1,0 +1,95 @@
+# Learned words belong to a complete private life and survive its boundaries.
+IMPORT "../src/iceberg_session.aml"
+
+day = 20740
+missing = model_try_load("")
+core = haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0)
+record_set(core, "dream_config", [10000, 0, 4])
+legacy = haiku_iceberg_new(core, [1, 1, 2, 1])
+janus = haiku_iceberg_enable_janus(legacy, day, 1, 0)
+old = record_clone(janus)
+live = haiku_iceberg_enable_words(janus, 0)
+assert(record_equal(janus, old), "Word learning activation changed the existing Janus life")
+assert(record_get(legacy, "version") == 1 and list_len(record_keys(legacy)) == 185, "Word learning changed the established v1 profile")
+assert(record_get(janus, "version") == 2 and list_len(record_keys(janus)) == 227, "Word learning changed the established v2 profile")
+assert(record_get(live, "version") == 3 and list_len(record_keys(live)) == 237, "Word learning iceberg profile differs")
+assert(record_get(live, "haiku_contact:version") == 2 and record_get(live, "friend_contact:version") == 2, "Both contacts did not acquire their own word learning")
+assert(record_has(janus, "haiku_contact:learn_words") == 0, "Existing Janus life silently acquired learned words")
+again = haiku_iceberg_enable_words(live, 0)
+assert(record_equal(live, again), "Word learning activation is not idempotent")
+list_set(record_get(again, "haiku_contact:learn_words"), 1, "changed")
+assert(text_equal(list_get(record_get(live, "haiku_contact:learn_words"), 1), ""), "Word learning activation returned mutable aliases")
+assert(record_equal(live, haiku_iceberg_enable_janus(live, day + 10, 0, 0)), "Janus activation downgraded an existing learning life")
+
+parallel = record_clone(live)
+baseline = record_clone(core)
+friend_before = haiku_iceberg_part(live, "friend_contact")
+hlex_before = haiku_iceberg_part(live, "haiku_lexical")
+flex_before = haiku_iceberg_part(live, "friend_lexical")
+messages = list_new()
+list_push(messages, "stream water river")
+list_push(messages, "stream sea ocean")
+list_push(messages, "stream rain lake")
+index = 0
+while index < 3:
+    text = list_get(messages, index)
+    first = haiku_iceberg_turn_at(live, text, 0, missing, missing, 0, day + index)
+    second = haiku_iceberg_turn_at(parallel, text, 0, missing, missing, 1, day + index)
+    original = haiku_session_turn(baseline, text, 0)
+    assert(text_equal(first, second) and record_equal(live, parallel), "Word learning differs between serial and worker publication")
+    assert(text_equal(first, original) and record_equal(baseline, haiku_iceberg_part(live, "voice")), "Absent bodies changed the original voice or draws")
+    glyphs = haiku_contact_glyphs(haiku_iceberg_part(live, "haiku_contact"), "stream", "en")
+    if index < 2:
+        assert(glyphs[0] == 0, "One or two teaching encounters confirmed an unknown word")
+    if index == 1:
+        checkpoint_save(parallel, "iceberg-learning.state")
+        resumed = checkpoint_load("iceberg-learning.state")
+        haiku_iceberg_check(resumed, 0)
+        assert(record_equal(parallel, resumed), "Learning checkpoint lost incomplete word evidence")
+        parallel = resumed
+    index = index + 1
+assert(glyphs[0] > 0 and glyphs[0] <= 0.333334, "Third distinct human context did not give stream a bounded water meaning")
+assert(record_equal(friend_before, haiku_iceberg_part(live, "friend_contact")), "Waking human teaching reached the unheard friend")
+assert(record_equal(hlex_before, haiku_iceberg_part(live, "haiku_lexical")) and record_equal(flex_before, haiku_iceberg_part(live, "friend_lexical")), "Learning with absent bodies changed immutable lexical histories")
+
+# The confirming human receipt was featurized before its new binding existed.
+contact = haiku_iceberg_part(live, "haiku_contact")
+rows = record_get(contact, "p:receipt_rows")
+features = record_get(contact, "p:receipt_x")
+slot = -1
+index = 0
+while index < 32:
+    if rows[index * 9] == 3 and rows[index * 9 + 2] == 0:
+        slot = index
+    index = index + 1
+assert(slot >= 0 and abs(features[slot * 96] - 2 / 3) < 0.000001, "Confirming contact consumed its own newly learned binding")
+first = haiku_iceberg_turn_at(live, "stream", 0, missing, missing, 0, day + 3)
+second = haiku_iceberg_turn_at(parallel, "stream", 0, missing, missing, 1, day + 3)
+assert(text_equal(first, second) and record_equal(live, parallel), "Held-out learned-word continuation differs after restart")
+contact = haiku_iceberg_part(live, "haiku_contact")
+rows = record_get(contact, "p:receipt_rows")
+features = record_get(contact, "p:receipt_x")
+index = 0
+slot = -1
+while index < 32:
+    if rows[index * 9] == 4 and rows[index * 9 + 2] == 0:
+        slot = index
+    index = index + 1
+assert(slot >= 0 and features[slot * 96] > 0, "A later stream-only encounter did not carry its learned water coordinate")
+checkpoint_save(live, "iceberg-learning.state")
+assert(record_equal(live, checkpoint_load("iceberg-learning.state")), "Complete learned life did not round-trip")
+
+# Contact disabled freezes every private learning leaf while the voice lives.
+off = haiku_iceberg_enable_words(haiku_iceberg_enable_janus(haiku_iceberg_new(core, [0, 0, 0, 0]), day, 1, 0), 0)
+off_contact = haiku_iceberg_part(off, "haiku_contact")
+haiku_iceberg_turn_at(off, "stream water river", 0, missing, missing, 1, day)
+assert(record_equal(off_contact, haiku_iceberg_part(off, "haiku_contact")), "Disabled contact learned from an undelivered encounter")
+
+# Upgrade happens at the real source clock, so old receipts do not become new
+# evidence. Its ordinary Janus state and both lexical histories remain exact.
+haiku_iceberg_turn_at(janus, "stream water river", 0, missing, missing, 0, day)
+upgraded = haiku_iceberg_enable_words(janus, 0)
+clock = record_get(upgraded, "haiku_contact:learn_clock")
+assert(clock[0] == 1 and clock[1] == 1 and clock[2] == 1 and clock[3] == 1 and clock[4] == 0, "Learning activation did not freeze the current source boundary")
+assert(record_equal(haiku_iceberg_part(janus, "haiku_janus"), haiku_iceberg_part(upgraded, "haiku_janus")), "Word activation changed the existing Janus autobiography")
+PRINT "HAIKU_ICEBERG_LEARNING_LIFE_OK"

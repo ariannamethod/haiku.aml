@@ -40,6 +40,9 @@ resonance, recursion, memory, and continuity throughout code and documentation.
 - Keep asynchronous state ownership explicit: foreground exchanges, learning,
   dreams, and persistence must agree on when an update becomes visible.
 - Keep documentation concise and playful. Carry the original README's voice.
+- Keep README focused on the organism, real dialogue, essential capabilities
+  and launch commands. Record technical changes, source pins, test counts and
+  reproduction evidence in `HAIKULOG.md`, newest entries first.
 - Commit source and small reproducible fixtures. Keep credentials, generated
   executables and live state out of git. Oleg explicitly approved the two
   converted, immutable model assets `weights/haiku1.gguf` and

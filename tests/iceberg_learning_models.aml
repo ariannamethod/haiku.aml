@@ -1,0 +1,39 @@
+# Real dual-body passes coexist with private learning and peer delivery.
+IMPORT "../src/iceberg_session.aml"
+
+day = 20740
+a = model_try_load("../weights/haiku1.gguf")
+b = model_try_load("../weights/haiku2.gguf")
+assert(model_ready(a) and model_ready(b), "Word learning fixture needs both immutable bodies")
+core = haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0)
+record_set(core, "dream_config", [1, 1, 16])
+serial = haiku_iceberg_enable_words(haiku_iceberg_enable_janus(haiku_iceberg_new(core, [1, 1, 2, 1]), day, 1, 0), 0)
+parallel = record_clone(serial)
+first = haiku_iceberg_turn_at(serial, "rain", 0, a, b, 0, day)
+second = haiku_iceberg_turn_at(parallel, "rain", 0, a, b, 1, day)
+assert(text_equal(first, second) and record_equal(serial, parallel), "Learned life with actual models differs between schedules")
+core = haiku_iceberg_part(serial, "voice")
+assert(haiku_dream_check(core) == 1 and list_len(record_get(core, "dream_history")) == 16, "Maximal real dream did not deliver its sixteen original lines")
+friend = haiku_iceberg_part(serial, "friend_contact")
+seen = record_get(friend, "p:seen")
+clock = record_get(friend, "learn_clock")
+assert(seen[0] == 0 and seen[6] == 15 and seen[7] == 16, "Friend contact source clocks lost actual dream ancestry")
+assert(clock[2] == 15 and clock[3] == 1, "Friend learner did not witness the last actual Haiku delivery")
+assert(record_get(serial, "haiku_lexical:revision") > 0 and record_get(serial, "friend_lexical:revision") > 0, "Learned life lost one presence's real lexical pass")
+assert(record_get(serial, "haiku_janus:revision") > 0 and record_get(serial, "friend_janus:revision") > 0, "Learned life lost one presence's Janus history")
+checkpoint_save(serial, "iceberg-learning-models.state")
+resumed = checkpoint_load("iceberg-learning-models.state")
+haiku_iceberg_check(resumed, 0)
+assert(record_equal(serial, resumed), "Real models and learned words lost a checkpoint leaf")
+# Continue after restart with both bodies quietly absent; no extra neural
+# inference is needed for externally witnessed learning or later Janus debt.
+missing = model_try_load("")
+record_set(serial, "voice:dream_config", [10000, 0, 4])
+record_set(resumed, "voice:dream_config", [10000, 0, 4])
+friend_before = haiku_iceberg_part(serial, "friend_contact")
+first = haiku_iceberg_turn_at(serial, "stream water river", 0, missing, missing, 0, day + 1)
+second = haiku_iceberg_turn_at(resumed, "stream water river", 0, missing, missing, 1, day + 1)
+assert(text_equal(first, second) and record_equal(serial, resumed), "Learned dual-body checkpoint did not continue exactly without its optional bodies")
+assert(record_equal(friend_before, haiku_iceberg_part(serial, "friend_contact")), "Later waking human evidence crossed into the unheard friend")
+checkpoint_save(serial, "iceberg-learning-models.state")
+PRINT "HAIKU_ICEBERG_LEARNING_MODELS_OK"

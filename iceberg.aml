@@ -13,6 +13,10 @@ owned_tail = 1
 # profile until this explicit one-time upgrade is selected.
 janus_balance = 1
 upgrade_balance = 0
+# New Janus lives can learn private word meanings from repeated encounters.
+# Existing v1/v2 checkpoints require this separate explicit activation.
+word_learning = 1
+upgrade_words = 0
 resuming = 0
 if text_len(state_path) > 0:
     resuming = file_exists(state_path)
@@ -37,6 +41,10 @@ if resuming == 0 and janus_balance:
     life = haiku_iceberg_enable_janus(life, utc_day(), 1, tokenizer_model)
 if resuming and upgrade_balance:
     life = haiku_iceberg_enable_janus(life, utc_day(), 1, tokenizer_model)
+if resuming == 0 and janus_balance and word_learning:
+    life = haiku_iceberg_enable_words(life, tokenizer_model)
+if resuming and upgrade_words:
+    life = haiku_iceberg_enable_words(life, tokenizer_model)
 
 path_a = ""
 path_b = ""

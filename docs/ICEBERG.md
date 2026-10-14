@@ -17,13 +17,17 @@ The new [iceberg conversation](ICEBERG_SESSION.md) connects immutable AML
 handles, four private lexical contexts, parameter mixing and two private
 parliaments to actual encounters. Bounded text-context returns provide word
 scores and representations; concept pressure joins lexical admission. Its
-185-field checkpoint retains all five organs together. Python Haiku remains
+version-3 checkpoint retains 237 fields across the voice, both lexical/contact
+lives and both Janus organs. Private [word associations](LEARNED_WORDS.md) grow
+from repeated accepted encounters; the [engineering log](../HAIKULOG.md)
+records each stage and its evidence. Python Haiku remains
 the behavioral and artistic reference; `haiku.aml` retains that stable profile.
 
 The sections below preserve the research and broader design. The executing
 boundary is detailed in [ICEBERG_SESSION](ICEBERG_SESSION.md),
 [LEXICAL_SOURCES](LEXICAL_SOURCES.md) and [PARLIAMENT_CONTACT](PARLIAMENT_CONTACT.md).
-Dynamic seasonal balance and recursive glyph birth remain upcoming work.
+Dynamic [Janus balance](JANUS_BALANCE.md) and learned word associations now run
+in the separate profile. Recursive glyph birth remains upcoming work.
 
 ## Sources and receipts
 
