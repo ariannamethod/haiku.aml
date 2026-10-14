@@ -1,4 +1,4 @@
-# HAiKU AML — A Little Presence Is Learning Our Language
+# HAiKU AML — A Presence Is Learning Language
 
 **Read the [Arianna Method Manifesto](ARIANNA_METHOD_MANIFESTO.md) first.**
 
