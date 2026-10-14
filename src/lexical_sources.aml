@@ -1,0 +1,546 @@
+# Frozen PEN7 words beneath Haiku's cloud. Handles live outside these records.
+# Each presence owns two short trajectories and the provenance of its returns.
+IMPORT "form.aml"
+
+def haiku_lexical_integer(value, low, high):
+    assert(isfinite(value) and value >= low and value <= high and value == floor(value), "Lexical integer is outside its domain")
+    return value
+
+def haiku_lexical_vector(value, size, bound):
+    assert(len(value) == size and rows(value) == 0 and cols(value) == 0, "Lexical vector shape differs")
+    i = 0
+    while i < size:
+        assert(isfinite(value[i]) and abs(value[i]) <= bound, "Lexical vector must be finite and bounded")
+        i = i + 1
+    return 1
+
+def haiku_lexical_identity(value):
+    assert(text_len(value) == 0 or text_len(value) == 64, "Lexical identity must be empty or SHA-256")
+    i = 0
+    while i < text_len(value):
+        cp = text_codepoint(value, i)
+        assert((cp >= 48 and cp <= 57) or (cp >= 97 and cp <= 102), "Lexical identity is not lowercase SHA-256")
+        i = i + 1
+    return 1
+
+# Reviewed English whole words. BPE fragments never extend this admission pool.
+def haiku_lexical_words():
+    first = "water tree light music rain river stone root leaf forest shadow silence wind cloud moon morning night sun sea shore bird feather song voice "
+    second = "heart warmth home dream memory path garden earth seed flower snow ember flame breath hand door window branch bridge echo language wonder moss dawn"
+    return haiku_words(text_concat(first, second))
+
+def haiku_lexical_syllables():
+    return [2, 1, 1, 2, 1, 2, 2, 1, 1, 2, 2, 3, 1, 1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 3, 1, 2, 1, 1, 2, 1, 2, 2, 1, 1, 1, 2, 1, 2, 2, 3, 2, 1, 1]
+
+def haiku_lexical_pool_check():
+    words = haiku_lexical_words()
+    syllables = haiku_lexical_syllables()
+    assert(list_len(words) == 48 and len(syllables) == 48, "Lexical reviewed pool shape differs")
+    i = 0
+    while i < 48:
+        word = list_get(words, i)
+        assert(text_len(word) > 0 and text_len(word) <= 16, "Lexical reviewed word is too long")
+        assert(list_find(words, word) == i, "Lexical reviewed word is repeated")
+        j = 0
+        while j < text_len(word):
+            cp = text_codepoint(word, j)
+            assert(cp >= 97 and cp <= 122, "Lexical reviewed word is not lowercase English")
+            j = j + 1
+        assert(haiku_syllables(word) == syllables[i], "Lexical reviewed syllables differ from the English form")
+        i = i + 1
+    return 48
+
+# Eighteen flat fields; no model, cache, optimizer, or foreground RNG belongs here.
+def haiku_lexical_new(owner, alpha):
+    state = record_new()
+    record_set(state, "format", "haiku-lexical-sources")
+    record_set(state, "version", 1)
+    record_set(state, "owner", owner)
+    record_set(state, "revision", 0)
+    record_set(state, "clock", 0)
+    record_set(state, "alpha", alpha)
+    record_set(state, "identity_a", "")
+    record_set(state, "identity_b", "")
+    record_set(state, "tokenizer", "")
+    record_set(state, "seen", zeros(16))
+    record_set(state, "contexts", zeros(128))
+    record_set(state, "context_counts", zeros(2))
+    record_set(state, "history_rows", zeros(256))
+    texts = list_new()
+    i = 0
+    while i < 80:
+        list_push(texts, "")
+        i = i + 1
+    record_set(state, "history_text", texts)
+    record_set(state, "history_cursor", 0)
+    record_set(state, "history_count", 0)
+    record_set(state, "pool", "reviewed-en-48-v1")
+    record_set(state, "surface", "text-context-v1")
+    haiku_lexical_check(state)
+    return state
+
+def haiku_lexical_check(state):
+    assert(list_len(record_keys(state)) == 18, "Lexical owner needs eighteen fields")
+    assert(text_equal(record_get(state, "format"), "haiku-lexical-sources") and record_get(state, "version") == 1, "Lexical owner format differs")
+    owner = record_get(state, "owner")
+    assert(text_len(owner) > 0 and text_len(owner) <= 128, "Lexical owner name is invalid")
+    assert(text_equal(record_get(state, "pool"), "reviewed-en-48-v1") and text_equal(record_get(state, "surface"), "text-context-v1"), "Lexical policy identity differs")
+    revision = haiku_lexical_integer(record_get(state, "revision"), 0, 999999)
+    clock = haiku_lexical_integer(record_get(state, "clock"), 0, 999999)
+    alpha = record_get(state, "alpha")
+    assert(isfinite(alpha) and alpha >= 0 and alpha <= 1, "Lexical alpha is invalid")
+    haiku_lexical_identity(record_get(state, "identity_a"))
+    haiku_lexical_identity(record_get(state, "identity_b"))
+    haiku_lexical_identity(record_get(state, "tokenizer"))
+    if revision > 0:
+        assert(text_len(record_get(state, "tokenizer")) == 64, "Lexical lived owner has no tokenizer identity")
+        assert(text_len(record_get(state, "identity_a")) + text_len(record_get(state, "identity_b")) >= 64, "Lexical lived owner has no model identity")
+    seen = record_get(state, "seen")
+    contexts = record_get(state, "contexts")
+    counts = record_get(state, "context_counts")
+    haiku_lexical_vector(seen, 16, 999999)
+    haiku_lexical_vector(contexts, 128, 2047)
+    haiku_lexical_vector(counts, 2, 64)
+    i = 0
+    while i < 16:
+        haiku_lexical_integer(seen[i], 0, 999999)
+        i = i + 1
+    d = 0
+    while d < 2:
+        haiku_lexical_integer(counts[d], 0, 64)
+        i = 0
+        while i < 64:
+            haiku_lexical_integer(contexts[d * 64 + i], 0, 2047)
+            assert(i < counts[d] or contexts[d * 64 + i] == 0, "Lexical unused context must be zero")
+            i = i + 1
+        d = d + 1
+    cursor = haiku_lexical_integer(record_get(state, "history_cursor"), 0, 15)
+    count = haiku_lexical_integer(record_get(state, "history_count"), 0, 16)
+    assert(count == min(16, revision), "Lexical history count differs from its revision")
+    assert(cursor == revision - floor(revision / 16) * 16, "Lexical history cursor differs from its revision")
+    rows = record_get(state, "history_rows")
+    texts = record_get(state, "history_text")
+    haiku_lexical_vector(rows, 256, 999999)
+    assert(list_len(texts) == 80, "Lexical history text shape differs")
+    slot = 0
+    live = 0
+    words = haiku_lexical_words()
+    while slot < 16:
+        r = slot * 16
+        used = haiku_lexical_integer(rows[r], 0, revision)
+        i = 0
+        while i < 5:
+            assert(text_len(list_get(texts, slot * 5 + i)) <= 64, "Lexical history fragment is too long")
+            i = i + 1
+        if used > 0:
+            expected_revision = revision - cursor + slot + 1
+            if slot >= cursor:
+                expected_revision = expected_revision - 16
+            assert(used == expected_revision, "Lexical retained revision is out of order")
+            live = live + 1
+            event = haiku_lexical_integer(rows[r + 1], 1, 999999)
+            haiku_lexical_integer(rows[r + 2], 0, clock)
+            direction = haiku_lexical_integer(rows[r + 3], 0, 1)
+            source = haiku_lexical_integer(rows[r + 4], 0, 7)
+            assert(event <= seen[direction * 8 + source], "Lexical history precedes its source clock")
+            haiku_lexical_integer(rows[r + 5], 0, 7)
+            haiku_lexical_integer(rows[r + 6], 1, 999999)
+            haiku_lexical_integer(rows[r + 7], 0, 7)
+            haiku_lexical_integer(rows[r + 8], 1, 999999)
+            assert(rows[r + 9] >= 0 and rows[r + 9] <= 1, "Lexical historical alpha is invalid")
+            mask = rows[r + 10]
+            assert(mask == 2 or mask == 4 or mask == 6, "Lexical historical availability is invalid")
+            assert(mask == 4 or text_len(record_get(state, "identity_a")) == 64, "Lexical historical A identity is absent")
+            assert(mask == 2 or text_len(record_get(state, "identity_b")) == 64, "Lexical historical B identity is absent")
+            haiku_lexical_integer(rows[r + 11], 0, 999999)
+            haiku_lexical_integer(rows[r + 12], 0, 999999)
+            haiku_lexical_integer(rows[r + 13], 1, 194)
+            haiku_lexical_integer(rows[r + 14], 1, 130)
+            expected_source = 4
+            if mask == 2:
+                expected_source = 2
+                assert(rows[r + 9] == 1, "Lexical historical A balance differs")
+            if mask == 4:
+                expected_source = 3
+                assert(rows[r + 9] == 0, "Lexical historical B balance differs")
+            assert(rows[r + 15] == expected_source, "Lexical historical provider source differs")
+            assert(list_find(words, list_get(texts, slot * 5 + 3)) >= 0 and list_find(words, list_get(texts, slot * 5 + 4)) >= 0, "Lexical historical proposal left its reviewed pool")
+        else:
+            i = 0
+            while i < 16:
+                assert(rows[r + i] == 0, "Lexical unused history row must be zero")
+                i = i + 1
+            i = 0
+            while i < 5:
+                assert(text_len(list_get(texts, slot * 5 + i)) == 0, "Lexical unused history text must be empty")
+                i = i + 1
+        slot = slot + 1
+    assert(live == count, "Lexical retained history count differs")
+    return 1
+
+# Source is the actual sender of this fragment. Returning through a model keeps
+# its separate parent/origin lineage; it never creates a human witness.
+def haiku_lexical_request(owner, fragment, source, event, turn, direction, alpha, enabled):
+    request = record_new()
+    record_set(request, "owner", owner)
+    record_set(request, "fragment", fragment)
+    record_set(request, "source", source)
+    record_set(request, "event", event)
+    record_set(request, "turn", turn)
+    record_set(request, "direction", direction)
+    record_set(request, "alpha", alpha)
+    record_set(request, "enabled", enabled)
+    record_set(request, "replay", 0)
+    record_set(request, "parent_source", source)
+    record_set(request, "parent_event", event)
+    record_set(request, "origin_source", source)
+    record_set(request, "origin_event", event)
+    record_set(request, "self_fragment", "")
+    record_set(request, "self_event", 0)
+    record_set(request, "friend_fragment", "")
+    record_set(request, "friend_event", 0)
+    haiku_lexical_request_check(request)
+    return request
+
+def haiku_lexical_request_check(request):
+    assert(list_len(record_keys(request)) == 17, "Lexical request shape differs")
+    assert(text_len(record_get(request, "owner")) > 0 and text_len(record_get(request, "owner")) <= 128, "Lexical request owner is invalid")
+    assert(text_len(record_get(request, "fragment")) <= 10000, "Lexical fragment exceeds text limit")
+    source = haiku_lexical_integer(record_get(request, "source"), 0, 7)
+    event = haiku_lexical_integer(record_get(request, "event"), 1, 999999)
+    haiku_lexical_integer(record_get(request, "turn"), 0, 999999)
+    haiku_lexical_integer(record_get(request, "direction"), 0, 1)
+    haiku_lexical_integer(record_get(request, "enabled"), 0, 1)
+    haiku_lexical_integer(record_get(request, "replay"), 0, 1)
+    alpha = record_get(request, "alpha")
+    assert(isfinite(alpha) and alpha >= 0 and alpha <= 1, "Lexical request alpha is invalid")
+    haiku_lexical_integer(record_get(request, "parent_source"), 0, 7)
+    haiku_lexical_integer(record_get(request, "parent_event"), 1, 999999)
+    haiku_lexical_integer(record_get(request, "origin_source"), 0, 7)
+    haiku_lexical_integer(record_get(request, "origin_event"), 1, 999999)
+    if source == 0:
+        assert(record_get(request, "origin_source") == 0 and record_get(request, "origin_event") == event, "Lexical human encounter cannot relabel an echo")
+        assert(record_get(request, "parent_source") == 0 and record_get(request, "parent_event") == event, "Lexical human encounter cannot have a model parent")
+    self_event = haiku_lexical_integer(record_get(request, "self_event"), 0, 999999)
+    friend_event = haiku_lexical_integer(record_get(request, "friend_event"), 0, 999999)
+    self_size = text_len(record_get(request, "self_fragment"))
+    friend_size = text_len(record_get(request, "friend_fragment"))
+    assert(self_size <= 10000 and friend_size <= 10000, "Lexical graft exceeds text limit")
+    assert((self_event == 0 and self_size == 0) or (self_event > 0 and self_size > 0), "Lexical self graft needs its actual event")
+    assert((friend_event == 0 and friend_size == 0) or (friend_event > 0 and friend_size > 0), "Lexical friend graft needs its delivered event")
+    return 1
+
+# Mutates only this caller-owned request. Two explicit optional graft slots.
+def haiku_lexical_graft(request, fragment, source, event):
+    haiku_lexical_request_check(request)
+    assert(source == 5 or source == 6, "Lexical graft must be self or delivered friend")
+    haiku_lexical_integer(event, 1, 999999)
+    assert(text_len(fragment) > 0 and text_len(fragment) <= 10000, "Lexical graft fragment is invalid")
+    pending = record_clone(request)
+    if source == 5:
+        assert(record_get(request, "self_event") == 0, "Lexical self graft is already filled")
+        record_set(pending, "self_fragment", fragment)
+        record_set(pending, "self_event", event)
+    else:
+        assert(record_get(request, "friend_event") == 0, "Lexical friend graft is already filled")
+        record_set(pending, "friend_fragment", fragment)
+        record_set(pending, "friend_event", event)
+    haiku_lexical_request_check(pending)
+    record_replace(request, pending)
+    return 1
+
+def haiku_lexical_lineage(request, parent_source, parent_event, origin_source, origin_event):
+    pending = record_clone(request)
+    record_set(pending, "parent_source", parent_source)
+    record_set(pending, "parent_event", parent_event)
+    record_set(pending, "origin_source", origin_source)
+    record_set(pending, "origin_event", origin_event)
+    haiku_lexical_request_check(pending)
+    record_replace(request, pending)
+    return 1
+
+def haiku_lexical_availability(a, b):
+    return 2 * model_ready(a) + 4 * model_ready(b)
+
+def haiku_lexical_model(a, b):
+    if model_ready(a):
+        return a
+    assert(model_ready(b), "Lexical source is unavailable")
+    return b
+
+# Each call starts a fresh NoTorch trajectory. Alpha cannot change inside it.
+def haiku_lexical_forward(a, b, alpha, tokens):
+    mask = haiku_lexical_availability(a, b)
+    if mask == 6:
+        return model_mix_forward(a, b, alpha, tokens)
+    if mask == 2:
+        return model_forward(a, tokens)
+    if mask == 4:
+        return model_forward(b, tokens)
+    result = record_new()
+    record_set(result, "ok", 0)
+    record_set(result, "error", "unavailable")
+    return result
+
+def haiku_lexical_tail(fragment, budget):
+    return text_slice(fragment, max(0, text_len(fragment) - budget), text_len(fragment))
+
+# English source context has a named ASCII policy; original Unicode fragments
+# stay in history. Other Haiku text/tokenizer routes keep their own behavior.
+def haiku_lexical_ascii(fragment):
+    result = ""
+    i = 0
+    while i < text_len(fragment):
+        cp = text_codepoint(fragment, i)
+        if cp >= 32 and cp <= 126:
+            result = text_concat(result, text_slice(fragment, i, i + 1))
+        else:
+            result = text_concat(result, " ")
+        i = i + 1
+    return text_lower(result)
+
+def haiku_lexical_scores(model, logits, words):
+    haiku_lexical_vector(logits, 2048, 1000000)
+    size = list_len(words)
+    assert(size > 0 and size <= 48, "Lexical score pool is invalid")
+    scores = zeros(size)
+    i = 0
+    while i < size:
+        word = list_get(words, i)
+        assert(list_find(haiku_lexical_words(), word) >= 0, "Lexical score word is outside the reviewed pool")
+        ids = model_encode(model, word, 16)
+        j = 0
+        while j < len(ids):
+            scores[i] = scores[i] + logits[ids[j]]
+            j = j + 1
+        scores[i] = scores[i] / len(ids)
+        i = i + 1
+    return scores
+
+# Stable rank, used only for the private trajectory's two remembered proposals.
+# The caller still receives the whole pool for parliament pressure/admission.
+def haiku_lexical_top(scores):
+    first = 0
+    second = 1
+    if scores[second] > scores[first]:
+        first = 1
+        second = 0
+    i = 2
+    while i < len(scores):
+        if scores[i] > scores[first]:
+            second = first
+            first = i
+        else:
+            if scores[i] > scores[second]:
+                second = i
+        i = i + 1
+    result = zeros(2)
+    result[0] = first
+    result[1] = second
+    return result
+
+def haiku_lexical_receipt(state, request):
+    result = record_new()
+    record_set(result, "committed", 0)
+    record_set(result, "status", "disabled")
+    record_set(result, "error", "")
+    record_set(result, "owner", record_get(state, "owner"))
+    record_set(result, "event", record_get(request, "event"))
+    record_set(result, "turn", record_get(request, "turn"))
+    record_set(result, "direction", record_get(request, "direction"))
+    record_set(result, "alpha", record_get(request, "alpha"))
+    record_set(result, "requested_alpha", record_get(request, "alpha"))
+    record_set(result, "origin_source", record_get(request, "origin_source"))
+    record_set(result, "origin_event", record_get(request, "origin_event"))
+    record_set(result, "parent_source", record_get(request, "parent_source"))
+    record_set(result, "parent_event", record_get(request, "parent_event"))
+    record_set(result, "input_source", record_get(request, "source"))
+    record_set(result, "self_event", record_get(request, "self_event"))
+    record_set(result, "friend_event", record_get(request, "friend_event"))
+    record_set(result, "fragment", haiku_lexical_tail(record_get(request, "fragment"), 64))
+    record_set(result, "self_fragment", haiku_lexical_tail(record_get(request, "self_fragment"), 32))
+    record_set(result, "friend_fragment", haiku_lexical_tail(record_get(request, "friend_fragment"), 32))
+    record_set(result, "source", -1)
+    record_set(result, "availability", 0)
+    record_set(result, "identity_a", "")
+    record_set(result, "identity_b", "")
+    record_set(result, "tokenizer", "")
+    record_set(result, "language", "en")
+    record_set(result, "surface", "text-context-v1")
+    record_set(result, "words", list_new())
+    record_set(result, "scores", zeros(1))
+    record_set(result, "syllables", zeros(1))
+    record_set(result, "hidden", zeros(448))
+    record_set(result, "context_tokens", zeros(1))
+    record_set(result, "context_count", 0)
+    record_set(result, "graft_tokens", 0)
+    record_set(result, "proposals", list_new())
+    record_set(result, "revision", record_get(state, "revision"))
+    return result
+
+def haiku_lexical_pass(state, a, b, request):
+    haiku_lexical_check(state)
+    haiku_lexical_request_check(request)
+    assert(text_equal(record_get(state, "owner"), record_get(request, "owner")), "Lexical request belongs to another owner")
+    assert(record_get(state, "alpha") == record_get(request, "alpha"), "Lexical request must capture the owner's alpha")
+    result = haiku_lexical_receipt(state, request)
+    if record_get(request, "enabled") == 0:
+        return result
+    mask = haiku_lexical_availability(a, b)
+    record_set(result, "availability", mask)
+    if mask == 2 or mask == 6:
+        record_set(result, "identity_a", model_identity(a))
+        record_set(result, "tokenizer", model_tokenizer_identity(a))
+    if mask == 4 or mask == 6:
+        record_set(result, "identity_b", model_identity(b))
+        record_set(result, "tokenizer", model_tokenizer_identity(b))
+    source = record_get(request, "source")
+    direction = record_get(request, "direction")
+    event = record_get(request, "event")
+    seen = record_get(state, "seen")
+    if record_get(request, "replay") == 1 or event <= seen[direction * 8 + source]:
+        record_set(result, "status", "replay")
+        return result
+    assert(record_get(request, "turn") >= record_get(state, "clock"), "Lexical encounter is older than its owner")
+    if mask == 0:
+        record_set(result, "status", "unavailable")
+        return result
+    tokenizer_model = haiku_lexical_model(a, b)
+    info = model_info(tokenizer_model)
+    assert(record_get(info, "vocab") == 2048 and record_get(info, "width") == 448 and record_get(info, "context") == 256, "Lexical provider geometry differs")
+    tokenizer = model_tokenizer_identity(tokenizer_model)
+    old_tokenizer = record_get(state, "tokenizer")
+    assert(text_len(old_tokenizer) == 0 or text_equal(old_tokenizer, tokenizer), "Lexical tokenizer identity differs from its checkpoint")
+    pending = record_clone(state)
+    model_source = 4
+    if mask == 2:
+        model_source = 2
+        record_set(result, "alpha", 1)
+    if mask == 4:
+        model_source = 3
+        record_set(result, "alpha", 0)
+    if mask == 2 or mask == 6:
+        identity = model_identity(a)
+        old_identity = record_get(state, "identity_a")
+        assert(text_len(old_identity) == 0 or text_equal(old_identity, identity), "Lexical model A identity differs from its checkpoint")
+        record_set(pending, "identity_a", identity)
+        record_set(result, "identity_a", identity)
+    if mask == 4 or mask == 6:
+        identity = model_identity(b)
+        old_identity = record_get(state, "identity_b")
+        assert(text_len(old_identity) == 0 or text_equal(old_identity, identity), "Lexical model B identity differs from its checkpoint")
+        assert(text_equal(model_tokenizer_identity(b), tokenizer), "Lexical model tokenizers differ")
+        record_set(pending, "identity_b", identity)
+        record_set(result, "identity_b", identity)
+    record_set(pending, "tokenizer", tokenizer)
+    record_set(result, "tokenizer", tokenizer)
+    record_set(result, "source", model_source)
+    primary = haiku_lexical_tail(record_get(request, "fragment"), 64)
+    own = haiku_lexical_tail(record_get(request, "self_fragment"), 32)
+    friend = haiku_lexical_tail(record_get(request, "friend_fragment"), 32)
+    graft = text_concat(text_concat(text_concat(text_concat(haiku_lexical_ascii(own), " "), haiku_lexical_ascii(friend)), " "), haiku_lexical_ascii(primary))
+    if list_len(haiku_words(graft)) == 0:
+        record_set(result, "status", "empty")
+        return result
+    additions = model_encode(tokenizer_model, graft, 130)
+    contexts = record_get(pending, "contexts")
+    counts = record_get(pending, "context_counts")
+    previous = counts[direction]
+    tokens = zeros(previous + len(additions))
+    i = 0
+    while i < previous:
+        tokens[i] = contexts[direction * 64 + i]
+        i = i + 1
+    i = 0
+    while i < len(additions):
+        tokens[previous + i] = additions[i]
+        i = i + 1
+    assert(len(tokens) <= 194, "Lexical context exceeded its declared pass budget")
+    forward = haiku_lexical_forward(a, b, record_get(request, "alpha"), tokens)
+    if record_get(forward, "ok") == 0:
+        record_set(result, "status", "forward-failed")
+        record_set(result, "error", record_get(forward, "error"))
+        return result
+    hidden = record_get(forward, "hidden")
+    haiku_lexical_vector(hidden, 448, 1000000)
+    words = haiku_lexical_words()
+    scores = haiku_lexical_scores(tokenizer_model, record_get(forward, "logits"), words)
+    syllables = haiku_lexical_syllables()
+    haiku_lexical_pool_check()
+    top = haiku_lexical_top(scores)
+    proposals = list_new()
+    list_push(proposals, list_get(words, top[0]))
+    list_push(proposals, list_get(words, top[1]))
+    continuation = text_concat(text_concat(text_concat(" ", list_get(proposals, 0)), " "), list_get(proposals, 1))
+    proposed_tokens = model_encode(tokenizer_model, continuation, 34)
+    total = len(tokens) + len(proposed_tokens)
+    retain = min(64, total)
+    start = total - retain
+    i = 0
+    while i < 64:
+        value = 0
+        if i < retain:
+            offset = start + i
+            if offset < len(tokens):
+                value = tokens[offset]
+            else:
+                value = proposed_tokens[offset - len(tokens)]
+        contexts[direction * 64 + i] = value
+        i = i + 1
+    counts[direction] = retain
+    seen = record_get(pending, "seen")
+    seen[direction * 8 + source] = event
+    revision = record_get(state, "revision") + 1
+    slot = record_get(state, "history_cursor")
+    r = slot * 16
+    history = record_get(pending, "history_rows")
+    history[r] = revision
+    history[r + 1] = event
+    history[r + 2] = record_get(request, "turn")
+    history[r + 3] = direction
+    history[r + 4] = source
+    history[r + 5] = record_get(request, "parent_source")
+    history[r + 6] = record_get(request, "parent_event")
+    history[r + 7] = record_get(request, "origin_source")
+    history[r + 8] = record_get(request, "origin_event")
+    history[r + 9] = record_get(result, "alpha")
+    history[r + 10] = mask
+    history[r + 11] = record_get(request, "self_event")
+    history[r + 12] = record_get(request, "friend_event")
+    history[r + 13] = len(tokens)
+    history[r + 14] = len(additions)
+    history[r + 15] = model_source
+    history_text = record_get(pending, "history_text")
+    list_set(history_text, slot * 5, primary)
+    list_set(history_text, slot * 5 + 1, own)
+    list_set(history_text, slot * 5 + 2, friend)
+    list_set(history_text, slot * 5 + 3, list_get(proposals, 0))
+    list_set(history_text, slot * 5 + 4, list_get(proposals, 1))
+    record_set(pending, "history_text", history_text)
+    record_set(pending, "revision", revision)
+    record_set(pending, "clock", record_get(request, "turn"))
+    record_set(pending, "history_cursor", revision - floor(revision / 16) * 16)
+    record_set(pending, "history_count", min(16, revision))
+    haiku_lexical_check(pending)
+    record_set(result, "committed", 1)
+    record_set(result, "status", "proposed")
+    record_set(result, "revision", revision)
+    record_set(result, "words", words)
+    record_set(result, "scores", scores)
+    record_set(result, "syllables", syllables)
+    record_set(result, "hidden", hidden)
+    record_set(result, "context_tokens", tokens)
+    record_set(result, "context_count", len(tokens))
+    record_set(result, "graft_tokens", len(additions))
+    record_set(result, "proposals", proposals)
+    record_replace(state, pending)
+    return result
+
+def haiku_lexical_save(state, path):
+    haiku_lexical_check(state)
+    return checkpoint_save(state, path)
+
+def haiku_lexical_load(path):
+    state = checkpoint_load(path)
+    haiku_lexical_check(state)
+    return state

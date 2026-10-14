@@ -12,12 +12,18 @@ Each can carry both currents into their conversation.
 This document separates source research, executed foundations and the proposed
 full extension. The [owned worker tail](ASYNC.md) now preserves the complete
 chat's dreams, Phase4 memory and journal through join, save, swap and display.
-The two frozen sources are packaged as [Q8_0/F32 GGUF](../weights/README.md),
-and a private [parliament](PARLIAMENT.md) runs in isolated AML fixtures. The
-stable chat does not load those sources or import the parliament yet. Four
-trajectories, parameter mixing, learned glyph bindings and their return path
-into words remain integration work. Python Haiku remains the behavioral and
-artistic reference.
+The two frozen sources are packaged as [Q8_0/F32 GGUF](../weights/README.md).
+The new [iceberg conversation](ICEBERG_SESSION.md) connects immutable AML
+handles, four private lexical contexts, parameter mixing and two private
+parliaments to actual encounters. Bounded text-context returns provide word
+scores and representations; concept pressure joins lexical admission. Its
+185-field checkpoint retains all five organs together. Python Haiku remains
+the behavioral and artistic reference; `haiku.aml` retains that stable profile.
+
+The sections below preserve the research and broader design. The executing
+boundary is detailed in [ICEBERG_SESSION](ICEBERG_SESSION.md),
+[LEXICAL_SOURCES](LEXICAL_SOURCES.md) and [PARLIAMENT_CONTACT](PARLIAMENT_CONTACT.md).
+Dynamic seasonal balance and recursive glyph birth remain upcoming work.
 
 ## Sources and receipts
 
@@ -111,8 +117,10 @@ and the dense `Wr @ h` branch retain their exact architecture. The
 lengths, chunked input, quantization differences and deliberate wrong-RoPE
 controls. The earlier research loader limitation is fixed at the NoTorch layer.
 
-An immutable PEN7 model value in AML, source availability, word admission and
-representation extraction into the organ still need their integration boundary.
+The [iceberg conversation](ICEBERG_SESSION.md) now uses immutable PEN7 values in
+AML for independent source availability, bounded word admission and contextual
+representation extraction. Its reusable NoTorch workspace mixes every parameter
+through bounded layer scratch; the two source bodies remain unchanged.
 
 Both expanded F32 parameter bodies together are **149.68 MiB**, before mapped
 Q8 bytes and working buffers. The smaller GGUF files reduce storage; the current
@@ -194,9 +202,10 @@ does at the start of reasoning. A later coefficient change needs a fresh
 forward or an invalidated cache; cached keys/values computed under an earlier
 mixture are not the state of the new one.
 
-The current dream-friend is generated through Haiku's serial dream machinery.
-Giving it separate persistent ownership is a new organ and requires an explicit
-state upgrade. It is not already implemented by having two weight files.
+The dream-friend's utterances still originate in Haiku's established dream
+machinery. The experimental 185-field checkpoint now gives it separate lexical
+contexts, a mixing preference and a complete private parliament. Its history
+advances only through its own events and explicitly delivered encounters.
 
 Each presence may come to favor the two lexical sources differently through
 its history. Compare interpolated models across several balances with each
@@ -305,11 +314,11 @@ the PEN7 bodies stay frozen. Birth, retirement, expert identities, per-expert
 rank cursors, RNG and all receipts survive checkpoint continuation.
 
 These are executed mechanisms, documented and tested in [PARLIAMENT](PARLIAMENT.md).
-The module is experimental and separate from stable chat. Its current callers
-provide features directly. Word-to-glyph binding, real model representations,
-recursive symbol birth and influence on spoken candidates are the next links
-to build. Each presence will receive its own owner; no shared mutable parliament
-is implied by sharing the two sources.
+The experimental [contact bridge](PARLIAMENT_CONTACT.md) now derives features
+from actual human, cloud, inner and dream encounters. Reviewed word aliases and
+four model prototypes contribute to the 88 coordinates; private pressure adjusts
+later vocabulary admission. Each presence has its own complete owner. Recursive
+symbol birth and learned concept structure remain later experiments.
 
 ## A thought can travel down and return
 
@@ -319,7 +328,10 @@ glyph pressure, giving the next three lines a longer internal conversation.
 The [Dario](research/iceberg/DARIO.md) and
 [Arianna](research/iceberg/ARIANNA_INJECTION.md) audits pin executable source
 paths, distinguish the transfers and record small policy/numerical probes.
-This return organ is proposed; stable Haiku has no live injection route yet.
+The bounded text-context return is now implemented in [lexical sources](LEXICAL_SOURCES.md)
+and connected by `iceberg.aml`. The following research contract also describes
+later direction-only and recursive experiments; the stable `haiku.aml` profile
+retains its original path.
 
 Dario contributes selective continuation at a generation boundary: a retrieved
 fragment enters the token context and the following generation grows from it.
@@ -423,11 +435,11 @@ revisions so the port can choose an explicit contract:
 |---|---|---|
 | Owned Python baseline | Implemented reusable worker and join/save/swap/display publication in ASYNC | Serial/worker/compiled continuation, restart, controlled completion and rejected publication checked; early display/pending intent remain later work |
 | Frozen lexical bodies | Implemented NoTorch converter, GGUF loader/forward and two Q8_0/F32 assets | Source pins, all-tensor conversion, multiple lengths, chunking and numerical controls recorded with weights |
-| Private parliament | Implemented standalone AML field, experts, immunity, delayed reward and exact restart | Interpreter/compiled life and memory fixtures, rejected states and checkpoint continuation checked; no stable-chat import |
-| Optional lexical sources | Next: immutable AML handle, bounded AML word admission and representation features | Zero/one/two sources, quiet absence, explicit identities and unchanged disabled-profile draws |
-| Duality in each presence | Separate Haiku/friend owners, retrospective/prospective contexts, parameter mixing, calendar and operative debt | Four histories and their mixing state survive restart; interventions remain local until an explicit exchange; mixed parameters are checked against endpoint controls |
-| Conceptual attraction | Shared seed concepts, private directed traces, learned word bindings, model representations and tagged exchange | Same concept through lexical aliases; neural contribution and lived history separately change measured pressure/bindings and later admission |
-| Returning thoughts | Proposed bounded text injection, then an independently measured direction lane | Source ancestry survives the round trip; matched controls measure word/glyph changes, exact disabled behavior and single publication |
+| Private parliament | Implemented AML field, experts, immunity and delayed reward; actual contact in the experimental conversation | Two private owners, real encounter order, measured prototype contribution and exact restart checked |
+| Optional lexical sources | Implemented immutable AML handles, 48-word reviewed pool, bounded admission and 448-value representations | Zero/one/two sources, quiet absence, exact hashes and unchanged disabled-profile draws checked |
+| Duality in each presence | Implemented separate owners, four retained contexts and all-parameter mixing; calendar/debt remain planned | Four histories survive restart; delivered/withheld context interventions and parameter endpoints checked |
+| Conceptual attraction | Implemented named aliases, reviewed bindings, model prototypes and tagged exchange; learned concept structure remains planned | Model contribution changes measured features; private pressure ranks later admission |
+| Returning thoughts | Implemented one bounded text-context return per selected boundary; direction injection remains planned | Source ancestry, replay, exact disabled behavior, serial/worker equality and one publication checked |
 | Dream-born glyphs | Bounded recursive symbol formation and stable structure across both owners | Creation threshold, recursive identity, save/restart, adoption and replay provenance |
 
 Keep input, initial state, admission budget and sampling draws fixed when

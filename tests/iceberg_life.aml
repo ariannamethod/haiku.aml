@@ -1,0 +1,43 @@
+# Actual foreground continuation remains exact when the deeper organs are off
+# or their optional model sources are absent. Private contact still remembers.
+IMPORT "../src/iceberg_session.aml"
+
+missing = model_try_load("missing-iceberg-model.gguf")
+core = haiku_state_new("regex", 0, 0, 575, 57)
+core = haiku_state_enable_dreams(core, 0)
+baseline = record_clone(core)
+disabled = haiku_iceberg_new(core, [0, 1, 2, 1])
+weightless = haiku_iceberg_new(core, [1, 1, 2, 1])
+friend_before = haiku_iceberg_part(weightless, "friend_contact")
+messages = haiku_words("rain moon memory")
+i = 0
+while i < list_len(messages):
+    text = list_get(messages, i)
+    expected = haiku_session_turn(baseline, text, 0)
+    off = haiku_iceberg_turn(disabled, text, 0, missing, missing, 1)
+    quiet = haiku_iceberg_turn(weightless, text, 0, missing, missing, 1)
+    assert(text_equal(expected, off) and text_equal(expected, quiet), "Iceberg absence changed spoken continuation")
+    assert(record_equal(baseline, haiku_iceberg_part(disabled, "voice")), "Disabled iceberg changed baseline draws or memory")
+    assert(record_equal(baseline, haiku_iceberg_part(weightless, "voice")), "Missing sources changed baseline draws or memory")
+    i = i + 1
+assert(record_equal(friend_before, haiku_iceberg_part(weightless, "friend_contact")), "Human contact leaked into the unheard friend")
+assert(record_get(haiku_iceberg_part(weightless, "haiku_contact"), "p:revision") > 0, "Real human/inner/cloud events never reached parliament")
+assert(record_get(haiku_iceberg_part(weightless, "haiku_lexical"), "revision") == 0, "Missing bodies changed lexical history")
+assert(list_len(record_get(weightless, "admission_text")) == 0, "Absent bodies admitted a word")
+assert(list_len(record_keys(weightless)) == 185, "Complete iceberg schema changed without versioning")
+
+checkpoint_save(weightless, "iceberg-life.state")
+restarted = checkpoint_load("iceberg-life.state")
+haiku_iceberg_check(restarted, 0)
+assert(record_equal(weightless, restarted), "Complete iceberg save lost a private leaf")
+first = haiku_iceberg_turn(weightless, "a small light remains", 0, missing, missing, 0)
+second = haiku_iceberg_turn(restarted, "a small light remains", 0, missing, missing, 1)
+assert(text_equal(first, second) and record_equal(weightless, restarted), "Restarted worker diverged from serial complete life")
+
+# Extracting an organ is a detached read, not permission to mutate its peer.
+snapshot = record_clone(weightless)
+private = haiku_iceberg_part(weightless, "haiku_contact")
+field = record_get(private, "p:field")
+field[0] = field[0] + 0.01
+assert(record_equal(snapshot, weightless), "Extracted contact aliases published life")
+PRINT "HAIKU_ICEBERG_LIFE_OK"

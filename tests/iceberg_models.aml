@@ -1,0 +1,46 @@
+# Two real bodies, two private presences, four contexts and one checkpoint.
+# A one-turn cooldown/probability1 deliberately opens both dream directions.
+IMPORT "../src/iceberg_session.aml"
+a = model_try_load("../weights/haiku1.gguf")
+b = model_try_load("../weights/haiku2.gguf")
+assert(model_ready(a) and model_ready(b), "Iceberg model fixture needs both pinned assets")
+core = haiku_state_new("regex", 0, 0, 575, 57)
+core = haiku_state_enable_dreams(core, 0)
+record_set(core, "dream_config", [1, 1, 4])
+serial = haiku_iceberg_new(core, [1, 1, 2, 1])
+parallel = record_clone(serial)
+messages = haiku_words("rain moon")
+i = 0
+while i < list_len(messages):
+    text = list_get(messages, i)
+    first = haiku_iceberg_turn(serial, text, 0, a, b, 0)
+    second = haiku_iceberg_turn(parallel, text, 0, a, b, 1)
+    assert(text_equal(first, second), "Model worker changed spoken lines")
+    assert(record_equal(serial, parallel), "Model worker changed a completed private life")
+    PRINT first
+    i = i + 1
+core = haiku_iceberg_part(serial, "voice")
+assert(haiku_dream_check(core) == 2, "Two declared dream gates did not open")
+h = haiku_iceberg_part(serial, "haiku_lexical")
+f = haiku_iceberg_part(serial, "friend_lexical")
+hc = record_get(h, "context_counts")
+fc = record_get(f, "context_counts")
+assert(hc[0] > 0 and hc[1] > 0 and fc[0] > 0 and fc[1] > 0, "All four owned trajectories did not acquire history")
+assert(text_equal(record_get(h, "identity_a"), model_identity(a)) and text_equal(record_get(f, "identity_b"), model_identity(b)), "Presence lost one of its frozen bodies")
+assert(list_len(record_get(serial, "admission_text")) > 0, "Real model proposals never entered future vocabulary")
+assert(list_len(record_get(serial, "admission_text")) <= 32, "Two turns exceeded the two-word admission budget")
+PRINT "Admitted words:"
+ledger = record_get(serial, "admission_text")
+i = 0
+while i < list_len(ledger):
+    PRINT list_get(ledger, i)
+    assert(list_find(record_get(core, "vocab"), list_get(ledger, i)) >= 0, "Admitted word cannot reach the generator")
+    i = i + 8
+checkpoint_save(serial, "iceberg-models.state")
+restarted = checkpoint_load("iceberg-models.state")
+haiku_iceberg_check(restarted, 0)
+assert(record_equal(serial, restarted), "Model checkpoint lost a trajectory or parliamentary owner")
+first = haiku_iceberg_turn(serial, "memory", 0, a, b, 0)
+second = haiku_iceberg_turn(restarted, "memory", 0, a, b, 1)
+assert(text_equal(first, second) and record_equal(serial, restarted), "Model restart differs from uninterrupted life")
+PRINT "HAIKU_ICEBERG_MODELS_OK"

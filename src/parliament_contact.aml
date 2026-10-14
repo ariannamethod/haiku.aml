@@ -1,0 +1,564 @@
+# Experimental contact below the cloud. Exact named words give the 88 shared
+# coordinates a trace; unknown words keep their spelling and remain unbound.
+# A private parliament and all its provenance live in one flat owner record.
+# Seed names/aliases: Arianna Method, actually.life l.c, GPL-3.0,
+# 2bf11b3f2fab36e1a8cd8a917438ca2423f65ee8. AML contact added 2026-10-14.
+IMPORT "parliament.aml"
+IMPORT "tokenizer.aml"
+IMPORT "lexical_sources.aml"
+
+def haiku_contact_anchors():
+    names = "water fire earth stone tree sky light dark cold person man woman child old spirit AI animal body food sleep pain strength "
+    names = text_concat(names, "joy grief love fear anger longing tired stress go make break see speak hear seek give want miss agree ")
+    names = text_concat(names, "home outside work internet bond conflict know idea think dream remember lie path up down far back before now after never always ")
+    names = text_concat(names, "not many much and one question how cause me you other money change write choose help have free death music good small same BE wait")
+    return haiku_words(names)
+
+def haiku_contact_key(language, word):
+    parts = list_new()
+    list_push(parts, language)
+    list_push(parts, text_lower(word))
+    return list_key(parts)
+
+def haiku_contact_aliases(bindings, language, words, glyph):
+    assert(glyph >= 0 and glyph < 88 and glyph == floor(glyph), "Contact glyph is invalid")
+    words = haiku_words(words)
+    i = 0
+    while i < list_len(words):
+        key = haiku_contact_key(language, list_get(words, i))
+        if map_has(bindings, key):
+            assert(map_get(bindings, key) == glyph, "Contact aliases conflict")
+        else:
+            map_set(bindings, key, glyph)
+        i = i + 1
+    return 1
+
+# The 88 names retain Actually.life's pinned order. This reviewed subset of
+# its aliases uses direct lookup; it has no orthographic or hash fallback.
+def haiku_contact_bindings():
+    bindings = map_new()
+    names = haiku_contact_anchors()
+    assert(list_len(names) == 88, "Contact anchor count differs")
+    i = 0
+    while i < 88:
+        haiku_contact_aliases(bindings, "en", list_get(names, i), i)
+        i = i + 1
+    haiku_contact_aliases(bindings, "en", "rain river sea ocean lake", 0)
+    haiku_contact_aliases(bindings, "en", "flame burn", 1)
+    haiku_contact_aliases(bindings, "en", "forest wood leaf", 4)
+    haiku_contact_aliases(bindings, "en", "sun sunrise dawn bright", 6)
+    haiku_contact_aliases(bindings, "en", "night shadow darkness", 7)
+    haiku_contact_aliases(bindings, "en", "computer robot machine", 15)
+    haiku_contact_aliases(bindings, "en", "happy smile laugh", 22)
+    haiku_contact_aliases(bindings, "en", "sad sorrow tears", 23)
+    haiku_contact_aliases(bindings, "en", "kiss hug", 24)
+    haiku_contact_aliases(bindings, "en", "listen sound", 35)
+    haiku_contact_aliases(bindings, "en", "house", 41)
+    haiku_contact_aliases(bindings, "en", "friend family together", 45)
+    haiku_contact_aliases(bindings, "en", "thought", 49)
+    haiku_contact_aliases(bindings, "en", "imagine", 50)
+    haiku_contact_aliases(bindings, "en", "memory", 51)
+    haiku_contact_aliases(bindings, "en", "song melody guitar piano drum", 82)
+    # Explicit language-qualified translations keep spelling and ambiguity.
+    haiku_contact_aliases(bindings, "fr", "eau pluie rivière mer océan", 0)
+    haiku_contact_aliases(bindings, "fr", "arbre forêt", 4)
+    haiku_contact_aliases(bindings, "fr", "lumière soleil", 6)
+    haiku_contact_aliases(bindings, "fr", "musique mélodie", 82)
+    haiku_contact_aliases(bindings, "ru", "вода дождь река море океан", 0)
+    haiku_contact_aliases(bindings, "ru", "дерево лес", 4)
+    haiku_contact_aliases(bindings, "ru", "свет солнце", 6)
+    haiku_contact_aliases(bindings, "ru", "музыка мелодия", 82)
+    return bindings
+
+def haiku_contact_integer(value, low, high):
+    assert(isfinite(value) and value >= low and value <= high and value == floor(value), "Contact integer is invalid")
+    return value
+
+def haiku_contact_parliament(state):
+    result = record_new()
+    names = record_get(state, "parliament_keys")
+    i = 0
+    while i < list_len(names):
+        name = list_get(names, i)
+        record_set(result, name, record_get(state, text_concat("p:", name)))
+        i = i + 1
+    return result
+
+def haiku_contact_put(state, parliament):
+    names = record_keys(parliament)
+    i = 0
+    while i < list_len(names):
+        name = list_get(names, i)
+        record_set(state, text_concat("p:", name), record_get(parliament, name))
+        i = i + 1
+    return 1
+
+def haiku_contact_new(owner, seed):
+    climate = haiku_parliament_features(zeros(88), [0.5, 0.5, 1, 0.5], [0.5, 0.5, 0.5], 0.5)
+    origin = haiku_parliament_signature(climate, zeros(96), 0)
+    boundary = zeros(64)
+    i = 0
+    while i < 64:
+        boundary[i] = -origin[i]
+        i = i + 1
+    parliament = haiku_parliament_new(owner, seed, origin, boundary)
+    state = record_new()
+    record_set(state, "format", "haiku-contact")
+    record_set(state, "version", 1)
+    record_set(state, "parliament_keys", record_keys(parliament))
+    haiku_contact_put(state, parliament)
+    record_set(state, "bindings", haiku_contact_bindings())
+    record_set(state, "binding_history", list_new())
+    text_rows = list_new()
+    i = 0
+    while i < 192:
+        list_push(text_rows, "")
+        i = i + 1
+    record_set(state, "contact_text", text_rows)
+    record_set(state, "contact_meta", zeros(256))
+    record_set(state, "prototype_identity", "")
+    record_set(state, "prototype_alpha", 0)
+    record_set(state, "prototype_values", zeros(1792))
+    haiku_contact_check(state)
+    return state
+
+# Owner/clock/revision/field are directly inspectable as p:owner, p:clock,
+# p:revision and p:field. The 32 provenance slots follow parliament receipts.
+def haiku_contact_check(state):
+    assert(list_len(record_keys(state)) == 42, "Contact needs exactly forty-two fields")
+    assert(text_equal(record_get(state, "format"), "haiku-contact") and record_get(state, "version") == 1, "Contact format is invalid")
+    parliament = haiku_contact_parliament(state)
+    haiku_parliament_check(parliament)
+    assert(text_equal(list_key(record_keys(parliament)), list_key(record_get(state, "parliament_keys"))), "Contact parliament namespace differs")
+    bindings = record_get(state, "bindings")
+    keys = map_keys(bindings)
+    assert(map_len(bindings) <= 1024, "Contact bindings are full")
+    i = 0
+    while i < list_len(keys):
+        haiku_contact_integer(map_get(bindings, list_get(keys, i)), 0, 87)
+        i = i + 1
+    seeds = haiku_contact_bindings()
+    keys = map_keys(seeds)
+    i = 0
+    while i < list_len(keys):
+        key = list_get(keys, i)
+        assert(map_has(bindings, key) and map_get(bindings, key) == map_get(seeds, key), "Contact shared binding changed")
+        i = i + 1
+    history = record_get(state, "binding_history")
+    assert(list_len(history) <= 768 and list_len(history) - floor(list_len(history) / 6) * 6 == 0, "Contact binding history is invalid")
+    history_keys = list_new()
+    i = 0
+    while i < list_len(history):
+        language = list_get(history, i)
+        word = list_get(history, i + 1)
+        assert(text_len(language) > 0 and text_len(language) <= 32, "Contact binding history language is invalid")
+        assert(text_len(word) > 0 and text_len(word) <= 10000, "Contact binding history word is invalid")
+        glyph = list_find(haiku_contact_anchors(), list_get(history, i + 2))
+        key = haiku_contact_key(language, word)
+        assert(glyph >= 0 and map_has(bindings, key) and map_get(bindings, key) == glyph, "Contact private binding differs from its history")
+        assert(map_has(seeds, key) == 0 and list_find(history_keys, key) < 0, "Contact binding history repeats a binding")
+        assert(list_find(haiku_tokenize_regex(list_get(history, i + 5)), word) >= 0, "Contact binding history lost its word")
+        assert(list_find(haiku_words("0 1 2 3 4 5 6 7"), list_get(history, i + 3)) >= 0, "Contact binding history source is invalid")
+        event_text = list_get(history, i + 4)
+        assert(text_len(event_text) > 0 and text_len(event_text) <= 6, "Contact binding history event is absent")
+        number = 0
+        digit = 0
+        while digit < text_len(event_text):
+            cp = text_codepoint(event_text, digit)
+            assert(cp >= 48 and cp <= 57, "Contact binding history event is invalid")
+            number = number * 10 + cp - 48
+            digit = digit + 1
+        assert(number > 0 and text_equal(text_fixed(number, 0), event_text), "Contact binding history event is invalid")
+        list_push(history_keys, key)
+        i = i + 6
+    assert(map_len(bindings) == map_len(seeds) + list_len(history_keys), "Contact private binding has no history")
+    text_rows = record_get(state, "contact_text")
+    meta = record_get(state, "contact_meta")
+    assert(list_len(text_rows) == 192, "Contact text receipts differ")
+    haiku_parliament_vector(meta, 256, 1000000)
+    rows = record_get(parliament, "receipt_rows")
+    i = 0
+    while i < 32:
+        slot = i * 8
+        if rows[i * 9] > 0:
+            assert(text_len(list_get(text_rows, i * 6)) > 0 and text_len(list_get(text_rows, i * 6)) <= 128, "Contact source owner is invalid")
+            assert(text_len(list_get(text_rows, i * 6 + 1)) <= 10000, "Contact text receipt is too long")
+            assert(text_len(list_get(text_rows, i * 6 + 2)) > 0 and text_len(list_get(text_rows, i * 6 + 2)) <= 32, "Contact language is invalid")
+            assert(text_len(list_get(text_rows, i * 6 + 3)) > 0 and text_len(list_get(text_rows, i * 6 + 3)) <= 128, "Contact origin owner is invalid")
+            assert(text_len(list_get(text_rows, i * 6 + 4)) <= 128 and text_len(list_get(text_rows, i * 6 + 5)) <= 4096, "Contact ancestry text is too long")
+            haiku_contact_integer(meta[slot], -1, 7)
+            haiku_contact_integer(meta[slot + 1], 0, 999999)
+            haiku_contact_integer(meta[slot + 2], 0, 7)
+            haiku_contact_integer(meta[slot + 3], 1, 999999)
+            assert(meta[slot + 4] >= 0 and meta[slot + 4] <= 1, "Contact mixture is invalid")
+            assert(meta[slot + 5] >= 0 and meta[slot + 5] <= 0.25, "Contact representation gain is invalid")
+            haiku_contact_integer(meta[slot + 6], 0, 1)
+            assert(meta[slot + 7] == rows[i * 9 + 6], "Contact availability receipt differs")
+            if meta[slot] == -1:
+                assert(meta[slot + 1] == 0 and text_equal(list_get(text_rows, i * 6 + 4), ""), "Contact native source has a parent")
+                assert(meta[slot + 2] == rows[i * 9 + 2] and meta[slot + 3] == rows[i * 9] and text_equal(list_get(text_rows, i * 6), list_get(text_rows, i * 6 + 3)), "Contact native receipt origin differs")
+            else:
+                assert(meta[slot + 1] > 0 and text_len(list_get(text_rows, i * 6 + 4)) > 0, "Contact derivative lost its parent")
+                if meta[slot] == 0:
+                    assert(meta[slot + 2] == 0 and meta[slot + 3] == meta[slot + 1], "Contact direct human ancestry differs")
+                    assert(text_equal(list_get(text_rows, i * 6 + 3), "human") and text_equal(list_get(text_rows, i * 6 + 4), "human"), "Contact human ancestry owner differs")
+            if rows[i * 9 + 2] == 0:
+                assert(meta[slot] == -1 and meta[slot + 2] == 0 and meta[slot + 3] == rows[i * 9], "Contact human witness has derivative ancestry")
+                assert(text_equal(list_get(text_rows, i * 6), "human") and text_equal(list_get(text_rows, i * 6 + 3), "human"), "Contact witness is not a human encounter")
+            if meta[slot + 6] == 0:
+                assert(meta[slot + 5] == 0, "Contact absent representation has gain")
+            else:
+                assert(text_len(list_get(text_rows, i * 6 + 5)) > 0, "Contact representation identity is absent")
+                assert(rows[i * 9 + 2] >= 2 and rows[i * 9 + 2] <= 4, "Contact representation receipt needs a model source")
+            source = rows[i * 9 + 2]
+            if source >= 2 and source <= 4:
+                assert(text_len(list_get(text_rows, i * 6 + 5)) > 0, "Contact model receipt identity is absent")
+                assert(source != 2 or meta[slot + 4] == 1, "Contact A receipt mixture differs")
+                assert(source != 3 or meta[slot + 4] == 0, "Contact B receipt mixture differs")
+        else:
+            j = 0
+            while j < 8:
+                assert(meta[slot + j] == 0, "Contact empty receipt has ancestry")
+                j = j + 1
+            j = 0
+            while j < 6:
+                assert(text_equal(list_get(text_rows, i * 6 + j), ""), "Contact empty receipt has text")
+                j = j + 1
+        i = i + 1
+    haiku_parliament_vector(record_get(state, "prototype_values"), 1792, 1000000)
+    alpha = record_get(state, "prototype_alpha")
+    assert(isfinite(alpha) and alpha >= 0 and alpha <= 1, "Contact prototype mixture is invalid")
+    assert(text_len(record_get(state, "prototype_identity")) <= 4096, "Contact prototype identity is too long")
+    if text_len(record_get(state, "prototype_identity")) == 0:
+        assert(alpha == 0 and haiku_parliament_dot(record_get(state, "prototype_values"), record_get(state, "prototype_values")) == 0, "Contact absent prototype cache has values")
+    return 1
+
+def haiku_contact_event(owner, text, language, climate, rings, quality, source, event, turn):
+    result = record_new()
+    record_set(result, "format", "haiku-contact-event")
+    record_set(result, "version", 1)
+    record_set(result, "owner", owner)
+    record_set(result, "text", text)
+    record_set(result, "language", language)
+    record_set(result, "climate", climate)
+    record_set(result, "rings", rings)
+    record_set(result, "quality", quality)
+    record_set(result, "source", source)
+    record_set(result, "event", event)
+    record_set(result, "turn", turn)
+    record_set(result, "replay", 0)
+    record_set(result, "origin_owner", owner)
+    record_set(result, "origin_source", source)
+    record_set(result, "origin_event", event)
+    record_set(result, "parent_owner", "")
+    record_set(result, "parent_source", -1)
+    record_set(result, "parent_event", 0)
+    record_set(result, "availability", len(rings) == 3)
+    record_set(result, "identity", "")
+    record_set(result, "alpha", 0)
+    record_set(result, "representation", zeros(88))
+    record_set(result, "representation_gain", 0)
+    record_set(result, "representation_available", 0)
+    return result
+
+# A derivative carries its root encounter and immediate parent through every
+# lexical return or delivery. Only the separate native-human route is a witness.
+def haiku_contact_derive(parent, owner, text, source, event, turn):
+    haiku_contact_event_check(parent)
+    assert(source != 0, "Contact derivative cannot become a human witness")
+    result = haiku_contact_event(owner, text, record_get(parent, "language"), record_get(parent, "climate"), record_get(parent, "rings"), record_get(parent, "quality"), source, event, turn)
+    record_set(result, "origin_owner", record_get(parent, "origin_owner"))
+    record_set(result, "origin_source", record_get(parent, "origin_source"))
+    record_set(result, "origin_event", record_get(parent, "origin_event"))
+    record_set(result, "parent_owner", record_get(parent, "owner"))
+    record_set(result, "parent_source", record_get(parent, "source"))
+    record_set(result, "parent_event", record_get(parent, "event"))
+    record_set(result, "replay", record_get(parent, "replay"))
+    return result
+
+def haiku_contact_event_check(event):
+    assert(list_len(record_keys(event)) == 24, "Contact event field count differs")
+    assert(text_equal(record_get(event, "format"), "haiku-contact-event") and record_get(event, "version") == 1, "Contact event format differs")
+    haiku_parliament_features(zeros(88), record_get(event, "climate"), record_get(event, "rings"), record_get(event, "quality"))
+    source = haiku_contact_integer(record_get(event, "source"), 0, 7)
+    number = haiku_contact_integer(record_get(event, "event"), 1, 999999)
+    haiku_contact_integer(record_get(event, "turn"), 1, 999999)
+    haiku_contact_integer(record_get(event, "replay"), 0, 1)
+    haiku_contact_integer(record_get(event, "origin_source"), 0, 7)
+    haiku_contact_integer(record_get(event, "origin_event"), 1, 999999)
+    parent = haiku_contact_integer(record_get(event, "parent_source"), -1, 7)
+    parent_event = haiku_contact_integer(record_get(event, "parent_event"), 0, 999999)
+    assert(text_len(record_get(event, "text")) <= 10000, "Contact text is too long")
+    assert(text_len(record_get(event, "language")) > 0 and text_len(record_get(event, "language")) <= 32, "Contact language is invalid")
+    assert(text_len(record_get(event, "owner")) > 0 and text_len(record_get(event, "owner")) <= 128, "Contact owner is invalid")
+    assert(text_len(record_get(event, "origin_owner")) > 0 and text_len(record_get(event, "origin_owner")) <= 128, "Contact origin owner is invalid")
+    if parent == -1:
+        assert(parent_event == 0 and text_equal(record_get(event, "parent_owner"), ""), "Contact native source has a parent")
+        assert(record_get(event, "origin_source") == source and record_get(event, "origin_event") == number and text_equal(record_get(event, "owner"), record_get(event, "origin_owner")), "Contact native origin differs")
+    else:
+        assert(parent_event > 0 and text_len(record_get(event, "parent_owner")) > 0 and text_len(record_get(event, "parent_owner")) <= 128, "Contact derivative lost its parent")
+        if parent == 0:
+            assert(record_get(event, "origin_source") == 0 and record_get(event, "origin_event") == parent_event, "Contact direct human ancestry differs")
+            assert(text_equal(record_get(event, "origin_owner"), "human") and text_equal(record_get(event, "parent_owner"), "human"), "Contact human ancestry owner differs")
+    if source == 0:
+        assert(parent == -1 and text_equal(record_get(event, "owner"), "human"), "Contact derivative cannot become a human witness")
+    mask = haiku_contact_integer(record_get(event, "availability"), 0, 7)
+    assert(mask - floor(mask / 2) * 2 == (len(record_get(event, "rings")) == 3), "Contact ring availability differs")
+    a = floor(mask / 2) - floor(mask / 4) * 2
+    b = floor(mask / 4)
+    assert(source != 2 or a == 1, "Contact A source is unavailable")
+    assert(source != 3 or b == 1, "Contact B source is unavailable")
+    assert(source != 4 or (a == 1 and b == 1), "Contact mixed source needs both models")
+    alpha = record_get(event, "alpha")
+    assert(isfinite(alpha) and alpha >= 0 and alpha <= 1, "Contact mixture is invalid")
+    assert(text_len(record_get(event, "identity")) <= 4096, "Contact model identity is too long")
+    if source >= 2 and source <= 4:
+        assert(text_len(record_get(event, "identity")) > 0, "Contact model identity is absent")
+        assert(source != 2 or alpha == 1, "Contact A mixture differs")
+        assert(source != 3 or alpha == 0, "Contact B mixture differs")
+    active = haiku_contact_integer(record_get(event, "representation_available"), 0, 1)
+    gain = record_get(event, "representation_gain")
+    assert(isfinite(gain) and gain >= 0 and gain <= 0.25, "Contact representation gain is invalid")
+    representation = record_get(event, "representation")
+    haiku_parliament_features_ok(representation, 88)
+    if active == 0:
+        assert(gain == 0 and haiku_parliament_dot(representation, representation) == 0, "Contact absent representation has evidence")
+    else:
+        assert(source >= 2 and source <= 4 and text_len(record_get(event, "identity")) > 0, "Contact representation needs a named model source")
+    return 1
+
+def haiku_contact_glyphs(state, text, language):
+    tokens = haiku_tokenize_regex(text)
+    glyphs = zeros(88)
+    bindings = record_get(state, "bindings")
+    i = 0
+    while i < list_len(tokens):
+        key = haiku_contact_key(language, list_get(tokens, i))
+        if map_has(bindings, key):
+            id = map_get(bindings, key)
+            glyphs[id] = glyphs[id] + 1
+        i = i + 1
+    i = 0
+    while i < 88:
+        glyphs[i] = glyphs[i] / (1 + glyphs[i])
+        i = i + 1
+    return glyphs
+
+def haiku_contact_features(state, event):
+    haiku_contact_event_check(event)
+    glyphs = haiku_contact_glyphs(state, record_get(event, "text"), record_get(event, "language"))
+    contribution = record_get(event, "representation")
+    gain = record_get(event, "representation_gain")
+    i = 0
+    while i < 88:
+        glyphs[i] = clamp(glyphs[i] + gain * contribution[i], 0, 1)
+        i = i + 1
+    return haiku_parliament_features(glyphs, record_get(event, "climate"), record_get(event, "rings"), record_get(event, "quality"))
+
+def haiku_contact_publish(state, event):
+    haiku_contact_check(state)
+    haiku_contact_event_check(event)
+    source = record_get(event, "source")
+    number = record_get(event, "event")
+    seen = record_get(state, "p:seen")
+    result = record_new()
+    record_set(result, "committed", 0)
+    # Check replay before chronology or creating a candidate: an old delivery
+    # remains an exact no-op even after a restart or a later human turn.
+    if record_get(event, "replay") == 1 or number <= seen[source]:
+        return result
+    pending = record_clone(state)
+    parliament = haiku_contact_parliament(pending)
+    features = haiku_contact_features(pending, event)
+    slot = record_get(parliament, "receipt_cursor")
+    result = haiku_parliament_step(parliament, features, source, number, record_get(event, "turn"), 0, record_get(event, "availability"))
+    assert(record_get(result, "committed") == 1, "Contact event failed to publish")
+    text_rows = record_get(pending, "contact_text")
+    names = haiku_words("owner text language origin_owner parent_owner identity")
+    i = 0
+    while i < 6:
+        list_set(text_rows, slot * 6 + i, record_get(event, list_get(names, i)))
+        i = i + 1
+    record_set(pending, "contact_text", text_rows)
+    meta = record_get(pending, "contact_meta")
+    names = haiku_words("parent_source parent_event origin_source origin_event alpha representation_gain representation_available availability")
+    i = 0
+    while i < 8:
+        meta[slot * 8 + i] = record_get(event, list_get(names, i))
+        i = i + 1
+    rewarded = 0
+    if source == 0:
+        rows = record_get(parliament, "receipt_rows")
+        i = 0
+        while i < 32:
+            if rows[i * 9] > 0 and rows[i * 9 + 1] < record_get(event, "turn") and rows[i * 9 + 5] == 0:
+                haiku_parliament_reward(parliament, rows[i * 9], rows[i * 9 + 2], number, record_get(event, "turn"), features)
+                rewarded = rewarded + 1
+            i = i + 1
+    haiku_contact_put(pending, parliament)
+    haiku_contact_check(pending)
+    record_replace(state, pending)
+    record_set(result, "features", features)
+    record_set(result, "rewarded", rewarded)
+    return result
+
+# Each word keeps its base score. Unknown words get zero field pressure.
+# A +/-5 field is bounded to +/-0.75 score units; stable ties keep input order.
+def haiku_contact_rank(state, words, scores, language):
+    haiku_contact_check(state)
+    assert(list_len(words) == len(scores), "Contact candidate scores differ")
+    haiku_parliament_vector(scores, len(scores), 1000000)
+    result = zeros(len(scores))
+    bindings = record_get(state, "bindings")
+    field = record_get(state, "p:field")
+    i = 0
+    while i < list_len(words):
+        key = haiku_contact_key(language, list_get(words, i))
+        pressure = 0
+        if map_has(bindings, key):
+            pressure = 0.15 * field[map_get(bindings, key)]
+        result[i] = scores[i] + pressure
+        i = i + 1
+    return result
+
+# An explicit reviewed binding requires the retained word-bearing encounter.
+# No caller is allowed to overwrite shared seeds or an earlier private choice.
+def haiku_contact_bind(state, language, word, glyph, source, event):
+    haiku_contact_check(state)
+    haiku_contact_integer(glyph, 0, 87)
+    haiku_contact_integer(source, 0, 7)
+    haiku_contact_integer(event, 1, 999999)
+    tokens = haiku_tokenize_regex(word)
+    assert(list_len(tokens) == 1 and text_equal(list_get(tokens, 0), word), "Contact binding needs one normalized word")
+    key = haiku_contact_key(language, word)
+    bindings = record_get(state, "bindings")
+    assert(map_has(bindings, key) == 0, "Contact binding already exists")
+    rows = record_get(state, "p:receipt_rows")
+    texts = record_get(state, "contact_text")
+    slot = -1
+    i = 0
+    while i < 32:
+        if rows[i * 9] == event and rows[i * 9 + 2] == source:
+            slot = i
+        i = i + 1
+    assert(slot >= 0, "Contact binding witness is absent or expired")
+    assert(text_equal(list_get(texts, slot * 6 + 2), language), "Contact binding language differs")
+    assert(list_find(haiku_tokenize_regex(list_get(texts, slot * 6 + 1)), word) >= 0, "Contact binding word is absent from witness")
+    pending = record_clone(state)
+    map_set(record_get(pending, "bindings"), key, glyph)
+    history = record_get(pending, "binding_history")
+    list_push(history, language)
+    list_push(history, word)
+    list_push(history, list_get(haiku_contact_anchors(), glyph))
+    list_push(history, text_fixed(source, 0))
+    list_push(history, text_fixed(event, 0))
+    list_push(history, list_get(texts, slot * 6 + 1))
+    record_set(pending, "binding_history", history)
+    haiku_contact_check(pending)
+    record_replace(state, pending)
+    return 1
+
+# Four exact named reference words bound the first representation experiment.
+# Their vectors use the same PEN7 provider, tokenizer and parameter mixture.
+def haiku_contact_prototype_ids():
+    return [0, 4, 6, 82]
+
+def haiku_contact_projection(hidden, prototypes):
+    haiku_parliament_vector(hidden, 448, 1000000)
+    haiku_parliament_vector(prototypes, 1792, 1000000)
+    result = zeros(88)
+    length = sqrt(max(0, haiku_parliament_dot(hidden, hidden)))
+    if length <= 0.0000001:
+        return result
+    ids = haiku_contact_prototype_ids()
+    i = 0
+    while i < 4:
+        prototype = haiku_parliament_part(prototypes, i * 448, 448)
+        size = sqrt(max(0, haiku_parliament_dot(prototype, prototype)))
+        if size > 0.0000001:
+            result[ids[i]] = clamp(haiku_parliament_dot(hidden, prototype) / (length * size), 0, 1)
+        i = i + 1
+    return result
+
+# Returns an enriched clone. Only the private prototype cache can change here;
+# event publication still belongs to publish. Replays do no model work. Four
+# one-word forwards rebuild the complete cache when provider or alpha changes.
+def haiku_contact_enrich(state, event, receipt, a, b):
+    haiku_contact_check(state)
+    assert(record_get(receipt, "committed") == 1, "Contact enrichment needs a completed lexical receipt")
+    assert(record_get(receipt, "source") == record_get(event, "source"), "Contact lexical source differs")
+    assert(record_get(receipt, "event") == record_get(event, "event") and record_get(receipt, "turn") == record_get(event, "turn"), "Contact lexical event differs")
+    assert(text_equal(record_get(receipt, "owner"), record_get(event, "owner")), "Contact lexical owner differs")
+    assert(record_get(receipt, "origin_source") == record_get(event, "origin_source") and record_get(receipt, "origin_event") == record_get(event, "origin_event"), "Contact lexical origin differs")
+    assert(record_get(receipt, "parent_source") == record_get(event, "parent_source") and record_get(receipt, "parent_event") == record_get(event, "parent_event"), "Contact lexical parent differs")
+    result = record_clone(event)
+    source = record_get(receipt, "source")
+    alpha = record_get(receipt, "alpha")
+    if source == 2:
+        alpha = 1
+    if source == 3:
+        alpha = 0
+    record_set(result, "alpha", alpha)
+    mask = record_get(receipt, "availability")
+    record_set(result, "availability", mask + (len(record_get(event, "rings")) == 3))
+    identity = haiku_words("PEN7-anchor4-v1")
+    list_push(identity, record_get(receipt, "identity_a"))
+    list_push(identity, record_get(receipt, "identity_b"))
+    list_push(identity, record_get(receipt, "tokenizer"))
+    list_push(identity, text_fixed(source, 0))
+    identity = list_key(identity)
+    record_set(result, "identity", identity)
+    haiku_contact_event_check(result)
+    seen = record_get(state, "p:seen")
+    if record_get(result, "replay") == 1 or record_get(result, "event") <= seen[source]:
+        return result
+    assert(mask == haiku_lexical_availability(a, b), "Contact live model availability differs from receipt")
+    tokenizer = haiku_lexical_model(a, b)
+    assert(text_equal(model_tokenizer_identity(tokenizer), record_get(receipt, "tokenizer")), "Contact tokenizer identity differs")
+    if model_ready(a):
+        assert(text_equal(model_identity(a), record_get(receipt, "identity_a")), "Contact model A identity differs")
+    if model_ready(b):
+        assert(text_equal(model_identity(b), record_get(receipt, "identity_b")), "Contact model B identity differs")
+    prototypes = record_get(state, "prototype_values")
+    changed = text_equal(record_get(state, "prototype_identity"), identity) == 0 or record_get(state, "prototype_alpha") != alpha
+    if changed:
+        prototypes = zeros(1792)
+        ids = haiku_contact_prototype_ids()
+        names = haiku_contact_anchors()
+        i = 0
+        while i < 4:
+            tokens = model_encode(tokenizer, list_get(names, ids[i]), 16)
+            forward = haiku_lexical_forward(a, b, alpha, tokens)
+            if record_get(forward, "ok") == 0:
+                return result
+            hidden = record_get(forward, "hidden")
+            haiku_parliament_vector(hidden, 448, 1000000)
+            if haiku_parliament_dot(hidden, hidden) <= 0.00000001:
+                return result
+            j = 0
+            while j < 448:
+                prototypes[i * 448 + j] = hidden[j]
+                j = j + 1
+            i = i + 1
+    activations = haiku_contact_projection(record_get(receipt, "hidden"), prototypes)
+    record_set(result, "representation", activations)
+    record_set(result, "representation_available", 1)
+    record_set(result, "representation_gain", 0.25)
+    haiku_contact_event_check(result)
+    if changed:
+        pending = record_clone(state)
+        record_set(pending, "prototype_identity", identity)
+        record_set(pending, "prototype_alpha", alpha)
+        record_set(pending, "prototype_values", prototypes)
+        haiku_contact_check(pending)
+        record_replace(state, pending)
+    return result
+
+def haiku_contact_save(state, path):
+    haiku_contact_check(state)
+    return checkpoint_save(state, path)
+
+def haiku_contact_load(path):
+    state = checkpoint_load(path)
+    haiku_contact_check(state)
+    return state

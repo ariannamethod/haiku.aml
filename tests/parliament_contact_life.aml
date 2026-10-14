@@ -1,0 +1,115 @@
+IMPORT "../src/session.aml"
+IMPORT "../src/parliament_contact.aml"
+
+# Actual foreground/tail results supply climate and rings, never guessed values.
+def contact_real_human(voice, contact, text):
+    spoken = haiku_session_turn(voice, text, 0)
+    bridge = record_get(voice, "bridge_event")
+    climate = zeros(4)
+    names = haiku_words("dissonance novelty arousal entropy")
+    i = 0
+    while i < 4:
+        climate[i] = map_get(bridge, list_get(names, i))
+        i = i + 1
+    turn = record_get(voice, "turn")
+    event = haiku_contact_event("human", text, "en", climate, record_get(voice, "ring_coherence"), map_get(bridge, "quality_after"), 0, turn, turn)
+    haiku_contact_publish(contact, event)
+    return event
+
+voice = haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0)
+record_set(voice, "dream_config", [2, 1, 4])
+live = haiku_contact_new("haiku", 42)
+friend = haiku_contact_new("friend", 43)
+human = contact_real_human(voice, live, "rain ocean water tree unboundword")
+first = haiku_contact_features(live, human)
+assert(abs(first[0] - 0.75) < 0.000001 and first[4] == 0.5, "Contact words lost their shared anchors")
+assert(first[88] == map_get(record_get(voice, "bridge_event"), "dissonance"), "Contact dissonance did not come from the real turn")
+rings = record_get(voice, "ring_coherence")
+assert(first[92] == rings[0], "Contact ring feature differs from completed tail")
+assert(text_equal(list_get(record_get(live, "contact_text"), 1), "rain ocean water tree unboundword"), "Unknown word disappeared from the receipt")
+unknown = haiku_contact_glyphs(live, "unboundword неведомое", "en")
+assert(haiku_parliament_dot(unknown, unknown) == 0, "Unknown words acquired invented concepts")
+french = haiku_contact_glyphs(live, "eau", "fr")
+russian = haiku_contact_glyphs(live, "вода", "ru")
+english = haiku_contact_glyphs(live, "eau", "en")
+assert(french[0] == 0.5, "French explicit binding disappeared")
+assert(russian[0] == 0.5, "Unicode explicit binding disappeared")
+assert(english[0] == 0, "Language namespaces leaked")
+
+cloud = haiku_contact_event("haiku", record_get(human, "text"), "en", record_get(human, "climate"), record_get(human, "rings"), record_get(human, "quality"), 1, 1, 1)
+haiku_contact_publish(live, cloud)
+inner_text = list_get(record_get(voice, "meta_history"), 2)
+inner = haiku_contact_event("haiku", inner_text, "en", record_get(human, "climate"), record_get(human, "rings"), record_get(human, "quality"), 5, 1, 1)
+inner_result = haiku_contact_publish(live, inner)
+assert(record_get(inner_result, "rewarded") == 0, "Inner voice rewarded an encounter as a human")
+rows = record_get(live, "p:receipt_rows")
+assert(rows[5] == 0, "An internal event rewarded the first human receipt")
+
+# Rank a controlled equal-score pair by the pressure actually produced above.
+field = record_get(live, "p:field")
+assert(haiku_parliament_dot(field, field) > 0, "Real encounter did not enter the private field")
+low = 0
+high = 0
+i = 1
+while i < 88:
+    if field[i] < field[low]:
+        low = i
+    if field[i] > field[high]:
+        high = i
+    i = i + 1
+words = list_new()
+list_push(words, list_get(haiku_contact_anchors(), low))
+list_push(words, list_get(haiku_contact_anchors(), high))
+ranked = haiku_contact_rank(live, words, [0, 0], "en")
+assert(ranked[1] > ranked[0], "Real field did not alter candidate ranking")
+
+second = contact_real_human(voice, live, "rain moon")
+rows = record_get(live, "p:receipt_rows")
+assert(rows[5] == 1 and rows[14] == 1 and rows[23] == 1, "Later real human did not reward retained earlier encounters")
+assert(rows[8] == 2, "Delayed reward lost its actual human witness ID")
+
+# Explicitly run the real dream generator if this climate did not trigger it.
+if list_len(record_get(voice, "dream_history")) == 0:
+    dreams = haiku_dream_run(voice, list_get(record_get(voice, "meta_history"), 4), 0)
+dreams = record_get(voice, "dream_history")
+assert(list_len(dreams) >= 4, "Real dream fixture has no dialogue")
+dream = haiku_contact_event("friend", list_get(dreams, 1), "en", record_get(second, "climate"), record_get(second, "rings"), 0.5, 7, 2, 2)
+before = record_clone(live)
+haiku_contact_publish(friend, dream)
+assert(record_equal(before, live), "Friend's private dream leaked before delivery")
+friend_before = record_clone(friend)
+delivery = haiku_contact_derive(dream, "haiku", record_get(dream, "text"), 6, 2, 2)
+delivered = haiku_contact_publish(live, delivery)
+assert(record_get(delivered, "committed") == 1 and record_equal(before, live) == 0, "Explicit friend delivery did not enter local experience")
+assert(record_equal(friend_before, friend), "Receiver changed the sender during delivery")
+assert(record_get(delivered, "rewarded") == 0, "Dream delivery became a human witness")
+assert(record_get(delivery, "origin_source") == 7 and text_equal(record_get(delivery, "origin_owner"), "friend"), "Friend delivery lost its root ancestry")
+returning = haiku_contact_derive(delivery, "haiku", "water tree", 5, 2, 2)
+assert(record_get(returning, "origin_source") == 7 and record_get(returning, "parent_source") == 6, "Inner return lost friend ancestry")
+haiku_contact_publish(live, returning)
+
+# Old event IDs and explicitly marked replay do not consume any owned draw.
+before = record_clone(live)
+haiku_contact_publish(live, human)
+record_set(returning, "event", 99)
+record_set(returning, "replay", 1)
+haiku_contact_publish(live, returning)
+assert(record_equal(before, live), "Contact replay changed an owned leaf")
+
+# Explicit reviewed binding remains private, retains its word-bearing evidence.
+haiku_contact_bind(live, "en", "unboundword", 0, 0, 1)
+bound = haiku_contact_glyphs(live, "unboundword", "en")
+assert(bound[0] == 0.5, "Reviewed private binding was not stored")
+assert(haiku_parliament_dot(haiku_contact_glyphs(friend, "unboundword", "en"), haiku_contact_glyphs(friend, "unboundword", "en")) == 0, "A private binding leaked to the friend")
+
+# Synthetic basis vectors inspect the exact cosine-to-named-coordinate math.
+hidden = zeros(448)
+hidden[0] = 2
+prototypes = zeros(1792)
+i = 0
+while i < 4:
+    prototypes[i * 448 + i] = 1
+    i = i + 1
+projected = haiku_contact_projection(hidden, prototypes)
+assert(projected[0] == 1 and projected[4] == 0 and projected[6] == 0 and projected[82] == 0, "Named representation projection differs")
+PRINT "HAIKU_CONTACT_REAL_LIFE_OK"
