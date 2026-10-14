@@ -44,16 +44,19 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   [Arianna's voice exchange](docs/research/iceberg/ARIANNA_INJECTION.md), with
   pinned source paths and bounded probes. Separate context continuation,
   embedding direction and hidden attention; record the return-path experiment.
-- [ ] Connect the experimental parliament to real cloud, human, inner-voice,
+- [x] Connect the experimental parliament to real cloud, human, inner-voice,
   friend and model features. Give each presence its own persistent organ;
-  measure pressure and word-admission changes before enabling it in chat.
-- [ ] Add AML immutable PEN7 handles and optional lexical sources with quiet
+  measure pressure and word-admission changes in the separate experimental
+  [iceberg conversation](docs/ICEBERG_SESSION.md).
+- [x] Add AML immutable PEN7 handles and optional lexical sources with quiet
   missing-weight fallback, explicit word admission and immutable shared models.
-- [ ] Give both Haiku and the dream-friend their own retrospective/prospective
-  trajectories, each mixing both sources through its own gamma/Janus field.
-  Persist four histories, each presence's parameter-mixing balance and their
-  exchanges while sharing the two immutable weight sets. Give the field owned
-  state and the provider explicit load results in the AML/NoTorch boundary.
+- [x] Give both Haiku and the dream-friend their own retrospective/prospective
+  contexts and fixed-per-pass parameter mixtures. Persist four histories,
+  separate balance preferences and explicit exchanges while sharing immutable
+  weight handles. Keep readiness, hashes and effective one-source coefficients
+  explicit at the AML/NoTorch boundary.
+- [ ] Evolve each presence's Gamma/Janus balance, calendar and operative debt
+  through its history; compare dynamic mixing with the fixed-alpha controls.
 - [ ] Add a conceptual field beneath the words: persistent glyph attraction,
   learned word bindings, then recursive symbols born during dream consolidation.
   Keep external observations, peer exchange and internal replay distinct.
@@ -61,10 +64,11 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   concept bindings; let that field influence later parameter mixing and words.
   Use NoTorch for numerical work, retain shared concept identities and each
   presence's own experience, and compare with the working weightless field.
-- [ ] Let each presence send a selected human/self/friend/cloud fragment into
+- [x] Let each presence send a selected human/self/friend fragment into
   its owned lexical trajectory and receive word/glyph proposals at a declared
   boundary. Preserve source ancestry, frozen bodies, private histories and
-  exact no-injection behavior; begin with one bounded down-and-back event.
+  exact disabled behavior. The first bounded text-context excursion runs in
+  `iceberg.aml`, with explicit self/peer graft controls and real return receipts.
 - [ ] Compare context injection and embedding-direction pressure independently
   at fixed parameter balance. Measure relevance, copying, glyph pressure and
   form; apply immune gain after normalization and invalidate dependent caches.

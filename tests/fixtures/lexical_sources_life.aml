@@ -1,0 +1,139 @@
+IMPORT "../../src/lexical_sources.aml"
+
+def lexical_test_equal(a, b):
+    assert(len(a) == len(b), "Lexical test array size differs")
+    i = 0
+    while i < len(a):
+        assert(a[i] == b[i], "Lexical test array differs")
+        i = i + 1
+    return 1
+
+def lexical_test_changed(a, b):
+    assert(len(a) == len(b), "Lexical changed-array size differs")
+    difference = 0
+    i = 0
+    while i < len(a):
+        difference = max(difference, abs(a[i] - b[i]))
+        i = i + 1
+    return difference
+
+def lexical_test_save(state, name):
+    return haiku_lexical_save(state, text_concat(lexical_test_prefix, name))
+
+haiku_lexical_pool_check()
+live = haiku_lexical_new("haiku", 0.5)
+friend = haiku_lexical_new("friend", 0.5)
+lexical_test_save(live, "absent.before")
+disabled = haiku_lexical_request("haiku", "water remembers the tree", 0, 1, 1, 1, 0.5, 0)
+none = haiku_lexical_pass(live, 0, 0, disabled)
+assert(record_get(none, "committed") == 0 and text_equal(record_get(none, "status"), "disabled"), "Disabled lexical route changed state")
+missing = model_try_load("missing-optional-lexical-model.gguf")
+assert(model_ready(missing) == 0, "Missing lexical model became ready")
+request = haiku_lexical_request("haiku", "water remembers the tree", 0, 1, 1, 1, 0.5, 1)
+none = haiku_lexical_pass(live, missing, missing, request)
+assert(record_get(none, "committed") == 0 and record_get(none, "availability") == 0, "Unavailable source ran a pass")
+lexical_test_save(live, "absent.after")
+
+a = model_try_load("../../weights/haiku1.gguf")
+b = model_try_load("../../weights/haiku2.gguf")
+assert(model_ready(a) == 1 and model_ready(b) == 1, "Real checked-in lexical assets are unavailable")
+identity_a = "50f159a2c34952bd9e6349880b4b20f8bbc0ac4b1f1dc2c1f6e4768732548b66"
+identity_b = "16909b8590bd7fbbf15ab11b2dbf3743d612da8c617aca2dda03d640fef13e29"
+assert(text_equal(model_identity(a), identity_a) and text_equal(model_identity(b), identity_b), "Checked-in model identity differs")
+assert(text_equal(model_tokenizer_identity(a), model_tokenizer_identity(b)), "Shared BPE identities differ")
+
+one_a = haiku_lexical_new("haiku", 0.5)
+single_a = haiku_lexical_pass(one_a, a, missing, request)
+assert(record_get(single_a, "committed") == 1 and record_get(single_a, "source") == 2, "A-only source did not return words")
+assert(record_get(single_a, "alpha") == 1 and record_get(single_a, "requested_alpha") == 0.5, "A-only effective balance differs")
+one_b = haiku_lexical_new("haiku", 0.5)
+single_b = haiku_lexical_pass(one_b, missing, b, request)
+assert(record_get(single_b, "committed") == 1 and record_get(single_b, "source") == 3, "B-only source did not return words")
+assert(record_get(single_b, "alpha") == 0 and record_get(one_b, "alpha") == 0.5, "B-only source changed its owner's balance")
+direct = model_forward(a, record_get(single_a, "context_tokens"))
+lexical_test_equal(record_get(single_a, "hidden"), record_get(direct, "hidden"))
+logits = record_get(direct, "logits")
+words = record_get(single_a, "words")
+scores = record_get(single_a, "scores")
+syllables = record_get(single_a, "syllables")
+i = 0
+while i < 48:
+    ids = model_encode(a, list_get(words, i), 16)
+    expected = 0
+    j = 0
+    while j < len(ids):
+        expected = expected + logits[ids[j]]
+        j = j + 1
+    expected = expected / len(ids)
+    assert(expected == scores[i], "Whole-word score is not the mean of its BPE logits")
+    assert(syllables[i] == haiku_syllables(list_get(words, i)), "Candidate admission lost syllables")
+    i = i + 1
+assert(list_find(words, "ular") < 0 and list_find(words, "ers") < 0, "Tokenizer fragment entered the whole-word pool")
+
+# Separate presence and delivery: a friend does not inherit Haiku's context.
+lexical_test_save(friend, "friend.before")
+without = record_clone(live)
+withheld = haiku_lexical_pass(without, a, b, request)
+haiku_lexical_graft(request, "the old tree hears its rain", 5, 7)
+haiku_lexical_graft(request, "a river enters music", 6, 9)
+returned = haiku_lexical_pass(live, a, b, request)
+assert(record_get(returned, "source") == 4 and record_get(returned, "availability") == 6, "Two-source mixture lost its identity")
+assert(record_get(returned, "input_source") == 0 and record_get(returned, "origin_source") == 0, "Original human lineage was lost")
+assert(record_get(returned, "self_event") == 7 and record_get(returned, "friend_event") == 9, "Delivered graft provenance was lost")
+assert(lexical_test_changed(record_get(withheld, "hidden"), record_get(returned, "hidden")) > 0.0001, "Delivered text did not change contextual representation")
+lexical_test_save(friend, "friend.after")
+lexical_test_save(live, "replay.before")
+again = haiku_lexical_pass(live, a, b, request)
+assert(record_get(again, "committed") == 0 and text_equal(record_get(again, "status"), "replay"), "Duplicate lexical event was admitted twice")
+explicit = haiku_lexical_request("haiku", "new text carrying a replay", 5, 100, 2, 1, 0.5, 1)
+record_set(explicit, "replay", 1)
+again = haiku_lexical_pass(live, a, b, explicit)
+assert(record_get(again, "committed") == 0, "Explicit replay was admitted")
+lexical_test_save(live, "replay.after")
+
+# The same source event can have its other owned direction; chronology survives.
+before = record_clone(live)
+back = haiku_lexical_request("haiku", "remember the rain before the song", 0, 1, 1, 0, 0.5, 1)
+back_result = haiku_lexical_pass(live, a, b, back)
+assert(record_get(back_result, "committed") == 1, "The second trajectory shared its sibling's replay clock")
+prior_contexts = record_get(before, "contexts")
+new_contexts = record_get(live, "contexts")
+i = 64
+while i < 128:
+    assert(prior_contexts[i] == new_contexts[i], "Retrospective pass changed the prospective context")
+    i = i + 1
+
+# Long context is clipped by named fragment budgets before native encoding.
+long = ""
+i = 0
+while i < 80:
+    long = text_concat(long, "rain ")
+    i = i + 1
+bounded = haiku_lexical_request("haiku", long, 5, 2, 2, 1, 0.5, 1)
+haiku_lexical_graft(bounded, long, 5, 3)
+haiku_lexical_graft(bounded, long, 6, 4)
+haiku_lexical_lineage(bounded, 4, 1, 0, 1)
+bounded_result = haiku_lexical_pass(live, a, b, bounded)
+assert(record_get(bounded_result, "context_count") <= 194 and record_get(bounded_result, "graft_tokens") <= 130, "Lexical BPE work budget escaped")
+assert(record_get(bounded_result, "input_source") == 5 and record_get(bounded_result, "source") == 4, "Returning self echo became a human event")
+assert(record_get(bounded_result, "parent_source") == 4 and record_get(bounded_result, "origin_source") == 0, "Recursive lineage was lost")
+assert(text_len(record_get(bounded_result, "fragment")) == 64, "Primary fragment budget differs")
+assert(text_len(record_get(bounded_result, "self_fragment")) == 32 and text_len(record_get(bounded_result, "friend_fragment")) == 32, "Graft fragment budgets differ")
+
+# Restart includes both contexts and proposal ancestry, without loaded handles.
+lexical_test_save(live, "restart")
+resumed = haiku_lexical_load(text_concat(lexical_test_prefix, "restart"))
+next = haiku_lexical_request("haiku", "the tree gives its shadow a name", 0, 3, 3, 0, 0.5, 1)
+full_result = haiku_lexical_pass(live, a, b, next)
+resumed_result = haiku_lexical_pass(resumed, a, b, next)
+lexical_test_equal(record_get(full_result, "scores"), record_get(resumed_result, "scores"))
+lexical_test_equal(record_get(full_result, "hidden"), record_get(resumed_result, "hidden"))
+lexical_test_save(live, "full")
+lexical_test_save(resumed, "resumed")
+lexical_test_save(live, "disappeared.before")
+lost = haiku_lexical_request("haiku", "the next rain", 0, 4, 4, 1, 0.5, 1)
+lost_result = haiku_lexical_pass(live, missing, missing, lost)
+assert(record_get(lost_result, "committed") == 0, "A disappeared optional source mutated lived context")
+lexical_test_save(live, "disappeared.after")
+assert(text_equal(model_identity(a), identity_a) and text_equal(model_identity(b), identity_b), "Lexical inference changed model identity")
+PRINT "HAIKU_LEXICAL_SOURCES_OK"

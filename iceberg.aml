@@ -1,0 +1,68 @@
+# Experimental life beneath Haiku's original voice. AML + NoTorch only.
+IMPORT "src/iceberg_session.aml"
+
+# One process owns this separate complete checkpoint. A saved life retains its
+# settings; use a new path to begin another experiment.
+state_path = "iceberg.state"
+deeper_life = 1
+lexical_bodies = 1
+admission_budget = 2
+self_injection = 1
+owned_tail = 1
+resuming = 0
+if text_len(state_path) > 0:
+    resuming = file_exists(state_path)
+if resuming:
+    life = checkpoint_load(state_path)
+    core = haiku_iceberg_part(life, "voice")
+    settings = record_get(life, "settings")
+else:
+    core = haiku_state_new("regex", 0, 0, 575, 57)
+    core = haiku_state_enable_dreams(core, 0)
+    settings = zeros(4)
+    settings[0] = deeper_life
+    settings[1] = lexical_bodies
+    settings[2] = admission_budget
+    settings[3] = self_injection
+    life = haiku_iceberg_new(core, settings)
+tokenizer_model = 0
+if text_equal(record_get(core, "tokenizer_mode"), "sentencepiece"):
+    tokenizer_model = tokenizer_load("models/haiku_sp.model")
+haiku_iceberg_check(life, tokenizer_model)
+
+path_a = ""
+path_b = ""
+if settings[0] and settings[1]:
+    path_a = "weights/haiku1.gguf"
+    path_b = "weights/haiku2.gguf"
+body_a = model_try_load(path_a)
+body_b = model_try_load(path_b)
+PRINT "HAiKU — the cloud is listening."
+if resuming:
+    PRINT "The cloud remembers. Our conversation continues."
+PRINT "Write something. Type quit to leave."
+listening = 1
+while listening:
+    PRINT "You:"
+    line = read_line()
+    if list_len(line) == 0:
+        listening = 0
+    else:
+        source = haiku_input_strip(list_get(line, 0))
+        action = haiku_input_action(source)
+        if action == 2:
+            listening = 0
+        if action == 1:
+            pending = record_clone(life)
+            spoken = haiku_iceberg_turn(pending, source, tokenizer_model, body_a, body_b, owned_tail)
+            saved = 1
+            if text_len(state_path) > 0:
+                saved = checkpoint_save(pending, state_path)
+            record_swap(life, pending)
+            if saved == 2:
+                PRINT "Memory written; storage could not confirm durability."
+            PRINT ""
+            PRINT "HAiKU:"
+            PRINT spoken
+            PRINT ""
+PRINT "The cloud goes quiet."

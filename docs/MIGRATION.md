@@ -3,15 +3,17 @@
 2026-10-07. Governed by the [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 Tokenization, foreground, continuity, and inner-life follow-up: 2026-10-08.
 Phase4, dreams, exchange journal and worker audit: 2026-10-13.
+Immutable lexical bodies and live private contact: 2026-10-14.
 This document records the inspected sources, current behavior, and implementation
 order. Numerical, text, lexical, cloud, memory, English form, candidate
 generation, MathBrain, RAE, tokenization, foreground exchange, and complete
 foreground checkpoints, MetaHaiku reflection, the three rings, Phase4 memory,
 dream dialogues and the exchange journal are implemented. Their complete tail
 now runs in an owned worker, joined before save, swap and response display.
-Frozen GGUF sources and an experimental private parliament have their own
-checked foundations; they are not connected to the stable chat yet. The status
-below marks the boundary between those functions and the remaining organism.
+Frozen GGUF sources and private parliaments now meet real encounters in the
+separate [iceberg conversation](ICEBERG_SESSION.md). The stable chat retains its
+Python-lineage profile. The status below marks the boundary between those
+functions and the remaining organism.
 
 ## Source bodies
 
@@ -268,16 +270,19 @@ adds exact ordered-record equality and validates the complete AWAIT form before
 joining. Haiku uses it to bind a completion to every field of its prepared
 experience. [ASYNC](ASYNC.md) preserves the earlier audit and records the fixes.
 
+The experimental iceberg now connects immutable AML PEN7 handles, bounded word
+admission, contextual representations and real encounters to two private
+parliaments. Its complete publication uses AML v5.12's 8192-line import capacity,
+16-argument functions and 512-field transient records. The saved life has 185
+fields; source bodies stay outside snapshots.
+
 The next integration work is:
 
-1. Immutable AML PEN7 model handles and explicit provider availability around
-   NoTorch's native GGUF sources. Keep model bodies outside per-turn snapshots;
-   connect bounded lexical proposals and representation features.
-2. Real cloud and encounter features for the private [parliament](PARLIAMENT.md),
-   with separate Haiku/friend owners and measured effects on glyph pressure.
-3. Early response display and input overlap, with durable pending experience,
+1. Dynamic source balance, lived concept structure and recursive dream-born
+   glyphs, with separate measured contributions to later words.
+2. Early response display and input overlap, with durable pending experience,
    exact restart replay and one completed-state publisher.
-4. A small local HTTP/event interface over the organism's events.
+3. A small local HTTP/event interface over the organism's events.
 
 Yent demonstrates the compiled/library connection through C-bodied BLOOD
 blocks. Haiku's application behavior will be expressed in AML; the language
@@ -515,10 +520,13 @@ native PEN7 converter/forward and parliament arithmetic.
 token output and rejects incompatible declared KV-head counts. Haiku now retains two
 immutable **21,308,576-byte Q8_0/F32 GGUF assets** with
 [conversion receipts](../weights/README.md); NoTorch expands their matrices once
-to frozen F32 for execution. The isolated [AML parliament](PARLIAMENT.md) owns
-its adapters, pressure, immune memory and delayed reward. Stable-chat model
-loading, lexical admission, per-presence mixtures and the full glyph feedback
-loop remain the [next iceberg connections](ICEBERG.md).
+to frozen F32 for execution. The [AML parliament](PARLIAMENT.md) owns its
+adapters, pressure, immune memory and delayed reward. The experimental
+[iceberg](ICEBERG_SESSION.md) connects both sources to each presence through
+immutable handles and all-parameter mixing. Four retained contexts, actual
+cloud/inner/dream encounters, model prototypes and bounded word admission now
+share one complete checkpoint. Dynamic balance and recursive glyph formation
+remain in the [iceberg research plan](ICEBERG.md).
 
 ### RAE development
 
@@ -543,12 +551,12 @@ metrics, and explicit asynchronous publication order.
    versioned checkpoint and one owned worker tail. Serial, worker and compiled
    schedules preserve responses and checkpoint bytes. Extend this boundary to
    early display only with durable pending experience and exact restart replay.
-5. Connect the native frozen PEN7 sources through immutable AML handles and
-   bounded word admission, with quiet zero/one/two-source operation. Give both
-   presences their own two-direction histories and explicit mixing state.
-6. Connect actual cloud, model and encounter features to the experimental
-   parliament. Measure its private glyph pressure and later word influence;
-   add learned bindings and recursive glyphs through the staged [iceberg](ICEBERG.md).
+5. Native frozen PEN7 sources now run through immutable AML handles and bounded
+   word admission, with quiet zero/one/two-source operation. Both presences own
+   two-direction histories and explicit mixing preferences.
+6. Actual cloud, model and encounter features now reach each private parliament.
+   Glyph pressure adjusts later word admission. Extend learned concept structure
+   and recursive glyphs through the staged [iceberg](ICEBERG.md).
 7. Add Klaus-inspired language packs with haiku-specific vocabulary and
    syllable behavior; preserve each language's own cloud.
 8. Add the local character interface, conversation, and event-driven animation.

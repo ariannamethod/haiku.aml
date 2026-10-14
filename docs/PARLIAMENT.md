@@ -7,11 +7,13 @@ Its experts propose a change in glyph pressure, its immune field decides how
 much of that change enters memory, and a later human encounter can teach the
 experts what followed. Four voices to begin with. Room for sixteen.
 
-The stable chat does **not import this module**. The organ runs in its own
-fixtures with caller-supplied features. It changes a real, persisted 88-value
-pressure field; extracting those features from words and PEN7 representations,
-forming new glyph identities, and feeding pressure into the spoken haiku are
-the next integration work. The [iceberg](ICEBERG.md) describes that larger loop.
+The stable `haiku.aml` profile retains its original imports. The separate
+[`iceberg.aml`](ICEBERG_SESSION.md) conversation now connects this organ through
+the [contact bridge](PARLIAMENT_CONTACT.md): real human, cloud, inner and friend
+encounters, named word bindings and bounded PEN7 representations feed its
+88-value pressure field. That pressure contributes to lexical admission for
+future poems. Recursive new glyph identities follow this foundation in the
+[iceberg](ICEBERG.md) design.
 
 ## Two frozen bodies, private changing lives
 
@@ -30,8 +32,8 @@ record hashes, licenses, quantization errors and the native forward comparisons.
 
 Constructing `haiku_parliament_new("haiku", ...)` and
 `haiku_parliament_new("friend", ...)` gives two independent owners. Each retains
-its own experts, pressure, RNG, immune memory and receipts. The existing chat's
-dream-friend has not yet been upgraded to carry this separate life.
+its own experts, pressure, RNG, immune memory and receipts. The experimental
+conversation persists both owners in one complete checkpoint.
 
 ## What enters an encounter
 
@@ -162,7 +164,8 @@ four ranks independently. Adapter values stay in `[-2,2]`.
 
 The reward equation has no approval term. It uses the climate retained at the
 later human encounter. Supplying real observations and attributing their source
-is the responsibility of the forthcoming chat integration.
+is now the responsibility of the [contact bridge](PARLIAMENT_CONTACT.md) and
+the experimental [iceberg conversation](ICEBERG_SESSION.md).
 
 ## Ownership and restart
 

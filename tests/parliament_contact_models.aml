@@ -1,0 +1,91 @@
+IMPORT "../src/parliament_contact.aml"
+
+a = model_try_load("../weights/haiku1.gguf")
+b = model_try_load("../weights/haiku2.gguf")
+absent = model_try_load("fixtures/contact-missing.gguf")
+assert(model_ready(a) == 1 and model_ready(b) == 1 and model_ready(absent) == 0, "Contact model fixtures are unavailable")
+human = haiku_contact_event("human", "water tree music", "en", [0.5, 0.5, 1, 0.5], [0.5, 0.5, 0.5], 0.5, 0, 1, 1)
+
+owner = haiku_lexical_new("haiku", 0.5)
+request = haiku_lexical_request("haiku", record_get(human, "text"), 0, 1, 1, 1, 0.5, 1)
+receipt = haiku_lexical_pass(owner, a, b, request)
+assert(record_get(receipt, "committed") == 1, "Contact mixed provider did not return a proposal")
+live = haiku_contact_new("haiku", 42)
+event = haiku_contact_derive(human, "haiku", "water tree", 4, 1, 1)
+event = haiku_contact_enrich(live, event, receipt, a, b)
+assert(record_get(event, "representation_available") == 1 and record_get(event, "representation_gain") == 0.25, "Actual PEN7 representation did not reach contact")
+assert(record_get(live, "prototype_alpha") == 0.5 and text_len(record_get(live, "prototype_identity")) > 0, "Prototype cache lost its mixture identity")
+projection = record_get(event, "representation")
+assert(haiku_parliament_dot(projection, projection) > 0, "Actual model produced no named anchor relation")
+plain_event = record_clone(event)
+record_set(plain_event, "representation", zeros(88))
+record_set(plain_event, "representation_gain", 0)
+record_set(plain_event, "representation_available", 0)
+with_features = haiku_contact_features(live, event)
+without_features = haiku_contact_features(live, plain_event)
+change = 0
+i = 0
+while i < 88:
+    difference = with_features[i] - without_features[i]
+    assert(difference >= 0 and difference <= 0.250001, "Model contribution exceeded its declared bound")
+    change = change + difference
+    i = i + 1
+assert(change > 0, "Enabling model representations did not change semantic features")
+plain = record_clone(live)
+haiku_contact_publish(plain, plain_event)
+haiku_contact_publish(live, event)
+assert(record_equal(plain, live) == 0, "Model representation intervention left all state unchanged")
+left = record_get(plain, "p:field")
+right = record_get(live, "p:field")
+change = 0
+i = 0
+while i < 88:
+    change = change + abs(left[i] - right[i])
+    i = i + 1
+assert(change > 0, "Model representation did not change admitted field pressure")
+before = record_clone(live)
+replayed = haiku_contact_enrich(live, event, receipt, a, b)
+haiku_contact_publish(live, replayed)
+assert(record_equal(before, live), "Replayed model event changed private cache or history")
+
+# Changing only the captured mixture rebuilds its reference vectors. Preparing
+# them does not count as another lived encounter or alter parliamentary state.
+different = haiku_lexical_new("haiku", 0.75)
+next_human = haiku_contact_event("human", "water tree music", "en", [0.5, 0.5, 1, 0.5], [0.5, 0.5, 0.5], 0.5, 0, 2, 2)
+next_request = haiku_lexical_request("haiku", record_get(next_human, "text"), 0, 2, 2, 1, 0.75, 1)
+next_receipt = haiku_lexical_pass(different, a, b, next_request)
+next_event = haiku_contact_derive(next_human, "haiku", "water tree", 4, 2, 2)
+prior = haiku_contact_parliament(live)
+old_prototypes = haiku_parliament_part(record_get(live, "prototype_values"), 0, 1792)
+next_event = haiku_contact_enrich(live, next_event, next_receipt, a, b)
+assert(record_get(live, "prototype_alpha") == 0.75, "Changed mixture reused old reference identity")
+assert(record_equal(prior, haiku_contact_parliament(live)), "Prototype refresh invented a lived encounter")
+new_prototypes = record_get(live, "prototype_values")
+change = 0
+i = 0
+while i < 1792:
+    change = change + abs(old_prototypes[i] - new_prototypes[i])
+    i = i + 1
+assert(change > 0, "Changed mixture reused the previous reference vectors")
+
+# One-source operation records the actual endpoint, retaining the requested
+# preference in the independent lexical owner. Missing-source mode stays quiet.
+single = haiku_lexical_new("haiku", 0.5)
+receipt_a = haiku_lexical_pass(single, a, absent, request)
+one = haiku_contact_new("haiku", 43)
+event_a = haiku_contact_derive(human, "haiku", "water", 2, 1, 1)
+event_a = haiku_contact_enrich(one, event_a, receipt_a, a, absent)
+assert(record_get(event_a, "alpha") == 1 and record_get(event_a, "availability") == 3, "Single A contact did not name its endpoint")
+haiku_contact_publish(one, event_a)
+single = haiku_lexical_new("haiku", 0.5)
+receipt_b = haiku_lexical_pass(single, absent, b, request)
+event_b = haiku_contact_derive(human, "haiku", "music", 3, 1, 1)
+event_b = haiku_contact_enrich(one, event_b, receipt_b, absent, b)
+assert(record_get(event_b, "alpha") == 0 and record_get(event_b, "availability") == 5, "Single B contact did not name its endpoint")
+haiku_contact_publish(one, event_b)
+single = haiku_lexical_new("haiku", 0.5)
+before = record_clone(single)
+quiet = haiku_lexical_pass(single, absent, absent, request)
+assert(record_get(quiet, "committed") == 0 and record_equal(before, single), "Absent models changed their lexical owner")
+assert(record_get(event_b, "origin_source") == 0 and record_get(event_b, "source") == 3, "Model return became its original human input")
+PRINT "HAIKU_CONTACT_PEN7_OK"

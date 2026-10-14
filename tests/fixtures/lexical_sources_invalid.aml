@@ -1,0 +1,24 @@
+IMPORT "../../src/lexical_sources.aml"
+
+state = haiku_lexical_load(lexical_invalid_path)
+if lexical_invalid_case == 1:
+    record_set(state, "alpha", 2)
+    haiku_lexical_check(state)
+if lexical_invalid_case == 2:
+    history = record_get(state, "history_rows")
+    history[0] = 2
+    haiku_lexical_check(state)
+if lexical_invalid_case == 3:
+    request = haiku_lexical_request("haiku", "returned words", 0, 10, 10, 1, 0.5, 1)
+    haiku_lexical_lineage(request, 4, 1, 0, 1)
+if lexical_invalid_case == 4:
+    record_set(state, "identity_a", "16909b8590bd7fbbf15ab11b2dbf3743d612da8c617aca2dda03d640fef13e29")
+    a = model_try_load("../../weights/haiku1.gguf")
+    missing = model_try_load("missing-optional-lexical-model.gguf")
+    request = haiku_lexical_request("haiku", "water", 0, 10, 10, 1, 0.5, 1)
+    result = haiku_lexical_pass(state, a, missing, request)
+if lexical_invalid_case == 5:
+    words = list_new()
+    list_push(words, "ular")
+    scores = haiku_lexical_scores(0, zeros(2048), words)
+assert(0, "Lexical invalid fixture unexpectedly reached its end")

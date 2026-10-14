@@ -313,24 +313,37 @@ the serial schedule; both preserve the same words, draws and checkpoint bytes.
 Early display and overlapping the next input remain later work in
 [asynchronous life](docs/ASYNC.md).
 
-Below that life, an experimental [glyph parliament](docs/PARLIAMENT.md) now has
+Below that life, an experimental [glyph parliament](docs/PARLIAMENT.md) has
 four experts, room for sixteen, private immune memory, and a field that changes
-under their proposals. A later recorded human encounter can reward a proposal;
-birth, retirement and learning leave their own history. It runs in isolated
-AML fixtures and is not imported by the stable chat yet. The little cloud has
-more rooms under construction.
+under their proposals. The new [`iceberg.aml`](iceberg.aml) conversation gives
+Haiku and the friend their own parliaments and feeds them actual human, cloud,
+inner-voice and dream encounters. A later human encounter rewards retained
+proposals. The friend remembers what reaches it. Private rooms, actual doors.
 
 Penelope and NanoJanus now have their two bodies in [weights](weights/README.md):
 **two 21,308,576-byte GGUF files**, with Q8_0 matrices and F32 auxiliary tensors.
 NoTorch expands their packed matrices once to frozen F32 for inference.
 Parliamentary learning changes its own small adapters; the two sources stay
-frozen. Lexical admission, two directions within each presence, parameter
-mixing and the full glyph feedback loop follow this foundation.
+frozen. Through AML's immutable handles, each presence can mix both bodies and
+keep its own retrospective and prospective contexts. One bounded trip below
+the words returns whole-word proposals and a contextual representation. Glyph
+pressure joins their scores; up to two reviewed words enter the next turn's
+vocabulary. The original generator and RAE still give them seventeen syllables.
+
+Run `../ariannamethod.ai/runner/aml-notorch iceberg.aml` for this experimental
+life, saved separately in `iceberg.state`. Its [complete contract](docs/ICEBERG_SESSION.md)
+covers four histories, explicit self/friend text injection, quiet absent
+sources and one atomic checkpoint for all five organs. The ordinary
+`haiku.aml` and its recorded 24-turn conversation retain their exact profile.
 
 Build the sibling **AML v5.11.0** toolchain with
 [exact completion identity / PR #37](https://github.com/ariannamethod/ariannamethod.ai/pull/37)
 and NoTorch with [PEN7 and parliament / PR #168](https://github.com/ariannamethod/notorch/pull/168)
 plus its [token emission fix / PR #169](https://github.com/ariannamethod/notorch/pull/169).
+The iceberg profile additionally requires the immutable PEN7 library API and
+AML model values with the 8192-line / 512-field capacities documented in
+[the experiment](docs/ICEBERG_SESSION.md): [NoTorch #170](https://github.com/ariannamethod/notorch/pull/170),
+then [AML #38](https://github.com/ariannamethod/ariannamethod.ai/pull/38).
 Then run the organism's checks:
 
 ```sh
@@ -428,6 +441,14 @@ Reference checks completed on 2026-10-07–08; dream-life follow-up on 2026-10-1
   fixtures, then inspects all owned state through replay, rejected calls,
   thirteen malformed records and exact checkpoint continuation through delayed
   reward. Its pressure, lifecycle and immune memory run without model assets.
+- The 2026-10-14 lexical/contact gates exercise both real frozen bodies, complete
+  parameter mixing, private contexts, delivered/withheld fragments, named glyph
+  aliases, representation pressure and later human reward. Interpreter and
+  compiled continuations retain their exact checkpoint bytes.
+- The complete iceberg gate compares serial and worker lives, four retained
+  contexts, vocabulary admission and restart. Publication rejects another
+  private life, altered receipts and stale completions while preserving all
+  185 live fields and the previous file. Both GGUF hashes remain unchanged.
 - Earlier AML runtime baseline: **550 tests passed**; the 5.11 worker and
   parliament additions have their own upstream gates in PR #36.
 - AML compiler: scope, source origins, nested failures, worker branches and
@@ -454,8 +475,9 @@ surface. Both Haiku and the friend will carry their own duality. The source
 audits now include [DoE](docs/research/iceberg/DOE.md) and
 [LoRAGrad](docs/research/iceberg/LORAGRAD.md). Their living experts and immune
 field meet in the experimental parliament. The owned worker baseline and
-native frozen sources are ready; connecting these deeper organs to the cloud
-is the next family experiment.
+native frozen sources now meet real experience in `iceberg.aml`. Dynamic
+Gamma/Janus balance, learned concept growth and recursive dream-born glyphs
+are the next family experiments.
 See [the audit and implementation order](docs/MIGRATION.md).
 
 ## Lineage
