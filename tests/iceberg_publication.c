@@ -38,13 +38,10 @@ static void reject_publish(const char *change, const char *diagnostic) {
     require(snapshot != NULL, "retain rejected result");
     char source[10000];
     snprintf(source, sizeof(source),
+        "IMPORT \"%s/src/iceberg_session.aml\"\n"
         "checked = haiku_iceberg_result_check(live, result, experience, request, 0)\n"
-        "checkpoint_save(checked, \"%s\")\nrecord_swap(live, checked)\n", saved_path);
-    int rc = iceberg_execute(source);
-    if (!rc || !strstr(am_get_error(), diagnostic)) {
-        fprintf(stderr, "expected refusal: %s\nactual: %s\n", diagnostic, am_get_error());
-        require(0, "iceberg completion unexpectedly accepted or wrong diagnostic");
-    }
+        "checkpoint_save(checked, \"%s\")\nrecord_swap(live, checked)\n", root, saved_path);
+    expect_error(source, diagnostic);
     unchanged(owner_before, "rejected completion changed a composite owner leaf");
     require(same_record(am_get_var_record("result"), snapshot), "validation mutated the result");
     am_record_free(snapshot);
