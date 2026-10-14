@@ -53,6 +53,8 @@ compiled and checkpoint checks retain old wire bytes; C hosts rebuild for the
 larger execution context. NoTorch stays at merged
 [#171](https://github.com/ariannamethod/notorch/pull/171),
 `ca3e17a24852ad1db08a6e6b908fb37036011d2d`. The source weights stay frozen.
+The final iceberg import graph contains **29 modules**, **8,324 physical
+source lines** and **250 user functions**: 267 slots including AML's builtins.
 
 Compatibility against Haiku #18's `7d4d2d9856f0a7bd22f46d35a5636d8a71e7785d`
 used seeds **575/57**, `rain` on UTC day **20740**, then `moon` on **20741**,
@@ -98,6 +100,26 @@ The **515**-field detached result, failed-save refusal and one-time save/swap
 passed against the retained fourteen-turn checkpoint. All nine gated source
 and test hashes stayed unchanged during these final two lanes. Reproduction:
 `bash tests/run_iceberg_symbols.sh` runs the three lanes in sequence.
+
+`bash tests/run_contact_symbols.sh` passed the complete standalone lifecycle
+through interpreter and compiled scalar execution. Output and all **nine**
+checkpoints matched byte for byte, including nested birth, private canonical
+identities, frozen learned paths, 128-observation expiry, sixteen-node capacity
+and exact disabled parity with the old 47-field contact. The threshold,
+depth-four and sixteen-anchor limits, unknown barriers and bounded pressure
+passed. The C gate rejected **six** invalid calls and **37** malformed records
+without changing owned state or preceding checkpoint bytes; replay stayed
+an exact no-op. All six gated source/test hashes remained unchanged.
+
+The implementation and assertions were tested at
+`0d70f370df3411a82b3c40ddc846fd5c542024fa`. The follow-up records these completed
+gates and closes the local-birth TODO. It also corrects the standalone fixture's
+final reporting line from `print(...)` to AML's `PRINT`: the former produced
+empty output, while a minimal interpreter/compiled control of the corrected
+line emitted the same expected success marker. This sole fixture-line change
+leaves all assertions and production sources intact; the long gate above was
+run before that reporting correction. Structural delivery and adoption between
+owners remain a separate step.
 
 ## 2026-10-14 — A word acquires a remembered neighbour
 

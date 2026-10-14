@@ -438,4 +438,4 @@ assert(record_equal(base, plain), "Disabled symbols changed the prior contact/le
 haiku_contact_save(base, text_concat(symbol_test_prefix, "off-base"))
 haiku_contact_save(plain, text_concat(symbol_test_prefix, "off-control"))
 haiku_contact_check(off)
-print("HAIKU_CONTACT_SYMBOLS_LIFE_OK")
+PRINT "HAIKU_CONTACT_SYMBOLS_LIFE_OK"
