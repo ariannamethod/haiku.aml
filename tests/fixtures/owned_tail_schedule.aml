@@ -34,8 +34,8 @@ i = 0
 while i < 40:
     unrelated = i * i
     i = i + 1
-AWAIT controlled_tail INTO completed
-haiku_session_result_check(state, completed, receipt, 0)
+AWAIT controlled_tail INTO result
+completed = haiku_session_result_check(state, result, receipt, 0)
 assert(text_equal(spoken, record_get(receipt, "output")), "worker selected another voice")
 assert(haiku_dream_check(completed) == 1, "controlled schedule did not include its dream")
 assert(map_get(record_get(completed, "mathbrain_state"), "observations") == 1, "ordered learner did not complete")

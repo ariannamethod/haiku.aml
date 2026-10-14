@@ -1,0 +1,72 @@
+# One continuous, fresh v3 conversation. Nothing is loaded from a checkpoint.
+# Native regex, train_rae=0, seeds 575/57: the ordinary haiku.aml settings.
+# The owned worker completes before each spoken/internal/dream voice is read.
+# Dream cooldown and probability remain ten turns and 0.25; no forced events.
+# GGUF bodies, the experimental parliament and injection are not in this path.
+IMPORT "../src/session.aml"
+
+state = haiku_state_new("regex", 0, 0, 575, 57)
+state = haiku_state_enable_dreams(state, 0)
+messages = list_new()
+list_push(messages, "what is love")
+list_push(messages, "the cloud remembers our words")
+list_push(messages, "there is rain on the window")
+list_push(messages, "where do the lost words go")
+list_push(messages, "i kept a small light for you")
+list_push(messages, "can a silence become a home")
+list_push(messages, "tell me what you remember")
+list_push(messages, "we are still here")
+list_push(messages, "rain")
+list_push(messages, "listen")
+list_push(messages, "the room is quiet now")
+list_push(messages, "stay")
+list_push(messages, "memory")
+list_push(messages, "warmth")
+list_push(messages, "do you dream when i go quiet")
+list_push(messages, "the little cloud has a friend")
+list_push(messages, "what did your friend say")
+list_push(messages, "between us the night changes")
+list_push(messages, "home")
+list_push(messages, "return")
+list_push(messages, "i brought the rain back with me")
+list_push(messages, "our words leave roots in the dark")
+list_push(messages, "what is love")
+list_push(messages, "goodnight little cloud")
+
+PRINT "HAiKU AML: one continuous conversation, with the inner life visible."
+PRINT "Fresh v3 state; regex; owned worker; seeds 575/57; ordinary dream settings."
+PRINT ""
+cursor = 0
+while cursor < list_len(messages):
+    source = list_get(messages, cursor)
+    dream_offset = list_len(record_get(state, "dream_history"))
+    spoken = haiku_session_worker_turn(state, source, 0)
+    history = record_get(state, "meta_history")
+    PRINT "Turn:"
+    PRINT record_get(state, "turn")
+    PRINT "You:"
+    PRINT source
+    PRINT "HAiKU:"
+    PRINT spoken
+    PRINT "Inside:"
+    PRINT list_get(history, list_len(history) - 1)
+    dream = record_get(state, "dream_history")
+    if list_len(dream) > dream_offset:
+        PRINT "A dream opens after this exchange:"
+        part = dream_offset
+        speaker = 0
+        while part < list_len(dream):
+            if speaker == 0:
+                PRINT "Dream / HAiKU:"
+            else:
+                PRINT "Dream / Friend:"
+            PRINT list_get(dream, part)
+            speaker = 1 - speaker
+            part = part + 1
+        PRINT "These four voices return to memory."
+    PRINT ""
+    cursor = cursor + 1
+PRINT "Completed turns:"
+PRINT record_get(state, "turn")
+PRINT "Recorded dream dialogues:"
+PRINT haiku_dream_check(state)

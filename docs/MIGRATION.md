@@ -262,8 +262,11 @@ AML v5.11.0 [PR #36](https://github.com/ariannamethod/ariannamethod.ai/pull/36)
 adds typed worker results, copied helper/local context, reusable joined slots,
 owned-child drain and explicit channel failures. It also bridges NoTorch's
 owned election, adapter injection and Oja operations. Haiku's worker now
-publishes complete turns through that boundary; [ASYNC](ASYNC.md) preserves the
-earlier audit and records the fixes.
+publishes complete turns through that boundary. The
+[PR #37 follow-up](https://github.com/ariannamethod/ariannamethod.ai/pull/37)
+adds exact ordered-record equality and validates the complete AWAIT form before
+joining. Haiku uses it to bind a completion to every field of its prepared
+experience. [ASYNC](ASYNC.md) preserves the earlier audit and records the fixes.
 
 The next integration work is:
 
@@ -500,13 +503,16 @@ NoTorch `bfde06669ad34896421b86147e919ca902a0d337`. The existing numerical
 and tokenizer APIs sufficed; that stage needed no NoTorch source change.
 These pins retain the original v5.10 audit history.
 
-The subsequent [owned-worker stage](ASYNC.md) uses AML v5.11 / PR #36 and
-preserves the same turn order and checkpoint schemas. Join, validation, save,
-swap and display form the current publication boundary. Early display,
+The subsequent [owned-worker stage](ASYNC.md) uses AML v5.11 / PR #36, with
+exact completion identity from [PR #37](https://github.com/ariannamethod/ariannamethod.ai/pull/37),
+and preserves the same turn order and checkpoint schemas. Join, validation,
+save, swap and display form the current publication boundary. Early display,
 overlapping input and durable pending intent remain the next scheduling work.
 
 [NoTorch PR #168](https://github.com/ariannamethod/notorch/pull/168) supplies the
-native PEN7 converter/forward and parliament arithmetic. Haiku now retains two
+native PEN7 converter/forward and parliament arithmetic.
+[PR #169](https://github.com/ariannamethod/notorch/pull/169) preserves complete
+token output and rejects incompatible declared KV-head counts. Haiku now retains two
 immutable **21,308,576-byte Q8_0/F32 GGUF assets** with
 [conversion receipts](../weights/README.md); NoTorch expands their matrices once
 to frozen F32 for execution. The isolated [AML parliament](PARLIAMENT.md) owns
