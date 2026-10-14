@@ -40,6 +40,10 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   [parliament](docs/PARLIAMENT.md): D96, rank four, four-to-sixteen private
   experts, 64 combined immune memories, 32 receipts, delayed human-witness
   reward, owned cursors, lifecycle and complete restart state.
+- [x] Audit [Dario v2](docs/research/iceberg/DARIO.md) and
+  [Arianna's voice exchange](docs/research/iceberg/ARIANNA_INJECTION.md), with
+  pinned source paths and bounded probes. Separate context continuation,
+  embedding direction and hidden attention; record the return-path experiment.
 - [ ] Connect the experimental parliament to real cloud, human, inner-voice,
   friend and model features. Give each presence its own persistent organ;
   measure pressure and word-admission changes before enabling it in chat.
@@ -57,6 +61,13 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   concept bindings; let that field influence later parameter mixing and words.
   Use NoTorch for numerical work, retain shared concept identities and each
   presence's own experience, and compare with the working weightless field.
+- [ ] Let each presence send a selected human/self/friend/cloud fragment into
+  its owned lexical trajectory and receive word/glyph proposals at a declared
+  boundary. Preserve source ancestry, frozen bodies, private histories and
+  exact no-injection behavior; begin with one bounded down-and-back event.
+- [ ] Compare context injection and embedding-direction pressure independently
+  at fixed parameter balance. Measure relevance, copying, glyph pressure and
+  form; apply immune gain after normalization and invalidate dependent caches.
 - [ ] After the baseline organs work, run the controlled extensions in
   [FAMILY.md](docs/FAMILY.md): reflection preserves foreground state, episodic
   recall, state-at-contact word memory, sampling mixtures, variable form,

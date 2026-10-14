@@ -1,6 +1,6 @@
 # Asynchronous life — one owner, an ordered conversation
 
-2026-10-13. Governed by the
+2026-10-14. Governed by the
 [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 
 The current organism carries the complete learning and inner-life tail through
@@ -56,6 +56,9 @@ NoTorch.
 ## The owned worker boundary
 
 This profile requires [AML 5.11 / PR #36](https://github.com/ariannamethod/ariannamethod.ai/pull/36).
+Full completion receipts also require
+[AML PR #37](https://github.com/ariannamethod/ariannamethod.ai/pull/37), which adds
+exact flat-record equality and validates `AWAIT ... INTO` before joining.
 Its [worker contract](https://github.com/ariannamethod/ariannamethod.ai/blob/8a5d449195ed8d45eecf08279001802aee12673a/docs/WORKERS.md)
 supplies the generic language work:
 
@@ -80,14 +83,27 @@ three boundaries:
 | Function | Work and owner |
 |---|---|
 | `haiku_session_prepare` | Mutates a detached candidate through cloud observation, candidate generation and RAE selection. Freezes input, response, contexts, features, climate, quality and base revision in an experience record. |
-| `haiku_session_tail` | Applies Phase4, learner updates, reflection, rings, dreams and journaling in the existing order, then validates the candidate. Both serial and worker schedules call this same function. |
-| `haiku_session_result_check` | Checks base/completed revisions, profile, learner mode, tokenizer identity and, for inner-life profiles, the retained input/response before publication. |
+| `haiku_session_tail` | Applies Phase4, learner updates, reflection, rings, dreams and journaling in the existing order, then validates the candidate. Returns a transient envelope carrying the state and full frozen experience. Both serial and worker schedules call this same function. |
+| `haiku_session_result_check` | Validates the envelope and compares every frozen experience field with the supplied receipt. Checks base/completed revisions, profile, learner mode and tokenizer identity, then returns an independently owned state for publication. |
 
 `haiku_session_worker_turn` launches one `haiku_tail` worker with the detached
 candidate and experience, then joins its typed record. A launch-time snapshot
 keeps later parent mutations out of that work. Worker code never opens the live
 checkpoint. The serial `haiku_session_turn` remains available as a comparison
 schedule.
+
+The flat envelope keeps `state:*` and `experience:*` in separate namespaces,
+with their ordered field lists, format and version. `record_equal` checks the
+receipt's keys, value types, string/list bytes, array shapes and every float32
+bit in scalars, arrays and maps. Same revision and same spoken text therefore
+cannot substitute for the quality, observation, features and bridge actually
+consumed by that job. Only the unwrapped state can reach the checkpoint;
+the v1/v2/v3 schemas remain exactly 29/36/55 fields.
+
+The earlier completion check accepted a v1 `moon` result with a same-base
+`rain` receipt. Inner profiles checked the input and response but did not bind
+the other experience fields. The full receipt closes both paths before any
+owner is replaced.
 
 The [`haiku.aml`](../haiku.aml) entrypoint passes its own detached `next_state`
 to that call, saves the complete result, swaps it into the live owner without
@@ -143,11 +159,15 @@ the real tail, mutates parent launch values, releases the worker, and delays
 joining an already completed result. The published owner stays unchanged;
 the final record matches the serial dream, learner and checkpoint exactly.
 
-[`owned_tail_state.c`](../tests/owned_tail_state.c) inspects all 55 live leaves.
-A changed receipt, stale base, duplicate completion, exhausted draw tape during
-the inner tail and failed save preserve their required owners and previous
-checkpoint. A successful worker after the failed job verifies slot recovery.
-The returned record remains independent after its thread exits.
+[`owned_tail_state.c`](../tests/owned_tail_state.c) inspects all 29/36/55 live
+leaves in the three profiles. Each rejects 13 receipt/envelope mismatches,
+including a same-base result from another input, changed quality/observation/
+bridge with identical input and response, a one-ULP feature change and signed
+zero. Every rejection preserves its complete owner and checkpoint bytes.
+Envelope mutation after validation leaves the unwrapped state independent.
+The v3 checks also cover stale bases, duplicate completion, an exhausted draw
+tape during the inner tail and failed saving. A successful worker after the
+failed job verifies slot recovery. The returned record survives thread exit.
 
 The language's own worker gates cover repeated jobs, typed result kinds,
 nested ownership, scope, imported source origins, shutdown, channels and

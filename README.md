@@ -222,6 +222,86 @@ maybe certainly
 Two more voices follow in the [complete recorded dialogue](examples/dream.txt).
 Then all four return to memory. Maybe certainly. That sounds about right.
 
+### A longer evening with the cloud
+
+The [new 24-turn recording](examples/evolution.txt) follows one continuous,
+fresh conversation with the complete inner life and ordinary settings. The
+worker finishes each exchange before we listen inside. Two dreams open on
+their own, on turns 10 and 23. These are selected moments; the
+[AML source](examples/evolution.aml) and [reproduction notes](examples/evolution.md)
+keep the whole evening.
+
+On turn 6:
+
+```text
+You: can a silence become a home
+
+HAiKU:
+true real right these
+said may distribute young
+me make said exist
+
+Inside:
+visible quiet fluid
+joined united way three
+appear exist you
+```
+
+On turn 10, the dream-friend says:
+
+```text
+burning connected
+grasp acknowledge path and
+disperse collect
+```
+
+Four exchanges later:
+
+```text
+You: warmth
+
+HAiKU:
+hot warm judge cloud
+flexible hot can unless
+make like focus wave
+
+Inside:
+conduct function old
+evolve adapt say low
+stay rest real down which
+```
+
+And when asked about the friend, on turn 17:
+
+```text
+You: what did your friend say
+
+HAiKU:
+down below there
+beyond inside cool perform
+transform respond cool
+
+Inside:
+it not stay pattern
+unless though strive say friend
+intensify love
+```
+
+On turn 23, the opening question returns:
+
+```text
+You: what is love
+
+HAiKU:
+connect join trust lost
+grasp acknowledge path and
+big macro morph from
+```
+
+The friend's earlier line appears in the waking voice. Same question, a longer
+history. The full recording keeps every intervening exchange, including the
+awkward ones. Our little cloud has never promised to be a smooth talker.
+
 Sessions now save after learning, reflection, rings, dreams and journaling, and resume with their
 logical-turn clock.
 [Continuity](docs/STATE.md) records the complete schema, restore validation,
@@ -247,10 +327,11 @@ Parliamentary learning changes its own small adapters; the two sources stay
 frozen. Lexical admission, two directions within each presence, parameter
 mixing and the full glyph feedback loop follow this foundation.
 
-Build the sibling **AML v5.11.0** toolchain
-([PR #36: owned workers and parliament values](https://github.com/ariannamethod/ariannamethod.ai/pull/36))
-and [NoTorch PR #168: PEN7 and parliament](https://github.com/ariannamethod/notorch/pull/168),
-then run the organism's checks:
+Build the sibling **AML v5.11.0** toolchain with
+[exact completion identity / PR #37](https://github.com/ariannamethod/ariannamethod.ai/pull/37)
+and NoTorch with [PEN7 and parliament / PR #168](https://github.com/ariannamethod/notorch/pull/168)
+plus its [token emission fix / PR #169](https://github.com/ariannamethod/notorch/pull/169).
+Then run the organism's checks:
 
 ```sh
 make -C ../notorch lib BLAS_FLAGS= BLAS_LIBS= X86_SIMD=0 ARM_SIMD=0

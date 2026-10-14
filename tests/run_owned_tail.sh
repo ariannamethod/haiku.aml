@@ -103,6 +103,8 @@ cmp "$haiku_work/owned-schedule-serial.state" "$haiku_work/owned-schedule-worker
 "$haiku_cc" -O2 -Wall -Wextra -Werror -I"$haiku_include" "$haiku_root/tests/owned_tail_state.c" \
     "$haiku_bridge" "$haiku_lib" "$haiku_notorch" -lm -lpthread \
     "${haiku_link_flags[@]}" -o "$haiku_work/owners"
-"$haiku_work/owners" "$haiku_root" "$haiku_work" "$haiku_work/serial/haiku.state"
+"$haiku_work/owners" "$haiku_root" "$haiku_work" \
+    "$haiku_work/foreground-serial/haiku.state" "$haiku_work/inner-serial/haiku.state" \
+    "$haiku_work/serial/haiku.state"
 printf 'PASS: 24 serial/worker/compiled turns, exact checkpoint bytes, native dream and restart at13\n'
 printf 'PASS: v1/v2 continuation, native tokenizer, coupled learning, blank/quit/EOF and controlled completion\n'

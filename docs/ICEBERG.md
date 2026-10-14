@@ -35,6 +35,8 @@ The source revisions below make each observation reproducible.
 | [AML](https://github.com/ariannamethod/ariannamethod.ai/tree/f2d4496790be33505715ba90373fea5225799625) | `f2d4496790be33505715ba90373fea5225799625` | [Gamma, Janus and model ownership](research/iceberg/AML_GAMMA.md) |
 | [DoE](https://github.com/ariannamethod/doe/tree/588cf0009d3933dc5b7e72ac553fdd6e7932fa65) | `588cf0009d3933dc5b7e72ac553fdd6e7932fa65` | [Election, expert lifecycle and Oja](research/iceberg/DOE.md) |
 | [LoRAGrad](https://github.com/ariannamethod/loragrad/tree/57c5553a867b363b2eb2029f1827618026fd49fb) | `57c5553a867b363b2eb2029f1827618026fd49fb` | [Immune axis, credits and memory](research/iceberg/LORAGRAD.md) |
+| [Dario](https://github.com/ariannamethod/dario/tree/8ccf9053298a8039e3d5e9df7fa053f4aed481e7) | `8ccf9053298a8039e3d5e9df7fa053f4aed481e7` | [V2 paper, thought boundaries and provenance](research/iceberg/DARIO.md) |
+| [Arianna](https://github.com/ariannamethod/arianna.c/tree/868773f300968536989391d3de84922f5b21be42) | `868773f300968536989391d3de84922f5b21be42` | [Text, direction and the returning lower voice](research/iceberg/ARIANNA_INJECTION.md) |
 
 Small portable probes and commands live in
 [tests/research/iceberg](../tests/research/iceberg/README.md). They use optional
@@ -309,6 +311,54 @@ recursive symbol birth and influence on spoken candidates are the next links
 to build. Each presence will receive its own owner; no shared mutable parliament
 is implied by sharing the two sources.
 
+## A thought can travel down and return
+
+Oleg's next layer lets Haiku and the friend send their own utterances into the
+frozen lexical bodies. A returned continuation can change word attraction and
+glyph pressure, giving the next three lines a longer internal conversation.
+The [Dario](research/iceberg/DARIO.md) and
+[Arianna](research/iceberg/ARIANNA_INJECTION.md) audits pin executable source
+paths, distinguish the transfers and record small policy/numerical probes.
+This return organ is proposed; stable Haiku has no live injection route yet.
+
+Dario contributes selective continuation at a generation boundary: a retrieved
+fragment enters the token context and the following generation grows from it.
+Arianna's ordinary duet uses two different transfers. Previous Resonance words
+enter Janus's next prompt; current Janus words steer Resonance through a
+separate embedding-derived direction added to logits. Its deeper chorus also
+has neighbor attention, which belongs to a later experiment with an explicit
+coordinate contract.
+
+For Haiku, start at a completed haiku or internal association boundary. Select
+one fragment from a named encounter, send it through a receiving presence's
+owned PEN7 context, then return a bounded lexical or representation proposal.
+Both presences retain both frozen sources and their own retrospective and
+prospective histories. Keep parameter balance fixed during this first trial;
+text injection, direction pressure and parameter mixing each need a separately
+measured contribution. PEN7 uses its native BPE and 256-position window. Budget
+the fragment together with retained context and reserved continuation space.
+
+Each excursion carries its owner, original source, event and parent ancestry,
+direction, source hashes, tokenizer, mixture, receiving revision and work
+budget. Publish it once through the owned completion boundary. Start with one
+trip down and back per selected boundary, preserving the already-published
+utterance. A reformulated self/friend utterance retains that origin throughout
+its return; it cannot become a new human witness for parliamentary reward.
+
+Compare no injection, a relevant fragment and a matched shuffled fragment with
+identical checkpoints and draws. Then compare text-only and direction-only
+routes before combining them. Inspect word ranks, glyph-pressure changes,
+copied spans, topic continuity, form and later learning. An absent model or a
+disabled route must preserve the established weightless path and its draws.
+Replayed events, stale results and completion order need the same exact
+ownership checks as the existing learning tail.
+
+The direction probe also gives a concrete design constraint: apply the immune
+gain after normalization, so normalization cannot cancel its attenuation.
+Invalidate dependent caches when the mixture or timed pressure changes. Keep
+all selection, provenance and admission in AML, with numerical execution in
+NoTorch; these references add no runtime dependency.
+
 ## Quiet absence, explicit continuity
 
 The HTML Penelope and NanoJanus paths demonstrate actual model-free field
@@ -377,6 +427,7 @@ revisions so the port can choose an explicit contract:
 | Optional lexical sources | Next: immutable AML handle, bounded AML word admission and representation features | Zero/one/two sources, quiet absence, explicit identities and unchanged disabled-profile draws |
 | Duality in each presence | Separate Haiku/friend owners, retrospective/prospective contexts, parameter mixing, calendar and operative debt | Four histories and their mixing state survive restart; interventions remain local until an explicit exchange; mixed parameters are checked against endpoint controls |
 | Conceptual attraction | Shared seed concepts, private directed traces, learned word bindings, model representations and tagged exchange | Same concept through lexical aliases; neural contribution and lived history separately change measured pressure/bindings and later admission |
+| Returning thoughts | Proposed bounded text injection, then an independently measured direction lane | Source ancestry survives the round trip; matched controls measure word/glyph changes, exact disabled behavior and single publication |
 | Dream-born glyphs | Bounded recursive symbol formation and stable structure across both owners | Creation threshold, recursive identity, save/restart, adoption and replay provenance |
 
 Keep input, initial state, admission budget and sampling draws fixed when

@@ -40,6 +40,7 @@ def haiku_session_prepare(pending, source, model):
 # This exact tail serves both schedules. All mutations stay with the candidate;
 # no worker opens a checkpoint or publishes a live owner.
 def haiku_session_tail(pending, experience, model):
+    experience = record_clone(experience)
     turn = record_get(experience, "turn")
     assert(record_get(pending, "turn") == record_get(experience, "base_revision"), "Haiku tail base revision differs")
     assert(turn == record_get(experience, "base_revision") + 1, "Haiku tail revision does not follow its base")
@@ -68,12 +69,53 @@ def haiku_session_tail(pending, experience, model):
             haiku_dream_run(pending, spoken, model)
         haiku_journal_append(pending, experience)
     haiku_state_check(pending, model)
-    return pending
+    # Flat records cannot contain another record. Keep two disjoint namespaces
+    # in a transient envelope; only its validated state reaches a checkpoint.
+    result = record_new()
+    record_set(result, "format", "haiku-tail-result")
+    record_set(result, "version", 1)
+    state_keys = record_keys(pending)
+    experience_keys = record_keys(experience)
+    record_set(result, "state_keys", state_keys)
+    record_set(result, "experience_keys", experience_keys)
+    cursor = 0
+    while cursor < list_len(state_keys):
+        key = list_get(state_keys, cursor)
+        record_set(result, text_concat("state:", key), record_get(pending, key))
+        cursor = cursor + 1
+    cursor = 0
+    while cursor < list_len(experience_keys):
+        key = list_get(experience_keys, cursor)
+        record_set(result, text_concat("experience:", key), record_get(experience, key))
+        cursor = cursor + 1
+    return result
 
-# The sole publisher checks the revision before replacing any owner. Reusing a
-# result after a completed turn, or delivering it to a later turn, fails here.
-def haiku_session_result_check(state, completed, experience, model):
+# The sole publisher checks the full frozen experience, then returns an owned
+# state. Same-base jobs must agree in every leaf, including float32 bits.
+def haiku_session_result_check(state, result, experience, model):
     assert(record_get(state, "turn") == record_get(experience, "base_revision"), "Haiku completed tail has a stale base revision")
+    haiku_state_fields(result, "format", "string")
+    haiku_state_fields(result, "version", "float")
+    haiku_state_fields(result, "state_keys experience_keys", "list")
+    assert(text_equal(record_get(result, "format"), "haiku-tail-result") and record_get(result, "version") == 1, "Haiku completed tail envelope is unsupported")
+    state_keys = record_keys(state)
+    experience_keys = record_keys(experience)
+    assert(text_equal(list_key(record_get(result, "state_keys")), list_key(state_keys)), "Haiku completed tail state fields differ")
+    assert(text_equal(list_key(record_get(result, "experience_keys")), list_key(experience_keys)), "Haiku completed tail experience fields differ")
+    assert(list_len(record_keys(result)) == 4 + list_len(state_keys) + list_len(experience_keys), "Haiku completed tail envelope field count differs")
+    receipt = record_new()
+    cursor = 0
+    while cursor < list_len(experience_keys):
+        key = list_get(experience_keys, cursor)
+        record_set(receipt, key, record_get(result, text_concat("experience:", key)))
+        cursor = cursor + 1
+    assert(record_equal(receipt, experience), "Haiku completed tail belongs to another experience")
+    completed = record_new()
+    cursor = 0
+    while cursor < list_len(state_keys):
+        key = list_get(state_keys, cursor)
+        record_set(completed, key, record_get(result, text_concat("state:", key)))
+        cursor = cursor + 1
     assert(record_get(completed, "turn") == record_get(experience, "turn"), "Haiku completed tail revision differs")
     assert(record_get(completed, "turn") == record_get(state, "turn") + 1, "Haiku completed tail must advance exactly one turn")
     haiku_state_check(completed, model)
@@ -85,14 +127,14 @@ def haiku_session_result_check(state, completed, experience, model):
         history = record_get(completed, "meta_history")
         assert(text_equal(list_get(history, list_len(history) - 3), record_get(experience, "input")), "Haiku completed tail belongs to another input")
         assert(text_equal(list_get(history, list_len(history) - 2), record_get(experience, "output")), "Haiku completed tail belongs to another response")
-    return 1
+    return completed
 
 # Serial scheduling remains available for exact continuation and comparison.
 def haiku_session_turn(state, source, model):
     pending = record_clone(state)
     experience = haiku_session_prepare(pending, source, model)
-    completed = haiku_session_tail(pending, experience, model)
-    haiku_session_result_check(state, completed, experience, model)
+    result = haiku_session_tail(pending, experience, model)
+    completed = haiku_session_result_check(state, result, experience, model)
     record_replace(state, completed)
     return record_get(experience, "output")
 
@@ -104,7 +146,7 @@ def haiku_session_worker_turn(state, source, model):
     experience = haiku_session_prepare(pending, source, model)
     SPAWN haiku_tail:
         return haiku_session_tail(pending, experience, model)
-    AWAIT haiku_tail INTO completed
-    haiku_session_result_check(state, completed, experience, model)
+    AWAIT haiku_tail INTO result
+    completed = haiku_session_result_check(state, result, experience, model)
     record_replace(state, completed)
     return record_get(experience, "output")
