@@ -107,3 +107,127 @@ This subaudit preceded Oleg's further choice of parameter mixing inside each
 presence. For the combined design and that refinement,
 see [The Haiku iceberg](../../ICEBERG.md). Portable probes are in
 [the research bundle](../../../tests/research/iceberg/README.md).
+
+## Follow-up, 2026-10-14: two births through the actual dream path
+
+The historical audit above is retained. Its `glyph_actual_probe.c` creates the
+second-level symbol by calling `birth_symbol` directly. The new
+[`glyph_dream_probe.c`](../../../tests/research/iceberg/glyph_dream_probe.c)
+exercises both levels through `ingest` and `dream_once`, including their
+13/14-observation boundaries. This is measured Actually.life behavior; the
+Haiku experiment described below is the next implementation step.
+
+The source is again `ariannamethod/actually.life` at
+`2bf11b3f2fab36e1a8cd8a917438ca2423f65ee8`, with `l.c` SHA-256
+`db2b9d0a667147a4d344644e2926064d2841cb2e44ad49d75d6de037fe4c3147`.
+The exact pinned file was fetched again and its hash matched the earlier audit.
+Primary paths are [`l.c:590–626`](https://github.com/ariannamethod/actually.life/blob/2bf11b3f2fab36e1a8cd8a917438ca2423f65ee8/l.c#L590-L626)
+for observed pairs and birth,
+[`1009–1050`](https://github.com/ariannamethod/actually.life/blob/2bf11b3f2fab36e1a8cd8a917438ca2423f65ee8/l.c#L1009-L1050)
+for recursive recognition/adoption, and
+[`1267–1305`](https://github.com/ariannamethod/actually.life/blob/2bf11b3f2fab36e1a8cd8a917438ca2423f65ee8/l.c#L1267-L1305)
+for the different ingestion and dream paths.
+
+With seed 42, thirteen ingestions of `fire water` followed by a dream produce
+no symbol. A fourteenth ingestion still leaves the alphabet unchanged; the
+following dream creates `fire+water` as local ID90. Thirteen external
+whole-symbol inputs `fire+water tree` and a dream retain one symbol. The
+fourteenth such input and the next dream create `(fire+water)+tree` as ID91.
+Every dream preserves both the co-occurrence total and directed field total.
+The source counts adjacent observations; Haiku's proposed threshold uses
+fourteen distinct external turns.
+
+```text
+dream external cooccurrence 13->13 field 13->13 symbols=0
+dream external cooccurrence 14->14 field 14->14 symbols=1
+first id=90 structure=fire+water threshold=14
+ordinary postbirth text remains 1,0,4
+dream external cooccurrence 27->27 field 27->27 symbols=1
+dream external cooccurrence 28->28 field 28->28 symbols=2
+second id=91 structure=(fire+water)+tree threshold=14
+compound-context pressure tree=0.000000954 music=-13.815510750
+receiver adopts same structure at private id=92; external counts=0 field=0; repeated resolve reuses id
+RECURSIVE_PRIMARY_SOURCE_OK
+```
+
+Three distinctions matter for the port:
+
+- `semtok_line("fire water tree")` still returns the three original IDs
+  `1,0,4` after the first birth. The source's ordinary membrane does not
+  compact a known pair. The probe's second phase uses `semtok_ether`, which
+  resolves `fire+water` as one existing symbol before ingestion. Haiku needs
+  an explicit recognition rule to obtain recursive observations from ordinary
+  later words.
+- The later pressure is executable: with the existing compound as context,
+  `field_fold` gives tree `0.000000954` and music `-13.815510750` after the
+  fourteen compound-to-tree observations. Those are source field logits;
+  Haiku will translate its own retained relationships into bounded word-score
+  contributions while keeping the PEN7 parameters frozen.
+- Adoption is a separate path. A fresh receiver is deliberately given
+  `tree+light` as its own ID90; resolving the sender's recursive name creates
+  its `fire+water` at ID91 and the nested symbol at ID92. The parent structure
+  agrees despite different local IDs. Repeating resolution reuses ID92, and
+  adoption alone adds no observations or field counts. The C source transmits
+  names and speaker/lineage IDs; Haiku's later exchange needs its exact
+  retained encounter ancestry as well.
+
+The probe executes the source's original `digest` updates on its small C
+model. It does not load PEN7. Haiku's new symbols will live in owned AML
+records, with immutable shared source weights.
+
+To reproduce from the Haiku repository root, point `iceberg_sources` at the
+external checkout directory:
+
+```sh
+iceberg_sources=/absolute/path/to/checkouts
+iceberg_work=$(mktemp -d)
+test "$(git -C "$iceberg_sources/actually.life" rev-parse HEAD)" = \
+  2bf11b3f2fab36e1a8cd8a917438ca2423f65ee8
+sha256sum "$iceberg_sources/actually.life/l.c"
+cc -O2 -std=gnu11 -I "$iceberg_sources/actually.life" \
+  tests/research/iceberg/glyph_dream_probe.c -lm \
+  -o "$iceberg_work/glyph-dream"
+"$iceberg_work/glyph-dream" > "$iceberg_work/glyph-dream.txt" \
+  2> "$iceberg_work/glyph-dream.err"
+test ! -s "$iceberg_work/glyph-dream.err"
+sha256sum tests/research/iceberg/glyph_dream_probe.c "$iceberg_work/glyph-dream.txt"
+```
+
+Measured exit status was zero; runtime stderr was empty. GCC emitted the
+source's existing recursive-name truncation warning at `l.c:775`. Probe source
+SHA-256 is `6da7e060d65ce5518d4ff0cc7bf241734603e675b2416c78a1bf5bf05deeeb80`;
+stdout SHA-256 is
+`f265b2c08ffefe3e1bc74eb518d75bbbc0c6323ad8100b3e4b41232f7d7632b2`.
+
+### Next Haiku experiment
+
+Keep four record leaves for the symbol organ and at most sixteen private
+nodes. A tree has at most four levels and expands to at most sixteen anchor
+leaves. Count a pair once per eligible external turn. Consolidate at
+most one new node after an actual completed dream, after that turn's contacts
+and admissions. A node's canonical ordered parent structure is shared meaning;
+its local slot, supporting encounters, recognition history and pressure belong
+to its owner. A newly created node starts affecting later encounters.
+
+Use the reviewed seed aliases alone for the first corpus: rotate `fire water`,
+`flame river`, `burn rain`, `fire sea`, `flame ocean`, and `burn lake` over
+fourteen distinct turns. Check thirteen observations and the still-awake
+fourteenth before the actual dream. After that birth, give fourteen new
+three-word encounters by appending `tree`, `forest`, `wood`, or `leaf`. Their
+recognized path is the existing compound followed by tree. Keep all earlier
+receipts unchanged: retrospective rescanning must not mint support for the
+second birth.
+
+These words are already fixed aliases, so the fixture isolates composition
+from learned-word promotion. Further controls should freeze a learned binding
+at each original encounter, preserve unbound-word barriers, reject replay as
+new evidence, and compare equal canonical structures in independently lived
+owners with different local slot order. Compare later glyph features and word
+scores at fixed candidate words, base scores, state and PEN7 mixture; verify
+owned history, save/restart, capacity, off-switch and random-stream equality.
+
+The first Haiku stage covers local birth, canonical recognition and later
+bounded pressure. Structured peer adoption remains a separate next step:
+only an actual delivered dream encounter may carry a sender-owned structure;
+the receiver keeps its own counts and ancestry, and duplicate delivery remains
+an exact no-op.

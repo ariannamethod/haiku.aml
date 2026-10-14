@@ -84,7 +84,7 @@ def haiku_iceberg_enable_words(life, tokenizer):
     haiku_iceberg_check(life, tokenizer)
     assert(record_get(life, "version") >= 2, "Haiku word learning requires an owned Janus life")
     result = record_clone(life)
-    if record_get(result, "version") == 3:
+    if record_get(result, "version") >= 3:
         return result
     owners = haiku_words("haiku_contact friend_contact")
     cursor = 0
@@ -97,13 +97,35 @@ def haiku_iceberg_enable_words(life, tokenizer):
     haiku_iceberg_check(result, tokenizer)
     return result
 
+# Dream symbols start at the present contact and actual dream boundary. A
+# saved profile changes only through this explicit, detached activation.
+def haiku_iceberg_enable_symbols(life, enabled, tokenizer):
+    haiku_iceberg_check(life, tokenizer)
+    haiku_state_integer(enabled, 0, 1)
+    assert(record_get(life, "version") >= 3, "Haiku symbols require an owned word-learning life")
+    result = record_clone(life)
+    if record_get(result, "version") >= 4:
+        return result
+    core = haiku_iceberg_part(result, "voice")
+    dream_count = haiku_dream_check(core)
+    owners = haiku_words("haiku_contact friend_contact")
+    cursor = 0
+    while cursor < 2:
+        name = list_get(owners, cursor)
+        contact = haiku_contact_enable_symbols(haiku_iceberg_part(result, name), enabled, dream_count)
+        haiku_iceberg_put(result, name, contact)
+        cursor = cursor + 1
+    record_set(result, "version", 4)
+    haiku_iceberg_check(result, tokenizer)
+    return result
+
 def haiku_iceberg_check(life, tokenizer):
     haiku_state_fields(life, "format", "string")
     haiku_state_fields(life, "version", "float")
     haiku_state_fields(life, "settings admission_values", "array")
     haiku_state_fields(life, "admission_text", "list")
     version = record_get(life, "version")
-    assert(text_equal(record_get(life, "format"), "haiku-iceberg") and (version == 1 or version == 2 or version == 3), "Haiku iceberg format is unsupported")
+    assert(text_equal(record_get(life, "format"), "haiku-iceberg") and (version == 1 or version == 2 or version == 3 or version == 4), "Haiku iceberg format is unsupported")
     haiku_iceberg_settings(record_get(life, "settings"))
     core = haiku_iceberg_part(life, "voice")
     haiku_state_check(core, tokenizer)
@@ -116,12 +138,36 @@ def haiku_iceberg_check(life, tokenizer):
     haiku_lexical_check(friend_lexical)
     haiku_contact_check(haiku_contact)
     haiku_contact_check(friend_contact)
-    contact_version = 1 + (version == 3)
+    contact_version = 1 + (version >= 3) + (version >= 4)
     assert(record_get(haiku_contact, "version") == contact_version and record_get(friend_contact, "version") == contact_version, "Haiku iceberg contact profile differs")
     assert(text_equal(record_get(haiku_lexical, "owner"), "haiku") and text_equal(record_get(friend_lexical, "owner"), "friend"), "Haiku iceberg lexical owners differ")
     assert(record_get(haiku_lexical, "clock") <= record_get(core, "turn") and record_get(friend_lexical, "clock") <= record_get(core, "turn"), "Haiku iceberg lexical history is ahead of its voice")
     assert(text_equal(record_get(haiku_contact, "p:owner"), "haiku") and text_equal(record_get(friend_contact, "p:owner"), "friend"), "Haiku iceberg contact owners differ")
     assert(record_get(haiku_contact, "p:clock") <= record_get(core, "turn") and record_get(friend_contact, "p:clock") <= record_get(core, "turn"), "Haiku iceberg contact is ahead of its voice")
+    if version >= 4:
+        dream_count = haiku_dream_check(core)
+        dialogs = record_get(core, "dream_dialogs")
+        owners = haiku_words("haiku_contact friend_contact")
+        cursor = 0
+        while cursor < 2:
+            contact = haiku_iceberg_part(life, list_get(owners, cursor))
+            clock = record_get(contact, "symbol_clock")
+            assert(clock[1] <= record_get(core, "turn") and clock[3] <= record_get(core, "turn") and clock[42] <= record_get(core, "turn"), "Haiku symbols are ahead of their voice")
+            assert(clock[2] <= dream_count and clock[4] <= dream_count, "Haiku symbols claim an absent dream boundary")
+            # This composite's only F peer source is an actual H dream line;
+            # unlike the wider standalone contact API, none are ineligible.
+            assert(clock[7] == min(128, clock[26 + cursor * 6]), "Haiku symbols lost accepted external encounters")
+            # Activation captures the global ordinal even if a quiet contact
+            # lags the voice. Every subsequently processed boundary is exact.
+            if clock[4] > clock[2]:
+                assert(dialogs[(clock[4] - 1) * 3] == clock[42], "Haiku symbols name another processed dream turn")
+            nodes = record_get(contact, "symbol_nodes")
+            index = 0
+            while index < clock[8]:
+                assert(nodes[index * 10 + 4] <= record_get(core, "turn") and nodes[index * 10 + 5] <= dream_count, "Haiku symbol birth is ahead of its actual dream")
+                assert(dialogs[(nodes[index * 10 + 5] - 1) * 3] == nodes[index * 10 + 4], "Haiku symbol birth names another actual dream turn")
+                index = index + 1
+            cursor = cursor + 1
     expected = 10 + list_len(record_keys(core)) + list_len(record_keys(haiku_lexical)) + list_len(record_keys(friend_lexical)) + list_len(record_keys(haiku_contact)) + list_len(record_keys(friend_contact))
     if version >= 2:
         owners = haiku_words("haiku friend")
@@ -425,6 +471,15 @@ def haiku_iceberg_tail(pending, before, experience, request, tokenizer, body_a, 
                 if version >= 2:
                     haiku_janus_expect(friend_janus, proposal, day)
             haiku_iceberg_model_contact(friend_contact, parent, proposal, body_a, body_b)
+        # The actual dream has now delivered every line and both optional
+        # lexical contacts have finished. A newborn can affect later turns.
+        if version >= 4:
+            old_count = haiku_dream_check(before)
+            dream_count = haiku_dream_check(core)
+            if dream_count > old_count:
+                assert(dream_count == old_count + 1, "Haiku symbols require one actual new dream")
+                haiku_contact_symbols_dream(haiku_contact, dream_count, turn)
+                haiku_contact_symbols_dream(friend_contact, dream_count, turn)
     completed = haiku_iceberg_pack(core, haiku_lexical, friend_lexical, haiku_contact, friend_contact, settings, record_get(ledger, "text"), record_get(ledger, "values"))
     if version >= 2:
         record_set(completed, "version", version)
@@ -551,11 +606,11 @@ def haiku_iceberg_result_structure(life, result, experience, request, tokenizer)
     assert(record_equal(settings_receipt, settings_before), "Haiku iceberg completion changed its settings")
     return completed
 
-# Rebuild Janus, lexical and learned-word transitions from the predecessor and
+# Rebuild Janus, lexical, learned-word and symbol transitions from the predecessor and
 # current accepted encounters. Each enabled model pass is independently run
 # again against its immutable sources; worker-provided scores are never proof.
 # Voice learners, dreams, prototype caches, admission and random streams are
-# not repeated. Word evidence alone is replayed from the accepted encounters.
+# not repeated. Private evidence alone is replayed from accepted encounters.
 def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, body_a, body_b):
     completed = haiku_iceberg_result_structure(life, result, experience, request, tokenizer)
     if record_get(life, "version") == 1:
@@ -623,7 +678,7 @@ def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, bo
                     haiku_janus_expect(balance, receipt, day)
         assert(record_equal(balance, haiku_iceberg_part(completed, balance_name)), "Haiku Janus completion differs from its witnessed transition")
         assert(record_equal(lexical, haiku_iceberg_part(completed, lexical_name)), "Haiku lexical completion differs from its immutable source transition")
-        if record_get(life, "version") == 3:
+        if record_get(life, "version") >= 3:
             contact_name = text_concat(owner, "_contact")
             contact = haiku_iceberg_part(life, contact_name)
             published = haiku_iceberg_part(completed, contact_name)
@@ -654,6 +709,23 @@ def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, bo
                     proposal_text = text_concat(text_concat(list_get(proposals, 0), " "), list_get(proposals, 1))
                     parent = haiku_iceberg_part(plan, "parent")
                     event = haiku_contact_derive(parent, owner, proposal_text, record_get(receipt, "source"), record_get(receipt, "event"), turn)
+                    if record_get(life, "version") >= 4:
+                        # The symbol clock receives a valid model encounter.
+                        # Its provider metadata comes from the independently
+                        # checked receipt; no prototype projection is repeated.
+                        alpha = record_get(receipt, "alpha")
+                        if record_get(receipt, "source") == 2:
+                            alpha = 1
+                        if record_get(receipt, "source") == 3:
+                            alpha = 0
+                        record_set(event, "alpha", alpha)
+                        record_set(event, "availability", record_get(receipt, "availability") + (len(record_get(event, "rings")) == 3))
+                        identity = haiku_words("PEN7-anchor4-v1")
+                        list_push(identity, record_get(receipt, "identity_a"))
+                        list_push(identity, record_get(receipt, "identity_b"))
+                        list_push(identity, record_get(receipt, "tokenizer"))
+                        list_push(identity, text_fixed(record_get(receipt, "source"), 0))
+                        record_set(event, "identity", list_key(identity))
                 else:
                     if index == 0 and event_index == 0:
                         event = haiku_contact_event("human", record_get(experience, "input"), "en", climate, rings, record_get(experience, "quality"), 0, turn, turn)
@@ -709,12 +781,18 @@ def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, bo
                     while cursor < 4:
                         meta[slot * 8 + cursor] = record_get(event, list_get(names, cursor))
                         cursor = cursor + 1
+                    if record_get(life, "version") >= 4:
+                        # All accepted sources advance their private receipt
+                        # clocks; only the native external policy adds paths.
+                        haiku_contact_symbols_step(contact, event)
                     if (index == 0 and source == 0) or (index == 1 and source == 6):
                         haiku_contact_learning_step(contact, event)
                     seen[source] = number
                     slot = slot + 1 - floor((slot + 1) / 32) * 32
                     contact_clock = turn
                 event_index = event_index + 1
+            if record_get(life, "version") >= 4 and settings[0] and dream_count > old_count:
+                haiku_contact_symbols_dream(contact, dream_count, turn)
             expected = record_new()
             actual = record_new()
             fields = haiku_words("learn_clock learn_words learn_counts learn_rows learn_text bindings binding_history")
@@ -725,6 +803,15 @@ def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, bo
                 record_set(actual, name, record_get(published, name))
                 cursor = cursor + 1
             assert(record_equal(expected, actual), "Haiku word learning completion differs from its witnessed transition")
+            if record_get(life, "version") >= 4:
+                fields = haiku_words("symbol_clock symbol_nodes symbol_rows symbol_text")
+                cursor = 0
+                while cursor < list_len(fields):
+                    name = list_get(fields, cursor)
+                    record_set(expected, name, record_get(contact, name))
+                    record_set(actual, name, record_get(published, name))
+                    cursor = cursor + 1
+                assert(record_equal(expected, actual), "Haiku symbol completion differs from its witnessed transition")
             record_set(expected, "seen", seen)
             record_set(actual, "seen", record_get(published, "p:seen"))
             assert(record_equal(expected, actual), "Haiku word learning completion source clocks differ")

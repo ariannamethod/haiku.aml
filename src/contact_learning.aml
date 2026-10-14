@@ -5,7 +5,7 @@
 def haiku_contact_enable_learning(state):
     haiku_contact_check(state)
     pending = record_clone(state)
-    if record_get(state, "version") == 2:
+    if record_get(state, "version") >= 2:
         return pending
     owner = record_get(state, "p:owner")
     assert(text_equal(owner, "haiku") or text_equal(owner, "friend"), "Contact learning owner is unsupported")
@@ -143,7 +143,7 @@ def haiku_contact_learning_lookup(state, language, word):
         result[0] = map_get(bindings, key)
         result[1] = 1
         return result
-    if record_get(state, "version") != 2:
+    if record_get(state, "version") < 2:
         return result
     words = record_get(state, "learn_words")
     slot = -1
@@ -307,7 +307,7 @@ def haiku_contact_learning_step(state, event):
     record_set(result, "duplicates", 0)
     record_set(result, "refused", 0)
     haiku_contact_event_check(event)
-    if record_get(state, "version") != 2:
+    if record_get(state, "version") < 2:
         return result
     owner = record_get(state, "p:owner")
     source = record_get(event, "source")
@@ -423,7 +423,7 @@ def haiku_contact_learning_step(state, event):
 def haiku_contact_learn(state, event):
     haiku_contact_check(state)
     haiku_contact_event_check(event)
-    if record_get(state, "version") != 2:
+    if record_get(state, "version") < 2:
         return haiku_contact_learning_step(state, event)
     clock = record_get(state, "learn_clock")
     if record_get(event, "replay") == 1 or record_get(event, "event") <= clock[2]:

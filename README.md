@@ -118,6 +118,8 @@ Both voices carry duality. Each keeps its own autobiography.
 New iceberg lives also grow [private word associations](docs/LEARNED_WORDS.md)
 from repeated encounters. Haiku learns from your words; the friend learns from
 Haiku's lines that actually reach it. Later poems meet those remembered meanings.
+Repeated paths can acquire [private compound symbols](docs/DREAM_SYMBOLS.md)
+in dreams; later encounters can recognize them and grow another layer.
 
 [The iceberg contract](docs/ICEBERG_SESSION.md) explains the controls,
 checkpoint upgrades and tested dependency revisions. The original `haiku.aml`

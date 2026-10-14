@@ -1,0 +1,161 @@
+# A symbol belongs to one lived contact and is born only at a real dream boundary.
+IMPORT "../src/iceberg_session.aml"
+
+def symbol_test_parity(legacy, disabled):
+    expected = record_new()
+    actual = record_new()
+    names = record_keys(legacy)
+    wrappers = haiku_words("version haiku_contact:version friend_contact:version haiku_contact:keys friend_contact:keys")
+    i = 0
+    while i < list_len(names):
+        name = list_get(names, i)
+        if list_find(wrappers, name) < 0:
+            record_set(expected, name, record_get(legacy, name))
+            record_set(actual, name, record_get(disabled, name))
+        i = i + 1
+    assert(record_equal(expected, actual), "Disabled symbols changed a v3 voice, contact or private history")
+    return 1
+
+day = 20740
+missing = model_try_load("")
+core = haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0)
+record_set(core, "dream_config", [10000, 0, 1])
+v1 = haiku_iceberg_new(core, [1, 0, 0, 0])
+v2 = haiku_iceberg_enable_janus(v1, day, 1, 0)
+v3 = haiku_iceberg_enable_words(v2, 0)
+original = record_clone(v3)
+live = haiku_iceberg_enable_symbols(v3, 1, 0)
+assert(record_equal(v3, original), "Symbol activation changed its existing learned life")
+assert(record_get(v1, "version") == 1 and list_len(record_keys(v1)) == 185, "Symbols changed the original iceberg profile")
+assert(record_get(v2, "version") == 2 and list_len(record_keys(v2)) == 227, "Symbols changed the Janus iceberg profile")
+assert(record_get(v3, "version") == 3 and list_len(record_keys(v3)) == 237, "Symbols changed the learned-word iceberg profile")
+assert(record_get(live, "version") == 4 and list_len(record_keys(live)) == 245, "Symbol iceberg profile differs")
+assert(record_get(live, "haiku_contact:version") == 3 and record_get(live, "friend_contact:version") == 3, "Symbols did not remain private to both contacts")
+again = haiku_iceberg_enable_symbols(live, 0, 0)
+assert(record_equal(live, again), "Repeated symbol activation changed an existing profile")
+list_set(record_get(again, "haiku_contact:symbol_text"), 0, "changed")
+assert(text_equal(list_get(record_get(live, "haiku_contact:symbol_text"), 0), ""), "Symbol activation returned shared mutable leaves")
+assert(record_equal(live, haiku_iceberg_enable_words(live, 0)), "Word activation downgraded a symbol life")
+assert(record_equal(live, haiku_iceberg_enable_janus(live, day + 9, 0, 0)), "Janus activation downgraded a symbol life")
+
+# An explicitly disabled v4 profile is an exact v3 continuation, including a
+# real one-line dream; only version wrappers and the four new leaves differ.
+disabled = haiku_iceberg_enable_symbols(v3, 0, 0)
+disabled_before = record_clone(disabled)
+record_set(v3, "voice:dream_config", [1, 1, 1])
+record_set(disabled, "voice:dream_config", [1, 1, 1])
+first = haiku_iceberg_turn_at(v3, "rain", 0, missing, missing, 0, day)
+second = haiku_iceberg_turn_at(disabled, "rain", 0, missing, missing, 1, day)
+assert(text_equal(first, second), "Disabled symbols changed the original utterance")
+symbol_test_parity(v3, disabled)
+assert(haiku_dream_check(haiku_iceberg_part(disabled, "voice")) == 1, "Disabled parity fixture did not contain an actual dream")
+names = haiku_words("haiku_contact:symbol_clock haiku_contact:symbol_nodes haiku_contact:symbol_rows haiku_contact:symbol_text friend_contact:symbol_clock friend_contact:symbol_nodes friend_contact:symbol_rows friend_contact:symbol_text")
+expected = record_new()
+actual = record_new()
+i = 0
+while i < list_len(names):
+    name = list_get(names, i)
+    record_set(expected, name, record_get(disabled_before, name))
+    record_set(actual, name, record_get(disabled, name))
+    i = i + 1
+assert(record_equal(expected, actual), "Disabled symbol leaves changed during a real dream")
+upgraded = haiku_iceberg_enable_symbols(v3, 1, 0)
+clock = record_get(upgraded, "haiku_contact:symbol_clock")
+assert(clock[1] == 1 and clock[2] == 1 and clock[4] == 1 and clock[8] == 0, "Symbol upgrade reused an earlier dream boundary")
+assert(record_equal(haiku_iceberg_part(upgraded, "voice"), haiku_iceberg_part(v3, "voice")), "Symbol upgrade rewrote the lived voice")
+
+# Fourteen real human turns create evidence. Repeated spelling across distinct
+# external turns is meaningful; no internal dream or model return adds a turn.
+friend_before = haiku_iceberg_part(live, "friend_contact")
+i = 0
+while i < 13:
+    haiku_iceberg_turn_at(live, "fire water", 0, missing, missing, 0, day + i)
+    if i == 6:
+        checkpoint_save(live, "iceberg-symbols.state")
+        resumed = checkpoint_load("iceberg-symbols.state")
+        haiku_iceberg_check(resumed, 0)
+        assert(record_equal(live, resumed), "A checkpoint lost incomplete symbol evidence")
+        live = resumed
+    i = i + 1
+parallel = record_clone(live)
+first = haiku_iceberg_turn_at(live, "fire water", 0, missing, missing, 0, day + 13)
+second = haiku_iceberg_turn_at(parallel, "fire water", 0, missing, missing, 1, day + 13)
+assert(text_equal(first, second) and record_equal(live, parallel), "Symbol evidence differs between serial and worker publication")
+clock = record_get(live, "haiku_contact:symbol_clock")
+assert(clock[8] == 0 and clock[7] == 14 and clock[26] == 14, "Fourteen external turns invented a birth without a dream")
+assert(record_equal(friend_before, haiku_iceberg_part(live, "friend_contact")), "Waking human symbol evidence reached the unheard friend")
+record_set(live, "voice:dream_config", [1, 1, 1])
+checkpoint_save(live, "iceberg-symbols-taught.state")
+parallel = checkpoint_load("iceberg-symbols-taught.state")
+before_contact = haiku_iceberg_part(live, "haiku_contact")
+birth_input = "fire"
+first = haiku_iceberg_turn_at(live, birth_input, 0, missing, missing, 0, day + 14)
+second = haiku_iceberg_turn_at(parallel, birth_input, 0, missing, missing, 1, day + 14)
+assert(text_equal(first, second) and record_equal(live, parallel), "Actual symbol birth differs between serial and worker publication")
+assert(haiku_dream_check(haiku_iceberg_part(live, "voice")) == 1, "Symbol fixture did not reach its actual dream")
+contact = haiku_iceberg_part(live, "haiku_contact")
+clock = record_get(contact, "symbol_clock")
+nodes = record_get(contact, "symbol_nodes")
+assert(clock[8] == 1 and clock[4] == 1 and clock[42] == 15, "An actual dream did not process exactly one symbol birth")
+assert(nodes[0] == 1 and nodes[1] == 0 and nodes[4] == 15 and nodes[5] == 1 and nodes[9] == 14, "Birth lost ordered parents, its real boundary or fourteen frozen witnesses")
+assert(text_len(haiku_contact_symbol_name(contact, 88)) > 0, "Born symbol has no structural identity")
+friend = haiku_iceberg_part(live, "friend_contact")
+clock = record_get(friend, "symbol_clock")
+seen = record_get(friend, "p:seen")
+assert(clock[4] == 1 and clock[42] == 15 and seen[6] == 1 and seen[7] == 0, "One-line dream did not process the friend who only heard Haiku")
+pressure = haiku_contact_symbol_pressure(contact, "fire", "en", 15)
+assert(pressure[0] == 0 and pressure[1] == 0, "Newborn symbol affected its own dream turn")
+pressure = haiku_contact_symbol_pressure(contact, "fire", "en", 16)
+assert(pressure[0] == 0.25 and pressure[1] == 0, "A symbol cannot anticipate its right parent on a later turn")
+rows = record_get(contact, "p:receipt_rows")
+features = record_get(contact, "p:receipt_x")
+i = 0
+slot = -1
+while i < 32:
+    if rows[i * 9] == 15 and rows[i * 9 + 2] == 0:
+        slot = i
+    i = i + 1
+assert(slot >= 0 and features[slot * 96] == 0 and features[slot * 96 + 1] == 0.5, "Symbol birth retrofitted its own accepted human vector")
+record_set(live, "voice:dream_config", [10000, 0, 1])
+record_set(parallel, "voice:dream_config", [10000, 0, 1])
+first = haiku_iceberg_turn_at(live, "fire", 0, missing, missing, 0, day + 15)
+second = haiku_iceberg_turn_at(parallel, "fire", 0, missing, missing, 1, day + 15)
+assert(text_equal(first, second) and record_equal(live, parallel), "Born symbol continuation differs after restart")
+contact = haiku_iceberg_part(live, "haiku_contact")
+event = haiku_contact_event("human", "fire", "en", [0.5,0.5,0.5,0.5], [0.5,0.5,0.5], 0.5, 0, 17, 17)
+features = haiku_contact_features(contact, event)
+assert(features[0] > 0 and features[1] == 0.5, "Born symbol did not press on a later native contact")
+# Project the same private history back to v2 for a direct rank comparison.
+plain = record_new()
+names = record_keys(contact)
+symbols = haiku_words("symbol_clock symbol_nodes symbol_rows symbol_text")
+i = 0
+while i < list_len(names):
+    name = list_get(names, i)
+    if list_find(symbols, name) < 0:
+        record_set(plain, name, record_get(contact, name))
+    i = i + 1
+record_set(plain, "version", 2)
+haiku_contact_check(plain)
+words = haiku_words("water fire tree")
+base_rank = haiku_contact_rank(plain, words, zeros(3), "en")
+new_rank = haiku_contact_rank(contact, words, zeros(3), "en")
+assert(new_rank[0] > base_rank[0] and new_rank[1] == base_rank[1] and new_rank[2] == base_rank[2], "Symbol pressure did not reach future reviewed-word ranking")
+checkpoint_save(live, "iceberg-symbols.state")
+assert(record_equal(live, checkpoint_load("iceberg-symbols.state")), "Complete symbol life did not round-trip")
+
+# Deeper contact can pause across real global dreams. The next delivered dream
+# records its actual ordinal without inventing births for the skipped dreams.
+gapped = haiku_iceberg_enable_symbols(original, 1, 0)
+record_set(gapped, "settings", [0,0,0,0])
+record_set(gapped, "voice:dream_config", [1,1,1])
+contact_before = haiku_iceberg_part(gapped, "haiku_contact")
+haiku_iceberg_turn_at(gapped, "rain", 0, missing, missing, 0, day)
+assert(haiku_dream_check(haiku_iceberg_part(gapped, "voice")) == 1, "Skipped-boundary fixture did not actually dream")
+assert(record_equal(contact_before, haiku_iceberg_part(gapped, "haiku_contact")), "Disabled deeper contact changed symbol history")
+record_set(gapped, "settings", [1,0,0,0])
+haiku_iceberg_turn_at(gapped, "moon", 0, missing, missing, 1, day + 1)
+assert(haiku_dream_check(haiku_iceberg_part(gapped, "voice")) == 2, "Resumed-boundary fixture did not actually dream")
+clock = record_get(gapped, "haiku_contact:symbol_clock")
+assert(clock[4] == 2 and clock[8] == 0 and clock[42] == 2, "Resumed contact could not process a later actual dream ordinal")
+PRINT "HAIKU_ICEBERG_SYMBOLS_LIFE_OK"

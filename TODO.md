@@ -64,6 +64,9 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   contexts, conflict, bounded pressure and exact publication/restart evidence.
 - [ ] Grow recursive symbols during dream consolidation. Keep external
   observations, peer exchange and internal replay distinct.
+- [ ] Exchange compound parent structures between owners with explicit delivery,
+  local ID resolution and bounded adoption. Preserve the receiver's own evidence;
+  hearing a structure does not manufacture its fourteen local witnesses.
 - [ ] Let model representations contribute to glyph formation and learned
   concept bindings; let that field influence later parameter mixing and words.
   Use NoTorch for numerical work, retain shared concept identities and each

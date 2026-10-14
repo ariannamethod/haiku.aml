@@ -6,6 +6,7 @@ Phase4, dreams, exchange journal and worker audit: 2026-10-13.
 Immutable lexical bodies and live private contact: 2026-10-14.
 Owned Janus calendars and witnessed expectation debt: 2026-10-14.
 Private learned word associations and the HAIKULOG split: 2026-10-14.
+Local recursive symbols at actual dream boundaries: 2026-10-14.
 This document records the inspected sources, current behavior, and implementation
 order. Numerical, text, lexical, cloud, memory, English form, candidate
 generation, MathBrain, RAE, tokenization, foreground exchange, and complete
@@ -18,7 +19,8 @@ two private [Janus balance organs](JANUS_BALANCE.md), a captured UTC day and
 future-witness debt. Version 1 retains its fixed profile until explicit
 activation; its existing histories survive that detached upgrade.
 Version 3 adds [private word associations](LEARNED_WORDS.md) from repeated
-accepted human/peer encounters. Each older profile stays unchanged until its
+accepted human/peer encounters. Version 4 adds [private dream-born symbols](DREAM_SYMBOLS.md),
+with frozen external paths and later recursive recognition. Each older profile stays unchanged until its
 explicit upgrade. [HAIKULOG](../HAIKULOG.md) carries the chronological technical
 account and measured verification, keeping README focused on the organism.
 The stable chat retains its
@@ -282,14 +284,16 @@ experience. [ASYNC](ASYNC.md) preserves the earlier audit and records the fixes.
 
 The experimental iceberg now connects immutable AML PEN7 handles, bounded word
 admission, contextual representations and real encounters to two private
-parliaments. Its complete publication uses AML v5.12's 8192-line import capacity,
-16-argument functions and 512-field transient records. The saved life has 185
-fields; source bodies stay outside snapshots.
+parliaments. Its version-4 publication uses AML's expanded 16384-line import
+capacity, 512 function slots, 16-argument functions and 1024-field records.
+The saved life has 245 fields; its detached completion has 515. Source bodies
+stay outside snapshots. Older profiles retain their own schemas until upgrade.
 
 The next integration work is:
 
-1. Dynamic source balance, lived concept structure and recursive dream-born
-   glyphs, with separate measured contributions to later words.
+1. Model-attributed concept formation and structural peer adoption, extending
+   the working Janus balance, learned word associations and local dream symbols
+   with separately measured contributions to later words.
 2. Early response display and input overlap, with durable pending experience,
    exact restart replay and one completed-state publisher.
 3. A small local HTTP/event interface over the organism's events.
@@ -536,8 +540,9 @@ adapters, pressure, immune memory and delayed reward. The experimental
 immutable handles and all-parameter mixing. Four retained contexts, actual
 cloud/inner/dream encounters, model prototypes and bounded word admission now
 share one complete checkpoint. Private Janus balance and externally learned
-word associations extend that profile through explicit activation. Recursive
-glyph formation remains in the [iceberg research plan](ICEBERG.md).
+word associations extend that profile through explicit activation. Local
+recursive glyph formation now joins it at actual dream boundaries; structural
+peer adoption remains in the [iceberg research plan](ICEBERG.md).
 
 ### RAE development
 

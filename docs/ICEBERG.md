@@ -17,17 +17,19 @@ The new [iceberg conversation](ICEBERG_SESSION.md) connects immutable AML
 handles, four private lexical contexts, parameter mixing and two private
 parliaments to actual encounters. Bounded text-context returns provide word
 scores and representations; concept pressure joins lexical admission. Its
-version-3 checkpoint retains 237 fields across the voice, both lexical/contact
+version-4 checkpoint retains 245 fields across the voice, both lexical/contact
 lives and both Janus organs. Private [word associations](LEARNED_WORDS.md) grow
-from repeated accepted encounters; the [engineering log](../HAIKULOG.md)
+from repeated accepted encounters; [recursive symbols](DREAM_SYMBOLS.md) can be
+born at an actual dream boundary. The [engineering log](../HAIKULOG.md)
 records each stage and its evidence. Python Haiku remains
 the behavioral and artistic reference; `haiku.aml` retains that stable profile.
 
 The sections below preserve the research and broader design. The executing
 boundary is detailed in [ICEBERG_SESSION](ICEBERG_SESSION.md),
 [LEXICAL_SOURCES](LEXICAL_SOURCES.md) and [PARLIAMENT_CONTACT](PARLIAMENT_CONTACT.md).
-Dynamic [Janus balance](JANUS_BALANCE.md) and learned word associations now run
-in the separate profile. Recursive glyph birth remains upcoming work.
+Dynamic [Janus balance](JANUS_BALANCE.md), learned word associations and local
+recursive glyph birth now run in the separate profile. Structural adoption
+between owners remains upcoming work.
 
 ## Sources and receipts
 
@@ -323,8 +325,9 @@ These are executed mechanisms, documented and tested in [PARLIAMENT](PARLIAMENT.
 The experimental [contact bridge](PARLIAMENT_CONTACT.md) now derives features
 from actual human, cloud, inner and dream encounters. Reviewed word aliases and
 four model prototypes contribute to the 88 coordinates; private pressure adjusts
-later vocabulary admission. Each presence has its own complete owner. Recursive
-symbol birth and learned concept structure remain later experiments.
+later vocabulary admission. Each presence has its own complete owner. Private
+word associations and dream-born recursive symbols extend these features;
+model-attributed concept formation remains a later experiment.
 
 ## A thought can travel down and return
 
@@ -444,9 +447,10 @@ revisions so the port can choose an explicit contract:
 | Private parliament | Implemented AML field, experts, immunity and delayed reward; actual contact in the experimental conversation | Two private owners, real encounter order, measured prototype contribution and exact restart checked |
 | Optional lexical sources | Implemented immutable AML handles, 48-word reviewed pool, bounded admission and 448-value representations | Zero/one/two sources, quiet absence, exact hashes and unchanged disabled-profile draws checked |
 | Duality in each presence | Implemented separate owners, four retained contexts, all-parameter mixing, private calendars and witnessed debt | Explicit captured day, fixed/dynamic controls, delayed external witnesses and complete restart; Janus contract records the boundaries |
-| Conceptual attraction | Implemented named aliases, reviewed bindings, model prototypes and tagged exchange; learned concept structure remains planned | Model contribution changes measured features; private pressure ranks later admission |
+| Conceptual attraction | Implemented named aliases, reviewed bindings, model prototypes, tagged exchange and private word associations | Model contribution changes measured features; repeated external contexts teach bounded associations; private pressure ranks later admission |
 | Returning thoughts | Implemented one bounded text-context return per selected boundary; direction injection remains planned | Source ancestry, replay, exact disabled behavior, serial/worker equality and one publication checked |
-| Dream-born glyphs | Bounded recursive symbol formation and stable structure across both owners | Creation threshold, recursive identity, save/restart, adoption and replay provenance |
+| Dream-born glyphs | Local recursive formation from frozen external paths; one birth per owner per actual dream | Fourteen distinct turns, later recursive recognition, permanent proofs, bounded contact/rank pressure and source-backed publication |
+| Structural peer adoption | Planned exchange of compound parent trees across private ID spaces | Explicit delivery/provenance, parent resolution, bounded adoption and replay without invented local evidence |
 
 Keep input, initial state, admission budget and sampling draws fixed when
 isolating an organ. Record how it changes the field, admitted words and eventual

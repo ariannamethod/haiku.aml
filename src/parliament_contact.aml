@@ -7,6 +7,7 @@ IMPORT "parliament.aml"
 IMPORT "tokenizer.aml"
 IMPORT "lexical_sources.aml"
 IMPORT "contact_learning.aml"
+IMPORT "contact_symbols.aml"
 
 def haiku_contact_anchors():
     names = "water fire earth stone tree sky light dark cold person man woman child old spirit AI animal body food sleep pain strength "
@@ -127,11 +128,14 @@ def haiku_contact_new(owner, seed):
 # p:revision and p:field. The 32 provenance slots follow parliament receipts.
 def haiku_contact_check(state):
     version = record_get(state, "version")
-    if version == 2:
-        assert(list_len(record_keys(state)) == 47, "Contact learning field count differs")
+    if version >= 2:
+        expected = 47
+        if version == 3:
+            expected = 51
+        assert(list_len(record_keys(state)) == expected, "Contact learning field count differs")
     else:
         assert(list_len(record_keys(state)) == 42, "Contact needs exactly forty-two fields")
-    assert(text_equal(record_get(state, "format"), "haiku-contact") and (version == 1 or version == 2), "Contact format is invalid")
+    assert(text_equal(record_get(state, "format"), "haiku-contact") and (version == 1 or version == 2 or version == 3), "Contact format is invalid")
     parliament = haiku_contact_parliament(state)
     haiku_parliament_check(parliament)
     assert(text_equal(list_key(record_keys(parliament)), list_key(record_get(state, "parliament_keys"))), "Contact parliament namespace differs")
@@ -236,7 +240,7 @@ def haiku_contact_check(state):
     assert(text_len(record_get(state, "prototype_identity")) <= 4096, "Contact prototype identity is too long")
     if text_len(record_get(state, "prototype_identity")) == 0:
         assert(alpha == 0 and haiku_parliament_dot(record_get(state, "prototype_values"), record_get(state, "prototype_values")) == 0, "Contact absent prototype cache has values")
-    if version == 2:
+    if version >= 2:
         haiku_contact_learning_check(state)
         clock = record_get(state, "learn_clock")
         source = 0
@@ -244,6 +248,14 @@ def haiku_contact_check(state):
             source = 6
         seen = record_get(state, "p:seen")
         assert(clock[2] <= seen[source] and clock[3] <= record_get(state, "p:clock"), "Contact learning is ahead of published encounters")
+    if version == 3:
+        haiku_contact_symbols_check(state)
+        clock = record_get(state, "symbol_clock")
+        seen = record_get(state, "p:seen")
+        i = 0
+        while i < 8:
+            assert(clock[18 + i] <= seen[i], "Contact symbol source exceeds publication")
+            i = i + 1
     return 1
 
 def haiku_contact_event(owner, text, language, climate, rings, quality, source, event, turn):
@@ -351,7 +363,7 @@ def haiku_contact_glyphs(state, text, language):
             id = map_get(bindings, key)
             glyphs[id] = glyphs[id] + 1
         else:
-            if record_get(state, "version") == 2:
+            if record_get(state, "version") >= 2:
                 learned = haiku_contact_learning_lookup(state, language, list_get(tokens, i))
                 if learned[0] >= 0:
                     glyphs[learned[0]] = glyphs[learned[0]] + learned[1]
@@ -365,11 +377,14 @@ def haiku_contact_glyphs(state, text, language):
 def haiku_contact_features(state, event):
     haiku_contact_event_check(event)
     glyphs = haiku_contact_glyphs(state, record_get(event, "text"), record_get(event, "language"))
+    prediction = zeros(88)
+    if record_get(state, "version") == 3:
+        prediction = haiku_contact_symbol_pressure(state, record_get(event, "text"), record_get(event, "language"), record_get(event, "turn"))
     contribution = record_get(event, "representation")
     gain = record_get(event, "representation_gain")
     i = 0
     while i < 88:
-        glyphs[i] = clamp(glyphs[i] + gain * contribution[i], 0, 1)
+        glyphs[i] = clamp(glyphs[i] + gain * contribution[i] + prediction[i], 0, 1)
         i = i + 1
     return haiku_parliament_features(glyphs, record_get(event, "climate"), record_get(event, "rings"), record_get(event, "quality"))
 
@@ -414,7 +429,9 @@ def haiku_contact_publish(state, event):
                 rewarded = rewarded + 1
             i = i + 1
     haiku_contact_put(pending, parliament)
-    if record_get(pending, "version") == 2:
+    if record_get(pending, "version") == 3:
+        haiku_contact_symbols_observe(pending, event)
+    if record_get(pending, "version") >= 2:
         haiku_contact_learn(pending, event)
     haiku_contact_check(pending)
     record_replace(state, pending)
@@ -431,6 +448,9 @@ def haiku_contact_rank(state, words, scores, language):
     result = zeros(len(scores))
     bindings = record_get(state, "bindings")
     field = record_get(state, "p:field")
+    prediction = zeros(88)
+    if record_get(state, "version") == 3:
+        prediction = haiku_contact_symbol_rank(state)
     i = 0
     while i < list_len(words):
         key = haiku_contact_key(language, list_get(words, i))
@@ -438,10 +458,14 @@ def haiku_contact_rank(state, words, scores, language):
         if map_has(bindings, key):
             pressure = 0.15 * field[map_get(bindings, key)]
         else:
-            if record_get(state, "version") == 2:
+            if record_get(state, "version") >= 2:
                 learned = haiku_contact_learning_lookup(state, language, list_get(words, i))
                 if learned[0] >= 0:
                     pressure = 0.15 * field[learned[0]] * learned[1]
+        if record_get(state, "version") == 3:
+            known = haiku_contact_learning_lookup(state, language, list_get(words, i))
+            if known[0] >= 0:
+                pressure = pressure + 0.15 * prediction[known[0]] * known[1]
         result[i] = scores[i] + pressure
         i = i + 1
     return result
