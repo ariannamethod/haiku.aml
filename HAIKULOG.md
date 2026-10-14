@@ -121,6 +121,19 @@ leaves all assertions and production sources intact; the long gate above was
 run before that reporting correction. Structural delivery and adoption between
 owners remain a separate step.
 
+Automatic review questioned the complete-life harness's checkpoint path after
+launching compiled code from `foreign`. AML resolves relative file operations
+against the retained source directory: `amlc` embeds the absolute source path,
+and `aml_resolve_value_path` joins the filename to that context. The existing
+comparison therefore reads the compiled writer's correct file. Both retained
+compiled programs name their work-directory sources; `foreign` is empty and
+the checkpoint timestamps follow the compiled builds. An additional control
+removed the destination before each interpreter/compiled run from `foreign`.
+Both recreated only the work-directory file, identical to the real 245-field
+checkpoint, SHA256
+`0016ec57ee6ce626857a5a417055600a3ce031b522339256caa9a009b65a95f2`.
+The path finding is a false positive; the harness remains unchanged.
+
 ## 2026-10-14 — A word acquires a remembered neighbour
 
 The experimental iceberg now keeps private word-to-anchor associations for
