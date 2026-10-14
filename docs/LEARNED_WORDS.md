@@ -72,9 +72,10 @@ current lookup behavior; automatic learning here is English.
 
 ## Five owned leaves
 
-`haiku_contact_enable_learning(contact)` returns a detached, idempotent
-version-2 contact with 47 fields. Version-1 contact retains its 42-field
-behavior. These five leaves carry the new organ:
+`haiku_contact_enable_learning(contact)` upgrades a version-1 contact to a
+detached version-2 contact with 47 fields. Already-enabled v2/v3 contacts retain
+their saved profile, including v3's symbols. A contact kept at version 1 retains
+its 42-field behavior. These five leaves carry the word-learning organ:
 
 | Leaf | Shape | Contents |
 |---|---|---|
@@ -95,7 +96,7 @@ rank paths use it. `haiku_contact_learn` requires the published encounter;
 iceberg publisher. The replay kernel changes only these five leaves.
 
 The enclosing version-3 life has **237 fields** and its detached worker result
-has **499**, within AML's existing 512-field record bound. Publication begins
+has **499**, fitting the original 512-field record bound. Publication begins
 with the exact predecessor and independently reconstructs accepted human and
 dream deliveries. It replays learning from those events and compares every
 learned leaf. A different but internally consistent set of counts or contexts
@@ -129,8 +130,9 @@ with the report.
 Those results choose the present learning boundary: repeated external context
 supplies the evidence. Existing bounded model features still participate in
 contact, while automatic word bindings use the reviewed local teachers above.
-Attributed model evidence and recursive dream-born symbols remain separate
-experiments in [TODO](../TODO.md).
+Attributed model evidence remains in [TODO](../TODO.md). The later version-4
+[dream-symbol organ](DREAM_SYMBOLS.md) uses frozen paths before each word-learning
+step and adds its own recurrence rule; it does not change this learner's policy.
 
 Focused gates: `make test-contact-learning test-iceberg-learning`. The standalone
 fixtures cover evidence, conflict, pressure, ownership and restart; the complete

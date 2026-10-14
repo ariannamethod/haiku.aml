@@ -1,0 +1,706 @@
+# Private recursive symbols. External paths earn evidence; an actual dream
+# boundary can preserve one ordered relation as a new, immutable parent tree.
+# The membrane and PEN7 vocabularies keep their existing identities.
+
+def haiku_contact_enable_symbols(state, enabled, dream_count):
+    haiku_contact_check(state)
+    assert(record_get(state, "version") >= 2, "Contact symbols require word memory")
+    pending = record_clone(state)
+    if record_get(state, "version") == 3:
+        return pending
+    haiku_contact_integer(enabled, 0, 1)
+    haiku_contact_integer(dream_count, 0, 999999)
+    clock = zeros(43)
+    clock[0] = enabled
+    clock[1] = record_get(state, "p:clock")
+    clock[2] = dream_count
+    clock[3] = clock[1]
+    clock[4] = dream_count
+    clock[9] = -1
+    clock[42] = clock[1]
+    seen = record_get(state, "p:seen")
+    i = 0
+    while i < 8:
+        clock[10 + i] = seen[i]
+        clock[18 + i] = seen[i]
+        clock[34 + i] = clock[1]
+        i = i + 1
+    texts = list_new()
+    i = 0
+    while i < 1408:
+        list_push(texts, "")
+        i = i + 1
+    record_set(pending, "version", 3)
+    record_set(pending, "symbol_clock", clock)
+    record_set(pending, "symbol_nodes", zeros(160))
+    record_set(pending, "symbol_rows", zeros(48928))
+    record_set(pending, "symbol_text", texts)
+    haiku_contact_check(pending)
+    return pending
+
+# Names are derived from ordered parent structure, so two owners can compare
+# identities without agreeing on their private numeric allocation order.
+def haiku_contact_symbol_name(state, id):
+    clock = record_get(state, "symbol_clock")
+    haiku_contact_integer(id, 0, 87 + clock[8])
+    names = haiku_contact_anchors()
+    nodes = record_get(state, "symbol_nodes")
+    i = 0
+    while i < clock[8]:
+        left = haiku_contact_integer(nodes[i * 10], 0, 87 + i)
+        right = haiku_contact_integer(nodes[i * 10 + 1], 0, 87 + i)
+        name = text_concat("(", list_get(names, left))
+        name = text_concat(name, "+")
+        name = text_concat(name, list_get(names, right))
+        name = text_concat(name, ")")
+        assert(text_len(name) <= 256, "Contact symbol name is too long")
+        list_push(names, name)
+        i = i + 1
+    return list_get(names, id)
+
+def haiku_contact_symbol_expand(state, id):
+    clock = record_get(state, "symbol_clock")
+    haiku_contact_integer(id, 0, 87 + clock[8])
+    if id < 88:
+        result = zeros(1)
+        result[0] = id
+        return result
+    nodes = record_get(state, "symbol_nodes")
+    row = (id - 88) * 10
+    left = haiku_contact_integer(nodes[row], 0, id - 1)
+    right = haiku_contact_integer(nodes[row + 1], 0, id - 1)
+    a = haiku_contact_symbol_expand(state, left)
+    b = haiku_contact_symbol_expand(state, right)
+    assert(len(a) + len(b) <= 16, "Contact symbol expansion is too long")
+    result = zeros(len(a) + len(b))
+    i = 0
+    while i < len(a):
+        result[i] = a[i]
+        i = i + 1
+    i = 0
+    while i < len(b):
+        result[len(a) + i] = b[i]
+        i = i + 1
+    return result
+
+# Collapse adjacent aliases, retain unknown barriers, then recognize the
+# longest already-born span. Structural names break equal-span ties.
+def haiku_contact_symbols_parse(state, base, count):
+    clock = record_get(state, "symbol_clock")
+    haiku_contact_integer(count, 0, clock[8])
+    clean = zeros(len(base))
+    used = 0
+    i = 0
+    while i < len(base):
+        if used == 0 or base[i] < 0 or base[i] != clean[used - 1]:
+            clean[used] = base[i]
+            used = used + 1
+        i = i + 1
+    parsed = zeros(used)
+    total = 0
+    cursor = 0
+    while cursor < used:
+        chosen = clean[cursor]
+        span = 1
+        chosen_name = ""
+        i = 0
+        while i < count:
+            leaves = haiku_contact_symbol_expand(state, 88 + i)
+            matches = cursor + len(leaves) <= used
+            j = 0
+            while matches and j < len(leaves):
+                matches = clean[cursor + j] == leaves[j]
+                j = j + 1
+            if matches:
+                name = haiku_contact_symbol_name(state, 88 + i)
+                take = len(leaves) > span
+                if len(leaves) == span:
+                    names = list_new()
+                    list_push(names, chosen_name)
+                    list_push(names, name)
+                    names = list_sorted(names)
+                    take = text_equal(list_get(names, 0), name)
+                if take:
+                    chosen = 88 + i
+                    span = len(leaves)
+                    chosen_name = name
+            i = i + 1
+        parsed[total] = chosen
+        total = total + 1
+        cursor = cursor + span
+    return haiku_parliament_part(parsed, 0, total)
+
+# A complete bounded token path keeps unknowns as -1. Oversized legal text
+# quietly has no path; the original contact and exact text still survive.
+def haiku_contact_symbols_path(state, text, language, turn):
+    tokens = haiku_tokenize_regex(text)
+    result = record_new()
+    record_set(result, "available", list_len(tokens) > 0 and list_len(tokens) <= 64)
+    base = [-1]
+    if list_len(tokens) > 0 and list_len(tokens) <= 64:
+        base = zeros(list_len(tokens))
+        i = 0
+        while i < list_len(tokens):
+            known = haiku_contact_learning_lookup(state, language, list_get(tokens, i))
+            base[i] = known[0]
+            i = i + 1
+    clock = record_get(state, "symbol_clock")
+    nodes = record_get(state, "symbol_nodes")
+    count = 0
+    while count < clock[8] and nodes[count * 10 + 4] < turn:
+        count = count + 1
+    record_set(result, "base", base)
+    record_set(result, "parsed", haiku_contact_symbols_parse(state, base, count))
+    record_set(result, "node_count", count)
+    return result
+
+# A recognized left-parent suffix anticipates the right parent's descendants.
+# Only the longest matching left span speaks; all tied predictions share .25.
+def haiku_contact_symbol_predict(state, base, turn):
+    result = zeros(88)
+    clock = record_get(state, "symbol_clock")
+    if clock[0] == 0 or len(base) == 0:
+        return result
+    clean = zeros(len(base))
+    used = 0
+    i = 0
+    while i < len(base):
+        if used == 0 or base[i] < 0 or base[i] != clean[used - 1]:
+            clean[used] = base[i]
+            used = used + 1
+        i = i + 1
+    nodes = record_get(state, "symbol_nodes")
+    longest = 0
+    matches = 0
+    i = 0
+    while i < clock[8]:
+        if nodes[i * 10 + 4] < turn:
+            left = haiku_contact_symbol_expand(state, nodes[i * 10])
+            found = len(left) <= used
+            j = 0
+            while found and j < len(left):
+                found = clean[used - len(left) + j] == left[j]
+                j = j + 1
+            if found and len(left) >= longest:
+                if len(left) > longest:
+                    result = zeros(88)
+                    longest = len(left)
+                    matches = 0
+                right = haiku_contact_symbol_expand(state, nodes[i * 10 + 1])
+                j = 0
+                while j < len(right):
+                    result[right[j]] = result[right[j]] + 1 / len(right)
+                    j = j + 1
+                matches = matches + 1
+        i = i + 1
+    i = 0
+    while i < 88:
+        result[i] = 0.25 * result[i] / max(1, matches)
+        i = i + 1
+    return result
+
+def haiku_contact_symbol_pressure(state, text, language, turn):
+    if record_get(state, "version") < 3:
+        return zeros(88)
+    path = haiku_contact_symbols_path(state, text, language, turn)
+    return haiku_contact_symbol_predict(state, record_get(path, "base"), turn)
+
+def haiku_contact_symbol_rank(state):
+    result = zeros(88)
+    if record_get(state, "version") < 3:
+        return result
+    clock = record_get(state, "symbol_clock")
+    if clock[0] == 0 or clock[9] < 0:
+        return result
+    rows = record_get(state, "symbol_rows")
+    row = clock[9] * 139
+    base = haiku_parliament_part(rows, row + 11, rows[row + 9])
+    return haiku_contact_symbol_predict(state, base, record_get(state, "p:clock"))
+
+# Stored paths are historical resolutions. Immutable seed spellings can be
+# checked again; a private learned word keeps the meaning accepted at that turn.
+# Publication replays every fresh resolution from the exact predecessor.
+def haiku_contact_symbols_check(state):
+    owner = record_get(state, "p:owner")
+    assert(text_equal(owner, "haiku") or text_equal(owner, "friend"), "Contact symbol owner is unsupported")
+    policy = 0
+    if text_equal(owner, "friend"):
+        policy = 6
+    clock = record_get(state, "symbol_clock")
+    nodes = record_get(state, "symbol_nodes")
+    rows = record_get(state, "symbol_rows")
+    texts = record_get(state, "symbol_text")
+    haiku_parliament_vector(clock, 43, 999999)
+    haiku_parliament_vector(nodes, 160, 999999)
+    assert(len(rows) == 48928 and rows(rows) == 0 and cols(rows) == 0, "Contact symbol receipt shape differs")
+    assert(list_len(texts) == 1408, "Contact symbol text shape differs")
+    i = 0
+    while i < 43:
+        low = 0
+        if i == 9:
+            low = -1
+        haiku_contact_integer(clock[i], low, 999999)
+        i = i + 1
+    haiku_contact_integer(clock[0], 0, 1)
+    haiku_contact_integer(clock[6], 0, 127)
+    haiku_contact_integer(clock[7], 0, 128)
+    haiku_contact_integer(clock[8], 0, 16)
+    haiku_contact_integer(clock[9], -1, 127)
+    assert(clock[3] >= clock[1] and clock[4] >= clock[2] and clock[42] >= clock[1] and clock[42] <= clock[3], "Contact symbol clock precedes activation")
+    if clock[4] == clock[2]:
+        assert(clock[42] == clock[1], "Contact symbol has an unprocessed dream turn")
+    else:
+        assert(clock[42] > clock[1], "Contact symbol dream repeats activation")
+    encounters = 0
+    i = 0
+    while i < 8:
+        assert(clock[18 + i] >= clock[10 + i], "Contact symbol source precedes activation")
+        assert(clock[26 + i] <= clock[18 + i] - clock[10 + i], "Contact symbol source count exceeds events")
+        assert(clock[34 + i] >= clock[1] and clock[34 + i] <= clock[3], "Contact symbol source turn differs")
+        if clock[26 + i] == 0:
+            assert(clock[18 + i] == clock[10 + i] and clock[34 + i] == clock[1], "Contact symbol unused source has encounters")
+        else:
+            assert(clock[34 + i] > clock[1], "Contact symbol source repeats activation")
+        encounters = encounters + clock[26 + i]
+        i = i + 1
+    assert(clock[5] >= encounters and clock[5] <= encounters + clock[4] - clock[2], "Contact symbol revision differs from encounters")
+    if clock[0] == 0 or clock[5] == 0:
+        assert(clock[5] == 0 and encounters == 0 and clock[3] == clock[1] and clock[4] == clock[2] and clock[42] == clock[1], "Contact symbol empty profile has lived state")
+    if clock[7] < 128:
+        assert(clock[6] == clock[7], "Contact symbol receipt cursor differs")
+    latest = clock[6] - 1
+    if latest < 0:
+        latest = 127
+    if clock[7] == 0:
+        latest = -1
+    assert(clock[9] == latest, "Contact symbol latest context differs")
+    assert(clock[7] <= clock[26 + policy], "Contact symbol receipts exceed external encounters")
+    if policy == 0:
+        assert(clock[7] == min(128, clock[26]), "Contact symbol human receipts are missing")
+    names = map_new()
+    i = 0
+    while i < 16:
+        row = i * 10
+        if i < clock[8]:
+            left = haiku_contact_integer(nodes[row], 0, 87 + i)
+            right = haiku_contact_integer(nodes[row + 1], 0, 87 + i)
+            depth_a = 0
+            depth_b = 0
+            if left >= 88:
+                depth_a = nodes[(left - 88) * 10 + 2]
+            if right >= 88:
+                depth_b = nodes[(right - 88) * 10 + 2]
+            assert(nodes[row + 2] == 1 + max(depth_a, depth_b) and nodes[row + 2] <= 4, "Contact symbol depth differs")
+            leaves = haiku_contact_symbol_expand(state, 88 + i)
+            assert(nodes[row + 3] == len(leaves) and len(leaves) <= 16, "Contact symbol leaf count differs")
+            haiku_contact_integer(nodes[row + 4], clock[1] + 1, clock[42])
+            haiku_contact_integer(nodes[row + 5], clock[2] + 1, clock[4])
+            haiku_contact_integer(nodes[row + 6], clock[1] + 1, nodes[row + 4])
+            haiku_contact_integer(nodes[row + 7], 1, clock[5])
+            haiku_contact_integer(nodes[row + 8], 14, 128)
+            assert(nodes[row + 9] == 14, "Contact symbol birth needs fourteen witnesses")
+            if i > 0:
+                assert(nodes[row + 4] > nodes[row - 6] and nodes[row + 5] > nodes[row - 5] and nodes[row + 7] > nodes[row - 3], "Contact symbol birth order differs")
+            name = haiku_contact_symbol_name(state, 88 + i)
+            assert(map_has(names, name) == 0, "Contact symbol repeats a canonical identity")
+            map_set(names, name, i)
+        else:
+            j = 0
+            while j < 10:
+                assert(nodes[row + j] == 0, "Contact symbol empty node has numbers")
+                j = j + 1
+        i = i + 1
+    seeds = haiku_contact_bindings()
+    event_rows = map_new()
+    revision_events = map_new()
+    expected_rows = zeros(48928)
+    slot = 0
+    while slot < 352:
+        row = slot * 139
+        occupied = slot < clock[7]
+        if clock[7] == 128 and slot < 128:
+            occupied = 1
+        if slot >= 128:
+            occupied = slot < 128 + clock[8] * 14
+        if occupied:
+            assert(rows[row] == policy, "Contact symbol witness source differs")
+            event = haiku_contact_integer(rows[row + 1], clock[10 + policy] + 1, clock[18 + policy])
+            turn = haiku_contact_integer(rows[row + 2], clock[1] + 1, clock[34 + policy])
+            revision = haiku_contact_integer(rows[row + 7], 1, clock[5])
+            if policy == 0:
+                assert(rows[row + 3] == 0 and rows[row + 4] == event and rows[row + 5] == -1 and rows[row + 6] == 0, "Contact symbol human ancestry differs")
+                assert(text_equal(list_get(texts, slot * 4 + 2), "human") and text_len(list_get(texts, slot * 4 + 3)) == 0, "Contact symbol human owner differs")
+            else:
+                assert(rows[row + 3] == 7 and rows[row + 4] == event and rows[row + 5] == 7 and rows[row + 6] == event, "Contact symbol peer ancestry differs")
+                assert(text_equal(list_get(texts, slot * 4 + 2), "haiku") and text_equal(list_get(texts, slot * 4 + 3), "haiku"), "Contact symbol peer owner differs")
+            raw = list_get(texts, slot * 4)
+            language = list_get(texts, slot * 4 + 1)
+            assert(text_len(raw) <= 10000 and text_len(language) > 0 and text_len(language) <= 32, "Contact symbol witness text is invalid")
+            available_nodes = 0
+            while available_nodes < clock[8] and nodes[available_nodes * 10 + 4] < turn:
+                available_nodes = available_nodes + 1
+            assert(rows[row + 8] == available_nodes, "Contact symbol witness rewrote its historical alphabet")
+            tokens = haiku_tokenize_regex(raw)
+            expected_length = list_len(tokens)
+            bounded = expected_length > 0 and expected_length <= 64
+            if bounded == 0:
+                expected_length = 1
+            assert(rows[row + 9] == expected_length, "Contact symbol witness path length differs")
+            base = haiku_parliament_part(rows, row + 11, expected_length)
+            j = 0
+            while j < expected_length:
+                haiku_contact_integer(base[j], -1, 87)
+                if bounded:
+                    key = haiku_contact_key(language, list_get(tokens, j))
+                    if map_has(seeds, key):
+                        assert(base[j] == map_get(seeds, key), "Contact symbol witness changed a shared glyph")
+                else:
+                    assert(base[j] == -1, "Contact symbol unavailable path has glyphs")
+                expected_rows[row + 11 + j] = base[j]
+                j = j + 1
+            parsed = haiku_contact_symbols_parse(state, base, available_nodes)
+            assert(rows[row + 10] == len(parsed), "Contact symbol compressed length differs")
+            j = 0
+            while j < len(parsed):
+                assert(rows[row + 75 + j] == parsed[j], "Contact symbol compressed path differs")
+                expected_rows[row + 75 + j] = parsed[j]
+                j = j + 1
+            j = 0
+            while j < 11:
+                expected_rows[row + j] = rows[row + j]
+                j = j + 1
+            event_key = text_fixed(event, 0)
+            if map_has(event_rows, event_key):
+                prior = map_get(event_rows, event_key)
+                j = 0
+                while j < 139:
+                    assert(rows[prior * 139 + j] == rows[row + j], "Contact symbol shared encounter numbers differ")
+                    j = j + 1
+                j = 0
+                while j < 4:
+                    assert(text_equal(list_get(texts, prior * 4 + j), list_get(texts, slot * 4 + j)), "Contact symbol shared encounter text differs")
+                    j = j + 1
+            else:
+                map_set(event_rows, event_key, slot)
+            revision_key = text_fixed(revision, 0)
+            if map_has(revision_events, revision_key):
+                assert(map_get(revision_events, revision_key) == event, "Contact symbol revision names another encounter")
+            else:
+                map_set(revision_events, revision_key, event)
+            if slot >= 128:
+                node = floor((slot - 128) / 14)
+                assert(turn <= nodes[node * 10 + 4] and revision < nodes[node * 10 + 7], "Contact symbol birth uses a later encounter")
+                left = nodes[node * 10]
+                right = nodes[node * 10 + 1]
+                found = 0
+                j = 1
+                while j < len(parsed):
+                    if parsed[j - 1] == left and parsed[j] == right:
+                        found = 1
+                    j = j + 1
+                assert(found, "Contact symbol birth proof lost its ordered parents")
+                first = 128 + node * 14
+                if slot == first:
+                    assert(turn == nodes[node * 10 + 6], "Contact symbol first witness turn differs")
+                else:
+                    assert(turn > rows[(slot - 1) * 139 + 2], "Contact symbol birth repeats an external turn")
+                    assert(event > rows[(slot - 1) * 139 + 1] and revision > rows[(slot - 1) * 139 + 7], "Contact symbol birth encounter order differs")
+        else:
+            j = 0
+            while j < 4:
+                assert(text_len(list_get(texts, slot * 4 + j)) == 0, "Contact symbol empty receipt has text")
+                j = j + 1
+        slot = slot + 1
+    # The typed equality primitive checks all unoccupied cells and path padding
+    # at once; only validated logical fields have entered the expected array.
+    actual_record = record_new()
+    expected_record = record_new()
+    record_set(actual_record, "rows", rows)
+    record_set(expected_record, "rows", expected_rows)
+    assert(record_equal(actual_record, expected_record), "Contact symbol empty receipt or path padding has numbers")
+    previous_event = 0
+    previous_turn = 0
+    previous_revision = 0
+    index = 0
+    while index < clock[7]:
+        slot = index
+        if clock[7] == 128:
+            slot = clock[6] + index
+            if slot >= 128:
+                slot = slot - 128
+        row = slot * 139
+        assert(rows[row + 1] > previous_event and rows[row + 2] >= previous_turn and rows[row + 7] > previous_revision, "Contact symbol observation order differs")
+        previous_event = rows[row + 1]
+        previous_turn = rows[row + 2]
+        previous_revision = rows[row + 7]
+        index = index + 1
+    return 1
+
+# The replay kernel receives a source-backed encounter. It owns only four
+# leaves and does not read the parliament's transient clock or receipt ring.
+def haiku_contact_symbols_step(state, event):
+    result = record_new()
+    record_set(result, "committed", 0)
+    record_set(result, "external", 0)
+    record_set(result, "available", 0)
+    haiku_contact_event_check(event)
+    if record_get(state, "version") < 3:
+        return result
+    clock = record_get(state, "symbol_clock")
+    source = record_get(event, "source")
+    number = record_get(event, "event")
+    turn = record_get(event, "turn")
+    if clock[0] == 0 or record_get(event, "replay") == 1 or number <= clock[18 + source] or turn <= clock[1]:
+        return result
+    haiku_contact_symbols_check(state)
+    assert(turn >= clock[3] and clock[5] < 999999 and clock[26 + source] < 999999, "Contact symbol encounter clock is invalid")
+    owner = record_get(state, "p:owner")
+    legitimate = text_equal(owner, "haiku") and source == 0 and text_equal(record_get(event, "owner"), "human")
+    if text_equal(owner, "friend") and source == 6:
+        legitimate = text_equal(record_get(event, "owner"), "friend")
+        legitimate = legitimate and text_equal(record_get(event, "origin_owner"), "haiku") and text_equal(record_get(event, "parent_owner"), "haiku")
+        legitimate = legitimate and record_get(event, "origin_source") == 7 and record_get(event, "parent_source") == 7
+        legitimate = legitimate and record_get(event, "origin_event") == number and record_get(event, "parent_event") == number
+    pending = record_clone(state)
+    clock = record_get(pending, "symbol_clock")
+    clock[3] = turn
+    clock[5] = clock[5] + 1
+    clock[18 + source] = number
+    clock[26 + source] = clock[26 + source] + 1
+    clock[34 + source] = turn
+    if legitimate:
+        path = haiku_contact_symbols_path(pending, record_get(event, "text"), record_get(event, "language"), turn)
+        base = record_get(path, "base")
+        parsed = record_get(path, "parsed")
+        rows = record_get(pending, "symbol_rows")
+        texts = record_get(pending, "symbol_text")
+        slot = clock[6]
+        row = slot * 139
+        i = 0
+        while i < 139:
+            rows[row + i] = 0
+            i = i + 1
+        rows[row] = source
+        rows[row + 1] = number
+        rows[row + 2] = turn
+        rows[row + 3] = record_get(event, "origin_source")
+        rows[row + 4] = record_get(event, "origin_event")
+        rows[row + 5] = record_get(event, "parent_source")
+        rows[row + 6] = record_get(event, "parent_event")
+        rows[row + 7] = clock[5]
+        rows[row + 8] = record_get(path, "node_count")
+        rows[row + 9] = len(base)
+        rows[row + 10] = len(parsed)
+        i = 0
+        while i < len(base):
+            rows[row + 11 + i] = base[i]
+            i = i + 1
+        i = 0
+        while i < len(parsed):
+            rows[row + 75 + i] = parsed[i]
+            i = i + 1
+        list_set(texts, slot * 4, record_get(event, "text"))
+        list_set(texts, slot * 4 + 1, record_get(event, "language"))
+        list_set(texts, slot * 4 + 2, record_get(event, "origin_owner"))
+        list_set(texts, slot * 4 + 3, record_get(event, "parent_owner"))
+        record_set(pending, "symbol_text", texts)
+        clock[9] = slot
+        clock[6] = slot + 1
+        if clock[6] == 128:
+            clock[6] = 0
+        clock[7] = min(128, clock[7] + 1)
+        record_set(result, "external", 1)
+        record_set(result, "available", record_get(path, "available"))
+    haiku_contact_symbols_check(pending)
+    leaves = haiku_words("symbol_clock symbol_nodes symbol_rows symbol_text")
+    i = 0
+    while i < 4:
+        name = list_get(leaves, i)
+        record_set(state, name, record_get(pending, name))
+        i = i + 1
+    record_set(result, "committed", 1)
+    return result
+
+# Normal observation is sealed by the exact just-published contact receipt.
+# The source-backed worker verifier calls the kernel with reconstructed events.
+def haiku_contact_symbols_observe(state, event):
+    haiku_contact_check(state)
+    haiku_contact_event_check(event)
+    if record_get(state, "version") < 3:
+        return haiku_contact_symbols_step(state, event)
+    clock = record_get(state, "symbol_clock")
+    source = record_get(event, "source")
+    if clock[0] == 0 or record_get(event, "replay") == 1 or record_get(event, "event") <= clock[18 + source] or record_get(event, "turn") <= clock[1]:
+        return haiku_contact_symbols_step(state, event)
+    slot = record_get(state, "p:receipt_cursor") - 1
+    if slot < 0:
+        slot = 31
+    rows = record_get(state, "p:receipt_rows")
+    texts = record_get(state, "contact_text")
+    meta = record_get(state, "contact_meta")
+    assert(rows[slot * 9] == record_get(event, "event") and rows[slot * 9 + 1] == record_get(event, "turn") and rows[slot * 9 + 2] == source, "Contact symbol witness is not the latest publication")
+    names = haiku_words("owner text language origin_owner parent_owner identity")
+    i = 0
+    while i < 6:
+        assert(text_equal(list_get(texts, slot * 6 + i), record_get(event, list_get(names, i))), "Contact symbol published witness text differs")
+        i = i + 1
+    names = haiku_words("parent_source parent_event origin_source origin_event alpha representation_gain representation_available availability")
+    i = 0
+    while i < 8:
+        assert(meta[slot * 8 + i] == record_get(event, list_get(names, i)), "Contact symbol published witness ancestry differs")
+        i = i + 1
+    features = haiku_contact_features(state, event)
+    published = record_get(state, "p:receipt_x")
+    i = 0
+    while i < 96:
+        assert(features[i] == published[slot * 96 + i], "Contact symbol published witness features differ")
+        i = i + 1
+    return haiku_contact_symbols_step(state, event)
+
+# The session supplies a validated actual dream boundary. Skipped global dreams
+# may leave a gap while deeper life is off; a processed boundary never reopens.
+def haiku_contact_symbols_dream(state, dream_count, turn):
+    result = record_new()
+    record_set(result, "committed", 0)
+    record_set(result, "born", -1)
+    if record_get(state, "version") < 3:
+        return result
+    haiku_contact_integer(dream_count, 0, 999999)
+    haiku_contact_integer(turn, 1, 999999)
+    clock = record_get(state, "symbol_clock")
+    if clock[0] == 0 or dream_count <= clock[4]:
+        return result
+    haiku_contact_symbols_check(state)
+    assert(turn > clock[42] and turn >= clock[3] and turn > clock[1] and clock[5] < 999999, "Contact symbol dream clock is invalid")
+    pending = record_clone(state)
+    clock = record_get(pending, "symbol_clock")
+    nodes = record_get(pending, "symbol_nodes")
+    rows = record_get(pending, "symbol_rows")
+    texts = record_get(pending, "symbol_text")
+    clock[3] = turn
+    clock[4] = dream_count
+    clock[42] = turn
+    clock[5] = clock[5] + 1
+    counts = map_new()
+    last_turns = map_new()
+    pairs = map_new()
+    if clock[8] < 16:
+        index = 0
+        while index < clock[7]:
+            slot = index
+            if clock[7] == 128:
+                slot = clock[6] + index
+                if slot >= 128:
+                    slot = slot - 128
+            row = slot * 139
+            j = 1
+            while j < rows[row + 10]:
+                left = rows[row + 75 + j - 1]
+                right = rows[row + 75 + j]
+                eligible = left >= 0 and right >= 0
+                i = 0
+                while eligible and i < clock[8]:
+                    if nodes[i * 10] == left and nodes[i * 10 + 1] == right:
+                        eligible = 0
+                    i = i + 1
+                if eligible:
+                    depth_a = 0
+                    depth_b = 0
+                    if left >= 88:
+                        depth_a = nodes[(left - 88) * 10 + 2]
+                    if right >= 88:
+                        depth_b = nodes[(right - 88) * 10 + 2]
+                    a = haiku_contact_symbol_expand(pending, left)
+                    b = haiku_contact_symbol_expand(pending, right)
+                    eligible = max(depth_a, depth_b) < 4 and len(a) + len(b) <= 16
+                if eligible:
+                    names = list_new()
+                    list_push(names, haiku_contact_symbol_name(pending, left))
+                    list_push(names, haiku_contact_symbol_name(pending, right))
+                    key = list_key(names)
+                    if map_has(counts, key) == 0:
+                        map_set(counts, key, 0)
+                        map_set(last_turns, key, 0)
+                        map_set(pairs, key, left * 104 + right)
+                    if map_get(last_turns, key) != rows[row + 2]:
+                        map_set(counts, key, map_get(counts, key) + 1)
+                        map_set(last_turns, key, rows[row + 2])
+                j = j + 1
+            index = index + 1
+    keys = list_sorted(map_keys(counts))
+    best = 13
+    chosen = ""
+    i = 0
+    while i < list_len(keys):
+        key = list_get(keys, i)
+        if map_get(counts, key) > best:
+            best = map_get(counts, key)
+            chosen = key
+        i = i + 1
+    if text_len(chosen) > 0:
+        encoded = map_get(pairs, chosen)
+        left = floor(encoded / 104)
+        right = encoded - left * 104
+        node = clock[8]
+        row = node * 10
+        nodes[row] = left
+        nodes[row + 1] = right
+        depth_a = 0
+        depth_b = 0
+        if left >= 88:
+            depth_a = nodes[(left - 88) * 10 + 2]
+        if right >= 88:
+            depth_b = nodes[(right - 88) * 10 + 2]
+        nodes[row + 2] = 1 + max(depth_a, depth_b)
+        a = haiku_contact_symbol_expand(pending, left)
+        b = haiku_contact_symbol_expand(pending, right)
+        nodes[row + 3] = len(a) + len(b)
+        nodes[row + 4] = turn
+        nodes[row + 5] = dream_count
+        nodes[row + 7] = clock[5]
+        nodes[row + 8] = best
+        nodes[row + 9] = 14
+        witnesses = 0
+        last_turn = 0
+        index = 0
+        while index < clock[7] and witnesses < 14:
+            slot = index
+            if clock[7] == 128:
+                slot = clock[6] + index
+                if slot >= 128:
+                    slot = slot - 128
+            witness = slot * 139
+            found = 0
+            j = 1
+            while j < rows[witness + 10]:
+                if rows[witness + 75 + j - 1] == left and rows[witness + 75 + j] == right:
+                    found = 1
+                j = j + 1
+            if found and rows[witness + 2] != last_turn:
+                destination = 128 + node * 14 + witnesses
+                j = 0
+                while j < 139:
+                    rows[destination * 139 + j] = rows[witness + j]
+                    j = j + 1
+                j = 0
+                while j < 4:
+                    list_set(texts, destination * 4 + j, list_get(texts, slot * 4 + j))
+                    j = j + 1
+                if witnesses == 0:
+                    nodes[row + 6] = rows[witness + 2]
+                last_turn = rows[witness + 2]
+                witnesses = witnesses + 1
+            index = index + 1
+        assert(witnesses == 14, "Contact symbol birth proof is incomplete")
+        clock[8] = node + 1
+        record_set(result, "born", 88 + node)
+    record_set(pending, "symbol_text", texts)
+    haiku_contact_symbols_check(pending)
+    leaves = haiku_words("symbol_clock symbol_nodes symbol_rows symbol_text")
+    i = 0
+    while i < 4:
+        name = list_get(leaves, i)
+        record_set(state, name, record_get(pending, name))
+        i = i + 1
+    record_set(result, "committed", 1)
+    return result

@@ -53,6 +53,12 @@ Contact features are frozen before the confirming encounter updates this layer;
 later glyph extraction and ranking use the new strength. The 42-field v1
 contact retains its exact previous profile.
 
+Version-3 contact adds [dream-born symbols](DREAM_SYMBOLS.md), four leaves and
+51 fields in total. Eligible external paths freeze before word learning; a real
+dream can preserve one relation supported on fourteen different turns. Later
+paths recognize that structure and can support another level. Both owners keep
+their own evidence, IDs and immutable birth proofs.
+
 The remaining feature columns keep the [parliament contract](PARLIAMENT.md):
 actual dissonance, novelty, normalized arousal and entropy at 88–91, completed
 echo/drift/meta coherence at 92–94, and the actual quality metric at 95.
@@ -88,6 +94,13 @@ within `[-.75,.75]` for reviewed words and `[-.375,.375]` for learned ones.
 Unresolved words keep their base scores. The experimental session uses the
 resulting order when admitting its bounded lexical proposals.
 
+With symbols enabled, the longest recognized left-parent suffix anticipates
+right-parent anchors with total mass at most .25. This joins contact features
+before their final clamp. Ranking also adds `.15 * projection[glyph] * strength`
+from the latest external context, at most +.0375 beyond the existing field
+correction. Nodes cannot contribute on their birth turn. This bounded effect
+does not require a model forward or random draw.
+
 ## A voice keeps its ancestry
 
 Native events name an emitting owner, source, source-local event ID and turn.
@@ -121,6 +134,8 @@ strings (emitter, exact text, language, root owner, parent owner, model identity
 and eight numbers (parent/root source and event, alpha, representation gain and
 availability, complete availability mask). They rotate with parliament receipts.
 Version 2 retains those leaves and adds the five learned-word leaves, for **47**.
+Version 3 adds four symbol leaves, for **51**; the complete layout and activation
+contract are in [DREAM_SYMBOLS](DREAM_SYMBOLS.md).
 
 | Entry point | Result |
 |---|---|

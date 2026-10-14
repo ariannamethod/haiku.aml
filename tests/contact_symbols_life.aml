@@ -1,0 +1,441 @@
+IMPORT "../src/parliament_contact.aml"
+
+def symbol_test_part(contact):
+    result = record_new()
+    names = haiku_words("symbol_clock symbol_nodes symbol_rows symbol_text")
+    i = 0
+    while i < list_len(names):
+        name = list_get(names, i)
+        record_set(result, name, record_get(contact, name))
+        i = i + 1
+    return record_clone(result)
+
+def symbol_test_new(owner, seed, enabled):
+    learned = haiku_contact_enable_learning(haiku_contact_new(owner, seed))
+    return haiku_contact_enable_symbols(learned, enabled, 0)
+
+def symbol_test_evidence(contact):
+    result = record_new()
+    names = haiku_words("symbol_nodes symbol_rows symbol_text")
+    i = 0
+    while i < list_len(names):
+        name = list_get(names, i)
+        record_set(result, name, record_get(contact, name))
+        i = i + 1
+    clock = record_get(contact, "symbol_clock")
+    focus = zeros(4)
+    focus[0] = clock[6]
+    focus[1] = clock[7]
+    focus[2] = clock[8]
+    focus[3] = clock[9]
+    record_set(result, "external_clock", focus)
+    return record_clone(result)
+
+# These are sealed native human or actual-delivery envelopes, using the same
+# source ancestry as iceberg. Full dream scheduling belongs to its own gate.
+def symbol_test_hear(contact, text, number, turn):
+    event = haiku_contact_event("human", text, "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, number, turn)
+    if text_equal(record_get(contact, "p:owner"), "friend"):
+        native = haiku_contact_event("haiku", text, "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 7, number, turn)
+        event = haiku_contact_derive(native, "friend", text, 6, number, turn)
+    haiku_contact_publish(contact, event)
+    return event
+
+def symbol_test_dream(contact, ordinal, turn):
+    owner = record_get(contact, "p:owner")
+    native = haiku_contact_event(owner, "music", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 7, turn, turn)
+    haiku_contact_publish(contact, native)
+    return haiku_contact_symbols_dream(contact, ordinal, turn)
+
+pairs = list_new()
+list_push(pairs, "fire water")
+list_push(pairs, "flame river")
+list_push(pairs, "burn rain")
+list_push(pairs, "fire sea")
+list_push(pairs, "flame ocean")
+list_push(pairs, "burn lake")
+trees = haiku_words("tree forest wood leaf")
+legacy = haiku_contact_enable_learning(haiku_contact_new("haiku", 42))
+old = record_clone(legacy)
+live = haiku_contact_enable_symbols(legacy, 1, 0)
+assert(record_equal(old, legacy), "Symbol activation changed its v2 input")
+assert(record_get(legacy, "version") == 2 and list_len(record_keys(legacy)) == 47, "Prior contact schema changed")
+assert(record_get(live, "version") == 3 and list_len(record_keys(live)) == 51, "Symbol contact schema differs")
+assert(record_equal(live, haiku_contact_enable_symbols(live, 1, 0)), "Symbol activation is not idempotent")
+friend = symbol_test_new("friend", 43, 1)
+friend_before = record_clone(friend)
+i = 0
+while i < 13:
+    pair = list_get(pairs, i - floor(i / 6) * 6)
+    symbol_test_hear(live, pair, i + 1, i + 1)
+    clock = record_get(live, "symbol_clock")
+    assert(clock[8] == 0, "A symbol was born while awake")
+    i = i + 1
+symbol_test_dream(live, 1, 13)
+clock = record_get(live, "symbol_clock")
+assert(clock[8] == 0 and clock[26] == 13, "Thirteen distinct turns reached the birth threshold")
+haiku_contact_save(live, text_concat(symbol_test_prefix, "thirteen"))
+resumed = haiku_contact_load(text_concat(symbol_test_prefix, "thirteen"))
+assert(record_equal(live, resumed), "Thirteen-turn checkpoint changed symbol state")
+event = symbol_test_hear(live, "flame river", 14, 14)
+symbol_test_hear(resumed, "flame river", 14, 14)
+clock = record_get(live, "symbol_clock")
+assert(clock[8] == 0 and clock[26] == 14, "The fourteenth waking turn itself created a symbol")
+frozen_features = haiku_contact_features(live, event)
+symbol_test_dream(live, 2, 14)
+symbol_test_dream(resumed, 2, 14)
+assert(record_equal(live, resumed), "Restart changed the first dream birth")
+clock = record_get(live, "symbol_clock")
+nodes = record_get(live, "symbol_nodes")
+assert(clock[8] == 1 and clock[26] == 14, "Dream replay invented external evidence")
+assert(nodes[0] == 1 and nodes[1] == 0 and nodes[8] == 14 and nodes[9] == 14, "First compound lost its parents or fourteen proofs")
+assert(text_equal(haiku_contact_symbol_name(live, 88), "(fire+water)"), "First compound canonical name differs")
+projection = haiku_contact_symbol_pressure(live, "fire", "en", 14)
+assert(haiku_parliament_dot(projection, projection) == 0, "A newborn affected its own birth turn")
+projection = haiku_contact_symbol_pressure(live, "fire", "en", 15)
+assert(projection[0] == 0.25, "A later fire prefix did not predict water")
+replay_before = record_clone(live)
+haiku_contact_symbols_dream(live, 2, 14)
+haiku_contact_publish(live, event)
+haiku_contact_symbols_observe(live, event)
+assert(record_equal(replay_before, live), "A repeated dream or delivery changed state or RNG")
+
+# The nested pair starts at zero on birth. Only fourteen NEW postbirth
+# encounters may supply the existing compound followed by tree.
+i = 0
+while i < 14:
+    pair = list_get(pairs, i - floor(i / 6) * 6)
+    tree = list_get(trees, i - floor(i / 4) * 4)
+    text = text_concat(text_concat(pair, " "), tree)
+    event = symbol_test_hear(live, text, i + 15, i + 15)
+    symbol_test_hear(resumed, text, i + 15, i + 15)
+    clock = record_get(live, "symbol_clock")
+    rows = record_get(live, "symbol_rows")
+    slot = clock[9]
+    assert(rows[slot * 139 + 9] == 3 and rows[slot * 139 + 10] == 2, "Existing structure was not recognized in new words")
+    assert(rows[slot * 139 + 75] == 88 and rows[slot * 139 + 76] == 4, "Nested path used another parent structure")
+    assert(clock[8] == 1, "Nested symbol was born while awake")
+    if i == 12:
+        symbol_test_dream(live, 3, 27)
+        symbol_test_dream(resumed, 3, 27)
+        clock = record_get(live, "symbol_clock")
+        assert(clock[8] == 1, "Nested birth reused prebirth observations")
+    assert(record_equal(live, resumed), "Restart changed the nested observation path")
+    i = i + 1
+symbol_test_dream(live, 4, 28)
+symbol_test_dream(resumed, 4, 28)
+assert(record_equal(live, resumed), "Restart changed the nested dream birth")
+clock = record_get(live, "symbol_clock")
+nodes = record_get(live, "symbol_nodes")
+assert(clock[8] == 2 and clock[26] == 28, "Nested consolidation changed the external count")
+assert(nodes[10] == 88 and nodes[11] == 4 and nodes[13] == 3, "Nested child lost its ordered parents or leaves")
+assert(text_equal(haiku_contact_symbol_name(live, 89), "((fire+water)+tree)"), "Nested canonical identity differs")
+assert(record_equal(friend_before, friend), "Haiku's external history leaked into its friend")
+haiku_contact_save(live, text_concat(symbol_test_prefix, "full"))
+haiku_contact_save(resumed, text_concat(symbol_test_prefix, "resumed"))
+
+# Fixed words, field and score measure exactly the symbol contribution.
+# Rank and feature queries themselves must consume no random draws or history.
+pressure_owner = record_clone(live)
+event = symbol_test_hear(pressure_owner, "fire water", 29, 29)
+before = record_clone(pressure_owner)
+projection = haiku_contact_symbol_pressure(pressure_owner, "fire water", "en", 29)
+assert(projection[4] == 0.25 and projection[0] == 0, "Longest learned left parent did not predict tree")
+reverse = haiku_contact_symbol_pressure(pressure_owner, "water fire", "en", 29)
+assert(reverse[0] == 0.25 and reverse[4] == 0, "Ordered context collapsed into an unordered bag")
+aliases = haiku_contact_symbol_pressure(pressure_owner, "flame burn", "en", 29)
+assert(aliases[0] == 0.25 and aliases[4] == 0, "Adjacent known aliases did not share their concept")
+blocked = haiku_contact_symbol_pressure(pressure_owner, "fire quorvex", "en", 29)
+assert(haiku_parliament_dot(blocked, blocked) == 0, "Pressure crossed an unknown suffix barrier")
+words = haiku_words("water flame tree music")
+ids = [0, 1, 4, 82]
+scores = [1, 1, 1, 1]
+ranked = haiku_contact_rank(pressure_owner, words, scores, "en")
+field = record_get(pressure_owner, "p:field")
+i = 0
+while i < 4:
+    extra = 0
+    if i == 2:
+        extra = 0.0375
+    assert(abs(ranked[i] - (scores[i] + 0.15 * field[ids[i]] + extra)) < 0.000001, "Symbol rank pressure exceeded or lost its declared contribution")
+    i = i + 1
+features = haiku_contact_features(pressure_owner, event)
+assert(features[4] > 0, "Recognized prefix did not change later contact features")
+assert(record_equal(before, pressure_owner), "Pure symbol pressure/rank/features changed owned state or RNG")
+
+# Four levels fit; a fifth level fails even when only six anchors are involved.
+bounded = record_clone(live)
+i = 0
+while i < 14:
+    symbol_test_hear(bounded, "fire water tree music", i + 29, i + 29)
+    i = i + 1
+symbol_test_dream(bounded, 5, 42)
+clock = record_get(bounded, "symbol_clock")
+nodes = record_get(bounded, "symbol_nodes")
+assert(clock[8] == 3 and nodes[22] == 3 and nodes[23] == 4, "A depth-three recursive path could not be born")
+i = 0
+while i < 14:
+    symbol_test_hear(bounded, "fire water tree music light", i + 43, i + 43)
+    i = i + 1
+symbol_test_dream(bounded, 6, 56)
+clock = record_get(bounded, "symbol_clock")
+nodes = record_get(bounded, "symbol_nodes")
+assert(clock[8] == 4 and nodes[32] == 4 and nodes[33] == 5, "Four levels were confused with four anchor leaves")
+i = 0
+while i < 14:
+    symbol_test_hear(bounded, "fire water tree music light dark", i + 57, i + 57)
+    i = i + 1
+symbol_test_dream(bounded, 7, 70)
+clock = record_get(bounded, "symbol_clock")
+assert(clock[8] == 4, "A compound exceeded four levels")
+
+# Repeated subtrees reach the sixteen-anchor bound with only four births.
+expanded = symbol_test_new("haiku", 49, 1)
+expansion_text = "fire water"
+level = 0
+while level < 5:
+    i = 0
+    while i < 14:
+        turn = level * 14 + i + 1
+        symbol_test_hear(expanded, expansion_text, turn, turn)
+        i = i + 1
+    symbol_test_dream(expanded, level + 1, (level + 1) * 14)
+    clock = record_get(expanded, "symbol_clock")
+    assert(clock[8] == min(4, level + 1), "Expanded compound capacity differs")
+    expansion_text = text_concat(text_concat(expansion_text, " "), expansion_text)
+    level = level + 1
+nodes = record_get(expanded, "symbol_nodes")
+assert(nodes[32] == 4 and nodes[33] == 16, "Balanced recursive composition did not retain sixteen anchor leaves")
+
+# An unknown word is a barrier, and an oversized path is wholly unavailable.
+barrier = symbol_test_new("haiku", 44, 1)
+i = 0
+while i < 14:
+    symbol_test_hear(barrier, "fire quorvex water", i + 1, i + 1)
+    i = i + 1
+symbol_test_dream(barrier, 1, 14)
+clock = record_get(barrier, "symbol_clock")
+assert(clock[8] == 0, "An unbound word disappeared between a fabricated adjacent pair")
+long_text = "fire water"
+i = 0
+while i < 63:
+    long_text = text_concat(long_text, " music")
+    i = i + 1
+symbol_test_hear(barrier, long_text, 15, 15)
+clock = record_get(barrier, "symbol_clock")
+rows = record_get(barrier, "symbol_rows")
+slot = clock[9]
+assert(rows[slot * 139 + 9] == 1 and rows[slot * 139 + 10] == 1, "Oversized input lost its barrier sentinel")
+assert(rows[slot * 139 + 11] == -1 and rows[slot * 139 + 75] == -1, "Oversized input contributed a clipped prefix")
+texts = record_get(barrier, "symbol_text")
+assert(text_equal(list_get(texts, slot * 4), long_text), "Unavailable path lost its exact original text")
+
+# Same-turn multiplicity, identical delivery and internal sources give no new
+# distinct-turn support. Fourteen later turns of the same path do count.
+same_turn = symbol_test_new("haiku", 45, 1)
+i = 0
+while i < 14:
+    symbol_test_hear(same_turn, "fire water fire water", i + 1, 1)
+    i = i + 1
+symbol_test_dream(same_turn, 1, 1)
+clock = record_get(same_turn, "symbol_clock")
+assert(clock[8] == 0, "One turn supplied fourteen separate supports")
+i = 0
+while i < 13:
+    symbol_test_hear(same_turn, "fire water", i + 15, i + 2)
+    i = i + 1
+symbol_test_dream(same_turn, 2, 14)
+clock = record_get(same_turn, "symbol_clock")
+assert(clock[8] == 1, "Repeated path on a genuinely new turn was discarded")
+
+# Two independently lived catalogs may assign different local IDs to the
+# exact same recursive identity. No completed node is adopted here.
+i = 0
+while i < 14:
+    symbol_test_hear(friend, "tree light", i + 1, i + 1)
+    i = i + 1
+symbol_test_dream(friend, 1, 14)
+i = 0
+while i < 14:
+    symbol_test_hear(friend, "fire water", i + 15, i + 15)
+    i = i + 1
+symbol_test_dream(friend, 2, 28)
+i = 0
+while i < 14:
+    symbol_test_hear(friend, "fire water tree", i + 29, i + 29)
+    i = i + 1
+symbol_test_dream(friend, 3, 42)
+assert(text_equal(haiku_contact_symbol_name(live, 88), haiku_contact_symbol_name(friend, 89)), "Canonical identity depended on a private local slot")
+assert(text_equal(haiku_contact_symbol_name(live, 89), haiku_contact_symbol_name(friend, 90)), "Nested identity depended on its private parent IDs")
+clock = record_get(friend, "symbol_clock")
+assert(clock[26] == 0 and clock[32] == 42, "Friend borrowed human counts instead of its own peer receipts")
+assert(record_equal(live, resumed), "Friend's private formation mutated Haiku")
+haiku_contact_save(friend, text_concat(symbol_test_prefix, "friend"))
+
+# Every accepted source owns a clock. Ignored evidence branches leave external
+# paths and nodes intact; the friend accepts only the original delivered root.
+before = symbol_test_evidence(live)
+source = 1
+while source <= 7:
+    number = source + 28
+    parent = haiku_contact_event("human", "fire water", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, number, number)
+    if source == 7:
+        forbidden = haiku_contact_event("haiku", "fire water", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 7, number, number)
+    else:
+        if source == 6:
+            parent = haiku_contact_event("friend", "fire water", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 7, number, number)
+        forbidden = haiku_contact_derive(parent, "haiku", "fire water", source, number, number)
+    if source >= 2 and source <= 4:
+        record_set(forbidden, "identity", "symbol-provenance-control")
+        record_set(forbidden, "availability", 6)
+        record_set(forbidden, "alpha", 0.5)
+        if source == 2:
+            record_set(forbidden, "alpha", 1)
+        if source == 3:
+            record_set(forbidden, "alpha", 0)
+    previous = record_get(record_clone(live), "symbol_clock")
+    haiku_contact_publish(live, forbidden)
+    clock = record_get(live, "symbol_clock")
+    assert(clock[26 + source] == previous[26 + source] + 1, "Accepted internal contact lost its own source clock")
+    assert(record_equal(before, symbol_test_evidence(live)), "Internal, model or peer echo taught Haiku's symbol organ")
+    source = source + 1
+before = symbol_test_evidence(friend)
+human = haiku_contact_event("human", "fire water", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, 43, 43)
+haiku_contact_publish(friend, human)
+old_native = haiku_contact_event("haiku", "fire water tree", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 7, 42, 42)
+reminted = haiku_contact_derive(old_native, "friend", "fire water tree", 6, 44, 44)
+haiku_contact_publish(friend, reminted)
+assert(record_equal(before, symbol_test_evidence(friend)), "Friend accepted human or renumbered peer evidence")
+
+# A later learned-word suspension cannot rewrite the previously observed path.
+learned = haiku_contact_enable_learning(haiku_contact_new("haiku", 46))
+teachers = list_new()
+list_push(teachers, "stream water river")
+list_push(teachers, "stream sea ocean")
+list_push(teachers, "stream rain lake")
+i = 0
+while i < 3:
+    symbol_test_hear(learned, list_get(teachers, i), i + 1, i + 1)
+    i = i + 1
+lookup = haiku_contact_learning_lookup(learned, "en", "stream")
+assert(lookup[0] == 0, "Frozen-path fixture failed to learn its original spelling")
+learned = haiku_contact_enable_symbols(learned, 1, 0)
+i = 0
+while i < 14:
+    symbol_test_hear(learned, "fire stream", i + 4, i + 4)
+    i = i + 1
+conflicts = list_new()
+list_push(conflicts, "stream light sun")
+list_push(conflicts, "stream sunrise dawn")
+list_push(conflicts, "stream bright sun")
+i = 0
+while i < 3:
+    symbol_test_hear(learned, list_get(conflicts, i), i + 18, i + 18)
+    i = i + 1
+lookup = haiku_contact_learning_lookup(learned, "en", "stream")
+assert(lookup[0] == -1, "Later contradiction did not suspend the learned spelling")
+symbol_test_dream(learned, 1, 20)
+assert(text_equal(haiku_contact_symbol_name(learned, 88), "(fire+water)"), "Birth rescanned old words using their later binding")
+rows = record_get(learned, "symbol_rows")
+assert(rows[128 * 139 + 11] == 1 and rows[128 * 139 + 12] == 0, "Frozen proof lost the original learned concept")
+symbol_test_hear(learned, "fire stream", 21, 21)
+clock = record_get(learned, "symbol_clock")
+rows = record_get(learned, "symbol_rows")
+assert(rows[clock[9] * 139 + 12] == -1, "Later encounter reused a suspended learned binding")
+haiku_contact_save(learned, text_concat(symbol_test_prefix, "frozen"))
+
+# Ordinary history expires at 128, while each born node retains fourteen exact
+# witness paths. A restart after expiry still validates those frozen proofs.
+expiry = record_clone(resumed)
+old_rows = record_get(record_clone(expiry), "symbol_rows")
+old_text = record_get(expiry, "symbol_text")
+old_nodes = record_get(record_clone(expiry), "symbol_nodes")
+i = 0
+while i < 128:
+    symbol_test_hear(expiry, "light", i + 29, i + 29)
+    i = i + 1
+clock = record_get(expiry, "symbol_clock")
+rows = record_get(expiry, "symbol_rows")
+texts = record_get(expiry, "symbol_text")
+nodes = record_get(expiry, "symbol_nodes")
+assert(clock[7] == 128 and clock[8] == 2 and clock[26] == 156, "Bounded observation expiry changed lived totals")
+i = 0
+while i < 128:
+    assert(rows[i * 139 + 1] >= 29, "Observation ring retained an expired source event")
+    i = i + 1
+i = 128 * 139
+while i < 156 * 139:
+    assert(rows[i] == old_rows[i], "Observation expiry rewrote a frozen formation proof")
+    i = i + 1
+i = 128 * 4
+while i < 156 * 4:
+    assert(text_equal(list_get(texts, i), list_get(old_text, i)), "Observation expiry rewrote original proof text")
+    i = i + 1
+i = 0
+while i < 160:
+    assert(nodes[i] == old_nodes[i], "Expiry changed a born node")
+    i = i + 1
+haiku_contact_save(expiry, text_concat(symbol_test_prefix, "expiry"))
+restored = haiku_contact_load(text_concat(symbol_test_prefix, "expiry"))
+assert(record_equal(expiry, restored), "Expired history lost its retained formation proofs on restart")
+
+# Seventeen independent two-leaf paths fit in one <=64-token encounter.
+# Fourteen turns support all of them; one node per dream fills sixteen slots.
+capacity = symbol_test_new("haiku", 47, 1)
+anchors = haiku_contact_anchors()
+corpus = ""
+i = 0
+while i < 17:
+    if i > 0:
+        corpus = text_concat(corpus, " quorvex ")
+    corpus = text_concat(corpus, text_concat(list_get(anchors, i), " music"))
+    i = i + 1
+i = 0
+while i < 14:
+    symbol_test_hear(capacity, corpus, i + 1, i + 1)
+    i = i + 1
+i = 0
+while i < 16:
+    symbol_test_dream(capacity, i + 1, i + 14)
+    clock = record_get(capacity, "symbol_clock")
+    assert(clock[8] == i + 1 and clock[26] == 14, "One dream created multiple nodes or extra observations")
+    i = i + 1
+old_nodes = record_get(record_clone(capacity), "symbol_nodes")
+symbol_test_dream(capacity, 17, 30)
+clock = record_get(capacity, "symbol_clock")
+nodes = record_get(capacity, "symbol_nodes")
+assert(clock[8] == 16 and clock[26] == 14, "Capacity overflow recycled a lived symbol")
+i = 0
+while i < 160:
+    assert(nodes[i] == old_nodes[i], "A full catalog changed an earlier symbol")
+    i = i + 1
+haiku_contact_save(capacity, text_concat(symbol_test_prefix, "capacity"))
+
+# The disabled organ is inert even when contact, dreams and learning continue.
+off = symbol_test_new("haiku", 48, 0)
+plain = haiku_contact_enable_learning(haiku_contact_new("haiku", 48))
+off_before = symbol_test_part(off)
+i = 0
+while i < 14:
+    symbol_test_hear(off, "fire water", i + 1, i + 1)
+    symbol_test_hear(plain, "fire water", i + 1, i + 1)
+    i = i + 1
+symbol_test_dream(off, 1, 14)
+native = haiku_contact_event("haiku", "music", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 7, 14, 14)
+haiku_contact_publish(plain, native)
+projection = haiku_contact_symbol_pressure(off, "fire", "en", 15)
+assert(haiku_parliament_dot(projection, projection) == 0, "Disabled symbols contributed pressure")
+assert(record_equal(off_before, symbol_test_part(off)), "Disabled symbols changed memory or counters")
+base = record_new()
+names = record_keys(plain)
+i = 0
+while i < list_len(names):
+    name = list_get(names, i)
+    record_set(base, name, record_get(off, name))
+    i = i + 1
+record_set(base, "version", 2)
+assert(record_equal(base, plain), "Disabled symbols changed the prior contact/learning/RNG profile")
+haiku_contact_save(base, text_concat(symbol_test_prefix, "off-base"))
+haiku_contact_save(plain, text_concat(symbol_test_prefix, "off-control"))
+haiku_contact_check(off)
+PRINT "HAIKU_CONTACT_SYMBOLS_LIFE_OK"

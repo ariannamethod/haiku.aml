@@ -11,9 +11,9 @@ NOTORCH_LIB ?= $(NOTORCH_ROOT)/libnotorch.a
 .PHONY: test-inner test-metahaiku test-overthinkg test-inner-state test-inner-cli
 .PHONY: test-dream-life test-phase4 test-dream test-journal test-dream-state test-dream-cli
 .PHONY: test-owned-tail test-parliament test-lexical-sources test-parliament-contact test-iceberg test-janus-balance test-iceberg-janus
-.PHONY: test-contact-learning test-iceberg-learning
+.PHONY: test-contact-learning test-iceberg-learning test-contact-symbols test-iceberg-symbols
 
-test: test-numerical test-text test-lexical test-cloud test-form test-generator test-mathbrain test-rae test-tokenizer test-foreground test-state test-inner test-dream-life test-owned-tail test-parliament test-lexical-sources test-parliament-contact test-iceberg test-janus-balance test-iceberg-janus test-contact-learning test-iceberg-learning
+test: test-numerical test-text test-lexical test-cloud test-form test-generator test-mathbrain test-rae test-tokenizer test-foreground test-state test-inner test-dream-life test-owned-tail test-parliament test-lexical-sources test-parliament-contact test-iceberg test-janus-balance test-iceberg-janus test-contact-learning test-iceberg-learning test-contact-symbols test-iceberg-symbols
 
 test-numerical:
 	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" bash tests/run_numerical.sh
@@ -67,5 +67,5 @@ test-inner-cli:
 
 test-dream-life: test-phase4 test-dream test-journal test-dream-state test-dream-cli
 
-test-phase4 test-dream test-journal test-dream-state test-dream-cli test-owned-tail test-parliament test-lexical-sources test-parliament-contact test-iceberg test-janus-balance test-iceberg-janus test-contact-learning test-iceberg-learning:
+test-phase4 test-dream test-journal test-dream-state test-dream-cli test-owned-tail test-parliament test-lexical-sources test-parliament-contact test-iceberg test-janus-balance test-iceberg-janus test-contact-learning test-iceberg-learning test-contact-symbols test-iceberg-symbols:
 	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" HAIKU_AML_INCLUDE="$(abspath $(AML_INCLUDE))" HAIKU_AML_BRIDGE_LIB="$(abspath $(AML_BRIDGE_LIB))" HAIKU_NOTORCH_LIB="$(abspath $(NOTORCH_LIB))" bash tests/run_$(subst -,_,$(@:test-%=%)).sh

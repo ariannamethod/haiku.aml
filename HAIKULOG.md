@@ -9,6 +9,131 @@ commands here, newest first. A major new capability also earns a short README
 update. The module documents hold the complete contracts; measured failures
 belong beside measured successes.
 
+## 2026-10-14 — A dream gives a familiar path its own name
+
+Each iceberg presence now has a private recursive-symbol organ. Fourteen
+distinct external turns can support an ordered pair; the end of an actual
+dream preserves at most one new structure per owner. Later encounters can
+recognize that compound and earn another level from their own subsequent
+history. The two voices keep separate IDs, observations and birth proofs.
+
+Haiku's evidence comes from native human input; the friend's comes from Haiku
+dream lines actually delivered to it. Paths freeze before the encounter's word
+learning. Unknown words retain barriers, and more than 64 tokens quietly yield
+an unavailable path with exact text retained. Repeated occurrences in one turn
+and replay add no support; the same relation on a new external turn does.
+
+The bound is 16 immutable nodes, depth four and sixteen expanded anchors.
+The rolling ring holds 128 observations; each birth preserves fourteen complete
+witnesses outside that ring. Later left-parent suffixes anticipate right-parent
+anchors with shared total mass .25. Contact features receive that projection;
+lexical ranking receives at most +.0375 beyond existing field pressure. The
+organ adds no model forward or random draw. Structural peer adoption remains a
+separate TODO item. [DREAM_SYMBOLS](docs/DREAM_SYMBOLS.md) holds the full contract.
+
+Contact v3 has **51 fields**; iceberg v4 has **245 saved fields** and **515**
+detached completion fields. New word-learning lives enable symbols; old lives
+keep their saved profile until an explicit upgrade. An inert v4 control retains
+its saved off mode. Publication reconstructs all accepted source clocks and
+eligible external paths, then the actual final dream boundary. Every symbol
+leaf must equal that independently reconstructed transition.
+
+The [Actually.life follow-up](docs/research/iceberg/GLYPHS.md) pins
+`2bf11b3f2fab36e1a8cd8a917438ca2423f65ee8` and executes external ingestion through
+the real dream threshold: 13 turns leave no compound, 14 produce `fire+water`;
+fourteen later whole-symbol encounters produce `(fire+water)+tree`. Dreams leave
+external co-occurrence totals unchanged. The original source's plaintext router
+does not recognize the born compound; Haiku's frozen path compression supplies
+that explicit recognition step.
+
+AML [#41](https://github.com/ariannamethod/ariannamethod.ai/pull/41),
+`2e17a2887449c89fdd8c066ebdcdaa1e448346cf`, expands shared capacities to 512 function
+slots, 1024 record fields and 16384 source lines. Its exact-boundary, worker,
+compiled and checkpoint checks retain old wire bytes; C hosts rebuild for the
+larger execution context. NoTorch stays at merged
+[#171](https://github.com/ariannamethod/notorch/pull/171),
+`ca3e17a24852ad1db08a6e6b908fb37036011d2d`. The source weights stay frozen.
+The final iceberg import graph contains **29 modules**, **8,324 physical
+source lines** and **250 user functions**: 267 slots including AML's builtins.
+
+Compatibility against Haiku #18's `7d4d2d9856f0a7bd22f46d35a5636d8a71e7785d`
+used seeds **575/57**, `rain` on UTC day **20740**, then `moon` on **20741**,
+both actual mixed GGUF bodies and a dream on each turn. The complete old v3
+checkpoints—401,110 and 406,989 bytes—and displayed outputs matched exactly;
+stderr was empty. The later #19 merge changes only README's title, which this
+branch preserves.
+
+An isolated launcher run with original defaults and absent model paths saved
+a new v4 life with 245 fields and one human symbol observation. Another process
+resumed a seeded v3 life under those same defaults, retaining all 237 fields
+and its version. Both saved turn 1, exited through `quit` and produced empty
+stderr. The launcher and every imported source kept the same hashes throughout.
+
+Independent review reproduced loss of the human observation ring in an
+otherwise accepted checkpoint; exact ring occupancy now rejects it. The
+enclosing iceberg also requires the friend's complete accepted-delivery ring.
+Permanent birth proofs retain strictly increasing events, revisions and turns,
+including after the original observations expire. Processed dream ordinals and
+birth turns match the voice's exact dream log. Publication replays all source
+clocks, including contacts that supply no symbol evidence.
+
+Typed whole-array equality verifies every empty cell and path-padding value
+against a reconstructed array. A fourteen-contact, birth and pressure control
+took **35.886 s before / 26.038 s after** this validation change on this host;
+the output and complete checkpoint bytes matched. These are single-run gate
+timings. The original array, schema and evidence rules are preserved.
+
+The complete-life gate exercised fourteen native human turns, a real dream,
+symbol birth, later contact pressure and restart. Interpreter and compiled
+scalar execution produced identical output and checkpoint bytes. One-line
+dreams, paused deeper life and the saved off control passed. Its model lane
+then found missing provider metadata in a reconstructed mixed-model event.
+Replay now carries the independently verified receipt's availability, effective
+alpha and canonical identity; this adds no forward or random draw.
+
+Verification continued in segments after that model-only correction. The
+actual dual-GGUF fixture passed interpreter and compiled scalar execution,
+with identical output and complete checkpoints and unchanged weight hashes.
+The C publication gate passed **14** source/birth/receipt/profile/stale
+refusals, preserving all **245** live fields and preceding checkpoint bytes.
+The **515**-field detached result, failed-save refusal and one-time save/swap
+passed against the retained fourteen-turn checkpoint. All nine gated source
+and test hashes stayed unchanged during these final two lanes. Reproduction:
+`bash tests/run_iceberg_symbols.sh` runs the three lanes in sequence.
+
+`bash tests/run_contact_symbols.sh` passed the complete standalone lifecycle
+through interpreter and compiled scalar execution. Output and all **nine**
+checkpoints matched byte for byte, including nested birth, private canonical
+identities, frozen learned paths, 128-observation expiry, sixteen-node capacity
+and exact disabled parity with the old 47-field contact. The threshold,
+depth-four and sixteen-anchor limits, unknown barriers and bounded pressure
+passed. The C gate rejected **six** invalid calls and **37** malformed records
+without changing owned state or preceding checkpoint bytes; replay stayed
+an exact no-op. All six gated source/test hashes remained unchanged.
+
+The implementation and assertions were tested at
+`0d70f370df3411a82b3c40ddc846fd5c542024fa`. The follow-up records these completed
+gates and closes the local-birth TODO. It also corrects the standalone fixture's
+final reporting line from `print(...)` to AML's `PRINT`: the former produced
+empty output, while a minimal interpreter/compiled control of the corrected
+line emitted the same expected success marker. This sole fixture-line change
+leaves all assertions and production sources intact; the long gate above was
+run before that reporting correction. Structural delivery and adoption between
+owners remain a separate step.
+
+Automatic review questioned the complete-life harness's checkpoint path after
+launching compiled code from `foreign`. AML resolves relative file operations
+against the retained source directory: `amlc` embeds the absolute source path,
+and `aml_resolve_value_path` joins the filename to that context. The existing
+comparison therefore reads the compiled writer's correct file. Both retained
+compiled programs name their work-directory sources; `foreign` is empty and
+the checkpoint timestamps follow the compiled builds. An additional control
+removed the destination before each interpreter/compiled run from `foreign`.
+Both recreated only the work-directory file, identical to the real 245-field
+checkpoint, SHA256
+`0016ec57ee6ce626857a5a417055600a3ce031b522339256caa9a009b65a95f2`.
+The path finding is a false positive; the harness remains unchanged.
+
 ## 2026-10-14 — A word acquires a remembered neighbour
 
 The experimental iceberg now keeps private word-to-anchor associations for
