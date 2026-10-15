@@ -9,6 +9,92 @@ commands here, newest first. A major new capability also earns a short README
 update. The module documents hold the complete contracts; measured failures
 belong beside measured successes.
 
+## 2026-10-15 — A structure crosses the dream
+
+Iceberg v5 carries a compound's ordered parents with an actual native dream
+line to its peer recipient. Each offer uses the sender's exact turn-start
+catalogue and spelling associations. At the end of the dream, after local
+consolidation, the receiver resolves the missing parent closure atomically
+into its own IDs. The first real delivery stays attached to every adopted
+node; duplicate canonical structures reuse the existing identity.
+
+Local and adopted compounds share the same sixteen-node alphabet and .25 total
+prediction budget. Adopted nodes have zero local proofs. Their next-turn
+recognition can support later local recursion: fourteen fresh eligible
+encounters with `C → music` and a later dream can grow `(C+music)` around a
+received `C`. Existing observations keep their frozen paths. The source
+mechanism is Actually.life's recursive `resolve_sym`, pinned at
+`2bf11b3f2fab36e1a8cd8a917438ca2423f65ee8`; the full Haiku contract lives in
+[SYMBOL_EXCHANGE](docs/SYMBOL_EXCHANGE.md).
+
+Contact v4 adds four exchange leaves to its earlier symbol organ, reaching
+**55 fields**. Iceberg v5 has **253 saved fields** and a **531-field** detached
+completion. New lives enable exchange; an existing v4 life needs explicit
+`upgrade_exchange=1`. Each saved enabled/off mode remains immutable. Publication
+derives both directions from the exact predecessors and actual dream events,
+then compares the reconstructed symbol and exchange leaves before save/swap.
+
+Base: merged Haiku [#20](https://github.com/ariannamethod/haiku.aml/pull/20),
+`09ebd0d071045ddf6739051d8e283438172e969b`. AML remains
+`2e17a2887449c89fdd8c066ebdcdaa1e448346cf`; NoTorch's tested library tree remains
+`ca3e17a24852ad1db08a6e6b908fb37036011d2d`. NoTorch's newer
+`2ed0cb03654b445df76168ada21477ab7282b70f` adds Chuck/SPA experiments without
+changing the library, PEN7, harness, ABI or library build rules. This stage
+keeps the established dependency pin.
+
+The restored scalar runtime first passed a genuine dream turn on the merged
+v4 source: all **245** saved fields and **515** detached fields validated;
+serial/worker states and interpreter/compiled checkpoint bytes matched, with
+empty stderr. The checkpoint was 801,146 bytes, SHA256
+`3e986d5003a5925dd5315cfdddc94302fdea445ff437154ba0bc4115e00d717a`.
+
+The frozen model audit rehashed both 21,308,576-byte GGUF files:
+`haiku1.gguf` is `50f159a2c34952bd9e6349880b4b20f8bbc0ac4b1f1dc2c1f6e4768732548b66`,
+and `haiku2.gguf` is `16909b8590bd7fbbf15ab11b2dbf3743d612da8c617aca2dda03d640fef13e29`.
+Both retain canonical tokenizer identity
+`664afe692a006a54fc00406209042f6d452748d64a883ecfab9ef66d41f8bdf2`, computed again
+from their actual 1,792 merge pairs. This audit adds no model forward.
+
+Compatibility compares this stage with an isolated copy of merged `09ebd0d`.
+Versions 1, 3 and 4 each complete two actual one-line dreams, with seeds
+575/57, `rain` and `moon`, UTC days 20740/20741 and unavailable model handles.
+All **six individual responses**, **six complete checkpoints** and **three
+combined outputs** match byte for byte; stderr is empty. The saved schemas
+remain 185/237/245 fields. The candidate run took **64.42 s** on this host.
+Its source snapshot used `iceberg_session.aml` SHA256
+`91c2062e319632f002b37f3ca9ad5c3ada06273a894a2a222221a4cfa76d68d0`;
+the subsequent saved-off sender correction affects only the new exchange path,
+which these old profiles never invoke.
+`python3 tests/compare_exchange_profiles.py` reproduces the comparison using
+that pinned baseline and the current sources. Its three generated AML
+scenarios match the executed audit's scenarios exactly; it retains both source
+snapshots, outputs, checkpoints and a SHA receipt.
+
+Independent review caught an AML record-assignment copy that left adoption in
+a temporary receiver; the dream tail now applies it directly to the owned
+contact. Review also removed comparisons between different owners' event and
+dream counters. Source numbers remain identity metadata; prior acquisition
+turns determine availability, and the enclosing life binds them to actual
+dream history. An explicit saved-off sender also yields no structural offer.
+
+The actual launcher was also run unchanged in two isolated directories with
+absent model paths. `rain` then `quit` created a v5 life with **253 fields** at
+turn 1; `sky` then `quit` resumed the golden v4 checkpoint at turn 3 with all
+**245 fields** and its saved profile. Both processes exited successfully with
+empty stderr. Launcher SHA256
+`d4b139a330ef452620a14080d072e12ec1f246bad338433775102a294b74861b`, all imported
+sources and the runtime stayed unchanged. Their complete checkpoints were
+818,983 and 804,986 bytes.
+
+The new C publication gate passed **13 refusals**, preserving all **253 owner
+fields**, the candidate envelope and the preceding checkpoint bytes. Two
+alternative histories first pass the whole-life validator: an invented extra
+delivery and a consumed delivery that withholds its available structure. Exact
+predecessor replay rejects both. Sender-tree, origin, actual-line, dream-boundary,
+profile and stale-result changes are also refused. The **531-field** detached
+completion, failed-save refusal and one-time save/swap pass with actual adoption
+in both directions.
+
 ## 2026-10-14 — A dream gives a familiar path its own name
 
 Each iceberg presence now has a private recursive-symbol organ. Fourteen

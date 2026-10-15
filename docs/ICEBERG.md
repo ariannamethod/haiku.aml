@@ -17,10 +17,11 @@ The new [iceberg conversation](ICEBERG_SESSION.md) connects immutable AML
 handles, four private lexical contexts, parameter mixing and two private
 parliaments to actual encounters. Bounded text-context returns provide word
 scores and representations; concept pressure joins lexical admission. Its
-version-4 checkpoint retains 245 fields across the voice, both lexical/contact
+version-5 checkpoint retains 253 fields across the voice, both lexical/contact
 lives and both Janus organs. Private [word associations](LEARNED_WORDS.md) grow
 from repeated accepted encounters; [recursive symbols](DREAM_SYMBOLS.md) can be
-born at an actual dream boundary. The [engineering log](../HAIKULOG.md)
+born at an actual dream boundary and [cross a spoken dream](SYMBOL_EXCHANGE.md).
+The [engineering log](../HAIKULOG.md)
 records each stage and its evidence. Python Haiku remains
 the behavioral and artistic reference; `haiku.aml` retains that stable profile.
 
@@ -29,7 +30,7 @@ boundary is detailed in [ICEBERG_SESSION](ICEBERG_SESSION.md),
 [LEXICAL_SOURCES](LEXICAL_SOURCES.md) and [PARLIAMENT_CONTACT](PARLIAMENT_CONTACT.md).
 Dynamic [Janus balance](JANUS_BALANCE.md), learned word associations and local
 recursive glyph birth now run in the separate profile. Structural adoption
-between owners remains upcoming work.
+between owners preserves first-delivery provenance and later local growth.
 
 ## Sources and receipts
 
@@ -450,7 +451,7 @@ revisions so the port can choose an explicit contract:
 | Conceptual attraction | Implemented named aliases, reviewed bindings, model prototypes, tagged exchange and private word associations | Model contribution changes measured features; repeated external contexts teach bounded associations; private pressure ranks later admission |
 | Returning thoughts | Implemented one bounded text-context return per selected boundary; direction injection remains planned | Source ancestry, replay, exact disabled behavior, serial/worker equality and one publication checked |
 | Dream-born glyphs | Local recursive formation from frozen external paths; one birth per owner per actual dream | Fourteen distinct turns, later recursive recognition, permanent proofs, bounded contact/rank pressure and source-backed publication |
-| Structural peer adoption | Planned exchange of compound parent trees across private ID spaces | Explicit delivery/provenance, parent resolution, bounded adoption and replay without invented local evidence |
+| Structural peer adoption | Ordered parent trees travel with actual dream lines and resolve into the receiver's private IDs | Exact predecessor offers, atomic bounded closure, first-delivery provenance, next-turn recognition and later local recursive evidence |
 
 Keep input, initial state, admission budget and sampling draws fixed when
 isolating an organ. Record how it changes the field, admitted words and eventual

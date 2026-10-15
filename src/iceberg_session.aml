@@ -119,13 +119,118 @@ def haiku_iceberg_enable_symbols(life, enabled, tokenizer):
     haiku_iceberg_check(result, tokenizer)
     return result
 
+# Structural exchange is a separate saved profile. Its activation records the
+# actual voice turn even when deeper contact has been quiet for several turns.
+def haiku_iceberg_enable_exchange(life, enabled, tokenizer):
+    haiku_iceberg_check(life, tokenizer)
+    haiku_state_integer(enabled, 0, 1)
+    assert(record_get(life, "version") >= 4, "Haiku exchange requires an owned symbol life")
+    result = record_clone(life)
+    if record_get(result, "version") >= 5:
+        return result
+    core = haiku_iceberg_part(result, "voice")
+    dream_count = haiku_dream_check(core)
+    owners = haiku_words("haiku_contact friend_contact")
+    cursor = 0
+    while cursor < 2:
+        name = list_get(owners, cursor)
+        contact = haiku_contact_enable_exchange(haiku_iceberg_part(result, name), enabled, record_get(core, "turn"), dream_count)
+        haiku_iceberg_put(result, name, contact)
+        cursor = cursor + 1
+    record_set(result, "version", 5)
+    haiku_iceberg_check(result, tokenizer)
+    return result
+
+# A retained delivery names an actual line and a tree already present in the
+# other append-only catalog. Historical word resolutions remain frozen; fresh
+# offers are independently reconstructed from the exact predecessor below.
+def haiku_iceberg_exchange_check(life, core):
+    dialogs = record_get(core, "dream_dialogs")
+    history = record_get(core, "dream_history")
+    dream_count = haiku_dream_check(core)
+    owners = haiku_words("haiku friend")
+    owner_index = 0
+    while owner_index < 2:
+        owner = list_get(owners, owner_index)
+        sender_name = list_get(owners, 1 - owner_index)
+        contact = haiku_iceberg_part(life, text_concat(owner, "_contact"))
+        sender = haiku_iceberg_part(life, text_concat(sender_name, "_contact"))
+        clock = record_get(contact, "exchange_clock")
+        assert(clock[1] <= record_get(core, "turn") and clock[5] <= record_get(core, "turn"), "Haiku exchange is ahead of its voice")
+        assert(clock[2] <= dream_count and clock[8] <= dream_count, "Haiku exchange claims an absent dream")
+        activation_dreams = 0
+        while activation_dreams < dream_count and dialogs[activation_dreams * 3] <= clock[1]:
+            activation_dreams = activation_dreams + 1
+        assert(clock[2] == activation_dreams, "Haiku exchange activation names another dream boundary")
+        seen = record_get(contact, "p:seen")
+        if clock[0]:
+            assert(clock[4] == seen[6], "Haiku exchange lost an accepted peer delivery")
+        if clock[4] > clock[3]:
+            assert(clock[8] > clock[2] and dialogs[(clock[8] - 1) * 3] == clock[5], "Haiku exchange clock names another dream turn")
+            offset = dialogs[(clock[8] - 1) * 3 + 1]
+            size = dialogs[(clock[8] - 1) * 3 + 2]
+            assert(clock[4] > offset and clock[4] <= offset + size, "Haiku exchange clock names another dream delivery")
+            part = clock[4] - 1 - offset
+            assert(part - floor(part / 2) * 2 == 1 - owner_index, "Haiku exchange clock names the wrong speaker")
+        source_clock = record_get(sender, "symbol_clock")
+        source_nodes = record_get(sender, "symbol_nodes")
+        source_origin = record_get(sender, "exchange_origin")
+        source_rows = record_get(sender, "exchange_rows")
+        source_names = map_new()
+        node = 0
+        while node < source_clock[8]:
+            map_set(source_names, haiku_contact_symbol_name(sender, 88 + node), node)
+            node = node + 1
+        rows = record_get(contact, "exchange_rows")
+        texts = record_get(contact, "exchange_text")
+        receipt = 0
+        while receipt < clock[7]:
+            row = receipt * 138
+            event = rows[row]
+            turn = rows[row + 1]
+            ordinal = rows[row + 2]
+            assert(ordinal > clock[2] and ordinal <= dream_count and dialogs[(ordinal - 1) * 3] == turn, "Haiku exchange receipt names another actual dream")
+            offset = dialogs[(ordinal - 1) * 3 + 1]
+            size = dialogs[(ordinal - 1) * 3 + 2]
+            assert(event > offset and event <= offset + size, "Haiku exchange receipt names another actual delivery")
+            part = event - 1 - offset
+            assert(part - floor(part / 2) * 2 == 1 - owner_index, "Haiku exchange receipt names the wrong speaker")
+            assert(text_equal(list_get(texts, receipt * 4), list_get(history, event - 1)), "Haiku exchange receipt changed its actual spoken text")
+            assert(text_equal(list_get(texts, receipt * 4 + 1), "en") and text_equal(list_get(texts, receipt * 4 + 2), sender_name), "Haiku exchange receipt changed its sender or language")
+            names = haiku_contact_anchors()
+            node = 0
+            while node < rows[row + 6]:
+                entry = row + 14 + node * 4
+                name = text_concat("(", list_get(names, rows[entry]))
+                name = text_concat(name, "+")
+                name = text_concat(name, list_get(names, rows[entry + 1]))
+                name = text_concat(name, ")")
+                list_push(names, name)
+                assert(map_has(source_names, name), "Haiku exchange dependency is absent from its sender")
+                original = map_get(source_names, name)
+                assert(source_nodes[original * 10 + 4] < turn, "Haiku exchange dependency was unavailable at delivery")
+                assert(source_origin[original * 3] == rows[entry + 2], "Haiku exchange dependency changed its sender origin")
+                first_event = 0
+                if source_origin[original * 3]:
+                    first_event = source_rows[source_origin[original * 3 + 1] * 138]
+                assert(first_event == rows[entry + 3], "Haiku exchange dependency changed its first hearing")
+                node = node + 1
+            root_name = list_get(names, 87 + rows[row + 6])
+            assert(text_equal(root_name, list_get(texts, receipt * 4 + 3)), "Haiku exchange root identity differs")
+            original = map_get(source_names, root_name)
+            assert(source_nodes[original * 10 + 4] == rows[row + 4] and source_nodes[original * 10 + 5] == rows[row + 5], "Haiku exchange root changed its sender acquisition")
+            assert(source_nodes[original * 10 + 7] <= rows[row + 3] and rows[row + 3] <= source_clock[5], "Haiku exchange sender revision is unavailable")
+            receipt = receipt + 1
+        owner_index = owner_index + 1
+    return 1
+
 def haiku_iceberg_check(life, tokenizer):
     haiku_state_fields(life, "format", "string")
     haiku_state_fields(life, "version", "float")
     haiku_state_fields(life, "settings admission_values", "array")
     haiku_state_fields(life, "admission_text", "list")
     version = record_get(life, "version")
-    assert(text_equal(record_get(life, "format"), "haiku-iceberg") and (version == 1 or version == 2 or version == 3 or version == 4), "Haiku iceberg format is unsupported")
+    assert(text_equal(record_get(life, "format"), "haiku-iceberg") and (version == 1 or version == 2 or version == 3 or version == 4 or version == 5), "Haiku iceberg format is unsupported")
     haiku_iceberg_settings(record_get(life, "settings"))
     core = haiku_iceberg_part(life, "voice")
     haiku_state_check(core, tokenizer)
@@ -138,7 +243,7 @@ def haiku_iceberg_check(life, tokenizer):
     haiku_lexical_check(friend_lexical)
     haiku_contact_check(haiku_contact)
     haiku_contact_check(friend_contact)
-    contact_version = 1 + (version >= 3) + (version >= 4)
+    contact_version = 1 + (version >= 3) + (version >= 4) + (version >= 5)
     assert(record_get(haiku_contact, "version") == contact_version and record_get(friend_contact, "version") == contact_version, "Haiku iceberg contact profile differs")
     assert(text_equal(record_get(haiku_lexical, "owner"), "haiku") and text_equal(record_get(friend_lexical, "owner"), "friend"), "Haiku iceberg lexical owners differ")
     assert(record_get(haiku_lexical, "clock") <= record_get(core, "turn") and record_get(friend_lexical, "clock") <= record_get(core, "turn"), "Haiku iceberg lexical history is ahead of its voice")
@@ -168,6 +273,8 @@ def haiku_iceberg_check(life, tokenizer):
                 assert(dialogs[(nodes[index * 10 + 5] - 1) * 3] == nodes[index * 10 + 4], "Haiku symbol birth names another actual dream turn")
                 index = index + 1
             cursor = cursor + 1
+    if version >= 5:
+        haiku_iceberg_exchange_check(life, core)
     expected = 10 + list_len(record_keys(core)) + list_len(record_keys(haiku_lexical)) + list_len(record_keys(friend_lexical)) + list_len(record_keys(haiku_contact)) + list_len(record_keys(friend_contact))
     if version >= 2:
         owners = haiku_words("haiku friend")
@@ -480,6 +587,28 @@ def haiku_iceberg_tail(pending, before, experience, request, tokenizer, body_a, 
                 assert(dream_count == old_count + 1, "Haiku symbols require one actual new dream")
                 haiku_contact_symbols_dream(haiku_contact, dream_count, turn)
                 haiku_contact_symbols_dream(friend_contact, dream_count, turn)
+                if version >= 5:
+                    # Local evidence has the first opportunity to acquire a
+                    # node. Each offer then travels with its actual delivery,
+                    # using only the sender's exact pre-turn knowledge.
+                    cursor = start
+                    while cursor < list_len(dream):
+                        line = list_get(dream, cursor)
+                        part = cursor - start
+                        speaker = "haiku"
+                        receiver_name = "friend"
+                        if part - floor(part / 2) * 2 == 1:
+                            speaker = "friend"
+                            receiver_name = "haiku"
+                        native = haiku_contact_event(speaker, line, "en", climate, rings, 0.5, 7, cursor + 1, turn)
+                        delivered = haiku_contact_derive(native, receiver_name, line, 6, cursor + 1, turn)
+                        sender = haiku_iceberg_part(predecessor, text_concat(speaker, "_contact"))
+                        packet = haiku_contact_exchange_offer(sender, native)
+                        if text_equal(receiver_name, "friend"):
+                            haiku_contact_exchange_recv(friend_contact, delivered, packet, dream_count)
+                        else:
+                            haiku_contact_exchange_recv(haiku_contact, delivered, packet, dream_count)
+                        cursor = cursor + 1
     completed = haiku_iceberg_pack(core, haiku_lexical, friend_lexical, haiku_contact, friend_contact, settings, record_get(ledger, "text"), record_get(ledger, "values"))
     if version >= 2:
         record_set(completed, "version", version)
@@ -793,6 +922,23 @@ def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, bo
                 event_index = event_index + 1
             if record_get(life, "version") >= 4 and settings[0] and dream_count > old_count:
                 haiku_contact_symbols_dream(contact, dream_count, turn)
+                if record_get(life, "version") >= 5:
+                    # Deferred adoption reads only the opposite predecessor.
+                    # An unverified sender successor cannot supply a tree.
+                    cursor = start
+                    while cursor < list_len(dream):
+                        part = cursor - start
+                        speaker = "haiku"
+                        if part - floor(part / 2) * 2 == 1:
+                            speaker = "friend"
+                        if text_equal(speaker, owner) == 0:
+                            line = list_get(dream, cursor)
+                            native = haiku_contact_event(speaker, line, "en", climate, rings, 0.5, 7, cursor + 1, turn)
+                            delivered = haiku_contact_derive(native, owner, line, 6, cursor + 1, turn)
+                            sender = haiku_iceberg_part(life, text_concat(speaker, "_contact"))
+                            packet = haiku_contact_exchange_offer(sender, native)
+                            haiku_contact_exchange_step(contact, delivered, packet, dream_count)
+                        cursor = cursor + 1
             expected = record_new()
             actual = record_new()
             fields = haiku_words("learn_clock learn_words learn_counts learn_rows learn_text bindings binding_history")
@@ -812,6 +958,15 @@ def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, bo
                     record_set(actual, name, record_get(published, name))
                     cursor = cursor + 1
                 assert(record_equal(expected, actual), "Haiku symbol completion differs from its witnessed transition")
+            if record_get(life, "version") >= 5:
+                fields = haiku_words("exchange_clock exchange_origin exchange_rows exchange_text")
+                cursor = 0
+                while cursor < list_len(fields):
+                    name = list_get(fields, cursor)
+                    record_set(expected, name, record_get(contact, name))
+                    record_set(actual, name, record_get(published, name))
+                    cursor = cursor + 1
+                assert(record_equal(expected, actual), "Haiku exchange completion differs from its witnessed deliveries")
             record_set(expected, "seen", seen)
             record_set(actual, "seen", record_get(published, "p:seen"))
             assert(record_equal(expected, actual), "Haiku word learning completion source clocks differ")

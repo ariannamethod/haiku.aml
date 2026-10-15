@@ -1,0 +1,60 @@
+# Controlled predecessor factory: genuine standalone contact calls and actual
+# voice history are prepared separately. This is not a replay of fourteen past
+# iceberg tails. The following delivery itself is an unchanged generated dream.
+IMPORT "../src/iceberg_session.aml"
+
+day = 20740
+core = haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0)
+record_set(core, "dream_config", [1, 1, 2])
+life = haiku_iceberg_enable_symbols(haiku_iceberg_enable_words(haiku_iceberg_enable_janus(haiku_iceberg_new(core, [1, 0, 0, 0]), day, 1, 0), 0), 1, 0)
+haiku = haiku_iceberg_part(life, "haiku_contact")
+friend = haiku_iceberg_part(life, "friend_contact")
+climate = [0.5, 0.5, 1, 0.5]
+rings = [0]
+
+# Reviewed aliases are witnessed before teaching. The fixed seeds below make
+# these adjacent words occur in the next actual native utterances; no generated
+# line or accepted current completion is rewritten to make a tree eligible.
+event = haiku_contact_event("haiku", "magnify intensify", "en", climate, rings, 0.5, 1, 1, 1)
+haiku_contact_publish(haiku, event)
+haiku_contact_bind(haiku, "en", "magnify", 1, 1, 1)
+haiku_contact_bind(haiku, "en", "intensify", 0, 1, 1)
+event = haiku_contact_event("friend", "arise guide", "en", climate, rings, 0.5, 1, 1, 1)
+haiku_contact_publish(friend, event)
+haiku_contact_bind(friend, "en", "arise", 4, 1, 1)
+haiku_contact_bind(friend, "en", "guide", 6, 1, 1)
+i = 1
+while i <= 14:
+    event = haiku_contact_event("human", "fire water", "en", climate, rings, 0.5, 0, i, i)
+    haiku_contact_publish(haiku, event)
+    native = haiku_contact_event("haiku", "tree light", "en", climate, rings, 0.5, 7, i * 2 - 1, i)
+    delivered = haiku_contact_derive(native, "friend", "tree light", 6, i * 2 - 1, i)
+    haiku_contact_publish(friend, delivered)
+    haiku_session_turn(core, "fire", 0)
+    i = i + 1
+assert(haiku_dream_check(core) == 14 and list_len(record_get(core, "dream_history")) == 28, "Prepared voice did not record fourteen actual dreams")
+history = record_get(core, "dream_history")
+haiku_contact_publish(haiku, haiku_contact_event("haiku", list_get(history, 26), "en", climate, rings, 0.5, 7, 27, 14))
+haiku_contact_publish(friend, haiku_contact_event("friend", list_get(history, 27), "en", climate, rings, 0.5, 7, 28, 14))
+haiku_contact_symbols_dream(haiku, 14, 14)
+haiku_contact_symbols_dream(friend, 14, 14)
+assert(text_equal(haiku_contact_symbol_name(haiku, 88), "(fire+water)"), "Prepared Haiku did not earn its own root")
+assert(text_equal(haiku_contact_symbol_name(friend, 88), "(tree+light)"), "Prepared friend did not earn its own root")
+haiku_iceberg_put(life, "voice", core)
+haiku_iceberg_put(life, "haiku_contact", haiku)
+haiku_iceberg_put(life, "friend_contact", friend)
+haiku_iceberg_check(life, 0)
+preview = record_clone(core)
+spoken = haiku_session_turn(preview, "moon", 0)
+history = record_get(preview, "dream_history")
+assert(haiku_dream_check(preview) == 15 and list_len(history) == 30, "Prepared next delivery is not an actual two-line dream")
+tokens = haiku_tokenize_regex(spoken)
+assert(text_equal(list_get(tokens, 3), "magnify") and text_equal(list_get(tokens, 4), "intensify"), "Prepared Haiku spoken span changed")
+tokens = haiku_tokenize_regex(list_get(history, 29))
+assert(text_equal(list_get(tokens, 0), "arise") and text_equal(list_get(tokens, 1), "guide"), "Prepared friend spoken span changed")
+expected = record_new()
+record_set(expected, "haiku", spoken)
+record_set(expected, "friend", list_get(history, 29))
+checkpoint_save(expected, "iceberg-exchange-preview.state")
+checkpoint_save(life, "iceberg-exchange-prepared.state")
+PRINT "HAIKU_ICEBERG_EXCHANGE_PREPARED"

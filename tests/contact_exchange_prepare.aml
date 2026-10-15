@@ -1,0 +1,64 @@
+IMPORT "contact_exchange_fixture.aml"
+
+# This preparation runs once. Both execution modes then load these same newly
+# lived records; no generated checkpoint or old scratch receipt is committed.
+donor = exchange_fixture_new("haiku", 61)
+i = 1
+while i <= 14:
+    exchange_fixture_hear(donor, "fire water", i, i)
+    i = i + 1
+exchange_fixture_dream(donor, 1, 14)
+assert(text_equal(haiku_contact_symbol_name(donor, 88), "(fire+water)"), "Prepared donor lost its first local birth")
+
+# The fourteen independent paths also prepare the later capacity control.
+# Unknown separators forbid accidental cross-pair edges. All teachers are
+# immutable base names; the repeated identical context supplies no word vote.
+anchors = haiku_contact_anchors()
+corpus = "fire water tree"
+i = 2
+while i < 16:
+    corpus = text_concat(corpus, " quorvex ")
+    corpus = text_concat(corpus, text_concat(list_get(anchors, i), " music"))
+    i = i + 1
+assert(list_len(haiku_tokenize_regex(corpus)) == 45, "Prepared corpus token bound differs")
+i = 15
+while i <= 28:
+    exchange_fixture_hear(donor, corpus, i, i)
+    i = i + 1
+exchange_fixture_dream(donor, 2, 28)
+assert(text_equal(haiku_contact_symbol_name(donor, 89), "((fire+water)+tree)"), "Prepared donor lost its nested local birth")
+before = record_clone(donor)
+legacy_donor = donor
+donor = haiku_contact_enable_exchange(donor, 1, 28, 2)
+assert(record_equal(before, legacy_donor), "Exchange activation mutated its predecessor")
+assert(record_get(before, "version") == 3 and record_get(donor, "version") == 4, "Exchange activation changed its predecessor profile")
+assert(list_len(record_keys(donor)) == 55, "Exchange contact field count differs")
+assert(record_equal(donor, haiku_contact_enable_exchange(donor, 1, 28, 2)), "Exchange activation is not idempotent")
+unknown = haiku_contact_learning_lookup(donor, "en", "quorvex")
+assert(unknown[0] == -1, "Prepared separator acquired a learned association")
+haiku_contact_save(donor, text_concat(exchange_fixture_prefix, "donor"))
+
+receiver = exchange_fixture_new("friend", 62)
+i = 1
+while i <= 14:
+    exchange_fixture_hear(receiver, "tree light", i, i)
+    i = i + 1
+exchange_fixture_dream(receiver, 1, 14)
+assert(text_equal(haiku_contact_symbol_name(receiver, 88), "(tree+light)"), "Prepared receiver lost its independent local birth")
+haiku_contact_save(receiver, text_concat(exchange_fixture_prefix, "receiver-v3"))
+off = haiku_contact_enable_exchange(receiver, 0, 14, 1)
+haiku_contact_save(off, text_concat(exchange_fixture_prefix, "off"))
+receiver = haiku_contact_enable_exchange(receiver, 1, 14, 1)
+haiku_contact_save(receiver, text_concat(exchange_fixture_prefix, "receiver"))
+
+capacity_sender = record_clone(donor)
+i = 0
+while i < 14:
+    exchange_fixture_dream(capacity_sender, i + 3, i + 29)
+    clock = record_get(capacity_sender, "symbol_clock")
+    assert(clock[8] == i + 3, "A prepared capacity boundary did not earn exactly one local node")
+    i = i + 1
+clock = record_get(capacity_sender, "symbol_clock")
+assert(clock[8] == 16 and clock[26] == 28, "Prepared capacity fixture invented observations")
+haiku_contact_save(capacity_sender, text_concat(exchange_fixture_prefix, "capacity-sender"))
+PRINT "HAIKU_CONTACT_EXCHANGE_PREPARED_OK"

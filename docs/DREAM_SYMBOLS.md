@@ -60,8 +60,9 @@ most **16**, canonical name at most **256 characters**. Shared anchors retain
 IDs 0–87; private compound IDs start at 88. Parents always precede children.
 An ordered canonical name identifies the structure independently of local ID
 allocation. Different owners can recognize the same structure while retaining
-different evidence and pressure. Structural adoption between owners remains a
-separate experiment; this profile transmits the existing spoken text.
+different evidence and pressure. Version 4 transmits the existing spoken text;
+version 5 adds [structural adoption](SYMBOL_EXCHANGE.md) with explicit peer
+provenance and the receiver's own subsequent history.
 
 The rolling window holds 128 external observation records. Each birth also
 copies fourteen witness records into permanent proof slots. Those proofs and
@@ -103,6 +104,8 @@ Contact version 3 retains the earlier 47 fields and adds:
 
 The contact has **51 fields**. Iceberg v4 has **245 saved fields** and its
 detached result has **515**. V1/v2/v3 lives retain their 185/227/237 fields.
+Version 5 adds four exchange leaves to each contact, growing the life to 253
+fields while preserving local birth proofs and the shared 16-node bound.
 The symbol profile requires AML's expanded 1024-field record capacity; complete
 modules also use its 512 function slots and 16384-line source bound.
 

@@ -6,7 +6,7 @@ def haiku_contact_enable_symbols(state, enabled, dream_count):
     haiku_contact_check(state)
     assert(record_get(state, "version") >= 2, "Contact symbols require word memory")
     pending = record_clone(state)
-    if record_get(state, "version") == 3:
+    if record_get(state, "version") >= 3:
         return pending
     haiku_contact_integer(enabled, 0, 1)
     haiku_contact_integer(dream_count, 0, 999999)
@@ -278,6 +278,13 @@ def haiku_contact_symbols_check(state):
     if policy == 0:
         assert(clock[7] == min(128, clock[26]), "Contact symbol human receipts are missing")
     names = map_new()
+    origins = zeros(48)
+    if record_get(state, "version") >= 4:
+        origins = record_get(state, "exchange_origin")
+        haiku_parliament_vector(origins, 48, 999999)
+    last_local_turn = 0
+    last_local_dream = 0
+    last_local_revision = 0
     i = 0
     while i < 16:
         row = i * 10
@@ -295,16 +302,30 @@ def haiku_contact_symbols_check(state):
             assert(nodes[row + 3] == len(leaves) and len(leaves) <= 16, "Contact symbol leaf count differs")
             haiku_contact_integer(nodes[row + 4], clock[1] + 1, clock[42])
             haiku_contact_integer(nodes[row + 5], clock[2] + 1, clock[4])
-            haiku_contact_integer(nodes[row + 6], clock[1] + 1, nodes[row + 4])
             haiku_contact_integer(nodes[row + 7], 1, clock[5])
-            haiku_contact_integer(nodes[row + 8], 14, 128)
-            assert(nodes[row + 9] == 14, "Contact symbol birth needs fourteen witnesses")
+            kind = haiku_contact_integer(origins[i * 3], 0, 1)
+            if kind == 0:
+                assert(origins[i * 3 + 1] == 0 and origins[i * 3 + 2] == 0, "Contact native symbol has adoption provenance")
+                haiku_contact_integer(nodes[row + 6], clock[1] + 1, nodes[row + 4])
+                haiku_contact_integer(nodes[row + 8], 14, 128)
+                assert(nodes[row + 9] == 14, "Contact symbol birth needs fourteen witnesses")
+                if record_get(state, "version") >= 4:
+                    assert(nodes[row + 4] > last_local_turn and nodes[row + 5] > last_local_dream and nodes[row + 7] > last_local_revision, "Contact symbol local birth order differs")
+                last_local_turn = nodes[row + 4]
+                last_local_dream = nodes[row + 5]
+                last_local_revision = nodes[row + 7]
+            else:
+                assert(nodes[row + 6] == 0 and nodes[row + 8] == 0 and nodes[row + 9] == 0, "Contact adopted symbol has local witnesses")
             if i > 0:
-                assert(nodes[row + 4] > nodes[row - 6] and nodes[row + 5] > nodes[row - 5] and nodes[row + 7] > nodes[row - 3], "Contact symbol birth order differs")
+                if record_get(state, "version") < 4:
+                    assert(nodes[row + 4] > nodes[row - 6] and nodes[row + 5] > nodes[row - 5] and nodes[row + 7] > nodes[row - 3], "Contact symbol birth order differs")
+                else:
+                    assert(nodes[row + 4] >= nodes[row - 6] and nodes[row + 5] >= nodes[row - 5] and nodes[row + 7] >= nodes[row - 3], "Contact symbol acquisition order differs")
             name = haiku_contact_symbol_name(state, 88 + i)
             assert(map_has(names, name) == 0, "Contact symbol repeats a canonical identity")
             map_set(names, name, i)
         else:
+            assert(origins[i * 3] == 0 and origins[i * 3 + 1] == 0 and origins[i * 3 + 2] == 0, "Contact empty symbol has adoption provenance")
             j = 0
             while j < 10:
                 assert(nodes[row + j] == 0, "Contact symbol empty node has numbers")
@@ -322,6 +343,8 @@ def haiku_contact_symbols_check(state):
             occupied = 1
         if slot >= 128:
             occupied = slot < 128 + clock[8] * 14
+            if occupied:
+                occupied = origins[floor((slot - 128) / 14) * 3] == 0
         if occupied:
             assert(rows[row] == policy, "Contact symbol witness source differs")
             event = haiku_contact_integer(rows[row + 1], clock[10 + policy] + 1, clock[18 + policy])

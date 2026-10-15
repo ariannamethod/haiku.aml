@@ -7,6 +7,7 @@ Immutable lexical bodies and live private contact: 2026-10-14.
 Owned Janus calendars and witnessed expectation debt: 2026-10-14.
 Private learned word associations and the HAIKULOG split: 2026-10-14.
 Local recursive symbols at actual dream boundaries: 2026-10-14.
+Structural exchange through actual dream deliveries: 2026-10-15.
 This document records the inspected sources, current behavior, and implementation
 order. Numerical, text, lexical, cloud, memory, English form, candidate
 generation, MathBrain, RAE, tokenization, foreground exchange, and complete
@@ -20,7 +21,10 @@ future-witness debt. Version 1 retains its fixed profile until explicit
 activation; its existing histories survive that detached upgrade.
 Version 3 adds [private word associations](LEARNED_WORDS.md) from repeated
 accepted human/peer encounters. Version 4 adds [private dream-born symbols](DREAM_SYMBOLS.md),
-with frozen external paths and later recursive recognition. Each older profile stays unchanged until its
+with frozen external paths and later recursive recognition. Version 5 adds
+[structural exchange](SYMBOL_EXCHANGE.md): ordered parents resolve into the
+receiver's own alphabet, with peer provenance and later local recursive growth.
+Each older profile stays unchanged until its
 explicit upgrade. [HAIKULOG](../HAIKULOG.md) carries the chronological technical
 account and measured verification, keeping README focused on the organism.
 The stable chat retains its
@@ -284,15 +288,15 @@ experience. [ASYNC](ASYNC.md) preserves the earlier audit and records the fixes.
 
 The experimental iceberg now connects immutable AML PEN7 handles, bounded word
 admission, contextual representations and real encounters to two private
-parliaments. Its version-4 publication uses AML's expanded 16384-line import
+parliaments. Its version-5 publication uses AML's expanded 16384-line import
 capacity, 512 function slots, 16-argument functions and 1024-field records.
-The saved life has 245 fields; its detached completion has 515. Source bodies
+The saved life has 253 fields; its detached completion has 531. Source bodies
 stay outside snapshots. Older profiles retain their own schemas until upgrade.
 
 The next integration work is:
 
-1. Model-attributed concept formation and structural peer adoption, extending
-   the working Janus balance, learned word associations and local dream symbols
+1. Model-attributed concept formation, extending
+   the working Janus balance, learned word associations and exchanged dream symbols
    with separately measured contributions to later words.
 2. Early response display and input overlap, with durable pending experience,
    exact restart replay and one completed-state publisher.
@@ -541,8 +545,10 @@ immutable handles and all-parameter mixing. Four retained contexts, actual
 cloud/inner/dream encounters, model prototypes and bounded word admission now
 share one complete checkpoint. Private Janus balance and externally learned
 word associations extend that profile through explicit activation. Local
-recursive glyph formation now joins it at actual dream boundaries; structural
-peer adoption remains in the [iceberg research plan](ICEBERG.md).
+recursive glyph formation now joins it at actual dream boundaries; version 5
+adds [structural peer adoption](SYMBOL_EXCHANGE.md) with the receiver's own
+subsequent history. Further model-concept experiments remain in the
+[iceberg research plan](ICEBERG.md).
 
 ### RAE development
 

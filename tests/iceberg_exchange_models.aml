@@ -1,0 +1,29 @@
+# One actual two-owner dream also returns both frozen-body lexical contacts.
+IMPORT "../src/iceberg_session.aml"
+
+a = model_try_load("../weights/haiku1.gguf")
+b = model_try_load("../weights/haiku2.gguf")
+assert(model_ready(a) and model_ready(b), "Exchange fixture needs both immutable bodies")
+serial = haiku_iceberg_enable_exchange(checkpoint_load("iceberg-exchange-prepared.state"), 1, 0)
+record_set(serial, "settings", [1, 1, 2, 1])
+parallel = record_clone(serial)
+first = haiku_iceberg_turn_at(serial, "moon", 0, a, b, 0, 20754)
+second = haiku_iceberg_turn_at(parallel, "moon", 0, a, b, 1, 20754)
+assert(text_equal(first, second) and record_equal(serial, parallel), "Dual-body exchange differs between serial and worker publication")
+assert(list_len(record_keys(serial)) == 253, "Model exchange life fields differ")
+owners = haiku_words("haiku friend")
+i = 0
+while i < 2:
+    owner = list_get(owners, i)
+    contact = haiku_iceberg_part(serial, text_concat(owner, "_contact"))
+    symbols = record_get(contact, "symbol_clock")
+    exchange = record_get(contact, "exchange_clock")
+    assert(symbols[8] == 2 and exchange[7] == 1, "A deferred model receipt hid the actual structural adoption")
+    assert(symbols[28] + symbols[29] + symbols[30] == 1, "Exchange repeated or dropped its model contact")
+    assert(record_get(serial, text_concat(owner, "_lexical:revision")) == 1, "Exchange repeated or dropped its lexical pass")
+    i = i + 1
+checkpoint_save(serial, "iceberg-exchange-models.state")
+loaded = checkpoint_load("iceberg-exchange-models.state")
+haiku_iceberg_check(loaded, 0)
+assert(record_equal(serial, loaded), "Dual-body exchange failed to round-trip")
+PRINT "HAIKU_ICEBERG_EXCHANGE_MODELS_OK"

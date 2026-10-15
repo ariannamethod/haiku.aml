@@ -69,8 +69,10 @@ retains its own bounded evidence, confidence and conflicts.
 Version 4 adds [private dream-born symbols](DREAM_SYMBOLS.md). Fourteen external
 turns can support an ordered relation; an actual dream preserves at most one
 new structure per owner. Later encounters can recognize it and build another
-level. Embedding-direction injection and structural adoption between owners
-remain in [TODO](../TODO.md).
+level. Version 5 adds [structural exchange](SYMBOL_EXCHANGE.md) through actual
+spoken dream lines. Received parents resolve into the listener's own alphabet;
+later local encounters can support a new recursive child. Embedding-direction
+injection remains in [TODO](../TODO.md).
 
 ## Events that actually happened
 
@@ -80,8 +82,8 @@ learning/reflection/dream tail:
 1. The actual human input, with the exchange's observation, quality and
    completed ring coherences. This later human encounter can reward retained
    earlier parliamentary receipts and settle Haiku's earlier Janus expectation.
-   In versions 3/4, its frozen contact features precede the word-learning update.
-   Version 4 also freezes its symbol path before that update.
+   In versions 3–5, its frozen contact features precede the word-learning update.
+   Versions 4/5 also freeze its symbol path before that update.
 2. The actual recent cloud triples, followed by the actual internal haiku.
 3. Every newly recorded dream line in its original alternating order. The
    speaker records its own event; the other presence receives a derived event
@@ -91,8 +93,12 @@ learning/reflection/dream tail:
    vocabulary admission. The friend's own excursion follows when it spoke in
    this dream. Each successful pass installs that presence's next expectation,
    after all of this turn's external witnesses have already arrived.
-5. Version 4 consolidates symbols at the end of an actual new dream, after both
+5. Versions 4/5 consolidate symbols at the end of an actual new dream, after both
    lexical passes and admission. New nodes first affect later turns.
+6. Version 5 then resolves structural offers from those actual deliveries, using
+   each sender's exact turn-start state. Missing parents are adopted atomically;
+   existing canonical structures retain their ID and first provenance. The new
+   structures become available on later turns.
 
 Human, cloud, self, peer, dream and model encounters keep separate source
 clocks. A returned model proposal preserves its parent and original source.
@@ -131,15 +137,15 @@ Its frozen learning features and original human observation retain their values.
 
 ## One publication, one checkpoint
 
-Version 4 has **245 flat fields**; versions 3/2/1 retain **237/227/185**:
+Version 5 has **253 flat fields**; versions 4/3/2/1 retain **245/237/227/185**:
 
 | Component | Fields |
 |---|---:|
 | Existing version-3 voice | 55 |
 | Haiku and friend lexical owners | 18 each |
-| Haiku and friend contact owners | 51 each in v4; 47 in v3; 42 in v1/v2 |
-| Haiku and friend Janus owners, versions 2–4 | 20 each |
-| Envelope, component key lists, settings and admission ledger | 12 in v2–4; 10 in v1 |
+| Haiku and friend contact owners | 55 each in v5; 51 in v4; 47 in v3; 42 in v1/v2 |
+| Haiku and friend Janus owners, versions 2–5 | 20 each |
+| Envelope, component key lists, settings and admission ledger | 12 in v2–5; 10 in v1 |
 
 The existing voice's 55-field schema is unchanged. `iceberg.state` is a separate
 complete checkpoint. It holds all four contexts, both parliaments, identities,
@@ -150,6 +156,9 @@ Version 3 adds five learned-word leaves per contact: activation/encounter
 clocks, candidate words, anchor counts, evidence rows and original context text.
 Version 4 adds four symbol leaves per contact: clocks, immutable parent trees,
 frozen observation/birth-proof paths and exact source text.
+Version 5 adds four exchange leaves per contact: delivery clocks, per-node
+origin, first-adoption packets and their exact source text. Both origins share
+the same sixteen-node catalogue; local birth proofs retain their own slots.
 
 The worker completion carries the entire exact predecessor, completed life,
 frozen foreground experience and provider request. Publication compares every
@@ -161,14 +170,14 @@ workers finish.
 
 The full module uses AML's expanded 16384-line import capacity, 512 function
 slots, 16-argument functions and 1024-field flat records. Its complete predecessor
-and successor fit in one transient result: 515 fields for version 4, 499 for
-version 3 and 479 for version 2.
+and successor fit in one transient result: 531 fields for version 5, 515 for
+version 4, 499 for version 3 and 479 for version 2.
 Publication also freezes
 each Janus owner's mode, activation day, calendar and witness policy. An
 advanced owner must record the request's captured day and turn; an idle owner
 must remain identical.
 
-Versions 2–4 also reconstruct both Janus transitions from the exact
+Versions 2–5 also reconstruct both Janus transitions from the exact
 predecessor, frozen human input and newly accepted dream deliveries. It preserves
 earlier dream text and boundaries, then independently repeats the relevant
 lexical passes using the supplied immutable model handles. The worker and
@@ -181,12 +190,12 @@ forwards per turn. Missing or disabled bodies perform no verification
 forward. Voice learners, dream generation, prototype forwards, vocabulary admission
 and random draws are not repeated, and the source weights remain immutable.
 The original five-argument `haiku_iceberg_result_check` accepts version 1 only.
-Versions 2–4 use `haiku_iceberg_check_sources(life, result, experience, request,
+Versions 2–5 use `haiku_iceberg_check_sources(life, result, experience, request,
 tokenizer, body_a, body_b)`, which also checks both handle identities against the
 captured request. Version-2's 227-field checkpoint and 479-field completion
 remain unchanged.
 
-Versions 3/4 independently replay word evidence from the exact
+Versions 3–5 independently replay word evidence from the exact
 predecessor and accepted human/dream events. All five learned leaves and the
 unchanged reviewed bindings must match. It also reconstructs contact source
 clocks, receipt cursor, retained text and ancestry in the original order.
@@ -194,13 +203,19 @@ Native receipt features are reconstructed before the corresponding learning
 step, so the confirming encounter cannot claim the meaning it just taught.
 The word-learning replay adds no model forward, parliament step or random draw.
 
-Version 4 also replays every eligible symbol observation before its word-learning
+Versions 4/5 also replay every eligible symbol observation before its word-learning
 step, then consolidates at the validated final dream boundary. All four symbol
 leaves must equal this reconstruction. Birth proofs survive observation expiry;
 their old learned meanings stay frozen. Life-level validation ties activation,
 birth turns and dream ordinals to the voice's actual history. The symbol replay
 adds no model forward or random draw. Its complete contract is in
 [DREAM_SYMBOLS](DREAM_SYMBOLS.md).
+
+Version 5 reconstructs each structural offer from the sender's exact predecessor
+and accepted dream line. It repeats adoption after local consolidation and
+compares all four exchange leaves and the shared symbol catalogue. The receiver
+keeps its own evidence: an adopted node has peer provenance and zero local
+proofs. Its later recursive children earn their own fourteen witnesses.
 
 ## Quiet absence and controls
 
@@ -219,6 +234,8 @@ New-life settings at the top of `iceberg.aml` are saved with the checkpoint:
 | `upgrade_words` | 0 | Explicitly activates word learning for an existing Janus life |
 | `dream_symbols` | 1 | Gives a new word-learning life version-4 dream symbols; zero saves an inert v4 control |
 | `upgrade_symbols` | 0 | Explicitly activates the symbol profile for an existing word-learning life |
+| `symbol_exchange` | 1 | Gives a new symbol life version-5 structural exchange; zero saves an inert v5 exchange control |
+| `upgrade_exchange` | 0 | Explicitly activates exchange for an existing version-4 life |
 
 An existing checkpoint retains its first four settings. The scheduling choice
 can change without changing the complete result. For a new control condition,
@@ -232,7 +249,7 @@ lexical preference. Mode 1 selects dynamic balance. Both modes use the same
 expectation and witness budget.
 
 `haiku_iceberg_enable_words(life, tokenizer)` returns a detached, idempotent
-version-3 upgrade from a Janus life, preserving an already-enabled v3/v4 profile.
+version-3 upgrade from a Janus life, preserving an already-enabled v3/v4/v5 profile.
 It captures the current contact clocks;
 old receipts cannot teach the new learner. An existing v1 checkpoint requires
 both `upgrade_balance=1` and `upgrade_words=1` to activate both organs together.
@@ -242,20 +259,27 @@ An existing v2 requires only `upgrade_words=1` to reach v3.
 idempotent v4 upgrade from a word-learning life. It captures the current contact
 turn and actual dream count; old receipts cannot teach the new organ. An older
 life first enables balance, then words, then symbols. The v4 symbol mode is
-saved and immutable; another enable call cannot switch it. With all upgrade
-controls at zero, saved v1/v2/v3 profiles continue exactly as before.
+saved and immutable; another enable call cannot switch it.
+
+`haiku_iceberg_enable_exchange(life, enabled, tokenizer)` is the detached,
+idempotent v5 upgrade from v4. It captures the actual core turn and dream count,
+and preserves the existing catalogue and local proofs. New lives with
+`dream_symbols=0` also save an inert exchange mode. With all upgrade controls
+at zero, saved v1/v2/v3/v4 profiles continue exactly as before.
+Upgrading an existing symbols-off control uses `symbol_exchange=0`; changing
+the launcher's `dream_symbols` value leaves that saved symbol mode intact.
 
 `haiku_iceberg_turn_at(..., worker, day)` accepts an explicit day for replay and
 controlled experiments. The ordinary turn samples AML's `utc_day()` once for
-versions 2–4; version 1 never reads the clock. The worker uses its frozen request.
+versions 2–5; version 1 never reads the clock. The worker uses its frozen request.
 
 Empty paths create explicit unavailable handles. Missing or invalid files
 remain inspectable through `model_ready` / `model_error`; they add no fallback
 lines to poems. With zero available bodies, lexical owners and the admission
 ledger stay unchanged while the enabled weightless contact field can continue.
 The original voice retains its exact weightless continuation and draws.
-Word evidence and version-4 symbol evidence continue from eligible external
-encounters without model bodies. Symbol pressure changes later contact and
+Word evidence, symbol evidence and structural exchange continue from eligible
+external encounters without model bodies. Symbol pressure changes later contact and
 ranking; absent proposals still produce no lexical admission. Turning off
 `deeper_life` leaves both contacts unchanged.
 An existing Janus expectation can still meet a legitimate later witness, but
@@ -285,6 +309,7 @@ make test-lexical-sources test-parliament-contact test-iceberg
 make test-janus-balance test-iceberg-janus
 make test-contact-learning test-iceberg-learning
 make test-contact-symbols test-iceberg-symbols
+make test-contact-exchange test-iceberg-exchange
 make test-owned-tail
 ```
 

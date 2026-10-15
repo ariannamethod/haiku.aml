@@ -1,0 +1,52 @@
+IMPORT "../src/parliament_contact.aml"
+
+# Fresh fixtures are built through the contact API. The integration gate owns
+# the global dream scheduler; each explicit boundary below is its unit input.
+def exchange_fixture_new(owner, seed):
+    state = haiku_contact_enable_learning(haiku_contact_new(owner, seed))
+    return haiku_contact_enable_symbols(state, 1, 0)
+
+def exchange_fixture_native(owner, text, number, turn):
+    return haiku_contact_event(owner, text, "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 7, number, turn)
+
+def exchange_fixture_hear(state, text, number, turn):
+    event = haiku_contact_event("human", text, "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 0, number, turn)
+    if text_equal(record_get(state, "p:owner"), "friend"):
+        native = exchange_fixture_native("haiku", text, number, turn)
+        event = haiku_contact_derive(native, "friend", text, 6, number, turn)
+    published = haiku_contact_publish(state, event)
+    assert(record_get(published, "committed") == 1, "Fixture external contact silently replayed")
+    return event
+
+def exchange_fixture_deliver(sender, receiver, text, number, turn):
+    native = exchange_fixture_native(record_get(sender, "p:owner"), text, number, turn)
+    published = haiku_contact_publish(sender, native)
+    assert(record_get(published, "committed") == 1, "Fixture sender line silently replayed")
+    peer = haiku_contact_derive(native, record_get(receiver, "p:owner"), text, 6, number, turn)
+    published = haiku_contact_publish(receiver, peer)
+    assert(record_get(published, "committed") == 1, "Fixture delivered line silently replayed")
+    return peer
+
+def exchange_fixture_dream(state, ordinal, turn):
+    seen = record_get(state, "p:seen")
+    number = max(turn, seen[7] + 1)
+    native = exchange_fixture_native(record_get(state, "p:owner"), "music", number, turn)
+    published = haiku_contact_publish(state, native)
+    assert(record_get(published, "committed") == 1, "Fixture dream line silently replayed")
+    return haiku_contact_symbols_dream(state, ordinal, turn)
+
+def exchange_fixture_leaf(state, key):
+    part = record_new()
+    record_set(part, key, record_get(state, key))
+    return record_clone(part)
+
+def exchange_fixture_memory(state):
+    part = record_new()
+    names = haiku_words("exchange_clock exchange_origin exchange_rows exchange_text")
+    i = 0
+    while i < list_len(names):
+        key = list_get(names, i)
+        record_set(part, key, record_get(state, key))
+        i = i + 1
+    return record_clone(part)
+
