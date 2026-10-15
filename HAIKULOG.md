@@ -86,6 +86,29 @@ empty stderr. Launcher SHA256
 sources and the runtime stayed unchanged. Their complete checkpoints were
 818,983 and 804,986 bytes.
 
+The integration factory combines fourteen genuine standalone contact
+observations with fourteen actual two-line core dreams in one controlled
+predecessor. With seeds 575/57, the known next dream uses the previously
+witnessed aliases `magnify intensify` and `arise guide`. The first setup stopped
+before teaching because `other` already has a shared binding; the fixture now
+checks its actual unknown aliases before teaching. The measured transition
+starts from this controlled predecessor and generates its next dream unchanged.
+Both owners retain their own root at ID88 and fourteen birth proofs, adopt the
+peer's distinct root at ID89 with zero local proofs, and recognize that received
+parent on the following waking contact with `C → music`.
+
+The focused integration gate passes serial/worker equality, detached and
+idempotent upgrade, exact restart and all **240 non-wrapper fields** of the
+disabled v5/v4 comparison. Interpreter and compiled stdout and complete
+checkpoint bytes match, SHA256
+`febfa24e0da467bb84f806eb2509cafe3d085640a530ff0c752b97033704c814`.
+The compiled run recreates a removed checkpoint at its retained source origin
+while running from a separate, empty working directory. A separate interpreted
+dual-GGUF dream passes serial/worker equality, both adoptions, one model contact
+and one lexical revision per owner, and checkpoint round-trip. Both model
+hashes remain unchanged. Preparation and the remaining lanes completed in
+segments using the same prepared checkpoint and final source hashes.
+
 The new C publication gate passed **13 refusals**, preserving all **253 owner
 fields**, the candidate envelope and the preceding checkpoint bytes. Two
 alternative histories first pass the whole-life validator: an invented extra
@@ -94,6 +117,75 @@ predecessor replay rejects both. Sender-tree, origin, actual-line, dream-boundar
 profile and stale-result changes are also refused. The **531-field** detached
 completion, failed-save refusal and one-time save/swap pass with actual adoption
 in both directions.
+
+The standalone lifecycle passed in both execution modes: all **twelve saved
+record pairs** match byte for byte, including the packet and delivered event.
+The ten contact states cover nested closure and private IDs, canonical reuse,
+later re-export, the thirteen/fourteen-witness boundary, restart, .25 prediction
+mass and +.0375 rank bound, atomic capacity refusal and the exact old-profile
+off projection. The later native child and its restarted counterpart share
+SHA256 `2699443b91f63556e8870b2f399289214264ea81cdad16879a88363aa7de8a6f`.
+The run then stopped in C after **21 rejected deliveries** and **18 rejected
+corrupt records**: changing the first receipt event from 100 to 99 was accepted.
+The original failure and the unexecuted remaining sixteen cases were retained;
+elapsed time was **1,070.24 s**, with empty lifecycle stderr and unchanged hashes.
+
+Both modes reused the same five prepared records, produced through genuine
+contact APIs at exchange source SHA256
+`026765d63b4762acc8c8e9228fc05bbe6bf1685b3d254406fec8da2393a021f3`.
+Preparation precedes the saved-off sender guard and does not query an off
+sender. The complete lifecycle, including that guard, ran at the source hashes
+below.
+
+The iceberg graph at this execution stage has **30 modules**, **9,115 physical
+source lines** and **262 user functions**: 279 slots including AML's builtins.
+These production SHA256 values stayed fixed through the long lifecycle and
+initial integration gates:
+
+| Source | SHA256 |
+| --- | --- |
+| `src/contact_exchange.aml` | `89fbe32b8d3faed7409760f28b3f4ea0aba7f77330c4cb64a311909449e0b589` |
+| `src/contact_symbols.aml` | `d598ecbdebfb28537b77783e14fc932bc910eac5286fe4c58fdd2979034ec3dd` |
+| `src/parliament_contact.aml` | `21491e66fffdf40e3ffc92a38ab77b13d79d6c420511893f7d1afdb308c8e1ef` |
+| `src/iceberg_session.aml` | `91c2062e319632f002b37f3ca9ad5c3ada06273a894a2a222221a4cfa76d68d0` |
+| `iceberg.aml` | `d4b139a330ef452620a14080d072e12ec1f246bad338433775102a294b74861b` |
+
+The receipt-clock defect above is fixed by seven validator lines. A retained
+receipt at the current delivery revision must match the exact current event,
+turn and dream; an older revision must precede the latest peer event. The
+100-to-99 mutation reproduces acceptance before the fix and explicit rejection
+after it. The transition code is unchanged. Corrected `contact_exchange.aml`
+SHA256 is `d07ab5c5d555b8028b30e69a57ebdf2a5c2ae4a41f8cb01746e726323f538dba`;
+the final import graph has **9,122 lines**, with the same module/function counts.
+
+The focused integration C gate then passed all **13 refusals** again on this
+corrected validator, including positive two-owner adoption and exact save/swap.
+The extra-delivery alternative changes both the delivery counter and its latest
+receipt revision to two, so it still passes the whole-life validator before
+exact predecessor replay rejects it. The altered latest event now fails at the
+new contact invariant. These final assertions live in
+`tests/iceberg_exchange_publication.c`, SHA256
+`d1de5d1732016f634b57f05c88699e3c36d0199ff13d16b99fba2b9400af9f1d`.
+
+The final standalone focused gate passed in **33.66 s**: **21 invalid
+deliveries** and **36 corrupt records** were rejected without mutation, exact
+receive/replay preserved the checkpoint, and all **fifteen genuine contact
+snapshots** loaded in both interpreter and compiled execution. These are the ten
+retained lifecycle states and five prepared states. Both paths also repeated
+the actual positive receive and replay. All twelve earlier record pairs and
+their hashes remained unchanged. The added thirty-sixth corruption covers an
+older receipt revision pretending to name the latest event; the original
+100-to-99 case covers the other direction. Two surplus EOF blank lines were
+removed from the fixture and C test before this final focused run.
+
+The long lifecycle and model lanes above remain their recorded executions;
+the final validator was checked against their retained states and positive
+transitions. Reproduce the complete suites from fresh preparation with:
+
+```sh
+make test-contact-exchange test-iceberg-exchange
+python3 tests/compare_exchange_profiles.py
+```
 
 ## 2026-10-14 — A dream gives a familiar path its own name
 

@@ -119,7 +119,8 @@ int main(int argc, char **argv) {
         "text = record_get(broken, \"exchange_text\")\nlist_set(text, 0, \"music\")\nrecord_set(broken, \"exchange_text\", text)",
         "text = record_get(broken, \"exchange_text\")\nlist_set(text, 2, \"friend\")\nrecord_set(broken, \"exchange_text\", text)",
         "text = record_get(broken, \"exchange_text\")\nlist_set(text, 3, \"(fire+(water+tree))\")\nrecord_set(broken, \"exchange_text\", text)",
-        "text = record_get(broken, \"exchange_text\")\nlist_set(text, 63, \"unused\")\nrecord_set(broken, \"exchange_text\", text)"
+        "text = record_get(broken, \"exchange_text\")\nlist_set(text, 63, \"unused\")\nrecord_set(broken, \"exchange_text\", text)",
+        "clock = record_get(broken, \"exchange_clock\")\nclock[6] = 2"
     };
     size_t corrupt_count = sizeof(corruptions) / sizeof(corruptions[0]);
     for (size_t i = 0; i < corrupt_count; ++i) {
@@ -144,4 +145,3 @@ int main(int argc, char **argv) {
     puts("PASS: exchange receipt replay and preceding checkpoint are exact");
     return 0;
 }
-

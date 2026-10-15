@@ -49,4 +49,3 @@ def exchange_fixture_memory(state):
         record_set(part, key, record_get(state, key))
         i = i + 1
     return record_clone(part)
-

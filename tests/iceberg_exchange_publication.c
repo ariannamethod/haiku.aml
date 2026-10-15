@@ -94,10 +94,12 @@ int main(int argc, char **argv) {
     unchanged(owner_before, "worker published an adoption before validation");
 
     /* This alternative history passes both validators: source event IDs have
-       gaps, so only exact predecessor replay disproves an extra delivery. */
+       gaps, so only exact predecessor replay disproves an extra earlier
+       delivery. The actual latest adoption retains the matching revision. */
     reject_publish(
         "clock = record_get(result, \"life:haiku_contact:exchange_clock\")\n"
         "assert(clock[6] == 1, \"fixture needs one actual delivery\")\nclock[6] = 2\n"
+        "rows = record_get(result, \"life:haiku_contact:exchange_rows\")\nrows[12] = 2\n"
         CHECK_LIFE, "exchange completion differs from its witnessed deliveries");
 
     /* Consuming the real delivery while withholding its available structure is
@@ -130,8 +132,8 @@ int main(int argc, char **argv) {
         "record_set(result, \"life:haiku_contact:exchange_text\", texts)\n"
         CHECK_CONTACT, "exchange receipt changed its actual spoken text");
     reject_publish(
-        "rows = record_get(result, \"life:haiku_contact:exchange_rows\")\nrows[0] = 29\n"
-        CHECK_CONTACT, "exchange receipt names the wrong speaker");
+        "rows = record_get(result, \"life:haiku_contact:exchange_rows\")\nrows[0] = 29\n",
+        "exchange latest delivery differs");
     reject_publish(
         "rows = record_get(result, \"life:haiku_contact:exchange_rows\")\nrows[4] = 13\nrows[5] = 13\n"
         CHECK_CONTACT, "exchange root changed its sender acquisition");

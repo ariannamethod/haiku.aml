@@ -370,6 +370,13 @@ def haiku_contact_exchange_check(state):
             added = haiku_contact_integer(rows[row + 11], 1, 15)
             revision = haiku_contact_integer(rows[row + 12], 1, clock[6])
             symbol_revision = haiku_contact_integer(rows[row + 13], 1, symbols[5])
+            # Revisions count this receiver's peer deliveries, including those
+            # that reused a tree or had no offer. Only the latest one seals the
+            # current clock; older first-arrival receipts keep their own time.
+            if revision == clock[6]:
+                assert(event == clock[4] and turn == clock[5] and dream == clock[8], "Contact exchange latest delivery differs")
+            else:
+                assert(event < clock[4], "Contact exchange older receipt repeats the latest delivery")
             assert(start + added <= symbols[8] and start >= previous_end, "Contact exchange adoption range differs")
             assert(event > previous_event and turn >= previous_turn and dream >= previous_dream and revision > previous_revision, "Contact exchange receipt order differs")
             if turn == previous_turn:

@@ -81,7 +81,9 @@ Contact version 4 adds four leaves to the earlier 51 fields:
 Every retained packet introduces at least one node, so sixteen immutable packet
 slots cover the catalogue's whole lifetime. The original symbol leaves retain
 their observation ring and permanent local proof slots. Adopted nodes leave
-their local proof slots empty.
+their local proof slots empty. A receipt at the current delivery revision must
+match its exact event, turn and dream clocks; an older receipt must precede the
+latest peer event. Later reuse or refusal keeps that first receipt intact.
 
 The contact has **55 fields**; iceberg v5 has **253 saved fields** and a
 **531-field** detached completion. Existing v4 lives retain their 245 fields
