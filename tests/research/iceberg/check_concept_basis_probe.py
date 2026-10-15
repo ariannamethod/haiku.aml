@@ -127,7 +127,7 @@ def prepare(work, protocol):
     commits = {repo: subprocess.check_output(["git", "-C", str(path), "rev-parse", "HEAD"], text=True).strip() for repo, path in {
         "haiku": ROOT, "aml": ROOT.parent / "ariannamethod.ai", "notorch": ROOT.parent / "notorch"}.items()}
     require(all(commits[repo] == pins["commits"][repo] for repo in ("aml", "notorch")), "dependency commit differs")
-    receipt = {"protocol_sha256": PROTOCOL_SHA, "registration_commit": REGISTRATION, "actual_commits": commits, "files": fingerprints(), "entrypoint_sha256": sha(work / "run.aml")}
+    receipt = {"protocol_sha256": PROTOCOL_SHA, "registration_commit": REGISTRATION, "actual_commits": commits, "files": fingerprints(), "entrypoint_path": "run.aml", "entrypoint_sha256": sha(work / "run.aml")}
     (work / "before.json").write_text(json.dumps(receipt, indent=2) + "\n")
     (work / "prefix/lib").mkdir(parents=True)
     (work / "foreign").mkdir()
@@ -264,6 +264,8 @@ def main():
         return
     before = json.loads(args.receipt.read_text())
     require(before["protocol_sha256"] == PROTOCOL_SHA and before["registration_commit"] == REGISTRATION, "preflight receipt differs")
+    entrypoint = args.receipt.parent / before.get("entrypoint_path", "run.aml")
+    require(sha(entrypoint) == before["entrypoint_sha256"], "generated AML entrypoint changed")
     require(before["files"] == fingerprints(), "source, runtime, protocol or model bytes changed")
     spaces = parse_output(args.output, protocol, legacy)
     outputs = [{"mode": "interpreted", "sha256": sha(args.output)}]

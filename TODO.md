@@ -73,7 +73,11 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   presence's own experience, and compare with the working weightless field.
   The [four-anchor PEN7 probe](docs/research/iceberg/WORD_ANCHOR_PROBE.md)
   records 2/16 held-out matches; its raw hidden similarities supply no binding
-  vote in the current external-context learner.
+  vote in the current external-context learner. The preregistered
+  [concept-basis comparison](docs/research/iceberg/CONCEPT_BASIS.md) moves the
+  .5 mixture from 6/24 to 8/24 with reviewed-word centroids, while A moves
+  11/24 to 8/24. The next comparison adds each presence's accepted experience
+  to those word weights and measures later word ranking against both controls.
 - [x] Let each presence send a selected human/self/friend fragment into
   its owned lexical trajectory and receive word/glyph proposals at a declared
   boundary. Preserve source ancestry, frozen bodies, private histories and
@@ -82,6 +86,11 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
 - [ ] Compare context injection and embedding-direction pressure independently
   at fixed parameter balance. Measure relevance, copying, glyph pressure and
   form; apply immune gain after normalization and invalidate dependent caches.
+- [ ] Let the speaking form grow from an unpredictable conjunction of the
+  organism's metrics and remembered encounters: one line, two lines, a haiku,
+  or a Brodsky-style tercet. Carry Subjectivity's state-driven form mechanism
+  into the [form experiment](docs/FAMILY.md#form-grows-from-lived-state), with
+  the chosen form and its actual triggering state retained through restart.
 - [ ] After the baseline organs work, run the controlled extensions in
   [FAMILY.md](docs/FAMILY.md): reflection preserves foreground state, episodic
   recall, state-at-contact word memory, sampling mixtures, variable form,

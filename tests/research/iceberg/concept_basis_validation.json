@@ -1,0 +1,16 @@
+{
+  "scope": "Post-measurement read-only entrypoint and fingerprint verification; original before/result preserved unchanged",
+  "original_before_sha256": "0ee0660cfcd67f2358086e9bb77d33f74d2138d36ef01125c4906ac27c4869bb",
+  "original_result_sha256": "15026c56e25441f529f650e642f03882d68147dc336c72e30ac711a3b70e3899",
+  "entrypoint_sha256": "53d389b96dde63304edcba8ae3201aea894ac0eeceda29b7eb1ae2e3096d3282",
+  "entrypoint_matches_original_receipt": true,
+  "only_post_run_file_change": {
+    "haiku/tests/research/iceberg/check_concept_basis_probe.py": {
+      "before": "bbbea1d069ebdbe03ec2b24b5280517c80cd8b52a2ded2440f08fc296fb2efd5",
+      "after": "274131309c1e1597397e20df0bf9186218460eedf358fa781f950019156f624a"
+    }
+  },
+  "original_output_sha256": "8e91b5baf3845264aab507ef98012f84eb807c3ad857d5a7239c9e476a5b338a",
+  "compiled_output_sha256": "8e91b5baf3845264aab507ef98012f84eb807c3ad857d5a7239c9e476a5b338a",
+  "new_model_forwards": 0
+}
