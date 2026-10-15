@@ -1,0 +1,107 @@
+# The same prepared predecessor feeds both execution modes. Actual delivery,
+# source verification and owner publication run through the complete iceberg.
+IMPORT "../src/iceberg_session.aml"
+
+def exchange_test_leaves(life):
+    result = record_new()
+    owners = haiku_words("haiku friend")
+    names = haiku_words("exchange_clock exchange_origin exchange_rows exchange_text")
+    i = 0
+    while i < 2:
+        j = 0
+        while j < 4:
+            name = text_concat(text_concat(list_get(owners, i), "_contact:"), list_get(names, j))
+            record_set(result, name, record_get(life, name))
+            j = j + 1
+        i = i + 1
+    return result
+
+def exchange_test_parity(legacy, disabled):
+    actual = record_new()
+    expected = record_new()
+    keys = record_keys(legacy)
+    wrappers = haiku_words("version haiku_contact:version friend_contact:version haiku_contact:keys friend_contact:keys")
+    i = 0
+    while i < list_len(keys):
+        key = list_get(keys, i)
+        if list_find(wrappers, key) < 0:
+            record_set(expected, key, record_get(legacy, key))
+            record_set(actual, key, record_get(disabled, key))
+        i = i + 1
+    assert(record_equal(expected, actual), "Disabled exchange changed a version-four leaf")
+    return 1
+
+day = 20754
+missing = model_try_load("")
+legacy = checkpoint_load("iceberg-exchange-prepared.state")
+expected = checkpoint_load("iceberg-exchange-preview.state")
+original = record_clone(legacy)
+live = haiku_iceberg_enable_exchange(legacy, 1, 0)
+assert(record_equal(legacy, original), "Exchange activation changed its existing symbol life")
+assert(record_get(live, "version") == 5 and list_len(record_keys(live)) == 253, "Exchange life fields differ")
+assert(record_get(live, "haiku_contact:version") == 4 and record_get(live, "friend_contact:version") == 4, "Exchange contact profile differs")
+again = haiku_iceberg_enable_exchange(live, 0, 0)
+assert(record_equal(live, again), "Repeated activation changed the saved exchange mode")
+clock = record_get(again, "haiku_contact:exchange_clock")
+clock[0] = 0
+clock = record_get(live, "haiku_contact:exchange_clock")
+assert(clock[0] == 1, "Exchange activation returned shared leaves")
+assert(record_equal(live, haiku_iceberg_enable_symbols(live, 0, 0)), "Symbol activation downgraded exchange")
+assert(record_equal(live, haiku_iceberg_enable_words(live, 0)), "Word activation downgraded exchange")
+
+disabled = haiku_iceberg_enable_exchange(legacy, 0, 0)
+off_before = exchange_test_leaves(disabled)
+first = haiku_iceberg_turn_at(legacy, "moon", 0, missing, missing, 0, day)
+second = haiku_iceberg_turn_at(disabled, "moon", 0, missing, missing, 1, day)
+assert(text_equal(first, second), "Disabled exchange changed the actual dream utterance")
+exchange_test_parity(legacy, disabled)
+assert(record_equal(off_before, exchange_test_leaves(disabled)), "Disabled exchange leaves changed")
+
+parallel = record_clone(live)
+first = haiku_iceberg_turn_at(live, "moon", 0, missing, missing, 0, day)
+second = haiku_iceberg_turn_at(parallel, "moon", 0, missing, missing, 1, day)
+assert(text_equal(first, second) and record_equal(live, parallel), "Actual exchange differs between serial and worker publication")
+assert(text_equal(first, record_get(expected, "haiku")), "Exchange changed the captured actual foreground")
+history = record_get(live, "voice:dream_history")
+assert(text_equal(list_get(history, 29), record_get(expected, "friend")), "Exchange changed the captured actual friend line")
+owners = haiku_words("haiku friend")
+names = haiku_words("(tree+light) (fire+water)")
+i = 0
+while i < 2:
+    owner = list_get(owners, i)
+    contact = haiku_iceberg_part(live, text_concat(owner, "_contact"))
+    clock = record_get(contact, "symbol_clock")
+    arrival = record_get(contact, "exchange_clock")
+    nodes = record_get(contact, "symbol_nodes")
+    origin = record_get(contact, "exchange_origin")
+    assert(clock[8] == 2 and arrival[7] == 1 and arrival[6] == 1, "Actual delivery did not adopt a new root for both owners")
+    assert(text_equal(haiku_contact_symbol_name(contact, 89), list_get(names, i)), "Private local ID resolution confused the two roots")
+    assert(origin[0] == 0 and origin[3] == 1 and origin[4] == 0 and origin[5] == 0, "First adoption lost its origin")
+    assert(nodes[4] == 14 and nodes[9] == 14, "Adoption replaced the original native proof")
+    assert(nodes[14] == 15 and nodes[15] == 15 and nodes[16] == 0 and nodes[18] == 0 and nodes[19] == 0, "Adoption invented local witnesses")
+    i = i + 1
+contact = haiku_iceberg_part(live, "haiku_contact")
+pressure = haiku_contact_symbol_pressure(contact, "tree", "en", 15)
+assert(pressure[6] == 0, "Arrival affected its own turn")
+pressure = haiku_contact_symbol_pressure(contact, "tree", "en", 16)
+assert(pressure[6] == 0.25, "Adopted parent has no later native pressure")
+checkpoint_save(live, "iceberg-exchange-adopted.state")
+resumed = checkpoint_load("iceberg-exchange-adopted.state")
+haiku_iceberg_check(resumed, 0)
+assert(record_equal(live, resumed), "Exchange checkpoint lost a private leaf")
+
+# The later human encounter really uses the received C as a parent in C->Z.
+# The standalone gate continues this route through fourteen own witnesses.
+before = exchange_test_leaves(live)
+record_set(live, "voice:dream_config", [10000, 0, 2])
+record_set(resumed, "voice:dream_config", [10000, 0, 2])
+first = haiku_iceberg_turn_at(live, "tree light music", 0, missing, missing, 0, day + 1)
+second = haiku_iceberg_turn_at(resumed, "tree light music", 0, missing, missing, 1, day + 1)
+assert(text_equal(first, second) and record_equal(live, resumed), "Received parents changed across restart or scheduling")
+assert(record_equal(before, exchange_test_leaves(live)), "A waking turn invented a peer exchange")
+clock = record_get(live, "haiku_contact:symbol_clock")
+rows = record_get(live, "haiku_contact:symbol_rows")
+row = clock[9] * 139
+assert(rows[row + 10] == 2 and rows[row + 75] == 89 and rows[row + 76] == 82, "The actual human path did not recognize its adopted C->Z parent")
+checkpoint_save(live, "iceberg-exchange.state")
+PRINT "HAIKU_ICEBERG_EXCHANGE_LIFE_OK"

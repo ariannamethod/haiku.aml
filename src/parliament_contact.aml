@@ -8,6 +8,7 @@ IMPORT "tokenizer.aml"
 IMPORT "lexical_sources.aml"
 IMPORT "contact_learning.aml"
 IMPORT "contact_symbols.aml"
+IMPORT "contact_exchange.aml"
 
 def haiku_contact_anchors():
     names = "water fire earth stone tree sky light dark cold person man woman child old spirit AI animal body food sleep pain strength "
@@ -130,12 +131,14 @@ def haiku_contact_check(state):
     version = record_get(state, "version")
     if version >= 2:
         expected = 47
-        if version == 3:
+        if version >= 3:
             expected = 51
+        if version == 4:
+            expected = 55
         assert(list_len(record_keys(state)) == expected, "Contact learning field count differs")
     else:
         assert(list_len(record_keys(state)) == 42, "Contact needs exactly forty-two fields")
-    assert(text_equal(record_get(state, "format"), "haiku-contact") and (version == 1 or version == 2 or version == 3), "Contact format is invalid")
+    assert(text_equal(record_get(state, "format"), "haiku-contact") and (version == 1 or version == 2 or version == 3 or version == 4), "Contact format is invalid")
     parliament = haiku_contact_parliament(state)
     haiku_parliament_check(parliament)
     assert(text_equal(list_key(record_keys(parliament)), list_key(record_get(state, "parliament_keys"))), "Contact parliament namespace differs")
@@ -248,7 +251,7 @@ def haiku_contact_check(state):
             source = 6
         seen = record_get(state, "p:seen")
         assert(clock[2] <= seen[source] and clock[3] <= record_get(state, "p:clock"), "Contact learning is ahead of published encounters")
-    if version == 3:
+    if version >= 3:
         haiku_contact_symbols_check(state)
         clock = record_get(state, "symbol_clock")
         seen = record_get(state, "p:seen")
@@ -256,6 +259,11 @@ def haiku_contact_check(state):
         while i < 8:
             assert(clock[18 + i] <= seen[i], "Contact symbol source exceeds publication")
             i = i + 1
+    if version == 4:
+        haiku_contact_exchange_check(state)
+        exchange_clock = record_get(state, "exchange_clock")
+        seen = record_get(state, "p:seen")
+        assert(exchange_clock[4] <= seen[6], "Contact exchange exceeds published deliveries")
     return 1
 
 def haiku_contact_event(owner, text, language, climate, rings, quality, source, event, turn):
@@ -378,7 +386,7 @@ def haiku_contact_features(state, event):
     haiku_contact_event_check(event)
     glyphs = haiku_contact_glyphs(state, record_get(event, "text"), record_get(event, "language"))
     prediction = zeros(88)
-    if record_get(state, "version") == 3:
+    if record_get(state, "version") >= 3:
         prediction = haiku_contact_symbol_pressure(state, record_get(event, "text"), record_get(event, "language"), record_get(event, "turn"))
     contribution = record_get(event, "representation")
     gain = record_get(event, "representation_gain")
@@ -429,7 +437,7 @@ def haiku_contact_publish(state, event):
                 rewarded = rewarded + 1
             i = i + 1
     haiku_contact_put(pending, parliament)
-    if record_get(pending, "version") == 3:
+    if record_get(pending, "version") >= 3:
         haiku_contact_symbols_observe(pending, event)
     if record_get(pending, "version") >= 2:
         haiku_contact_learn(pending, event)
@@ -449,7 +457,7 @@ def haiku_contact_rank(state, words, scores, language):
     bindings = record_get(state, "bindings")
     field = record_get(state, "p:field")
     prediction = zeros(88)
-    if record_get(state, "version") == 3:
+    if record_get(state, "version") >= 3:
         prediction = haiku_contact_symbol_rank(state)
     i = 0
     while i < list_len(words):
@@ -462,7 +470,7 @@ def haiku_contact_rank(state, words, scores, language):
                 learned = haiku_contact_learning_lookup(state, language, list_get(words, i))
                 if learned[0] >= 0:
                     pressure = 0.15 * field[learned[0]] * learned[1]
-        if record_get(state, "version") == 3:
+        if record_get(state, "version") >= 3:
             known = haiku_contact_learning_lookup(state, language, list_get(words, i))
             if known[0] >= 0:
                 pressure = pressure + 0.15 * prediction[known[0]] * known[1]

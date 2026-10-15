@@ -120,6 +120,8 @@ from repeated encounters. Haiku learns from your words; the friend learns from
 Haiku's lines that actually reach it. Later poems meet those remembered meanings.
 Repeated paths can acquire [private compound symbols](docs/DREAM_SYMBOLS.md)
 in dreams; later encounters can recognize them and grow another layer.
+Those structures can [cross a spoken dream](docs/SYMBOL_EXCHANGE.md). Each
+listener keeps the meeting, then grows new connections through its own life.
 
 [The iceberg contract](docs/ICEBERG_SESSION.md) explains the controls,
 checkpoint upgrades and tested dependency revisions. The original `haiku.aml`

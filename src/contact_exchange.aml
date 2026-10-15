@@ -1,0 +1,612 @@
+# Ordered symbol trees travel with a real dream line. The recipient keeps the
+# first delivery as immutable provenance; its own fourteen-witness births stay
+# in the same alphabet with their original, separate proof slots.
+
+def haiku_contact_enable_exchange(state, enabled, turn, dream_count):
+    haiku_contact_check(state)
+    assert(record_get(state, "version") >= 3, "Contact exchange requires dream symbols")
+    pending = record_clone(state)
+    if record_get(state, "version") >= 4:
+        return pending
+    haiku_contact_integer(enabled, 0, 1)
+    symbols = record_get(state, "symbol_clock")
+    haiku_contact_integer(turn, symbols[3], 999999)
+    haiku_contact_integer(dream_count, symbols[4], 999999)
+    assert(enabled == 0 or symbols[0] == 1, "Contact exchange requires active symbols")
+    clock = zeros(9)
+    clock[0] = enabled
+    clock[1] = turn
+    clock[2] = dream_count
+    seen = record_get(state, "p:seen")
+    clock[3] = seen[6]
+    clock[4] = seen[6]
+    clock[5] = turn
+    clock[8] = dream_count
+    texts = list_new()
+    i = 0
+    while i < 64:
+        list_push(texts, "")
+        i = i + 1
+    record_set(pending, "version", 4)
+    record_set(pending, "exchange_clock", clock)
+    record_set(pending, "exchange_origin", zeros(48))
+    record_set(pending, "exchange_rows", zeros(2208))
+    record_set(pending, "exchange_text", texts)
+    haiku_contact_check(pending)
+    return pending
+
+def haiku_exchange_clean(base):
+    result = zeros(len(base))
+    count = 0
+    i = 0
+    while i < len(base):
+        if count == 0 or base[i] < 0 or base[i] != result[count - 1]:
+            result[count] = base[i]
+            count = count + 1
+        i = i + 1
+    return haiku_parliament_part(result, 0, count)
+
+# Packet IDs describe a left-to-right postorder closure, independently of the
+# sender's allocation order. Source origin metadata follows each definition.
+def haiku_exchange_tree(state, id, work):
+    if id < 88:
+        return id
+    name = haiku_contact_symbol_name(state, id)
+    known = record_get(work, "known")
+    if map_has(known, name):
+        return map_get(known, name)
+    nodes = record_get(state, "symbol_nodes")
+    left = haiku_exchange_tree(state, nodes[(id - 88) * 10], work)
+    right = haiku_exchange_tree(state, nodes[(id - 88) * 10 + 1], work)
+    index = record_get(work, "count")
+    assert(index < 15, "Contact exchange tree exceeds capacity")
+    tree = record_get(work, "tree")
+    tree[index * 4] = left
+    tree[index * 4 + 1] = right
+    if record_get(state, "version") >= 4:
+        origin = record_get(state, "exchange_origin")
+        tree[index * 4 + 2] = origin[(id - 88) * 3]
+        if tree[index * 4 + 2] == 1:
+            receipts = record_get(state, "exchange_rows")
+            tree[index * 4 + 3] = receipts[origin[(id - 88) * 3 + 1] * 138]
+    known = record_get(work, "known")
+    map_set(known, name, 88 + index)
+    record_set(work, "known", known)
+    record_set(work, "count", index + 1)
+    return 88 + index
+
+# A bounded shape decoder validates all packet references and canonical names.
+def haiku_exchange_shape(tree, count):
+    haiku_contact_integer(count, 0, 15)
+    haiku_parliament_vector(tree, 60, 999999)
+    names = haiku_contact_anchors()
+    depths = zeros(15)
+    lengths = zeros(15)
+    leaves = zeros(240)
+    known = map_new()
+    i = 0
+    while i < 15:
+        if i < count:
+            left = haiku_contact_integer(tree[i * 4], 0, 87 + i)
+            right = haiku_contact_integer(tree[i * 4 + 1], 0, 87 + i)
+            kind = haiku_contact_integer(tree[i * 4 + 2], 0, 1)
+            arrival = haiku_contact_integer(tree[i * 4 + 3], 0, 999999)
+            assert((kind == 0 and arrival == 0) or (kind == 1 and arrival > 0), "Contact exchange source origin differs")
+            depth = 1
+            size = 0
+            side = 0
+            while side < 2:
+                parent = left
+                if side == 1:
+                    parent = right
+                if parent < 88:
+                    assert(size < 16, "Contact exchange expansion is too long")
+                    leaves[i * 16 + size] = parent
+                    size = size + 1
+                else:
+                    parent = parent - 88
+                    depth = max(depth, 1 + depths[parent])
+                    assert(size + lengths[parent] <= 16, "Contact exchange expansion is too long")
+                    j = 0
+                    while j < lengths[parent]:
+                        leaves[i * 16 + size] = leaves[parent * 16 + j]
+                        size = size + 1
+                        j = j + 1
+                side = side + 1
+            assert(depth <= 4, "Contact exchange tree is too deep")
+            name = text_concat("(", list_get(names, left))
+            name = text_concat(name, "+")
+            name = text_concat(name, list_get(names, right))
+            name = text_concat(name, ")")
+            assert(text_len(name) <= 256 and map_has(known, name) == 0, "Contact exchange tree repeats a structure")
+            map_set(known, name, i)
+            list_push(names, name)
+            depths[i] = depth
+            lengths[i] = size
+        else:
+            j = 0
+            while j < 4:
+                assert(tree[i * 4 + j] == 0, "Contact exchange unused tree has numbers")
+                j = j + 1
+        i = i + 1
+    reached = zeros(15)
+    if count > 0:
+        reached[count - 1] = 1
+    i = count - 1
+    while i >= 0:
+        assert(reached[i] == 1, "Contact exchange tree has an unrelated definition")
+        side = 0
+        while side < 2:
+            parent = tree[i * 4 + side]
+            if parent >= 88:
+                reached[parent - 88] = 1
+            side = side + 1
+        i = i - 1
+    result = record_new()
+    record_set(result, "names", names)
+    record_set(result, "depths", depths)
+    record_set(result, "lengths", lengths)
+    record_set(result, "leaves", leaves)
+    return result
+
+def haiku_exchange_packet_check(packet):
+    assert(list_len(record_keys(packet)) == 17, "Contact exchange packet field count differs")
+    assert(text_equal(record_get(packet, "format"), "haiku-symbol-offer") and record_get(packet, "version") == 1, "Contact exchange packet format differs")
+    available = haiku_contact_integer(record_get(packet, "available"), 0, 1)
+    sender = record_get(packet, "sender")
+    assert(text_equal(sender, "haiku") or text_equal(sender, "friend"), "Contact exchange sender is invalid")
+    event = haiku_contact_integer(record_get(packet, "event"), 1, 999999)
+    turn = haiku_contact_integer(record_get(packet, "turn"), 1, 999999)
+    raw = record_get(packet, "text")
+    language = record_get(packet, "language")
+    assert(text_len(raw) <= 10000 and text_len(language) > 0 and text_len(language) <= 32, "Contact exchange text is invalid")
+    haiku_contact_integer(record_get(packet, "sender_revision"), 0, 999999)
+    root_turn = haiku_contact_integer(record_get(packet, "root_turn"), 0, turn - 1)
+    root_dream = haiku_contact_integer(record_get(packet, "root_dream"), 0, 999999)
+    count = haiku_contact_integer(record_get(packet, "count"), 0, 15)
+    offset = haiku_contact_integer(record_get(packet, "offset"), 0, 63)
+    span = haiku_contact_integer(record_get(packet, "span"), 0, 16)
+    tree = record_get(packet, "tree")
+    shape = haiku_exchange_shape(tree, count)
+    base = record_get(packet, "base")
+    assert(len(base) > 0 and len(base) <= 64 and rows(base) == 0 and cols(base) == 0, "Contact exchange base path shape differs")
+    tokens = haiku_tokenize_regex(raw)
+    bounded = list_len(tokens) > 0 and list_len(tokens) <= 64
+    expected_length = 1
+    if bounded:
+        expected_length = list_len(tokens)
+    assert(len(base) == expected_length, "Contact exchange base path length differs")
+    seeds = haiku_contact_bindings()
+    i = 0
+    while i < len(base):
+        haiku_contact_integer(base[i], -1, 87)
+        if bounded:
+            key = haiku_contact_key(language, list_get(tokens, i))
+            if map_has(seeds, key):
+                assert(base[i] == map_get(seeds, key), "Contact exchange changed a shared glyph")
+        else:
+            assert(base[i] == -1, "Contact exchange unavailable path has glyphs")
+        i = i + 1
+    if available:
+        assert(bounded and count > 0 and root_turn > 0 and root_dream > 0 and record_get(packet, "sender_revision") > 0, "Contact exchange offer has no prior tree")
+        names = record_get(shape, "names")
+        assert(text_equal(record_get(packet, "root"), list_get(names, 87 + count)), "Contact exchange root identity differs")
+        lengths = record_get(shape, "lengths")
+        leaves = record_get(shape, "leaves")
+        clean = haiku_exchange_clean(base)
+        assert(span == lengths[count - 1] and offset + span <= len(clean), "Contact exchange spoken span differs")
+        i = 0
+        while i < span:
+            assert(clean[offset + i] == leaves[(count - 1) * 16 + i], "Contact exchange root was not spoken")
+            i = i + 1
+    else:
+        assert(count == 0 and offset == 0 and span == 0 and root_turn == 0 and root_dream == 0 and text_len(record_get(packet, "root")) == 0, "Contact empty exchange has a tree")
+    return shape
+
+def haiku_contact_exchange_offer(sender, event):
+    haiku_contact_check(sender)
+    haiku_contact_event_check(event)
+    assert(record_get(sender, "version") >= 3, "Contact exchange sender has no symbol organ")
+    owner = record_get(sender, "p:owner")
+    assert(text_equal(record_get(event, "owner"), owner) and record_get(event, "source") == 7 and record_get(event, "parent_source") == -1 and record_get(event, "replay") == 0, "Contact exchange offer needs a native dream line")
+    clock = record_get(sender, "symbol_clock")
+    turn = record_get(event, "turn")
+    packet = record_new()
+    record_set(packet, "format", "haiku-symbol-offer")
+    record_set(packet, "version", 1)
+    record_set(packet, "available", 0)
+    record_set(packet, "sender", owner)
+    record_set(packet, "event", record_get(event, "event"))
+    record_set(packet, "turn", turn)
+    record_set(packet, "text", record_get(event, "text"))
+    record_set(packet, "language", record_get(event, "language"))
+    record_set(packet, "sender_revision", clock[5])
+    record_set(packet, "root_turn", 0)
+    record_set(packet, "root_dream", 0)
+    record_set(packet, "count", 0)
+    record_set(packet, "offset", 0)
+    record_set(packet, "span", 0)
+    record_set(packet, "root", "")
+    record_set(packet, "tree", zeros(60))
+    path = haiku_contact_symbols_path(sender, record_get(event, "text"), record_get(event, "language"), turn)
+    base = record_get(path, "base")
+    record_set(packet, "base", base)
+    clean = haiku_exchange_clean(base)
+    nodes = record_get(sender, "symbol_nodes")
+    chosen = -1
+    chosen_span = 0
+    chosen_offset = 0
+    chosen_name = ""
+    enabled = clock[0]
+    if record_get(sender, "version") >= 4:
+        exchange = record_get(sender, "exchange_clock")
+        enabled = enabled and exchange[0] == 1
+    if enabled and record_get(path, "available") == 1:
+        offset = 0
+        while offset < len(clean):
+            i = 0
+            while i < clock[8]:
+                if nodes[i * 10 + 4] < turn:
+                    leaves = haiku_contact_symbol_expand(sender, 88 + i)
+                    found = offset + len(leaves) <= len(clean)
+                    j = 0
+                    while found and j < len(leaves):
+                        found = clean[offset + j] == leaves[j]
+                        j = j + 1
+                    if found:
+                        name = haiku_contact_symbol_name(sender, 88 + i)
+                        take = len(leaves) > chosen_span
+                        if len(leaves) == chosen_span and offset == chosen_offset:
+                            tie = list_new()
+                            list_push(tie, name)
+                            list_push(tie, chosen_name)
+                            tie = list_sorted(tie)
+                            take = text_equal(list_get(tie, 0), name)
+                        if take:
+                            chosen = i
+                            chosen_span = len(leaves)
+                            chosen_offset = offset
+                            chosen_name = name
+                i = i + 1
+            offset = offset + 1
+    if chosen >= 0:
+        work = record_new()
+        record_set(work, "count", 0)
+        record_set(work, "known", map_new())
+        record_set(work, "tree", zeros(60))
+        haiku_exchange_tree(sender, 88 + chosen, work)
+        record_set(packet, "available", 1)
+        record_set(packet, "root_turn", nodes[chosen * 10 + 4])
+        record_set(packet, "root_dream", nodes[chosen * 10 + 5])
+        record_set(packet, "count", record_get(work, "count"))
+        record_set(packet, "offset", chosen_offset)
+        record_set(packet, "span", chosen_span)
+        record_set(packet, "root", chosen_name)
+        record_set(packet, "tree", record_get(work, "tree"))
+    haiku_exchange_packet_check(packet)
+    return packet
+
+# Recover the exact first-arrival packet without consulting current spellings.
+def haiku_exchange_receipt(state, index):
+    clock = record_get(state, "exchange_clock")
+    haiku_contact_integer(index, 0, clock[7] - 1)
+    rows = record_get(state, "exchange_rows")
+    texts = record_get(state, "exchange_text")
+    row = index * 138
+    length = haiku_contact_integer(rows[row + 9], 1, 64)
+    packet = record_new()
+    record_set(packet, "format", "haiku-symbol-offer")
+    record_set(packet, "version", 1)
+    record_set(packet, "available", 1)
+    record_set(packet, "sender", list_get(texts, index * 4 + 2))
+    record_set(packet, "event", rows[row])
+    record_set(packet, "turn", rows[row + 1])
+    record_set(packet, "text", list_get(texts, index * 4))
+    record_set(packet, "language", list_get(texts, index * 4 + 1))
+    record_set(packet, "sender_revision", rows[row + 3])
+    record_set(packet, "root_turn", rows[row + 4])
+    record_set(packet, "root_dream", rows[row + 5])
+    record_set(packet, "count", rows[row + 6])
+    record_set(packet, "offset", rows[row + 7])
+    record_set(packet, "span", rows[row + 8])
+    record_set(packet, "root", list_get(texts, index * 4 + 3))
+    record_set(packet, "tree", haiku_parliament_part(rows, row + 14, 60))
+    record_set(packet, "base", haiku_parliament_part(rows, row + 74, length))
+    return packet
+
+def haiku_contact_exchange_check(state):
+    clock = record_get(state, "exchange_clock")
+    origins = record_get(state, "exchange_origin")
+    rows = record_get(state, "exchange_rows")
+    texts = record_get(state, "exchange_text")
+    symbols = record_get(state, "symbol_clock")
+    nodes = record_get(state, "symbol_nodes")
+    haiku_parliament_vector(clock, 9, 999999)
+    haiku_parliament_vector(origins, 48, 999999)
+    assert(len(rows) == 2208 and rows(rows) == 0 and cols(rows) == 0, "Contact exchange receipt shape differs")
+    assert(list_len(texts) == 64, "Contact exchange text shape differs")
+    i = 0
+    while i < 9:
+        haiku_contact_integer(clock[i], 0, 999999)
+        i = i + 1
+    haiku_contact_integer(clock[0], 0, 1)
+    haiku_contact_integer(clock[7], 0, 16)
+    assert(clock[0] == 0 or symbols[0] == 1, "Contact exchange requires active symbols")
+    assert(clock[1] >= symbols[1] and clock[2] >= symbols[2], "Contact exchange activation precedes symbols")
+    assert(clock[4] >= clock[3] and clock[5] >= clock[1] and clock[8] >= clock[2], "Contact exchange clock precedes activation")
+    assert(clock[6] <= clock[4] - clock[3] and clock[7] <= clock[6], "Contact exchange revision differs from deliveries")
+    if clock[0] == 0 or clock[6] == 0:
+        assert(clock[6] == 0 and clock[7] == 0 and clock[4] == clock[3] and clock[5] == clock[1] and clock[8] == clock[2], "Contact empty exchange has lived state")
+    else:
+        assert(clock[4] > clock[3] and clock[5] > clock[1] and clock[8] > clock[2], "Contact exchange repeats activation")
+        assert(clock[5] <= symbols[42] and clock[8] <= symbols[4], "Contact exchange precedes its dream boundary")
+    owner = record_get(state, "p:owner")
+    sender = "friend"
+    if text_equal(owner, "friend"):
+        sender = "haiku"
+    catalog = map_new()
+    i = 0
+    while i < symbols[8]:
+        map_set(catalog, haiku_contact_symbol_name(state, 88 + i), i)
+        i = i + 1
+    expected_rows = zeros(2208)
+    expected_origin = zeros(48)
+    previous_event = clock[3]
+    previous_turn = clock[1]
+    previous_dream = clock[2]
+    previous_revision = 0
+    previous_end = 0
+    index = 0
+    while index < 16:
+        row = index * 138
+        if index < clock[7]:
+            packet = haiku_exchange_receipt(state, index)
+            shape = haiku_exchange_packet_check(packet)
+            assert(text_equal(record_get(packet, "sender"), sender), "Contact exchange receipt sender differs")
+            event = haiku_contact_integer(rows[row], clock[3] + 1, clock[4])
+            turn = haiku_contact_integer(rows[row + 1], clock[1] + 1, clock[5])
+            dream = haiku_contact_integer(rows[row + 2], clock[2] + 1, clock[8])
+            start = haiku_contact_integer(rows[row + 10], 0, symbols[8] - 1)
+            added = haiku_contact_integer(rows[row + 11], 1, 15)
+            revision = haiku_contact_integer(rows[row + 12], 1, clock[6])
+            symbol_revision = haiku_contact_integer(rows[row + 13], 1, symbols[5])
+            # Revisions count this receiver's peer deliveries, including those
+            # that reused a tree or had no offer. Only the latest one seals the
+            # current clock; older first-arrival receipts keep their own time.
+            if revision == clock[6]:
+                assert(event == clock[4] and turn == clock[5] and dream == clock[8], "Contact exchange latest delivery differs")
+            else:
+                assert(event < clock[4], "Contact exchange older receipt repeats the latest delivery")
+            assert(start + added <= symbols[8] and start >= previous_end, "Contact exchange adoption range differs")
+            assert(event > previous_event and turn >= previous_turn and dream >= previous_dream and revision > previous_revision, "Contact exchange receipt order differs")
+            if turn == previous_turn:
+                assert(dream == previous_dream, "Contact exchange turn names two dreams")
+            else:
+                assert(dream > previous_dream, "Contact exchange dream names two turns")
+            names = record_get(shape, "names")
+            depths = record_get(shape, "depths")
+            lengths = record_get(shape, "lengths")
+            resolved = zeros(15)
+            created = 0
+            j = 0
+            while j < record_get(packet, "count"):
+                name = list_get(names, 88 + j)
+                assert(map_has(catalog, name), "Contact exchange lost a received structure")
+                local = map_get(catalog, name)
+                resolved[j] = 88 + local
+                if local >= start:
+                    assert(local == start + created and created < added, "Contact exchange closure allocation differs")
+                    node = local * 10
+                    assert(nodes[node + 4] == turn and nodes[node + 5] == dream and nodes[node + 7] == symbol_revision, "Contact exchange acquisition boundary differs")
+                    assert(nodes[node + 6] == 0 and nodes[node + 8] == 0 and nodes[node + 9] == 0, "Contact adopted symbol has local evidence")
+                    assert(nodes[node + 2] == depths[j] and nodes[node + 3] == lengths[j], "Contact exchange adopted shape differs")
+                    expected_origin[local * 3] = 1
+                    expected_origin[local * 3 + 1] = index
+                    expected_origin[local * 3 + 2] = j
+                    created = created + 1
+                else:
+                    assert(nodes[local * 10 + 4] <= turn, "Contact exchange reused a future structure")
+                j = j + 1
+            assert(created == added, "Contact exchange receipt has no new structure")
+            j = 0
+            while j < 74 + rows[row + 9]:
+                expected_rows[row + j] = rows[row + j]
+                j = j + 1
+            previous_event = event
+            previous_turn = turn
+            previous_dream = dream
+            previous_revision = revision
+            previous_end = start + added
+        else:
+            j = 0
+            while j < 4:
+                assert(text_len(list_get(texts, index * 4 + j)) == 0, "Contact unused exchange receipt has text")
+                j = j + 1
+        index = index + 1
+    actual_record = record_new()
+    expected_record = record_new()
+    record_set(actual_record, "rows", rows)
+    record_set(actual_record, "origin", origins)
+    record_set(expected_record, "rows", expected_rows)
+    record_set(expected_record, "origin", expected_origin)
+    assert(record_equal(actual_record, expected_record), "Contact exchange provenance or empty padding differs")
+    return 1
+
+# Source replay invokes this kernel after the owner's actual dream boundary.
+# A full closure either fits completely or consumes only its delivery clock.
+def haiku_contact_exchange_step(state, event, packet, dream_count):
+    result = record_new()
+    record_set(result, "committed", 0)
+    record_set(result, "adopted", 0)
+    record_set(result, "root", -1)
+    record_set(result, "status", 0)
+    haiku_contact_event_check(event)
+    if record_get(state, "version") < 4:
+        return result
+    clock = record_get(state, "exchange_clock")
+    number = record_get(event, "event")
+    turn = record_get(event, "turn")
+    if clock[0] == 0 or record_get(event, "replay") == 1 or number <= clock[4] or turn <= clock[1]:
+        return result
+    haiku_contact_symbols_check(state)
+    haiku_contact_exchange_check(state)
+    shape = haiku_exchange_packet_check(packet)
+    owner = record_get(state, "p:owner")
+    sender = "friend"
+    if text_equal(owner, "friend"):
+        sender = "haiku"
+    assert(record_get(event, "source") == 6 and text_equal(record_get(event, "owner"), owner), "Contact exchange needs a delivered peer line")
+    assert(record_get(event, "origin_source") == 7 and record_get(event, "parent_source") == 7 and record_get(event, "origin_event") == number and record_get(event, "parent_event") == number, "Contact exchange delivery ancestry differs")
+    assert(text_equal(record_get(event, "origin_owner"), sender) and text_equal(record_get(event, "parent_owner"), sender), "Contact exchange delivery sender differs")
+    assert(text_equal(record_get(packet, "sender"), sender) and record_get(packet, "event") == number and record_get(packet, "turn") == turn, "Contact exchange packet delivery differs")
+    assert(text_equal(record_get(packet, "text"), record_get(event, "text")) and text_equal(record_get(packet, "language"), record_get(event, "language")), "Contact exchange packet text differs")
+    symbols = record_get(state, "symbol_clock")
+    haiku_contact_integer(dream_count, clock[2] + 1, 999999)
+    assert(symbols[4] == dream_count and symbols[42] == turn and turn >= clock[5] and dream_count >= clock[8], "Contact exchange needs the completed dream boundary")
+    assert(clock[6] < 999999, "Contact exchange revision is exhausted")
+    if turn == clock[5]:
+        assert(dream_count == clock[8], "Contact exchange turn names two boundaries")
+    else:
+        assert(dream_count > clock[8], "Contact exchange boundary repeats a turn")
+    pending = record_clone(state)
+    clock = record_get(pending, "exchange_clock")
+    clock[4] = number
+    clock[5] = turn
+    clock[6] = clock[6] + 1
+    clock[8] = dream_count
+    record_set(result, "committed", 1)
+    record_set(result, "status", 1)
+    if record_get(packet, "available") == 1:
+        symbols = record_get(pending, "symbol_clock")
+        catalog = map_new()
+        i = 0
+        while i < symbols[8]:
+            map_set(catalog, haiku_contact_symbol_name(pending, 88 + i), 88 + i)
+            i = i + 1
+        names = record_get(shape, "names")
+        count = record_get(packet, "count")
+        missing = 0
+        i = 0
+        while i < count:
+            if map_has(catalog, list_get(names, 88 + i)) == 0:
+                missing = missing + 1
+            i = i + 1
+        if missing == 0:
+            record_set(result, "root", map_get(catalog, record_get(packet, "root")))
+            record_set(result, "status", 2)
+        if missing > 0 and symbols[8] + missing > 16:
+            record_set(result, "status", 4)
+        if missing > 0 and symbols[8] + missing <= 16:
+            assert(clock[7] < 16, "Contact exchange receipt capacity differs")
+            receipt = clock[7]
+            start = symbols[8]
+            tree = record_get(packet, "tree")
+            nodes = record_get(pending, "symbol_nodes")
+            origins = record_get(pending, "exchange_origin")
+            depths = record_get(shape, "depths")
+            lengths = record_get(shape, "lengths")
+            resolved = zeros(15)
+            i = 0
+            while i < count:
+                name = list_get(names, 88 + i)
+                if map_has(catalog, name):
+                    resolved[i] = map_get(catalog, name)
+                else:
+                    local = symbols[8]
+                    left = tree[i * 4]
+                    right = tree[i * 4 + 1]
+                    if left >= 88:
+                        left = resolved[left - 88]
+                    if right >= 88:
+                        right = resolved[right - 88]
+                    node = local * 10
+                    nodes[node] = left
+                    nodes[node + 1] = right
+                    nodes[node + 2] = depths[i]
+                    nodes[node + 3] = lengths[i]
+                    nodes[node + 4] = turn
+                    nodes[node + 5] = dream_count
+                    nodes[node + 7] = symbols[5]
+                    origins[local * 3] = 1
+                    origins[local * 3 + 1] = receipt
+                    origins[local * 3 + 2] = i
+                    resolved[i] = 88 + local
+                    map_set(catalog, name, 88 + local)
+                    symbols[8] = local + 1
+                i = i + 1
+            rows = record_get(pending, "exchange_rows")
+            row = receipt * 138
+            rows[row] = number
+            rows[row + 1] = turn
+            rows[row + 2] = dream_count
+            rows[row + 3] = record_get(packet, "sender_revision")
+            rows[row + 4] = record_get(packet, "root_turn")
+            rows[row + 5] = record_get(packet, "root_dream")
+            rows[row + 6] = count
+            rows[row + 7] = record_get(packet, "offset")
+            rows[row + 8] = record_get(packet, "span")
+            base = record_get(packet, "base")
+            rows[row + 9] = len(base)
+            rows[row + 10] = start
+            rows[row + 11] = missing
+            rows[row + 12] = clock[6]
+            rows[row + 13] = symbols[5]
+            i = 0
+            while i < 60:
+                rows[row + 14 + i] = tree[i]
+                i = i + 1
+            i = 0
+            while i < len(base):
+                rows[row + 74 + i] = base[i]
+                i = i + 1
+            texts = record_get(pending, "exchange_text")
+            list_set(texts, receipt * 4, record_get(packet, "text"))
+            list_set(texts, receipt * 4 + 1, record_get(packet, "language"))
+            list_set(texts, receipt * 4 + 2, sender)
+            list_set(texts, receipt * 4 + 3, record_get(packet, "root"))
+            record_set(pending, "exchange_text", texts)
+            clock[7] = receipt + 1
+            record_set(result, "adopted", missing)
+            record_set(result, "root", resolved[count - 1])
+            record_set(result, "status", 3)
+    haiku_contact_symbols_check(pending)
+    haiku_contact_exchange_check(pending)
+    leaves = haiku_words("symbol_clock symbol_nodes exchange_clock exchange_origin exchange_rows exchange_text")
+    i = 0
+    while i < 6:
+        name = list_get(leaves, i)
+        record_set(state, name, record_get(pending, name))
+        i = i + 1
+    return result
+
+# Deferred intake seals the retained original delivery. Later same-dream word
+# learning does not reinterpret the features that were published with it.
+def haiku_contact_exchange_recv(state, event, packet, dream_count):
+    haiku_contact_check(state)
+    haiku_contact_event_check(event)
+    if record_get(state, "version") < 4:
+        return haiku_contact_exchange_step(state, event, packet, dream_count)
+    clock = record_get(state, "exchange_clock")
+    if clock[0] == 0 or record_get(event, "replay") == 1 or record_get(event, "event") <= clock[4] or record_get(event, "turn") <= clock[1]:
+        return haiku_contact_exchange_step(state, event, packet, dream_count)
+    rows = record_get(state, "p:receipt_rows")
+    texts = record_get(state, "contact_text")
+    meta = record_get(state, "contact_meta")
+    slot = -1
+    i = 0
+    while i < 32:
+        if rows[i * 9] == record_get(event, "event") and rows[i * 9 + 1] == record_get(event, "turn") and rows[i * 9 + 2] == 6:
+            slot = i
+        i = i + 1
+    assert(slot >= 0, "Contact exchange delivery was not published")
+    names = haiku_words("owner text language origin_owner parent_owner identity")
+    i = 0
+    while i < 6:
+        assert(text_equal(list_get(texts, slot * 6 + i), record_get(event, list_get(names, i))), "Contact exchange published text differs")
+        i = i + 1
+    names = haiku_words("parent_source parent_event origin_source origin_event alpha representation_gain representation_available availability")
+    i = 0
+    while i < 8:
+        assert(meta[slot * 8 + i] == record_get(event, list_get(names, i)), "Contact exchange published ancestry differs")
+        i = i + 1
+    return haiku_contact_exchange_step(state, event, packet, dream_count)
