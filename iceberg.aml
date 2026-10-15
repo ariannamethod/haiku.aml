@@ -25,6 +25,11 @@ upgrade_symbols = 0
 # symbol lives keep version 4 until this explicit exchange upgrade is selected.
 symbol_exchange = 1
 upgrade_exchange = 0
+# New lives use personal concept weights from their own prior encounters.
+# Modes: 0 representation off, 1 equal teachers, 2 personal teacher weights.
+# Saved v1-v5 lives retain their profile until this explicit activation.
+personal_concepts = 2
+upgrade_concepts = 0
 resuming = 0
 if text_len(state_path) > 0:
     resuming = file_exists(state_path)
@@ -61,6 +66,10 @@ if resuming == 0 and janus_balance and word_learning:
     life = haiku_iceberg_enable_exchange(life, symbol_exchange * dream_symbols, tokenizer_model)
 if resuming and upgrade_exchange:
     life = haiku_iceberg_enable_exchange(life, symbol_exchange, tokenizer_model)
+if resuming == 0 and janus_balance and word_learning:
+    life = haiku_iceberg_enable_concepts(life, personal_concepts * dream_symbols, tokenizer_model)
+if resuming and upgrade_concepts:
+    life = haiku_iceberg_enable_concepts(life, personal_concepts, tokenizer_model)
 
 path_a = ""
 path_b = ""
@@ -69,6 +78,8 @@ if settings[0] and settings[1]:
     path_b = "weights/haiku2.gguf"
 body_a = model_try_load(path_a)
 body_b = model_try_load(path_b)
+if resuming:
+    haiku_iceberg_concepts_audit(life, body_a, body_b)
 PRINT "HAiKU — the cloud is listening."
 if resuming:
     PRINT "The cloud remembers. Our conversation continues."

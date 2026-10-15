@@ -1,0 +1,177 @@
+# One prescribed history supplies all three modes. Provider banks are immutable
+# geometry, so the equal-mode comparison reuses the already source-checked bank.
+IMPORT "../src/iceberg_session.aml"
+
+def concepts_model_turn(life, source, a, b, worker, day):
+    before = haiku_iceberg_part(life, "voice")
+    core = record_clone(before)
+    experience = haiku_session_prepare(core, source, 0)
+    request = haiku_iceberg_request_at(life, source, a, b, day)
+    pending = record_clone(life)
+    haiku_iceberg_put(pending, "voice", core)
+    if worker:
+        SPAWN concepts_tail:
+            return haiku_iceberg_tail(pending, before, experience, request, 0, a, b)
+        AWAIT concepts_tail INTO result
+    else:
+        result = haiku_iceberg_tail(pending, before, experience, request, 0, a, b)
+    checked = haiku_iceberg_check_sources(life, result, experience, request, 0, a, b)
+    record_replace(life, checked)
+    return result
+
+def concepts_model_delta(first, second):
+    assert(len(first) == len(second), "Concept measurement shapes differ")
+    delta = 0
+    i = 0
+    while i < len(first):
+        delta = max(delta, abs(first[i] - second[i]))
+        i = i + 1
+    return delta
+
+def concepts_model_order(first, second):
+    changes = 0
+    i = 0
+    while i < len(first):
+        j = i + 1
+        while j < len(first):
+            if (first[i] >= first[j]) != (second[i] >= second[j]):
+                changes = changes + 1
+            j = j + 1
+        i = i + 1
+    return changes
+
+def concepts_model_admitted(life):
+    words = list_new()
+    names = record_get(life, "admission_text")
+    i = 0
+    while i < list_len(names):
+        list_push(words, list_get(names, i))
+        i = i + 8
+    return words
+
+a = model_try_load("../weights/haiku1.gguf")
+b = model_try_load("../weights/haiku2.gguf")
+assert(model_ready(a) and model_ready(b), "Concept fixture needs both frozen bodies")
+prior = checkpoint_load("iceberg-concepts-prior.state")
+record_set(prior, "settings", [1, 1, 2, 1])
+personal = haiku_iceberg_enable_concepts(prior, 2, 0)
+equal = haiku_iceberg_enable_concepts(prior, 1, 0)
+off = haiku_iceberg_enable_concepts(prior, 0, 0)
+personal_prior = record_clone(personal)
+input = "tree forest wood leaf light"
+personal_result = concepts_model_turn(personal, input, a, b, 0, 20741)
+assert(list_len(record_keys(personal_result)) == 555, "Concept completion envelope fields differ")
+assert(list_len(record_keys(personal)) == 265, "Concept model life fields differ")
+owners = haiku_words("haiku friend")
+i = 0
+while i < 2:
+    name = text_concat(list_get(owners, i), "_contact")
+    contact = haiku_iceberg_part(personal, name)
+    cache = haiku_contact_concept_cache(contact)
+    assert(text_len(list_get(record_get(cache, "identity"), 2)) == 64 and text_len(list_get(record_get(cache, "identity"), 3)) == 64, "Actual dream did not warm both owners' endpoint banks")
+    target = haiku_iceberg_part(equal, name)
+    fields = haiku_words("identity units_a units_b tokens")
+    j = 0
+    while j < 4:
+        field = list_get(fields, j)
+        record_set(target, text_concat("concept_", field), record_get(cache, field))
+        j = j + 1
+    haiku_iceberg_put(equal, name, target)
+    i = i + 1
+haiku_iceberg_check(equal, 0)
+off_result = concepts_model_turn(off, input, a, b, 0, 20741)
+equal_result = concepts_model_turn(equal, input, a, b, 0, 20741)
+experience = haiku_iceberg_part(personal_result, "experience")
+assert(record_equal(experience, haiku_iceberg_part(off_result, "experience")) and record_equal(experience, haiku_iceberg_part(equal_result, "experience")), "Concept modes changed the fixed foreground experience")
+i = 0
+while i < 2:
+    name = text_concat(list_get(owners, i), "_lexical")
+    assert(record_equal(haiku_iceberg_part(personal, name), haiku_iceberg_part(equal, name)) and record_equal(haiku_iceberg_part(personal, name), haiku_iceberg_part(off, name)), "Concept modes changed the physical lexical pass")
+    i = i + 1
+
+# A bounded diagnostic repeats one verified lexical pass and four endpoint
+# query forwards to expose all 48 actual scores and both scalar projections.
+before = haiku_iceberg_part(prior, "voice")
+core = haiku_iceberg_part(personal, "voice")
+balance = haiku_iceberg_part(prior, "haiku_janus")
+human = haiku_contact_event("human", input, "en", record_get(experience, "observation"), record_get(core, "ring_coherence"), record_get(experience, "quality"), 0, 2, 2)
+haiku_janus_witness(balance, human, 20741)
+snapshot = haiku_janus_snapshot(balance, 20741)
+lexical = haiku_iceberg_part(prior, "haiku_lexical")
+record_set(lexical, "alpha", record_get(snapshot, "alpha"))
+plan = haiku_iceberg_lexical_plan("haiku", before, core, experience, record_get(prior, "settings"), record_get(snapshot, "alpha"))
+receipt = haiku_lexical_pass(lexical, a, b, haiku_iceberg_part(plan, "request"))
+assert(record_get(receipt, "committed"), "Concept measurement has no actual lexical receipt")
+old_contact = haiku_iceberg_part(personal_prior, "haiku_contact")
+personal_contact = haiku_iceberg_part(personal, "haiku_contact")
+equal_contact = haiku_iceberg_part(equal, "haiku_contact")
+off_contact = haiku_iceberg_part(off, "haiku_contact")
+clock = record_get(personal_contact, "symbol_clock")
+assert(clock[8] == 0, "Concept comparison unexpectedly acquired a symbol before its rank measurement")
+cache = haiku_contact_concept_cache(personal_contact)
+projection = haiku_concept_project(cache, record_get(old_contact, "concept_counts"), record_get(receipt, "context_tokens"), a, b, record_get(receipt, "alpha"))
+equal_projection = haiku_concept_project(cache, zeros(21), record_get(receipt, "context_tokens"), a, b, record_get(receipt, "alpha"))
+assert(record_get(projection, "ok") and record_get(equal_projection, "ok"), "Concept diagnostic query failed")
+words = record_get(receipt, "words")
+raw = record_get(receipt, "scores")
+rank_off = haiku_contact_rank(off_contact, words, raw, "en")
+rank_equal = haiku_contact_rank(equal_contact, words, raw, "en")
+rank_personal = haiku_contact_rank(personal_contact, words, raw, "en")
+measurement = record_new()
+record_set(measurement, "words", words)
+record_set(measurement, "raw", raw)
+record_set(measurement, "rank_off", rank_off)
+record_set(measurement, "rank_equal", rank_equal)
+record_set(measurement, "rank_personal", rank_personal)
+record_set(measurement, "representation_equal", record_get(equal_projection, "representation"))
+record_set(measurement, "representation_personal", record_get(projection, "representation"))
+record_set(measurement, "field_off", record_get(off_contact, "p:field"))
+record_set(measurement, "field_equal", record_get(equal_contact, "p:field"))
+record_set(measurement, "field_personal", record_get(personal_contact, "p:field"))
+record_set(measurement, "admitted_off", concepts_model_admitted(off))
+record_set(measurement, "admitted_equal", concepts_model_admitted(equal))
+record_set(measurement, "admitted_personal", concepts_model_admitted(personal))
+record_set(measurement, "haiku_counts", record_get(personal, "haiku_contact:concept_counts"))
+record_set(measurement, "friend_counts", record_get(personal, "friend_contact:concept_counts"))
+checkpoint_save(measurement, "iceberg-concepts-measurement.state")
+PRINT text_concat("CONCEPT representation_equal_personal max_delta=", text_fixed(concepts_model_delta(record_get(equal_projection, "representation"), record_get(projection, "representation")), 9))
+PRINT text_concat("CONCEPT field_equal_personal max_delta=", text_fixed(concepts_model_delta(record_get(equal_contact, "p:field"), record_get(personal_contact, "p:field")), 9))
+PRINT text_concat("CONCEPT rank_off_equal max_delta=", text_fixed(concepts_model_delta(rank_off, rank_equal), 9))
+PRINT text_concat("CONCEPT rank_equal_personal max_delta=", text_fixed(concepts_model_delta(rank_equal, rank_personal), 9))
+PRINT text_concat("CONCEPT rank_off_equal changed_pairs=", text_fixed(concepts_model_order(rank_off, rank_equal), 0))
+PRINT text_concat("CONCEPT rank_equal_personal changed_pairs=", text_fixed(concepts_model_order(rank_equal, rank_personal), 0))
+PRINT "CONCEPT admitted_off"
+PRINT concepts_model_admitted(off)
+PRINT "CONCEPT admitted_equal"
+PRINT concepts_model_admitted(equal)
+PRINT "CONCEPT admitted_personal"
+PRINT concepts_model_admitted(personal)
+PRINT "CONCEPT haiku_counts"
+PRINT record_get(personal, "haiku_contact:concept_counts")
+PRINT "CONCEPT friend_counts"
+PRINT record_get(personal, "friend_contact:concept_counts")
+PRINT "CONCEPT scores word raw off equal personal"
+i = 0
+while i < 48:
+    row = text_concat(list_get(words, i), " ")
+    row = text_concat(row, text_fixed(raw[i], 9))
+    row = text_concat(text_concat(row, " "), text_fixed(rank_off[i], 9))
+    row = text_concat(text_concat(row, " "), text_fixed(rank_equal[i], 9))
+    row = text_concat(text_concat(row, " "), text_fixed(rank_personal[i], 9))
+    PRINT row
+    i = i + 1
+
+checkpoint_save(personal, "iceberg-concepts-models-first.state")
+resumed = checkpoint_load("iceberg-concepts-models-first.state")
+haiku_iceberg_check(resumed, 0)
+assert(haiku_iceberg_concepts_audit(resumed, a, b) == 84, "Resume did not audit both populated private endpoint banks")
+assert(record_equal(resumed, personal), "Model-aware audit changed the saved owner")
+warm_before = record_clone(personal)
+input = "music song melody guitar piano"
+warm_result = concepts_model_turn(personal, input, a, b, 0, 20742)
+parallel_result = concepts_model_turn(resumed, input, a, b, 1, 20742)
+assert(record_equal(personal, resumed) and record_equal(warm_result, parallel_result), "Warm concepts changed across worker scheduling or restart")
+checkpoint_save(warm_before, "iceberg-concepts-publication-base.state")
+checkpoint_save(warm_result, "iceberg-concepts-publication-result.state")
+checkpoint_save(personal, "iceberg-concepts-models.state")
+PRINT "HAIKU_ICEBERG_CONCEPTS_MODELS_OK"

@@ -1,0 +1,321 @@
+# Personal concept geometry. Frozen endpoint teachers live in separate spaces;
+# contact supplies a prior-turn count snapshot and the completed lexical tokens.
+# The returned scalar mixture is distinct from a PEN7 parameter mixture.
+IMPORT "parliament.aml"
+IMPORT "lexical_sources.aml"
+
+def haiku_concept_words():
+    return haiku_words("water rain river sea ocean lake tree forest wood leaf light sun sunrise dawn bright music song melody guitar piano drum")
+
+def haiku_concept_groups():
+    return [0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 6, 6, 6, 6, 6, 82, 82, 82, 82, 82, 82]
+
+def haiku_concept_new():
+    cache = record_new()
+    identity = haiku_words("PEN7-personal-endpoint21-v1 reviewed-en-21-v1")
+    list_push(identity, "")
+    list_push(identity, "")
+    list_push(identity, "")
+    record_set(cache, "identity", identity)
+    record_set(cache, "units_a", zeros(9408))
+    record_set(cache, "units_b", zeros(9408))
+    record_set(cache, "tokens", zeros(693))
+    return cache
+
+def haiku_concept_norm(vector):
+    haiku_parliament_vector(vector, 448, 1000000)
+    squared = haiku_parliament_dot(vector, vector)
+    assert(isfinite(squared) and squared > 0, "Concept vector has no finite positive norm")
+    return sqrt(squared)
+
+# Structural checkpoint validation. A source-backed publication additionally
+# rebuilds a cold bank or preserves its exact trusted predecessor bank.
+def haiku_concept_check(cache):
+    names = haiku_words("identity units_a units_b tokens ok error forwards")
+    keys = record_keys(cache)
+    assert(list_len(keys) == 4 or list_len(keys) == 7, "Concept cache field count differs")
+    i = 0
+    while i < list_len(keys):
+        assert(list_find(names, list_get(keys, i)) >= 0, "Concept cache field is unknown")
+        i = i + 1
+    identity = record_get(cache, "identity")
+    assert(list_len(identity) == 5, "Concept cache identity shape differs")
+    assert(text_equal(list_get(identity, 0), "PEN7-personal-endpoint21-v1"), "Concept method differs")
+    assert(text_equal(list_get(identity, 1), "reviewed-en-21-v1"), "Concept teacher manifest differs")
+    i = 2
+    while i < 5:
+        haiku_lexical_identity(list_get(identity, i))
+        i = i + 1
+    known = text_len(list_get(identity, 2)) + text_len(list_get(identity, 3)) > 0
+    assert((text_len(list_get(identity, 4)) > 0) == known, "Concept tokenizer availability differs")
+    side = 0
+    while side < 2:
+        bank = record_get(cache, "units_a")
+        if side == 1:
+            bank = record_get(cache, "units_b")
+        haiku_parliament_vector(bank, 9408, 1.00001)
+        if text_len(list_get(identity, side + 2)) == 0:
+            j = 0
+            while j < 9408:
+                assert(bank[j] == 0, "Concept absent bank has values")
+                j = j + 1
+        else:
+            j = 0
+            while j < 21:
+                unit = haiku_parliament_part(bank, j * 448, 448)
+                assert(abs(haiku_concept_norm(unit) - 1) <= 0.00001, "Concept teacher is not unit length")
+                j = j + 1
+        side = side + 1
+    tokens = record_get(cache, "tokens")
+    haiku_parliament_vector(tokens, 693, 2047)
+    i = 0
+    while i < 21:
+        count = haiku_lexical_integer(tokens[i * 33], 0, 32)
+        assert((count > 0) == known, "Concept teacher token availability differs")
+        j = 0
+        while j < 32:
+            value = haiku_lexical_integer(tokens[i * 33 + 1 + j], 0, 2047)
+            if j >= count:
+                assert(value == 0, "Concept teacher token padding differs")
+            j = j + 1
+        i = i + 1
+    if list_len(keys) == 7:
+        haiku_lexical_integer(record_get(cache, "ok"), 0, 1)
+        haiku_lexical_integer(record_get(cache, "forwards"), 0, 42)
+        assert(text_len(record_get(cache, "error")) <= 4096, "Concept cache error is too long")
+    return 1
+
+# New vectors and inputs are published together. An absent side keeps its
+# previous immutable bank; any failed forward returns the untouched old bank.
+def haiku_concept_cache(a, b, prior):
+    base = record_clone(prior)
+    if list_len(record_keys(base)) == 0:
+        base = haiku_concept_new()
+    haiku_concept_check(base)
+    record_set(base, "ok", 0)
+    record_set(base, "error", "unavailable")
+    record_set(base, "forwards", 0)
+    mask = haiku_lexical_availability(a, b)
+    if mask == 0:
+        return base
+    pending = record_clone(base)
+    identity = record_get(pending, "identity")
+    tokenizer = haiku_lexical_model(a, b)
+    tokenizer_id = model_tokenizer_identity(tokenizer)
+    old_tokenizer = list_get(identity, 4)
+    assert(text_len(old_tokenizer) == 0 or text_equal(old_tokenizer, tokenizer_id), "Concept tokenizer identity differs")
+    list_set(identity, 4, tokenizer_id)
+    words = haiku_concept_words()
+    encoded = record_get(pending, "tokens")
+    i = 0
+    while i < 21:
+        ids = model_encode(tokenizer, list_get(words, i), 32)
+        assert(len(ids) >= 1 and len(ids) <= 32, "Concept teacher token length differs")
+        if text_len(old_tokenizer) > 0:
+            assert(encoded[i * 33] == len(ids), "Concept teacher input length differs")
+        encoded[i * 33] = len(ids)
+        j = 0
+        while j < len(ids):
+            if text_len(old_tokenizer) > 0:
+                assert(encoded[i * 33 + 1 + j] == ids[j], "Concept teacher input differs")
+            encoded[i * 33 + 1 + j] = ids[j]
+            j = j + 1
+        i = i + 1
+    calls = 0
+    side = 0
+    while side < 2:
+        model = a
+        key = "units_a"
+        if side == 1:
+            model = b
+            key = "units_b"
+        if model_ready(model):
+            info = model_info(model)
+            assert(record_get(info, "vocab") == 2048 and record_get(info, "width") == 448 and record_get(info, "context") == 256, "Concept provider geometry differs")
+            assert(text_equal(model_tokenizer_identity(model), tokenizer_id), "Concept endpoint tokenizers differ")
+            old_identity = list_get(identity, side + 2)
+            assert(text_len(old_identity) == 0 or text_equal(old_identity, model_identity(model)), "Concept endpoint identity differs")
+            if text_len(old_identity) == 0:
+                bank = zeros(9408)
+                i = 0
+                while i < 21:
+                    ids = haiku_parliament_part(encoded, i * 33 + 1, encoded[i * 33])
+                    output = model_forward(model, ids)
+                    calls = calls + 1
+                    if record_get(output, "ok") == 0:
+                        record_set(base, "error", record_get(output, "error"))
+                        record_set(base, "forwards", calls)
+                        return base
+                    hidden = record_get(output, "hidden")
+                    size = haiku_concept_norm(hidden)
+                    j = 0
+                    while j < 448:
+                        bank[i * 448 + j] = hidden[j] / size
+                        j = j + 1
+                    i = i + 1
+                record_set(pending, key, bank)
+                list_set(identity, side + 2, model_identity(model))
+        side = side + 1
+    record_set(pending, "identity", identity)
+    record_set(pending, "tokens", encoded)
+    record_set(pending, "ok", 1)
+    record_set(pending, "error", "")
+    record_set(pending, "forwards", calls)
+    haiku_concept_check(pending)
+    return pending
+
+# Explicit checkpoint/body-return boundary. Cached vectors are proved against
+# each available body once here; a missing body keeps its bank unverified.
+def haiku_concept_audit(cache, a, b):
+    haiku_concept_check(cache)
+    result = record_new()
+    record_set(result, "ok", 0)
+    record_set(result, "error", "")
+    record_set(result, "availability", haiku_lexical_availability(a, b))
+    record_set(result, "verified", 0)
+    record_set(result, "forwards", 0)
+    identity = record_get(cache, "identity")
+    encoded = record_get(cache, "tokens")
+    words = haiku_concept_words()
+    calls = 0
+    side = 0
+    while side < 2:
+        model = a
+        key = "units_a"
+        mask = 2
+        if side == 1:
+            model = b
+            key = "units_b"
+            mask = 4
+        if model_ready(model) and text_len(list_get(identity, side + 2)) > 0:
+            assert(text_equal(model_identity(model), list_get(identity, side + 2)), "Concept audit endpoint identity differs")
+            assert(text_equal(model_tokenizer_identity(model), list_get(identity, 4)), "Concept audit tokenizer identity differs")
+            bank = record_get(cache, key)
+            i = 0
+            while i < 21:
+                tokens = model_encode(model, list_get(words, i), 32)
+                assert(len(tokens) == encoded[i * 33], "Concept audit teacher length differs")
+                j = 0
+                while j < len(tokens):
+                    assert(tokens[j] == encoded[i * 33 + 1 + j], "Concept audit teacher input differs")
+                    j = j + 1
+                output = model_forward(model, tokens)
+                calls = calls + 1
+                if record_get(output, "ok") == 0:
+                    record_set(result, "error", record_get(output, "error"))
+                    record_set(result, "forwards", calls)
+                    return result
+                hidden = record_get(output, "hidden")
+                size = haiku_concept_norm(hidden)
+                j = 0
+                while j < 448:
+                    assert(hidden[j] / size == bank[i * 448 + j], "Concept audited teacher vector differs")
+                    j = j + 1
+                i = i + 1
+            record_set(result, "verified", record_get(result, "verified") + mask)
+        side = side + 1
+    record_set(result, "ok", 1)
+    record_set(result, "forwards", calls)
+    return result
+
+def haiku_concept_scores(bank, counts, hidden):
+    groups = haiku_concept_groups()
+    ids = [0, 4, 6, 82]
+    query_norm = haiku_concept_norm(hidden)
+    result = zeros(88)
+    group = 0
+    while group < 4:
+        total = zeros(448)
+        i = 0
+        while i < 21:
+            if groups[i] == ids[group]:
+                j = 0
+                while j < 448:
+                    total[j] = total[j] + (1 + counts[i]) * bank[i * 448 + j]
+                    j = j + 1
+            i = i + 1
+        size = haiku_concept_norm(total)
+        j = 0
+        while j < 448:
+            total[j] = total[j] / size
+            j = j + 1
+        reference_norm = haiku_concept_norm(total)
+        score = haiku_parliament_dot(hidden, total) / (query_norm * reference_norm)
+        assert(isfinite(score) and abs(score) <= 1.00001, "Concept cosine is invalid")
+        result[ids[group]] = score
+        group = group + 1
+    return result
+
+# Query tokens are the exact lexical receipt trajectory before its proposed
+# words were appended. Physical-mixture receipt.hidden is never an input.
+def haiku_concept_project(cache, counts, tokens, a, b, alpha):
+    haiku_concept_check(cache)
+    haiku_parliament_vector(counts, 21, 128)
+    i = 0
+    while i < 21:
+        haiku_lexical_integer(counts[i], 0, 128)
+        i = i + 1
+    assert(isfinite(alpha) and alpha >= 0 and alpha <= 1, "Concept scalar mixture is invalid")
+    assert(len(tokens) >= 1 and len(tokens) <= 194, "Concept query token budget differs")
+    haiku_parliament_vector(tokens, len(tokens), 2047)
+    i = 0
+    while i < len(tokens):
+        haiku_lexical_integer(tokens[i], 0, 2047)
+        i = i + 1
+    result = record_new()
+    record_set(result, "ok", 0)
+    record_set(result, "error", "unavailable")
+    record_set(result, "forwards", 0)
+    mask = haiku_lexical_availability(a, b)
+    record_set(result, "availability", mask)
+    if mask == 2:
+        alpha = 1
+    if mask == 4:
+        alpha = 0
+    record_set(result, "alpha", alpha)
+    record_set(result, "raw_a", zeros(88))
+    record_set(result, "raw_b", zeros(88))
+    record_set(result, "mixed", zeros(88))
+    record_set(result, "representation", zeros(88))
+    identity = record_get(cache, "identity")
+    record_set(result, "identity", list_key(identity))
+    if mask == 0:
+        return result
+    pending = record_clone(result)
+    calls = 0
+    side = 0
+    while side < 2:
+        model = a
+        bank_key = "units_a"
+        score_key = "raw_a"
+        if side == 1:
+            model = b
+            bank_key = "units_b"
+            score_key = "raw_b"
+        if model_ready(model):
+            assert(text_equal(model_identity(model), list_get(identity, side + 2)), "Concept query endpoint identity differs")
+            assert(text_equal(model_tokenizer_identity(model), list_get(identity, 4)), "Concept query tokenizer identity differs")
+            output = model_forward(model, tokens)
+            calls = calls + 1
+            if record_get(output, "ok") == 0:
+                record_set(result, "error", record_get(output, "error"))
+                record_set(result, "forwards", calls)
+                return result
+            scores = haiku_concept_scores(record_get(cache, bank_key), counts, record_get(output, "hidden"))
+            record_set(pending, score_key, scores)
+        side = side + 1
+    raw_a = record_get(pending, "raw_a")
+    raw_b = record_get(pending, "raw_b")
+    mixed = zeros(88)
+    representation = zeros(88)
+    i = 0
+    while i < 88:
+        mixed[i] = alpha * raw_a[i] + (1 - alpha) * raw_b[i]
+        representation[i] = clamp(mixed[i], 0, 1)
+        i = i + 1
+    record_set(pending, "mixed", mixed)
+    record_set(pending, "representation", representation)
+    record_set(pending, "ok", 1)
+    record_set(pending, "error", "")
+    record_set(pending, "forwards", calls)
+    return pending

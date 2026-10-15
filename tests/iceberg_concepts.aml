@@ -1,0 +1,98 @@
+# Three saved profiles share one genuine foreground and external history.
+# Only the new concept leaves differ while both immutable bodies are absent.
+IMPORT "../src/iceberg_session.aml"
+
+def concepts_test_parity(legacy, current):
+    expected = record_new()
+    actual = record_new()
+    keys = record_keys(legacy)
+    wrappers = haiku_words("version haiku_contact:version friend_contact:version haiku_contact:keys friend_contact:keys")
+    i = 0
+    while i < list_len(keys):
+        key = list_get(keys, i)
+        if list_find(wrappers, key) < 0:
+            record_set(expected, key, record_get(legacy, key))
+            record_set(actual, key, record_get(current, key))
+        i = i + 1
+    assert(record_equal(expected, actual), "Weightless concepts changed an existing version-five leaf")
+    return 1
+
+def concepts_test_private(life):
+    result = record_new()
+    owners = haiku_words("haiku friend")
+    names = haiku_words("concept_clock concept_counts concept_identity concept_units_a concept_units_b concept_tokens")
+    i = 0
+    while i < 2:
+        j = 0
+        while j < 6:
+            key = text_concat(text_concat(list_get(owners, i), "_contact:"), list_get(names, j))
+            record_set(result, key, record_get(life, key))
+            j = j + 1
+        i = i + 1
+    return result
+
+missing = model_try_load("")
+core = haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0)
+record_set(core, "dream_config", [1, 1, 2])
+legacy = haiku_iceberg_new(core, [1, 0, 0, 1])
+legacy = haiku_iceberg_enable_janus(legacy, 20740, 1, 0)
+legacy = haiku_iceberg_enable_words(legacy, 0)
+legacy = haiku_iceberg_enable_symbols(legacy, 1, 0)
+legacy = haiku_iceberg_enable_exchange(legacy, 1, 0)
+original = record_clone(legacy)
+live = haiku_iceberg_enable_concepts(legacy, 2, 0)
+disabled = haiku_iceberg_enable_concepts(legacy, 0, 0)
+assert(record_equal(legacy, original), "Concept activation changed its source life")
+assert(record_get(live, "version") == 6 and list_len(record_keys(live)) == 265, "Concept life profile differs")
+assert(record_get(live, "haiku_contact:version") == 5 and record_get(live, "friend_contact:version") == 5, "Concept owner profile differs")
+again = haiku_iceberg_enable_concepts(live, 0, 0)
+assert(record_equal(live, again), "Concept activation changed an existing saved mode")
+clock = record_get(again, "haiku_contact:concept_clock")
+clock[0] = 0
+clock = record_get(live, "haiku_contact:concept_clock")
+assert(clock[0] == 2, "Concept activation returned shared state")
+assert(record_equal(live, haiku_iceberg_enable_exchange(live, 0, 0)), "Exchange activation downgraded concepts")
+assert(haiku_iceberg_concepts_audit(live, missing, missing) == 0, "Absent bodies caused a cache audit forward")
+off_before = concepts_test_private(disabled)
+parallel = record_clone(live)
+input = "rain river water ocean lake"
+first = haiku_iceberg_turn_at(legacy, input, 0, missing, missing, 0, 20740)
+second = haiku_iceberg_turn_at(disabled, input, 0, missing, missing, 1, 20740)
+assert(text_equal(first, second), "Disabled concepts changed the foreground")
+concepts_test_parity(legacy, disabled)
+assert(record_equal(off_before, concepts_test_private(disabled)), "Disabled concept state changed")
+checkpoint_save(legacy, "iceberg-concepts-prior.state")
+third = haiku_iceberg_turn_at(live, input, 0, missing, missing, 0, 20740)
+fourth = haiku_iceberg_turn_at(parallel, input, 0, missing, missing, 1, 20740)
+assert(text_equal(first, third) and text_equal(third, fourth) and record_equal(live, parallel), "Personal concepts differ by execution schedule")
+concepts_test_parity(legacy, live)
+assert(haiku_dream_check(haiku_iceberg_part(live, "voice")) == 0, "The fixed first input unexpectedly changed its dream boundary")
+counts = record_get(live, "haiku_contact:concept_counts")
+assert(counts[0] == 1 and counts[1] == 1 and counts[2] == 1 and counts[4] == 1 and counts[5] == 1, "Human teacher words did not enter the completed snapshot")
+upgraded = haiku_iceberg_enable_concepts(legacy, 2, 0)
+# An upgrade appends new outer namespace keys; a completed tail packs them
+# beside their owner. Compare the exact owned parts, independent of that order.
+owners = haiku_words("haiku_contact friend_contact")
+i = 0
+while i < 2:
+    owner = list_get(owners, i)
+    expected = haiku_iceberg_part(upgraded, owner)
+    actual = haiku_iceberg_part(live, owner)
+    assert(record_equal(expected, actual), "Upgrade did not retain the already owned external snapshot")
+    i = i + 1
+checkpoint_save(live, "iceberg-concepts-first.state")
+resumed = checkpoint_load("iceberg-concepts-first.state")
+haiku_iceberg_check(resumed, 0)
+assert(haiku_iceberg_concepts_audit(resumed, missing, missing) == 0, "Quiet resume caused a model forward")
+assert(record_equal(live, resumed), "Concept checkpoint lost a private leaf")
+input = "tree forest wood leaf light"
+first = haiku_iceberg_turn_at(live, input, 0, missing, missing, 0, 20741)
+second = haiku_iceberg_turn_at(resumed, input, 0, missing, missing, 1, 20741)
+assert(text_equal(first, second) and record_equal(live, resumed), "Concept history changed across restart")
+assert(haiku_dream_check(haiku_iceberg_part(live, "voice")) == 1, "The fixed second input lost its actual dream")
+clock = record_get(live, "haiku_contact:concept_clock")
+counts = record_get(live, "haiku_contact:concept_counts")
+assert(clock[1] == 2 and clock[2] == 2 and clock[3] == 2, "Concept snapshot did not advance once per completed external turn")
+assert(counts[6] == 1 and counts[7] == 1 and counts[8] == 1 and counts[9] == 1 and counts[10] == 1, "Later tree/light teachers were lost")
+checkpoint_save(live, "iceberg-concepts.state")
+PRINT "HAIKU_ICEBERG_CONCEPTS_LIFE_OK"

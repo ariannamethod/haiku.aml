@@ -9,6 +9,7 @@ IMPORT "lexical_sources.aml"
 IMPORT "contact_learning.aml"
 IMPORT "contact_symbols.aml"
 IMPORT "contact_exchange.aml"
+IMPORT "contact_concepts.aml"
 
 def haiku_contact_anchors():
     names = "water fire earth stone tree sky light dark cold person man woman child old spirit AI animal body food sleep pain strength "
@@ -133,12 +134,14 @@ def haiku_contact_check(state):
         expected = 47
         if version >= 3:
             expected = 51
-        if version == 4:
+        if version >= 4:
             expected = 55
+        if version == 5:
+            expected = 61
         assert(list_len(record_keys(state)) == expected, "Contact learning field count differs")
     else:
         assert(list_len(record_keys(state)) == 42, "Contact needs exactly forty-two fields")
-    assert(text_equal(record_get(state, "format"), "haiku-contact") and (version == 1 or version == 2 or version == 3 or version == 4), "Contact format is invalid")
+    assert(text_equal(record_get(state, "format"), "haiku-contact") and (version == 1 or version == 2 or version == 3 or version == 4 or version == 5), "Contact format is invalid")
     parliament = haiku_contact_parliament(state)
     haiku_parliament_check(parliament)
     assert(text_equal(list_key(record_keys(parliament)), list_key(record_get(state, "parliament_keys"))), "Contact parliament namespace differs")
@@ -259,11 +262,13 @@ def haiku_contact_check(state):
         while i < 8:
             assert(clock[18 + i] <= seen[i], "Contact symbol source exceeds publication")
             i = i + 1
-    if version == 4:
+    if version >= 4:
         haiku_contact_exchange_check(state)
         exchange_clock = record_get(state, "exchange_clock")
         seen = record_get(state, "p:seen")
         assert(exchange_clock[4] <= seen[6], "Contact exchange exceeds published deliveries")
+    if version == 5:
+        haiku_contact_concepts_check(state, 0)
     return 1
 
 def haiku_contact_event(owner, text, language, climate, rings, quality, source, event, turn):
@@ -516,7 +521,246 @@ def haiku_contact_bind(state, language, word, glyph, source, event):
     return 1
 
 # Four exact named reference words bound the first representation experiment.
-# Their vectors use the same PEN7 provider, tokenizer and parameter mixture.
+# The numerical cache is immutable between endpoint arrivals. Counts belong to
+# the contact owner and are deliberately outside that provider-specific record.
+def haiku_contact_concept_cache(state):
+    result = record_new()
+    names = haiku_words("identity units_a units_b tokens")
+    i = 0
+    while i < 4:
+        name = list_get(names, i)
+        record_set(result, name, record_get(state, text_concat("concept_", name)))
+        i = i + 1
+    return result
+
+# A view of the retained external encounters, including existing experience at
+# explicit upgrade. Each reviewed EN spelling contributes once per encounter.
+# The frozen glyph path, learned aliases and manual bindings are not teachers.
+def haiku_contact_concepts_view(state):
+    result = record_new()
+    counts = zeros(21)
+    record_set(result, "counts", counts)
+    record_set(result, "event", 0)
+    record_set(result, "turn", 0)
+    record_set(result, "revision", 0)
+    clock = record_get(state, "concept_clock")
+    if clock[0] == 0:
+        return result
+    symbol_clock = record_get(state, "symbol_clock")
+    assert(symbol_clock[0] == 1, "Contact concepts require active external history")
+    policy = 0
+    if text_equal(record_get(state, "p:owner"), "friend"):
+        policy = 6
+    rows = record_get(state, "symbol_rows")
+    texts = record_get(state, "symbol_text")
+    words = haiku_concept_words()
+    slot = 0
+    while slot < 128:
+        row = slot * 139
+        number = rows[row + 1]
+        if number > 0:
+            assert(rows[row] == policy, "Contact concept witness policy differs")
+            if policy == 0:
+                assert(rows[row + 3] == 0 and rows[row + 4] == number and rows[row + 5] == -1 and rows[row + 6] == 0, "Contact concept human ancestry differs")
+                assert(text_equal(list_get(texts, slot * 4 + 2), "human") and text_equal(list_get(texts, slot * 4 + 3), ""), "Contact concept human owner differs")
+            else:
+                assert(rows[row + 3] == 7 and rows[row + 4] == number and rows[row + 5] == 7 and rows[row + 6] == number, "Contact concept peer ancestry differs")
+                assert(text_equal(list_get(texts, slot * 4 + 2), "haiku") and text_equal(list_get(texts, slot * 4 + 3), "haiku"), "Contact concept peer owner differs")
+            if number > record_get(result, "event"):
+                record_set(result, "event", number)
+                record_set(result, "turn", rows[row + 2])
+                record_set(result, "revision", rows[row + 7])
+            if text_equal(list_get(texts, slot * 4 + 1), "en"):
+                tokens = haiku_tokenize_regex(list_get(texts, slot * 4))
+                i = 0
+                while i < 21:
+                    if list_find(tokens, list_get(words, i)) >= 0:
+                        counts[i] = counts[i] + 1
+                    i = i + 1
+        slot = slot + 1
+    record_set(result, "counts", counts)
+    return result
+
+# During a tail, current encounters may already have evicted older ring rows.
+# The prior snapshot remains intact. A closed life additionally reproduces its
+# exact counts and latest witness from the final ring, not from model output.
+def haiku_contact_concepts_check(state, closed):
+    haiku_contact_integer(closed, 0, 1)
+    clock = record_get(state, "concept_clock")
+    counts = record_get(state, "concept_counts")
+    haiku_parliament_vector(clock, 5, 999999)
+    haiku_parliament_vector(counts, 21, 128)
+    haiku_contact_integer(clock[0], 0, 2)
+    i = 1
+    while i < 5:
+        haiku_contact_integer(clock[i], 0, 999999)
+        i = i + 1
+    i = 0
+    while i < 21:
+        haiku_contact_integer(counts[i], 0, 128)
+        i = i + 1
+    cache = haiku_contact_concept_cache(state)
+    haiku_concept_check(cache)
+    symbol_clock = record_get(state, "symbol_clock")
+    if clock[0] == 0:
+        assert(clock[1] == 0 and clock[2] == 0 and clock[3] == 0 and clock[4] == 0, "Contact disabled concepts have witnesses")
+        assert(haiku_parliament_dot(counts, counts) == 0, "Contact disabled concepts have counts")
+        assert(record_equal(cache, haiku_concept_new()), "Contact disabled concepts have a model cache")
+    else:
+        assert(symbol_clock[0] == 1, "Contact concepts require active external history")
+        policy = 0
+        if text_equal(record_get(state, "p:owner"), "friend"):
+            policy = 6
+        assert(clock[1] <= symbol_clock[26 + policy], "Contact concept versions exceed external encounters")
+        assert(clock[2] <= symbol_clock[18 + policy] and clock[3] <= symbol_clock[3] and clock[4] <= symbol_clock[5], "Contact concept cutoff exceeds external history")
+        if clock[1] == 0:
+            assert(clock[2] == 0 and clock[3] == 0 and clock[4] == 0 and haiku_parliament_dot(counts, counts) == 0, "Contact empty concepts have lived state")
+        else:
+            assert(clock[2] > 0 and clock[3] > 0 and clock[4] > 0, "Contact concept version has no witness")
+    if closed:
+        view = haiku_contact_concepts_view(state)
+        assert(clock[2] == record_get(view, "event") and clock[3] == record_get(view, "turn") and clock[4] == record_get(view, "revision"), "Contact concept closed cutoff differs from external history")
+        actual = record_new()
+        expected = record_new()
+        record_set(actual, "counts", counts)
+        record_set(expected, "counts", record_get(view, "counts"))
+        assert(record_equal(actual, expected), "Contact concept closed counts differ from external history")
+    return 1
+
+# Only the completed owned tail advances this snapshot. The source-backed
+# publisher also calls this kernel on its independently reconstructed ring.
+def haiku_contact_concepts_finish(state):
+    haiku_contact_concepts_check(state, 0)
+    view = haiku_contact_concepts_view(state)
+    clock = record_get(state, "concept_clock")
+    result = record_new()
+    record_set(result, "committed", 0)
+    record_set(result, "version", clock[1])
+    if record_get(view, "event") == clock[2]:
+        haiku_contact_concepts_check(state, 1)
+        return result
+    assert(record_get(view, "event") > clock[2], "Contact concept witness went backwards")
+    assert(record_get(view, "turn") > clock[3] and record_get(view, "revision") > clock[4], "Contact concept witness order differs")
+    assert(clock[1] < 999999, "Contact concept versions are full")
+    pending = record_clone(state)
+    clock = record_get(pending, "concept_clock")
+    clock[1] = clock[1] + 1
+    clock[2] = record_get(view, "event")
+    clock[3] = record_get(view, "turn")
+    clock[4] = record_get(view, "revision")
+    record_set(pending, "concept_counts", record_get(view, "counts"))
+    haiku_contact_concepts_check(pending, 1)
+    record_set(state, "concept_clock", clock)
+    record_set(state, "concept_counts", record_get(pending, "concept_counts"))
+    record_set(result, "committed", 1)
+    record_set(result, "version", clock[1])
+    return result
+
+def haiku_contact_enable_concepts(state, mode):
+    haiku_contact_check(state)
+    assert(record_get(state, "version") >= 4, "Contact concepts require the exchange profile")
+    pending = record_clone(state)
+    if record_get(state, "version") >= 5:
+        return pending
+    haiku_contact_integer(mode, 0, 2)
+    symbol_clock = record_get(state, "symbol_clock")
+    assert(mode == 0 or symbol_clock[0] == 1, "Contact concepts require active external history")
+    clock = zeros(5)
+    clock[0] = mode
+    record_set(pending, "version", 5)
+    record_set(pending, "concept_clock", clock)
+    record_set(pending, "concept_counts", zeros(21))
+    cache = haiku_concept_new()
+    names = haiku_words("identity units_a units_b tokens")
+    i = 0
+    while i < 4:
+        name = list_get(names, i)
+        record_set(pending, text_concat("concept_", name), record_get(cache, name))
+        i = i + 1
+    haiku_contact_concepts_finish(pending)
+    haiku_contact_check(pending)
+    return pending
+
+# This identity names the actual lexical provider and the owner's prior
+# concept snapshot. Cache rebuilds and current-tail words cannot mint evidence.
+def haiku_contact_concepts_id(state, receipt):
+    assert(text_equal(record_get(state, "p:owner"), record_get(receipt, "owner")), "Contact concept lexical owner differs")
+    identity = haiku_words("PEN7-personal-endpoint21-v1 reviewed-en-21-v1")
+    list_push(identity, record_get(receipt, "identity_a"))
+    list_push(identity, record_get(receipt, "identity_b"))
+    list_push(identity, record_get(receipt, "tokenizer"))
+    list_push(identity, text_fixed(record_get(receipt, "source"), 0))
+    list_push(identity, record_get(state, "p:owner"))
+    policy = "human0"
+    if text_equal(record_get(state, "p:owner"), "friend"):
+        policy = "haiku7-peer6"
+    list_push(identity, policy)
+    clock = record_get(state, "concept_clock")
+    i = 0
+    while i < 5:
+        list_push(identity, text_fixed(clock[i], 0))
+        i = i + 1
+    return list_key(identity)
+
+def haiku_contact_concepts_apply(state, event, receipt, a, b):
+    assert(text_equal(record_get(state, "p:owner"), record_get(event, "owner")), "Contact concept event owner differs")
+    result = record_clone(event)
+    source = record_get(receipt, "source")
+    alpha = record_get(receipt, "alpha")
+    if source == 2:
+        alpha = 1
+    if source == 3:
+        alpha = 0
+    mask = record_get(receipt, "availability")
+    record_set(result, "alpha", alpha)
+    record_set(result, "availability", mask + (len(record_get(event, "rings")) == 3))
+    record_set(result, "identity", haiku_contact_concepts_id(state, receipt))
+    record_set(result, "representation", zeros(88))
+    record_set(result, "representation_available", 0)
+    record_set(result, "representation_gain", 0)
+    haiku_contact_event_check(result)
+    seen = record_get(state, "p:seen")
+    if record_get(result, "replay") == 1 or record_get(result, "event") <= seen[source]:
+        return result
+    clock = record_get(state, "concept_clock")
+    assert(clock[3] < record_get(event, "turn"), "Contact concept snapshot is not from an earlier turn")
+    assert(mask == haiku_lexical_availability(a, b), "Contact live model availability differs from receipt")
+    tokenizer = haiku_lexical_model(a, b)
+    assert(text_equal(model_tokenizer_identity(tokenizer), record_get(receipt, "tokenizer")), "Contact tokenizer identity differs")
+    if model_ready(a):
+        assert(text_equal(model_identity(a), record_get(receipt, "identity_a")), "Contact model A identity differs")
+    if model_ready(b):
+        assert(text_equal(model_identity(b), record_get(receipt, "identity_b")), "Contact model B identity differs")
+    if clock[0] == 0:
+        return result
+    tokens = record_get(receipt, "context_tokens")
+    assert(len(tokens) == record_get(receipt, "context_count"), "Contact concept query length differs from lexical receipt")
+    cache = haiku_concept_cache(a, b, haiku_contact_concept_cache(state))
+    if record_get(cache, "ok") == 0:
+        return result
+    counts = record_get(state, "concept_counts")
+    if clock[0] == 1:
+        counts = zeros(21)
+    projection = haiku_concept_project(cache, counts, tokens, a, b, alpha)
+    if record_get(projection, "ok") == 0:
+        return result
+    assert(record_get(projection, "availability") == mask and record_get(projection, "alpha") == alpha, "Contact concept provider receipt differs")
+    record_set(result, "representation", record_get(projection, "representation"))
+    record_set(result, "representation_available", 1)
+    record_set(result, "representation_gain", 0.25)
+    haiku_contact_event_check(result)
+    pending = record_clone(state)
+    names = haiku_words("identity units_a units_b tokens")
+    i = 0
+    while i < 4:
+        name = list_get(names, i)
+        record_set(pending, text_concat("concept_", name), record_get(cache, name))
+        i = i + 1
+    haiku_contact_check(pending)
+    record_replace(state, pending)
+    return result
+
+# Legacy prototype vectors use the same PEN7 provider and parameter mixture.
 def haiku_contact_prototype_ids():
     return [0, 4, 6, 82]
 
@@ -548,6 +792,8 @@ def haiku_contact_enrich(state, event, receipt, a, b):
     assert(text_equal(record_get(receipt, "owner"), record_get(event, "owner")), "Contact lexical owner differs")
     assert(record_get(receipt, "origin_source") == record_get(event, "origin_source") and record_get(receipt, "origin_event") == record_get(event, "origin_event"), "Contact lexical origin differs")
     assert(record_get(receipt, "parent_source") == record_get(event, "parent_source") and record_get(receipt, "parent_event") == record_get(event, "parent_event"), "Contact lexical parent differs")
+    if record_get(state, "version") == 5:
+        return haiku_contact_concepts_apply(state, event, receipt, a, b)
     result = record_clone(event)
     source = record_get(receipt, "source")
     alpha = record_get(receipt, "alpha")

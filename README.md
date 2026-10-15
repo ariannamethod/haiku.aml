@@ -122,6 +122,8 @@ Repeated paths can acquire [private compound symbols](docs/DREAM_SYMBOLS.md)
 in dreams; later encounters can recognize them and grow another layer.
 Those structures can [cross a spoken dream](docs/SYMBOL_EXCHANGE.md). Each
 listener keeps the meeting, then grows new connections through its own life.
+Even a familiar concept gains a [personal centre](docs/PERSONAL_CONCEPTS.md):
+rain and sea leave different traces, and those traces reach later word choices.
 
 [The iceberg contract](docs/ICEBERG_SESSION.md) explains the controls,
 checkpoint upgrades and tested dependency revisions. The original `haiku.aml`

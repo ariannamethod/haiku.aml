@@ -186,8 +186,16 @@ records the independently verified entrypoint and the sole subsequent
 checker-file change; it performed zero new forwards.
 
 Use clean sibling AML/NoTorch checkouts at the revisions above, the scalar
-build commands in the main README, and both checked-in GGUF files. From the
-Haiku repository root:
+build commands in the main README, and both checked-in GGUF files. The frozen
+protocol fingerprints the complete contact source. Reproduce this historical
+experiment from its report revision, which includes the stricter checker:
+
+```sh
+git worktree add --detach ../haiku-concept-basis b75ac3d4e941d237a4010c55f6ed03c5d1fe1749
+cd ../haiku-concept-basis
+```
+
+The sibling location preserves the dependency paths. From that worktree root:
 
 ```sh
 set -eu

@@ -110,11 +110,14 @@ The [contact bridge](PARLIAMENT_CONTACT.md) gives these events the shared
 88 concept coordinates. Named aliases and reviewed private bindings preserve
 the original words. In version 3, later contact and ranking can also use a
 word's independently earned association, at strength no greater than .5.
-Unresolved words remain unbound. Four named prototypes—water,
-tree, light and music—provide the first measured representation contribution.
-Their cache belongs to the receiving presence and names the exact model pair,
-tokenizer and effective coefficient. A changed identity or coefficient rebuilds
-the cache through the same model forward.
+Unresolved words remain unbound. Versions 1–5 use four isolated named
+prototypes—water, tree, light and music—with a cache tied to the exact model
+pair, tokenizer and effective coefficient. Version 6 uses the same concept
+identities with [personal centres](PERSONAL_CONCEPTS.md): twenty-one reviewed
+word vectors in each endpoint space, weighted by the owner's preceding external
+encounters. Endpoint vectors remain fixed across changes in counts or alpha.
+The exact lexical input is queried in each available body; raw concept scores
+are mixed with the receipt's alpha, then clamped and returned at gain .25.
 
 ## How words reach the next poem
 
@@ -137,15 +140,16 @@ Its frozen learning features and original human observation retain their values.
 
 ## One publication, one checkpoint
 
-Version 5 has **253 flat fields**; versions 4/3/2/1 retain **245/237/227/185**:
+Version 6 has **265 flat fields**; versions 5/4/3/2/1 retain
+**253/245/237/227/185**:
 
 | Component | Fields |
 |---|---:|
 | Existing version-3 voice | 55 |
 | Haiku and friend lexical owners | 18 each |
-| Haiku and friend contact owners | 55 each in v5; 51 in v4; 47 in v3; 42 in v1/v2 |
-| Haiku and friend Janus owners, versions 2–5 | 20 each |
-| Envelope, component key lists, settings and admission ledger | 12 in v2–5; 10 in v1 |
+| Haiku and friend contact owners | 61 each in v6; 55 in v5; 51 in v4; 47 in v3; 42 in v1/v2 |
+| Haiku and friend Janus owners, versions 2–6 | 20 each |
+| Envelope, component key lists, settings and admission ledger | 12 in v2–6; 10 in v1 |
 
 The existing voice's 55-field schema is unchanged. `iceberg.state` is a separate
 complete checkpoint. It holds all four contexts, both parliaments, identities,
@@ -159,6 +163,10 @@ frozen observation/birth-proof paths and exact source text.
 Version 5 adds four exchange leaves per contact: delivery clocks, per-node
 origin, first-adoption packets and their exact source text. Both origins share
 the same sixteen-node catalogue; local birth proofs retain their own slots.
+Version 6 adds six concept leaves per contact: mode/snapshot clock, twenty-one
+encounter counts, two immutable endpoint banks, exact teacher token IDs and
+bank identities. The snapshot advances after the whole tail; current contacts
+use the predecessor's counts.
 
 The worker completion carries the entire exact predecessor, completed life,
 frozen foreground experience and provider request. Publication compares every
@@ -170,14 +178,14 @@ workers finish.
 
 The full module uses AML's expanded 16384-line import capacity, 512 function
 slots, 16-argument functions and 1024-field flat records. Its complete predecessor
-and successor fit in one transient result: 531 fields for version 5, 515 for
+and successor fit in one transient result: 555 fields for version 6, 531 for version 5, 515 for
 version 4, 499 for version 3 and 479 for version 2.
 Publication also freezes
 each Janus owner's mode, activation day, calendar and witness policy. An
 advanced owner must record the request's captured day and turn; an idle owner
 must remain identical.
 
-Versions 2–5 also reconstruct both Janus transitions from the exact
+Versions 2–6 also reconstruct both Janus transitions from the exact
 predecessor, frozen human input and newly accepted dream deliveries. It preserves
 earlier dream text and boundaries, then independently repeats the relevant
 lexical passes using the supplied immutable model handles. The worker and
@@ -187,10 +195,12 @@ replacement score pool, debt or history is insufficient.
 
 Verification repeats each enabled lexical pass, at most two additional model
 forwards per turn. Missing or disabled bodies perform no verification
-forward. Voice learners, dream generation, prototype forwards, vocabulary admission
-and random draws are not repeated, and the source weights remain immutable.
+forward. In versions 2–5, prototype forwards, vocabulary admission and contact
+random draws are not repeated. Version 6 also verifies the complete contact
+transition and word selection as described below. Voice learners and dream
+generation retain the existing publication boundary; source weights stay frozen.
 The original five-argument `haiku_iceberg_result_check` accepts version 1 only.
-Versions 2–5 use `haiku_iceberg_check_sources(life, result, experience, request,
+Versions 2–6 use `haiku_iceberg_check_sources(life, result, experience, request,
 tokenizer, body_a, body_b)`, which also checks both handle identities against the
 captured request. Version-2's 227-field checkpoint and 479-field completion
 remain unchanged.
@@ -217,6 +227,17 @@ compares all four exchange leaves and the shared symbol catalogue. The receiver
 keeps its own evidence: an adopted node has peer provenance and zero local
 proofs. Its later recursive children earn their own fourteen witnesses.
 
+Version 6 independently repeats every accepted contact through
+`haiku_contact_publish`, including the endpoint projection, owned parliament
+field and random stream. Its reconstructed final contact must match every leaf.
+It rebuilds pre-admission vocabulary from the predecessor and accepted human
+trigrams/dream lines, then repeats selection with the authentic contact field
+and lexical receipt. The full admission ledger and final vocabulary must match.
+This happens before dream consolidation, exchange and the next count snapshot,
+matching the actual tail's order. Closed counts and their cutoff must also agree
+with the retained external history. The additional concept-forward budget and
+checkpoint bank audit are specified in [PERSONAL_CONCEPTS](PERSONAL_CONCEPTS.md).
+
 ## Quiet absence and controls
 
 New-life settings at the top of `iceberg.aml` are saved with the checkpoint:
@@ -236,6 +257,8 @@ New-life settings at the top of `iceberg.aml` are saved with the checkpoint:
 | `upgrade_symbols` | 0 | Explicitly activates the symbol profile for an existing word-learning life |
 | `symbol_exchange` | 1 | Gives a new symbol life version-5 structural exchange; zero saves an inert v5 exchange control |
 | `upgrade_exchange` | 0 | Explicitly activates exchange for an existing version-4 life |
+| `personal_concepts` | 2 | Gives a new life version-6 concepts: 0 off, 1 equal, 2 personal; symbols-off selects 0 |
+| `upgrade_concepts` | 0 | Explicitly activates concepts for an existing version-5 life |
 
 An existing checkpoint retains its first four settings. The scheduling choice
 can change without changing the complete result. For a new control condition,
@@ -249,7 +272,7 @@ lexical preference. Mode 1 selects dynamic balance. Both modes use the same
 expectation and witness budget.
 
 `haiku_iceberg_enable_words(life, tokenizer)` returns a detached, idempotent
-version-3 upgrade from a Janus life, preserving an already-enabled v3/v4/v5 profile.
+version-3 upgrade from a Janus life, preserving an already-enabled v3/v4/v5/v6 profile.
 It captures the current contact clocks;
 old receipts cannot teach the new learner. An existing v1 checkpoint requires
 both `upgrade_balance=1` and `upgrade_words=1` to activate both organs together.
@@ -265,13 +288,22 @@ saved and immutable; another enable call cannot switch it.
 idempotent v5 upgrade from v4. It captures the actual core turn and dream count,
 and preserves the existing catalogue and local proofs. New lives with
 `dream_symbols=0` also save an inert exchange mode. With all upgrade controls
-at zero, saved v1/v2/v3/v4 profiles continue exactly as before.
+at zero, saved v1/v2/v3/v4/v5 profiles continue exactly as before.
 Upgrading an existing symbols-off control uses `symbol_exchange=0`; changing
 the launcher's `dream_symbols` value leaves that saved symbol mode intact.
 
+`haiku_iceberg_enable_concepts(life, mode, tokenizer)` is a detached, idempotent
+v6 upgrade from v5. Modes 1 and 2 require active symbols and derive their first
+counts from already retained personal history. The selected mode is saved and
+immutable. Mode 0 permits symbols-off lives. After checkpoint loading and when
+a model provider returns, direct callers run
+`haiku_iceberg_concepts_audit(life, body_a, body_b)`; the launcher does so after
+loading the resumed life's bodies. This pure audit rebuilds each available
+populated bank and checks exact vectors and teacher tokens.
+
 `haiku_iceberg_turn_at(..., worker, day)` accepts an explicit day for replay and
 controlled experiments. The ordinary turn samples AML's `utc_day()` once for
-versions 2–5; version 1 never reads the clock. The worker uses its frozen request.
+versions 2–6; version 1 never reads the clock. The worker uses its frozen request.
 
 Empty paths create explicit unavailable handles. Missing or invalid files
 remain inspectable through `model_ready` / `model_error`; they add no fallback
@@ -310,6 +342,7 @@ make test-janus-balance test-iceberg-janus
 make test-contact-learning test-iceberg-learning
 make test-contact-symbols test-iceberg-symbols
 make test-contact-exchange test-iceberg-exchange
+make test-contact-concept-numerical test-contact-concept-experience test-iceberg-concepts
 make test-owned-tail
 ```
 

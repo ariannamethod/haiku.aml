@@ -17,10 +17,12 @@ The new [iceberg conversation](ICEBERG_SESSION.md) connects immutable AML
 handles, four private lexical contexts, parameter mixing and two private
 parliaments to actual encounters. Bounded text-context returns provide word
 scores and representations; concept pressure joins lexical admission. Its
-version-5 checkpoint retains 253 fields across the voice, both lexical/contact
+version-6 checkpoint retains 265 fields across the voice, both lexical/contact
 lives and both Janus organs. Private [word associations](LEARNED_WORDS.md) grow
 from repeated accepted encounters; [recursive symbols](DREAM_SYMBOLS.md) can be
 born at an actual dream boundary and [cross a spoken dream](SYMBOL_EXCHANGE.md).
+The four reviewed model concepts now acquire [personal centres](PERSONAL_CONCEPTS.md)
+from each presence's retained encounters and contribute to later word ranking.
 The [engineering log](../HAIKULOG.md)
 records each stage and its evidence. Python Haiku remains
 the behavioral and artistic reference; `haiku.aml` retains that stable profile.

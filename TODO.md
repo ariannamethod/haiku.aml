@@ -67,6 +67,10 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
 - [x] Exchange compound parent structures between owners with explicit delivery,
   local ID resolution and bounded adoption. Preserve the receiver's own evidence;
   hearing a structure does not manufacture its fourteen local witnesses.
+- [x] Give the four reviewed model concepts [personal centres](docs/PERSONAL_CONCEPTS.md)
+  from each presence's retained external encounters. Compare their later word
+  ranking with equal word weights and representation-off controls; preserve
+  frozen source bodies, exact publication and restart.
 - [ ] Let model representations contribute to glyph formation and learned
   concept bindings; let that field influence later parameter mixing and words.
   Use NoTorch for numerical work, retain shared concept identities and each
@@ -76,8 +80,9 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   vote in the current external-context learner. The preregistered
   [concept-basis comparison](docs/research/iceberg/CONCEPT_BASIS.md) moves the
   .5 mixture from 6/24 to 8/24 with reviewed-word centroids, while A moves
-  11/24 to 8/24. The next comparison adds each presence's accepted experience
-  to those word weights and measures later word ranking against both controls.
+  11/24 to 8/24. The live profile now adds each presence's accepted experience
+  to those word weights. New binding votes, glyph formation and their contribution
+  to later parameter balance remain separate experiments.
 - [x] Let each presence send a selected human/self/friend fragment into
   its owned lexical trajectory and receive word/glyph proposals at a declared
   boundary. Preserve source ancestry, frozen bodies, private histories and

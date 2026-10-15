@@ -1,0 +1,22 @@
+IMPORT "../src/contact_concepts.aml"
+
+bad = checkpoint_load(concept_checkpoint)
+if concept_invalid_case == 0:
+    tokens = record_get(bad, "tokens")
+    assert(tokens[1] != 0, "Concept teacher fixture already has zero first token")
+    tokens[1] = 0
+    record_set(bad, "tokens", tokens)
+if concept_invalid_case == 1:
+    bank = record_get(bad, "units_a")
+    i = 0
+    while i < 448:
+        bank[i] = -bank[i]
+        i = i + 1
+    record_set(bad, "units_a", bank)
+# Both corruptions retain a structurally valid checkpoint. Only the actual
+# immutable body establishes the correspondence from teacher input to vector.
+haiku_concept_check(bad)
+a = model_try_load("../weights/haiku1.gguf")
+missing = model_try_load("fixtures/concept-intentionally-missing.gguf")
+haiku_concept_audit(bad, a, missing)
+assert(0, "Concept corrupted cache passed model-aware audit")
