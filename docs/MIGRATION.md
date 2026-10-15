@@ -288,16 +288,19 @@ experience. [ASYNC](ASYNC.md) preserves the earlier audit and records the fixes.
 
 The experimental iceberg now connects immutable AML PEN7 handles, bounded word
 admission, contextual representations and real encounters to two private
-parliaments. Its version-5 publication uses AML's expanded 16384-line import
+parliaments. Its version-6 publication uses AML's expanded 16384-line import
 capacity, 512 function slots, 16-argument functions and 1024-field records.
-The saved life has 253 fields; its detached completion has 531. Source bodies
+The saved life has 265 fields; its detached completion has 555. Source bodies
 stay outside snapshots. Older profiles retain their own schemas until upgrade.
+Four reviewed concepts acquire [personal centres](PERSONAL_CONCEPTS.md) through
+each owner's retained external encounters. Their independently computed endpoint
+scores return through the contact field into word ranking and admission.
 
 The next integration work is:
 
 1. Model-attributed concept formation, extending
    the working Janus balance, learned word associations and exchanged dream symbols
-   with separately measured contributions to later words.
+   beyond the current experience-weighted centres and their measured word ranking.
 2. Early response display and input overlap, with durable pending experience,
    exact restart replay and one completed-state publisher.
 3. A small local HTTP/event interface over the organism's events.

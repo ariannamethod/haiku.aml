@@ -59,6 +59,12 @@ dream can preserve one relation supported on fourteen different turns. Later
 paths recognize that structure and can support another level. Both owners keep
 their own evidence, IDs and immutable birth proofs.
 
+Version 4 adds [structural exchange](SYMBOL_EXCHANGE.md), reaching 55 fields.
+Version 5 adds [personal concept centres](PERSONAL_CONCEPTS.md), reaching 61:
+the same twenty-one reviewed teachers acquire different weights through each
+owner's retained external history. Every current-turn model return uses the
+preceding snapshot; the completed tail advances its counts and cutoff.
+
 The remaining feature columns keep the [parliament contract](PARLIAMENT.md):
 actual dissonance, novelty, normalized arousal and entropy at 88–91, completed
 echo/drift/meta coherence at 92–94, and the actual quality metric at 95.
@@ -68,8 +74,8 @@ quality `.5`; its boundary is the opposite normalized direction.
 
 ## Four model reference words
 
-`haiku_contact_enrich` uses PEN7's actual 448-value final hidden representation.
-Its first bounded reference set is **water, tree, light, music**, at coordinates
+In contact versions 1–4, `haiku_contact_enrich` uses PEN7's actual 448-value final
+hidden representation. Its reference set is **water, tree, light, music**, at coordinates
 0, 4, 6 and 82. Four one-word forwards build their reference vectors with the
 same loaded provider, tokenizer and parameter mixture as the lexical receipt.
 Positive cosine similarity becomes their activation; all other model-contributed
@@ -79,6 +85,13 @@ Each contact caches these 1,792 F32 values, the complete provider/tokenizer
 identity and the exact mixture coefficient. A change rebuilds all four vectors.
 The cache adds 7,168 numeric bytes per presence. Rebuilding the reference cache
 alone neither observes an encounter nor changes parliamentary pressure.
+
+Contact v5 dispatches enrichment through the personal concept module. Its
+separate A/B teacher banks remain fixed across changes in counts or alpha.
+Queries use the completed receipt's exact input tokens in both endpoint spaces;
+raw scores are mixed before clamping. The gain and ranking path below remain
+shared. [PERSONAL_CONCEPTS](PERSONAL_CONCEPTS.md) specifies modes, source policies,
+bank audits and measured word-rank results.
 
 Model activation adds at most `.25` to each named feature, clamped to `[0,1]`.
 The event freezes provider identity, actual alpha, availability and gain.
@@ -136,6 +149,8 @@ availability, complete availability mask). They rotate with parliament receipts.
 Version 2 retains those leaves and adds the five learned-word leaves, for **47**.
 Version 3 adds four symbol leaves, for **51**; the complete layout and activation
 contract are in [DREAM_SYMBOLS](DREAM_SYMBOLS.md).
+Versions 4 and 5 add four exchange leaves and six concept leaves respectively,
+for **55** and **61** fields.
 
 | Entry point | Result |
 |---|---|
@@ -145,6 +160,8 @@ contract are in [DREAM_SYMBOLS](DREAM_SYMBOLS.md).
 | `haiku_contact_enrich(contact, event, receipt, A, B)` | Enriched event clone; complete private cache may update |
 | `haiku_contact_publish(contact, event)` | Atomic pressure/provenance/reward publication |
 | `haiku_contact_rank(contact, words, scores, language)` | New bounded candidate scores |
+| `haiku_contact_enable_concepts(contact, mode)` | Detached v5 upgrade from v4, deriving the owner's retained history |
+| `haiku_contact_concepts_finish(contact)` | Advance the snapshot at the completed-tail boundary |
 | `haiku_contact_check`, `save`, `load` | Schema validation and exact continuation |
 
 `p:owner`, `p:clock`, `p:revision` and `p:field` expose current identity and

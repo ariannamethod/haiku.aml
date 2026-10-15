@@ -9,6 +9,140 @@ commands here, newest first. A major new capability also earns a short README
 update. The module documents hold the complete contracts; measured failures
 belong beside measured successes.
 
+## 2026-10-15 — The same concept, two personal histories
+
+Merged [#22](https://github.com/ariannamethod/haiku.aml/pull/22),
+`fab2a4aad1dbfdf05f7487582b7f6acbe3352271`, supplies this stage's predecessor.
+Iceberg v6 gives each presence [personal concept centres](docs/PERSONAL_CONCEPTS.md)
+for water, tree, light and music. The twenty-one reviewed English teachers stay
+fixed. Each word's weight is `1 + count` in the owner's retained 128 external
+encounters: native human input for Haiku, actual Haiku dream deliveries for the
+friend. Repeated spellings count once per encounter. Other languages, model
+proposals, private speech, replay and newly learned aliases add no teachers.
+
+The three saved modes are representation off, equal teacher weights and personal
+weights. Modes 1/2 retain their own genuine encounter counts; mode 1 projects
+with equal weights. The complete current tail uses the predecessor's snapshot.
+Only its final publication advances the next snapshot and exact event/turn/
+symbol-revision cutoff. Activation derives counts from already retained history.
+
+Each frozen body has its own 21 × 448 bank of unit teacher vectors. The exact
+lexical input tokens query each available endpoint independently. The runtime
+mixes raw endpoint cosines with the lexical receipt's alpha, then clamps and
+returns them at the existing .25 gain. Word logits retain their physical
+parameter-mixture pass. This endpoint-score method has its own name and receipt;
+the preceding experiment's physical .5-space accuracy remains its own result.
+
+The declared live comparison uses seeds **575/57**, days **20740–20742**, and
+these three inputs in order:
+
+1. `rain river water ocean lake` creates the common weightless v5 history.
+2. `tree forest wood leaf light` compares modes 0/1/2 from that predecessor.
+3. `music song melody guitar piano` checks the warm continuation and restart.
+
+The first input produced no dream; the second produced an actual dream and
+populated both owners' model banks. The equal control reuses the already
+source-verified immutable banks, while retaining its own preceding core and
+encounter counts. Foreground experience and physical lexical receipts agree
+across the three modes.
+
+| Measured second-turn difference | Result |
+| --- | ---: |
+| Equal → personal, largest concept-score change | 0.0018619895 |
+| Equal → personal, largest private-field change | 0.000000073458068 |
+| Equal → personal, largest final word-rank change | 0 |
+| Off → equal, largest final word-rank change | 0.0000059604645 |
+| Changed pairwise orders among 48 words, either comparison | 0 |
+| Actual admissions in all three modes | `root`, then `sea` |
+
+Personal water changes from **0.7678155303 to 0.7659535408**. The other three
+centres have unchanged prior counts. The field receives the difference; its
+contribution to final word scores rounds away in this float32 run. The next
+snapshot contains ten teacher words with one Haiku encounter each. The friend's
+real delivered poem contains none of the twenty-one teachers, so its counts
+remain zero while its encounter boundary advances. Inputs, gains and the
+admission budget were kept fixed after observing these results.
+On the third turn, the friend's own line contains `guitar` and `water`; those
+words still add no external teacher count to the friend.
+
+Contact v5 adds six leaves, reaching **61 fields per owner**. Iceberg v6 has
+**265 saved fields** and a **555-field** completion. Its publisher independently
+replays the complete contact transition, endpoint calculation and private
+parliament field. It reconstructs pre-admission vocabulary from accepted human
+trigrams and dream lines, repeats ranked selection at the original point in the
+tail, and compares the entire ledger and final vocabulary. Voice learning and
+generation retain their existing accepted-core boundary.
+
+After checkpoint loading and provider return, the pure model-aware audit
+rebuilds each populated available bank and compares exact vectors and teacher
+tokens. The launcher calls it after loading the resumed life's bodies; direct
+API callers use `haiku_iceberg_concepts_audit`. Cold construction/query costs
+44 forwards per owner with both bodies, warm query costs 2, and resume audit
+costs 42. The publisher's independent verification is additional work. Missing
+bodies preserve history and banks while contributing zero representation.
+
+The focused numerical gate passed in **21.050 seconds**, with byte-identical
+interpreter/compiled stdout and checkpoints, empty successful-execution stderr
+and unchanged GGUF hashes. Its 196 forwards include both rejected vector audits;
+wrong teacher tokens fail before a forward. The preceding diagnostic used 190,
+for 386 in this numerical lane. The mixed-sign `zuvrel` case checks that clamp
+follows scalar mixing. A separate synthetic-count `stream` fixture checks the
+weighted formula; it is distinct from the live encounter comparison above.
+
+The focused experience gate passed with zero model forwards: genuine source
+policies, deferred snapshots, exact alias counts, replay, activation, all modes,
+128-encounter expiry and restart. Eight saved artifact pairs and full stdout
+agree between interpreter and compiler. Twenty corrupt snapshots and five
+invalid boundary calls are rejected without changing their inputs.
+
+The actual model-history gate passes cold construction, all three controls,
+both owners' real dream paths, an 84-forward audit after loading and exact warm
+serial/worker continuation of the entire life and completion envelope. Its
+309 forward calls comprise 252 teacher calls, 36 endpoint queries and 21
+physical parameter-mixture calls. The publication gate uses the retained warm
+completion: **16 refusals**, unchanged 265-field owner and saved bytes, a failed
+save that leaves the owner intact, and one successful save/swap. Its 141 calls
+comprise 84 teacher audits, 38 endpoint queries and 19 physical mixtures.
+Together those two phases use **450 calls**; the publication phase took
+445.986 seconds. No voice or dream lifecycle is regenerated for a corruption.
+
+The weightless v6 lifecycle also agrees between interpreter and compiler in
+complete stdout and the full checkpoint. The final compiled pass took 172
+seconds and ran from a foreign directory. Three fixture corrections preceded
+that final pass: the first input's actual no-dream result, order-independent
+comparison of upgrade versus canonical packing, and a shorter assertion within
+AML's source-line limit. Production source remained unchanged; the interpreter
+completed its corrected remainder from the genuine saved prior.
+
+The single interpreted v1–v5 compatibility comparison against `fab2a4a` passed:
+**10/10 responses**, **10/10 complete checkpoints** and all five combined stdout
+files match byte for byte over two actual dream turns per profile. It took
+247.645 seconds, with empty stderr and unchanged hashes for all 31 current source
+files. Both model paths were empty; these legacy runs performed zero forwards.
+
+AML remains `2e17a2887449c89fdd8c066ebdcdaa1e448346cf`; NoTorch remains
+`f6504cf8e8799c6a01b26a75ab90f004a6a3d804`, tree-identical to merged
+`ca3e17a24852ad1db08a6e6b908fb37036011d2d`. The launcher import graph has
+9,872 source lines and 281 user functions, within the existing runtime limits.
+
+| Source | SHA256 |
+| --- | --- |
+| `src/contact_concepts.aml` | `f4e88b58a6ef73f1dc85b8a8f788d0ca1d8a15efe92712632d101c4fb97f55b1` |
+| `src/parliament_contact.aml` | `a1929c1139ff9238bea4b31d1f2f53bae3d7fc57c7b0800b26d7f3b07bc30c39` |
+| `src/iceberg_session.aml` | `05d6de726fdab7cea37b52a85ab23eec03c7734cbbb07dc9905ecb494d8c1d62` |
+| `iceberg.aml` | `d4004d8c7109a06f2fa1935c7af334f846808aeeb789497ae6889bd4dd08b045` |
+
+The [complete validation receipt](tests/research/iceberg/personal_concepts_validation.json)
+retains all 48 raw and ranked word scores, both projections, private fields,
+actual dream text and count snapshots, test/source/runtime hashes and checkpoint
+parity. Its SHA256 is
+`b9fe65efc4430b1d14377780fa757c0e5cbef0db6b9288cee4e5781a9432b9f0`.
+
+```sh
+make test-contact-concept-numerical test-contact-concept-experience test-iceberg-concepts
+python3 tests/compare_concept_profiles.py
+```
+
 ## 2026-10-15 — Several known words around one concept
 
 Merged [#21](https://github.com/ariannamethod/haiku.aml/pull/21),

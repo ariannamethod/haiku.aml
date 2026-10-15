@@ -1,0 +1,166 @@
+IMPORT "../src/contact_concepts.aml"
+
+# Cache telemetry is transient. These are exactly the four persisted leaves.
+def concept_fixture_core(cache):
+    result = record_new()
+    names = haiku_words("identity units_a units_b tokens")
+    i = 0
+    while i < list_len(names):
+        name = list_get(names, i)
+        record_set(result, name, record_get(cache, name))
+        i = i + 1
+    return result
+
+a = model_try_load("../weights/haiku1.gguf")
+b = model_try_load("../weights/haiku2.gguf")
+absent = model_try_load("fixtures/concept-intentionally-missing.gguf")
+assert(model_ready(a) and model_ready(b) and model_ready(absent) == 0, "Concept test bodies are unavailable")
+assert(text_equal(model_identity(a), "50f159a2c34952bd9e6349880b4b20f8bbc0ac4b1f1dc2c1f6e4768732548b66"), "Concept A test body differs")
+assert(text_equal(model_identity(b), "16909b8590bd7fbbf15ab11b2dbf3743d612da8c617aca2dda03d640fef13e29"), "Concept B test body differs")
+assert(text_equal(model_tokenizer_identity(a), "664afe692a006a54fc00406209042f6d452748d64a883ecfab9ef66d41f8bdf2"), "Concept test tokenizer differs")
+assert(text_equal(model_tokenizer_identity(a), model_tokenizer_identity(b)), "Concept endpoint tokenizers differ")
+empty = haiku_concept_new()
+empty_before = record_clone(empty)
+haiku_concept_check(empty)
+quiet = haiku_concept_cache(absent, absent, empty)
+assert(record_get(quiet, "ok") == 0 and record_get(quiet, "forwards") == 0, "Absent concepts built a bank")
+assert(record_equal(empty, concept_fixture_core(quiet)) and record_equal(empty, empty_before), "Absent concepts changed their cache")
+quiet_query = haiku_concept_project(empty, zeros(21), [1], absent, absent, 0.5)
+assert(record_get(quiet_query, "ok") == 0 and record_get(quiet_query, "forwards") == 0, "Absent concepts forwarded a query")
+assert(record_get(quiet_query, "availability") == 0, "Absent concepts claim a provider")
+
+# A alone builds 21 teachers; B's later arrival keeps every A value and input.
+single = haiku_concept_cache(a, absent, empty)
+assert(record_get(single, "ok") == 1 and record_get(single, "forwards") == 21, "Single concept bank budget differs")
+single_before = record_clone(single)
+complete = haiku_concept_cache(a, b, single)
+assert(record_get(complete, "ok") == 1 and record_get(complete, "forwards") == 21, "Second concept bank budget differs")
+assert(record_equal(single, single_before) and record_equal(empty, empty_before), "Concept builder changed its input")
+old_a = record_new()
+new_a = record_new()
+record_set(old_a, "units", record_get(single, "units_a"))
+record_set(new_a, "units", record_get(complete, "units_a"))
+assert(record_equal(old_a, new_a), "B arrival changed immutable A teachers")
+core = concept_fixture_core(complete)
+core_before = record_clone(core)
+warm = haiku_concept_cache(a, b, core)
+assert(record_get(warm, "forwards") == 0 and record_equal(core, concept_fixture_core(warm)), "Warm concept bank was rebuilt")
+temporarily_absent = haiku_concept_cache(a, absent, core)
+assert(record_get(temporarily_absent, "forwards") == 0 and record_equal(core, concept_fixture_core(temporarily_absent)), "Temporary B absence erased its bank")
+all_absent = haiku_concept_cache(absent, absent, core)
+assert(record_get(all_absent, "forwards") == 0 and record_equal(core, concept_fixture_core(all_absent)), "Model absence erased owned geometry")
+
+assert(checkpoint_save(core, concept_checkpoint) == 1, "Concept cache checkpoint save failed")
+restored = checkpoint_load(concept_checkpoint)
+haiku_concept_check(restored)
+assert(record_equal(core, restored), "Concept cache checkpoint changed")
+audit = haiku_concept_audit(restored, a, b)
+assert(record_get(audit, "ok") == 1 and record_get(audit, "verified") == 6 and record_get(audit, "forwards") == 42, "Concept checkpoint body audit differs")
+assert(record_equal(core, restored), "Concept body audit changed saved geometry")
+unverified = haiku_concept_audit(restored, absent, absent)
+assert(record_get(unverified, "ok") == 1 and record_get(unverified, "verified") == 0 and record_get(unverified, "forwards") == 0, "Absent checkpoint audit invented a proof")
+uncached = haiku_concept_audit(empty, a, b)
+assert(record_get(uncached, "verified") == 0 and record_get(uncached, "forwards") == 0, "Empty checkpoint audit created a bank")
+
+# These are the published, preregistered endpoint-centroid stream scores from
+# concept_basis_probe.json (15026c56...). Zero counts recover that geometry.
+tokens = model_encode(a, "stream", 32)
+assert(len(tokens) == 1 and tokens[0] == 1408, "Concept stream input differs")
+zero = zeros(21)
+equal = haiku_concept_project(restored, zero, tokens, a, b, 0.5)
+assert(record_get(equal, "ok") == 1 and record_get(equal, "forwards") == 2, "Endpoint query budget differs")
+expected_a = [0.542814255, 0.530690432, 0.631687701, 0.531239033]
+expected_b = [0.53580761, 0.561371863, 0.653027952, 0.520014405]
+old_parameter_mix = [0.512367427, 0.432943463, 0.506066322, 0.465128928]
+glyphs = [0, 4, 6, 82]
+raw_a = record_get(equal, "raw_a")
+raw_b = record_get(equal, "raw_b")
+mixed = record_get(equal, "mixed")
+physical_difference = 0
+i = 0
+while i < 4:
+    g = glyphs[i]
+    assert(abs(raw_a[g] - expected_a[i]) <= 0.000001, "Equal A prototype differs from published probe")
+    assert(abs(raw_b[g] - expected_b[i]) <= 0.000001, "Equal B prototype differs from published probe")
+    assert(mixed[g] == 0.5 * raw_a[g] + 0.5 * raw_b[g], "Concept scalar mixture differs")
+    physical_difference = physical_difference + abs(mixed[g] - old_parameter_mix[i])
+    i = i + 1
+assert(physical_difference > 0.01, "Endpoint scalar method silently reused parameter mixture geometry")
+
+# The published control has opposite endpoint signs, making clamp order
+# observable. Its invented spelling gains no binding from this representation.
+control_tokens = model_encode(a, "zuvrel", 32)
+control = haiku_concept_project(restored, zero, control_tokens, a, b, 0.5)
+control_a = record_get(control, "raw_a")
+control_b = record_get(control, "raw_b")
+control_mix = record_get(control, "mixed")
+control_representation = record_get(control, "representation")
+assert(record_get(control, "forwards") == 2, "Concept sign control budget differs")
+assert(control_a[0] > 0 and control_b[0] < 0, "Published endpoint sign control changed")
+assert(control_mix[0] == 0.5 * control_a[0] + 0.5 * control_b[0], "Signed endpoint score was clipped early")
+assert(control_representation[0] == clamp(control_mix[0], 0, 1), "Signed concept clamp differs")
+assert(control_representation[0] < 0.5 * control_a[0], "Concept clipped each provider before mixing")
+
+# A numerical fixture supplies four declared count interventions. The contact
+# experience fixture separately earns counts through real external events.
+counts = zeros(21)
+counts[1] = 14
+counts[8] = 7
+counts[11] = 3
+counts[18] = 9
+counts_before = record_new()
+record_set(counts_before, "counts", counts)
+personal = haiku_concept_project(restored, counts, tokens, a, b, 0.5)
+single_a = haiku_concept_project(restored, counts, tokens, a, absent, 0.37)
+single_b = haiku_concept_project(restored, counts, tokens, absent, b, 0.37)
+assert(record_get(personal, "forwards") == 2, "Personal query budget differs")
+assert(record_get(single_a, "alpha") == 1 and record_get(single_a, "availability") == 2 and record_get(single_a, "forwards") == 1, "Single A query lost its actual endpoint")
+assert(record_get(single_b, "alpha") == 0 and record_get(single_b, "availability") == 4 and record_get(single_b, "forwards") == 1, "Single B query lost its actual endpoint")
+personal_a = record_get(personal, "raw_a")
+personal_b = record_get(personal, "raw_b")
+personal_mix = record_get(personal, "mixed")
+endpoint_a = record_get(single_a, "mixed")
+endpoint_b = record_get(single_b, "mixed")
+representation = record_get(personal, "representation")
+change = 0
+i = 0
+while i < 88:
+    assert(endpoint_a[i] == personal_a[i] and endpoint_b[i] == personal_b[i], "Query crossed endpoint spaces")
+    assert(personal_mix[i] == 0.5 * personal_a[i] + 0.5 * personal_b[i], "Personal scalar mixture differs")
+    assert(representation[i] == clamp(personal_mix[i], 0, 1), "Concept clamp preceded endpoint mixing")
+    change = change + abs(personal_mix[i] - mixed[i])
+    if i != 0 and i != 4 and i != 6 and i != 82:
+        assert(representation[i] == 0, "Concept proposal fabricated another anchor")
+    i = i + 1
+assert(change > 0.0001, "Declared personal counts did not change geometry")
+counts_after = record_new()
+record_set(counts_after, "counts", counts)
+assert(record_equal(counts_before, counts_after), "Concept projection changed its count snapshot")
+assert(record_equal(core_before, restored), "Concept query changed immutable teacher banks")
+warm_after = haiku_concept_cache(a, b, restored)
+assert(record_get(warm_after, "forwards") == 0 and record_equal(core, concept_fixture_core(warm_after)), "Personal counts rebuilt teacher banks")
+
+# The live query uses the exact pre-proposal lexical trajectory, including its
+# retained prior tokens, rather than re-encoding only the last input phrase.
+owner = haiku_lexical_new("haiku", 0.5)
+request = haiku_lexical_request("haiku", "water under tree", 0, 1, 1, 1, 0.5, 1)
+receipt = haiku_lexical_pass(owner, a, b, request)
+assert(record_get(receipt, "committed") == 1, "Concept live lexical request failed")
+query = record_get(receipt, "context_tokens")
+assert(len(query) == record_get(receipt, "context_count"), "Concept live trajectory length differs")
+live = haiku_concept_project(restored, counts, query, a, b, record_get(receipt, "alpha"))
+assert(record_get(live, "ok") == 1 and record_get(live, "forwards") == 2, "Concept live trajectory query failed")
+record_set(receipt, "hidden", zeros(448))
+repeat = haiku_concept_project(restored, counts, record_get(receipt, "context_tokens"), a, b, record_get(receipt, "alpha"))
+assert(record_equal(live, repeat), "Concept query consumed the physical-mixture hidden")
+assert(record_equal(core_before, restored), "Live trajectory query changed its bank")
+
+PRINT "CONCEPT_STREAM_EQUAL_AND_PERSONAL"
+i = 0
+while i < 4:
+    PRINT glyphs[i]
+    PRINT mixed[glyphs[i]]
+    PRINT personal_mix[glyphs[i]]
+    i = i + 1
+PRINT "CONCEPT_TEACHER_FORWARDS_42_AUDIT_42_QUERY_12_LEXICAL_1"
+PRINT "HAIKU_CONTACT_CONCEPT_NUMERICAL_OK"
