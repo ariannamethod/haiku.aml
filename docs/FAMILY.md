@@ -100,6 +100,26 @@ restart, so its state format needs those fields and explicit vocabulary IDs.
 | **Two characters, one sediment** | After distinct owl/friend states exist, compare uncoupled, live-coupled and frozen/shuffled-field runs with identical exchange order. Record which speaker's state changed and which later words followed that change |
 | **Rendering preserves the next word** | Render one completed utterance through terminal/browser/replay repeatedly. Require identical text and unchanged learner, memory and generation RNG state |
 
+### Form grows from lived state
+
+Oleg's direction on 2026-10-15 gives the form experiment its explicit range:
+one line, two lines, a haiku, or a Brodsky-style tercet. The form should emerge
+from an unpredictable conjunction of the organism's own metrics and remembered
+encounters. Subjectivity supplies the state-driven form mechanism to examine;
+Brodsky supplies the tercet and rhyme lineage described above.
+
+The experiment will select and record the form together with the actual state
+that produced it, before generating the five candidates. The tercet branch
+carries Brodsky's ABA rhyme and possible ABA → BCB continuation. Each form owns
+its line, syllable and rhyme requirements. RAE, MathBrain and journal validation
+need corresponding shorter-output profiles; their current three-line and
+minimum-word assumptions are part of this port. Generation, candidate
+assessment and the journal carry one chosen form through the complete
+encounter. Continuation after restart must recover the same form, words and
+random-stream position.
+The existing 5–7–5 path supplies the fixed-form comparison. Implementation
+follows the current concept-field work.
+
 All experimental application logic belongs in AML. General text, collections,
 events and storage belong in the language; numerical learning stays in NoTorch.
 The [migration map](MIGRATION.md) and [RAE research](RAE_RESEARCH.md) retain the

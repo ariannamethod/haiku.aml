@@ -1,0 +1,218 @@
+# Explicit research only. Generate concept_config from the preregistered JSON
+# with check_concept_basis_probe.py prepare; this file changes no live owner.
+IMPORT "../../../src/parliament_contact.aml"
+
+def concept_probe_norm(vector):
+    i = 0
+    while i < len(vector):
+        assert(isfinite(vector[i]), "Concept hidden is nonfinite")
+        i = i + 1
+    squared = haiku_parliament_dot(vector, vector)
+    assert(isfinite(squared) and squared > 0, "Concept vector has no finite positive norm")
+    return sqrt(squared)
+
+def concept_probe_emit(hidden, cache, centroids, anchor_inputs):
+    width = 448
+    query_norm = concept_probe_norm(hidden)
+    PRINT query_norm
+    method = 0
+    while method < 2:
+        scores = zeros(4)
+        i = 0
+        while i < 4:
+            reference = haiku_parliament_part(cache, anchor_inputs[i] * width, width)
+            if method == 1:
+                reference = haiku_parliament_part(centroids, i * width, width)
+            reference_norm = concept_probe_norm(reference)
+            scores[i] = haiku_parliament_dot(hidden, reference) / (query_norm * reference_norm)
+            assert(isfinite(scores[i]), "Concept cosine is nonfinite")
+            PRINT scores[i]
+            i = i + 1
+        winner = 0
+        best = scores[0]
+        second = -2
+        i = 1
+        while i < 4:
+            if scores[i] > best:
+                second = best
+                best = scores[i]
+                winner = i
+            else:
+                if scores[i] > second:
+                    second = scores[i]
+            i = i + 1
+        PRINT winner
+        PRINT best - second
+        method = method + 1
+    return 1
+
+def concept_probe_space(config, a, b, space, source, alpha, mask):
+    assert(haiku_lexical_availability(a, b) == mask, "Concept provider availability differs")
+    tokenizer = haiku_lexical_model(a, b)
+    assert(text_equal(model_tokenizer_identity(tokenizer), record_get(config, "tokenizer")), "Concept tokenizer differs")
+    inputs = record_get(config, "inputs")
+    bound = record_get(config, "bound")
+    glyphs = record_get(config, "glyphs")
+    train_inputs = record_get(config, "train_inputs")
+    train_anchors = record_get(config, "train_anchors")
+    anchor_inputs = record_get(config, "anchor_inputs")
+    training_counts = record_get(config, "training_counts")
+    count = list_len(inputs)
+    width = 448
+    max_tokens = 32
+    cache = zeros(count * width)
+    encoded = zeros(count * max_tokens)
+    lengths = zeros(count)
+    norms = zeros(count)
+    calls = 0
+    PRINT "SPACE"
+    PRINT space
+    PRINT source
+    PRINT alpha
+    PRINT mask
+    PRINT model_identity(a)
+    PRINT model_identity(b)
+    PRINT model_tokenizer_identity(tokenizer)
+    n = 0
+    while n < count:
+        ids = model_encode(tokenizer, list_get(inputs, n), max_tokens)
+        assert(len(ids) >= 1 and len(ids) <= max_tokens, "Concept encoding length differs")
+        output = haiku_lexical_forward(a, b, alpha, ids)
+        calls = calls + 1
+        assert(record_get(output, "ok") == 1, "Concept forward failed")
+        hidden = record_get(output, "hidden")
+        assert(len(hidden) == width, "Concept hidden width differs")
+        norms[n] = concept_probe_norm(hidden)
+        lengths[n] = len(ids)
+        j = 0
+        while j < len(ids):
+            encoded[n * max_tokens + j] = ids[j]
+            j = j + 1
+        j = 0
+        while j < width:
+            cache[n * width + j] = hidden[j]
+            j = j + 1
+        n = n + 1
+
+    # A fresh full forward, before any score aggregation. The complete raw
+    # hidden and token sequence must reproduce; no partial-vector checksum.
+    repeat_index = record_get(config, "repeat_index")
+    repeat_ids = model_encode(tokenizer, list_get(inputs, repeat_index), max_tokens)
+    repeated = haiku_lexical_forward(a, b, alpha, repeat_ids)
+    calls = calls + 1
+    assert(record_get(repeated, "ok") == 1, "Concept repeat forward failed")
+    repeated_hidden = record_get(repeated, "hidden")
+    assert(len(repeated_hidden) == width and len(repeat_ids) == lengths[repeat_index], "Concept repeat shape differs")
+    j = 0
+    while j < len(repeat_ids):
+        assert(repeat_ids[j] == encoded[repeat_index * max_tokens + j], "Concept repeated tokens differ")
+        j = j + 1
+    j = 0
+    while j < width:
+        assert(repeated_hidden[j] == cache[repeat_index * width + j], "Concept repeated hidden differs")
+        j = j + 1
+    PRINT "EXACT_REPEAT"
+    PRINT repeat_index
+    PRINT width
+
+    # Equal-weight normalized sum of unit training hiddens. Keep the listed
+    # word/component order; no division by class size or cross-provider mix.
+    centroids = zeros(4 * width)
+    i = 0
+    while i < len(train_inputs):
+        input_index = train_inputs[i]
+        anchor = train_anchors[i]
+        j = 0
+        while j < width:
+            centroids[anchor * width + j] = centroids[anchor * width + j] + cache[input_index * width + j] / norms[input_index]
+            j = j + 1
+        i = i + 1
+    i = 0
+    while i < 4:
+        total = haiku_parliament_part(centroids, i * width, width)
+        total_norm = concept_probe_norm(total)
+        j = 0
+        while j < width:
+            centroids[i * width + j] = total[j] / total_norm
+            j = j + 1
+        reference = haiku_parliament_part(centroids, i * width, width)
+        PRINT "CENTROID"
+        PRINT i
+        PRINT training_counts[i]
+        PRINT total_norm
+        PRINT concept_probe_norm(reference)
+        i = i + 1
+
+    n = 0
+    while n < count:
+        hidden = haiku_parliament_part(cache, n * width, width)
+        PRINT "ROW"
+        PRINT n
+        PRINT list_get(inputs, n)
+        PRINT lengths[n]
+        j = 0
+        while j < lengths[n]:
+            PRINT encoded[n * max_tokens + j]
+            j = j + 1
+        PRINT bound[n]
+        PRINT glyphs[n]
+        concept_probe_emit(hidden, cache, centroids, anchor_inputs)
+        n = n + 1
+    PRINT "REPEAT_ROW"
+    PRINT repeat_index
+    concept_probe_emit(repeated_hidden, cache, centroids, anchor_inputs)
+    assert(calls == count + 1, "Concept forward budget differs")
+    PRINT "SPACE_CALLS"
+    PRINT calls
+    return calls
+
+def concept_probe_run(config):
+    inputs = record_get(config, "inputs")
+    bound = record_get(config, "bound")
+    glyphs = record_get(config, "glyphs")
+    train_inputs = record_get(config, "train_inputs")
+    train_anchors = record_get(config, "train_anchors")
+    anchor_glyphs = [0, 4, 6, 82]
+    assert(list_len(inputs) == 90 and len(bound) == 90 and len(glyphs) == 90, "Concept input inventory differs")
+    assert(len(train_inputs) == 21 and len(train_anchors) == 21, "Concept training inventory differs")
+    bindings = haiku_contact_bindings()
+    unique = map_new()
+    i = 0
+    while i < list_len(inputs):
+        text = list_get(inputs, i)
+        assert(map_has(unique, text) == 0, "Concept input text is duplicated")
+        map_set(unique, text, i)
+        key = haiku_contact_key("en", text)
+        known = map_has(bindings, key)
+        glyph = -1
+        if known:
+            glyph = map_get(bindings, key)
+        assert(known == bound[i] and glyph == glyphs[i], "Concept reviewed membership differs")
+        i = i + 1
+    i = 0
+    while i < len(train_inputs):
+        assert(glyphs[train_inputs[i]] == anchor_glyphs[train_anchors[i]], "Concept training teacher differs")
+        i = i + 1
+    a = model_try_load("../../../weights/haiku1.gguf")
+    b = model_try_load("../../../weights/haiku2.gguf")
+    missing = model_try_load("concept-basis-intentionally-absent.gguf")
+    assert(model_ready(a) == 1 and model_ready(b) == 1 and model_ready(missing) == 0, "Concept source availability differs")
+    assert(text_equal(model_identity(a), record_get(config, "identity_a")), "Concept A identity differs")
+    assert(text_equal(model_identity(b), record_get(config, "identity_b")), "Concept B identity differs")
+    assert(text_equal(model_tokenizer_identity(a), record_get(config, "tokenizer")) and text_equal(model_tokenizer_identity(b), record_get(config, "tokenizer")), "Concept source tokenizers differ")
+    PRINT "CONCEPT_BASIS_V1"
+    PRINT record_get(config, "protocol_sha256")
+    PRINT record_get(config, "registration_commit")
+    total = concept_probe_space(config, a, missing, "a_only", 2, 1, 2)
+    total = total + concept_probe_space(config, missing, b, "b_only", 3, 0, 4)
+    total = total + concept_probe_space(config, a, b, "ab_half", 4, 0.5, 6)
+    absent = haiku_lexical_forward(missing, missing, 0.5, [1])
+    assert(haiku_lexical_availability(missing, missing) == 0 and record_get(absent, "ok") == 0, "Concept absent sources created a representation")
+    assert(list_len(record_keys(absent)) == 2 and text_equal(record_get(absent, "error"), "unavailable"), "Concept absence gained output arrays")
+    assert(total == 273, "Concept total forward budget differs")
+    PRINT "TOTAL_CALLS"
+    PRINT total
+    PRINT "QUIET_ABSENCE_AND_EXACT_REPEATS_OK"
+    return 1
+
+concept_probe_run(concept_config)

@@ -1,0 +1,1585 @@
+{
+  "schema": "haiku-concept-basis-protocol-v1",
+  "status": "preregistered-before-new-model-runs",
+  "registered_date_utc": "2026-10-15",
+  "question": "Does a unit-normalized centroid of the existing reviewed English seed representations improve fixed four-way word attribution over isolated anchor representations?",
+  "selection": {
+    "new_items_chosen_by": "Independent reviewer from linguistic knowledge before any new model forward.",
+    "fixed_before_measurement": [
+      "training words",
+      "primary words and expected groups",
+      "controls",
+      "provider spaces",
+      "two methods",
+      "input order",
+      "tie order",
+      "metrics",
+      "forward budget"
+    ],
+    "training_source": "All current English static bindings for glyphs 0, 4, 6 and 82, with each exact spelling used once; no additional teachers.",
+    "exclusions": [
+      "Every new primary/control spelling is absent from the complete current English static binding table.",
+      "Every new primary/control spelling is absent from the 50-row legacy word-anchor probe.",
+      "Primary, regression and controls contribute no vectors to prototype construction."
+    ],
+    "outcome_adaptive_changes": false,
+    "production_changes": false
+  },
+  "source_pins": {
+    "commits": {
+      "haiku": "702ae6ae5098d1002b362abb01b00eaf51f6ff28",
+      "aml": "2e17a2887449c89fdd8c066ebdcdaa1e448346cf",
+      "notorch": "f6504cf8e8799c6a01b26a75ab90f004a6a3d804"
+    },
+    "training_bindings_file": "src/parliament_contact.aml",
+    "training_bindings_sha256": "21491e66fffdf40e3ffc92a38ab77b13d79d6c420511893f7d1afdb308c8e1ef",
+    "legacy_receipt_file": "tests/research/iceberg/word_anchor_probe.json",
+    "legacy_receipt_sha256": "d313913940590af7e28ec648979d0230b28baa7699bd3f55c740a02f0602adc2",
+    "model_a_path": "weights/haiku1.gguf",
+    "model_b_path": "weights/haiku2.gguf",
+    "model_a_identity": "50f159a2c34952bd9e6349880b4b20f8bbc0ac4b1f1dc2c1f6e4768732548b66",
+    "model_b_identity": "16909b8590bd7fbbf15ab11b2dbf3743d612da8c617aca2dda03d640fef13e29",
+    "tokenizer_identity": "664afe692a006a54fc00406209042f6d452748d64a883ecfab9ef66d41f8bdf2"
+  },
+  "anchors": [
+    {
+      "name": "water",
+      "glyph": 0,
+      "training_words": [
+        "water",
+        "rain",
+        "river",
+        "sea",
+        "ocean",
+        "lake"
+      ]
+    },
+    {
+      "name": "tree",
+      "glyph": 4,
+      "training_words": [
+        "tree",
+        "forest",
+        "wood",
+        "leaf"
+      ]
+    },
+    {
+      "name": "light",
+      "glyph": 6,
+      "training_words": [
+        "light",
+        "sun",
+        "sunrise",
+        "dawn",
+        "bright"
+      ]
+    },
+    {
+      "name": "music",
+      "glyph": 82,
+      "training_words": [
+        "music",
+        "song",
+        "melody",
+        "guitar",
+        "piano",
+        "drum"
+      ]
+    }
+  ],
+  "spaces": [
+    {
+      "id": "a_only",
+      "source": 2,
+      "alpha": 1.0,
+      "availability": 2,
+      "a_ready": 1,
+      "b_ready": 0,
+      "tokenizer_provider": "a"
+    },
+    {
+      "id": "b_only",
+      "source": 3,
+      "alpha": 0.0,
+      "availability": 4,
+      "a_ready": 0,
+      "b_ready": 1,
+      "tokenizer_provider": "b"
+    },
+    {
+      "id": "ab_half",
+      "source": 4,
+      "alpha": 0.5,
+      "availability": 6,
+      "a_ready": 1,
+      "b_ready": 1,
+      "tokenizer_provider": "a"
+    }
+  ],
+  "methods": [
+    {
+      "id": "isolated_anchor",
+      "prototype": "h_space(anchor_name), kept raw to preserve the existing isolated-anchor cosine arithmetic",
+      "training_words_per_prototype": 1
+    },
+    {
+      "id": "normalized_seed_centroid",
+      "prototype": "c = unit(sum(unit(h_space(word)) for word in anchor.training_words)); sum in the listed order with no intermediate division by class size",
+      "training_words_per_prototype": [
+        6,
+        4,
+        5,
+        6
+      ]
+    }
+  ],
+  "representation": {
+    "width": 448,
+    "h": "Final last-token RMS-normalized hidden vector returned by the PEN7 forward.",
+    "unit": "v / sqrt(sum(v_i * v_i))",
+    "text": "Exact input string; no prompt, prefix, suffix, external context or appended token.",
+    "encoding": "model_encode with token limit 32 and the declared available tokenizer provider; record every token ID.",
+    "position": "Each forward starts at learned position zero with its own exact token sequence.",
+    "forward": "haiku_lexical_forward with the declared providers and effective alpha; unavailable provider handles are genuinely not ready.",
+    "parameter_mixture": "For ab_half, mix the immutable A/B parameters at alpha .5 before inference using the existing full-parameter path.",
+    "space_separation": "Construct and score every prototype within the same declared space. No A/B hidden-vector or prototype averaging.",
+    "arithmetic": "Compute both prototype methods and scores with the same existing AML float32 numerical path, in the listed training-word and component order.",
+    "score": "For raw query q and reference r, compute dot(q, r) / (sqrt(dot(q, q)) * sqrt(dot(r, r))). Reference r is the raw isolated anchor hidden or the unit-normalized seed centroid. Recompute both norms; preserve negative values and do not clamp.",
+    "cache": "Forward each of the 90 exact strings once per space; both methods read that same hidden result.",
+    "encoding_max_tokens": 32
+  },
+  "sets": {
+    "primary_heldout": [
+      {
+        "text": "brook",
+        "expected_anchor": "water"
+      },
+      {
+        "text": "creek",
+        "expected_anchor": "water"
+      },
+      {
+        "text": "pond",
+        "expected_anchor": "water"
+      },
+      {
+        "text": "puddle",
+        "expected_anchor": "water"
+      },
+      {
+        "text": "waterfall",
+        "expected_anchor": "water"
+      },
+      {
+        "text": "lagoon",
+        "expected_anchor": "water"
+      },
+      {
+        "text": "cedar",
+        "expected_anchor": "tree"
+      },
+      {
+        "text": "willow",
+        "expected_anchor": "tree"
+      },
+      {
+        "text": "spruce",
+        "expected_anchor": "tree"
+      },
+      {
+        "text": "maple",
+        "expected_anchor": "tree"
+      },
+      {
+        "text": "sapling",
+        "expected_anchor": "tree"
+      },
+      {
+        "text": "acorn",
+        "expected_anchor": "tree"
+      },
+      {
+        "text": "illumination",
+        "expected_anchor": "light"
+      },
+      {
+        "text": "luminosity",
+        "expected_anchor": "light"
+      },
+      {
+        "text": "sunbeam",
+        "expected_anchor": "light"
+      },
+      {
+        "text": "lantern",
+        "expected_anchor": "light"
+      },
+      {
+        "text": "glimmer",
+        "expected_anchor": "light"
+      },
+      {
+        "text": "gleam",
+        "expected_anchor": "light"
+      },
+      {
+        "text": "cello",
+        "expected_anchor": "music"
+      },
+      {
+        "text": "flute",
+        "expected_anchor": "music"
+      },
+      {
+        "text": "trumpet",
+        "expected_anchor": "music"
+      },
+      {
+        "text": "symphony",
+        "expected_anchor": "music"
+      },
+      {
+        "text": "orchestra",
+        "expected_anchor": "music"
+      },
+      {
+        "text": "sonata",
+        "expected_anchor": "music"
+      }
+    ],
+    "regression": [
+      {
+        "text": "stream",
+        "expected_anchor": "water"
+      },
+      {
+        "text": "wave",
+        "expected_anchor": "water"
+      },
+      {
+        "text": "tide",
+        "expected_anchor": "water"
+      },
+      {
+        "text": "droplet",
+        "expected_anchor": "water"
+      },
+      {
+        "text": "oak",
+        "expected_anchor": "tree"
+      },
+      {
+        "text": "birch",
+        "expected_anchor": "tree"
+      },
+      {
+        "text": "branch",
+        "expected_anchor": "tree"
+      },
+      {
+        "text": "bark",
+        "expected_anchor": "tree"
+      },
+      {
+        "text": "glow",
+        "expected_anchor": "light"
+      },
+      {
+        "text": "lamp",
+        "expected_anchor": "light"
+      },
+      {
+        "text": "photon",
+        "expected_anchor": "light"
+      },
+      {
+        "text": "radiance",
+        "expected_anchor": "light"
+      },
+      {
+        "text": "rhythm",
+        "expected_anchor": "music"
+      },
+      {
+        "text": "violin",
+        "expected_anchor": "music"
+      },
+      {
+        "text": "harmony",
+        "expected_anchor": "music"
+      },
+      {
+        "text": "concert",
+        "expected_anchor": "music"
+      }
+    ],
+    "controls": [
+      {
+        "text": "receipt",
+        "kind": "unrelated",
+        "expected_anchor": null
+      },
+      {
+        "text": "screwdriver",
+        "kind": "unrelated",
+        "expected_anchor": null
+      },
+      {
+        "text": "omelette",
+        "kind": "unrelated",
+        "expected_anchor": null
+      },
+      {
+        "text": "kilogram",
+        "kind": "unrelated",
+        "expected_anchor": null
+      },
+      {
+        "text": "vexlorn",
+        "kind": "invented",
+        "expected_anchor": null
+      },
+      {
+        "text": "prandek",
+        "kind": "invented",
+        "expected_anchor": null
+      },
+      {
+        "text": "zuvrel",
+        "kind": "invented",
+        "expected_anchor": null
+      },
+      {
+        "text": "norkesh",
+        "kind": "invented",
+        "expected_anchor": null
+      }
+    ]
+  },
+  "legacy_rows": [
+    {
+      "source_row": 0,
+      "text": "water",
+      "group": "anchor",
+      "input_index": 0
+    },
+    {
+      "source_row": 1,
+      "text": "tree",
+      "group": "anchor",
+      "input_index": 1
+    },
+    {
+      "source_row": 2,
+      "text": "light",
+      "group": "anchor",
+      "input_index": 2
+    },
+    {
+      "source_row": 3,
+      "text": "music",
+      "group": "anchor",
+      "input_index": 3
+    },
+    {
+      "source_row": 4,
+      "text": "river",
+      "group": "seed_alias",
+      "input_index": 5
+    },
+    {
+      "source_row": 5,
+      "text": "rain",
+      "group": "seed_alias",
+      "input_index": 4
+    },
+    {
+      "source_row": 6,
+      "text": "forest",
+      "group": "seed_alias",
+      "input_index": 9
+    },
+    {
+      "source_row": 7,
+      "text": "leaf",
+      "group": "seed_alias",
+      "input_index": 11
+    },
+    {
+      "source_row": 8,
+      "text": "sun",
+      "group": "seed_alias",
+      "input_index": 12
+    },
+    {
+      "source_row": 9,
+      "text": "bright",
+      "group": "seed_alias",
+      "input_index": 15
+    },
+    {
+      "source_row": 10,
+      "text": "song",
+      "group": "seed_alias",
+      "input_index": 16
+    },
+    {
+      "source_row": 11,
+      "text": "piano",
+      "group": "seed_alias",
+      "input_index": 19
+    },
+    {
+      "source_row": 12,
+      "text": "stream",
+      "group": "heldout_water",
+      "input_index": 45
+    },
+    {
+      "source_row": 13,
+      "text": "wave",
+      "group": "heldout_water",
+      "input_index": 46
+    },
+    {
+      "source_row": 14,
+      "text": "tide",
+      "group": "heldout_water",
+      "input_index": 47
+    },
+    {
+      "source_row": 15,
+      "text": "droplet",
+      "group": "heldout_water",
+      "input_index": 48
+    },
+    {
+      "source_row": 16,
+      "text": "oak",
+      "group": "heldout_tree",
+      "input_index": 49
+    },
+    {
+      "source_row": 17,
+      "text": "birch",
+      "group": "heldout_tree",
+      "input_index": 50
+    },
+    {
+      "source_row": 18,
+      "text": "branch",
+      "group": "heldout_tree",
+      "input_index": 51
+    },
+    {
+      "source_row": 19,
+      "text": "bark",
+      "group": "heldout_tree",
+      "input_index": 52
+    },
+    {
+      "source_row": 20,
+      "text": "glow",
+      "group": "heldout_light",
+      "input_index": 53
+    },
+    {
+      "source_row": 21,
+      "text": "lamp",
+      "group": "heldout_light",
+      "input_index": 54
+    },
+    {
+      "source_row": 22,
+      "text": "photon",
+      "group": "heldout_light",
+      "input_index": 55
+    },
+    {
+      "source_row": 23,
+      "text": "radiance",
+      "group": "heldout_light",
+      "input_index": 56
+    },
+    {
+      "source_row": 24,
+      "text": "rhythm",
+      "group": "heldout_music",
+      "input_index": 57
+    },
+    {
+      "source_row": 25,
+      "text": "violin",
+      "group": "heldout_music",
+      "input_index": 58
+    },
+    {
+      "source_row": 26,
+      "text": "harmony",
+      "group": "heldout_music",
+      "input_index": 59
+    },
+    {
+      "source_row": 27,
+      "text": "concert",
+      "group": "heldout_music",
+      "input_index": 60
+    },
+    {
+      "source_row": 28,
+      "text": "invoice",
+      "group": "unrelated",
+      "input_index": 69
+    },
+    {
+      "source_row": 29,
+      "text": "tax",
+      "group": "unrelated",
+      "input_index": 70
+    },
+    {
+      "source_row": 30,
+      "text": "sandwich",
+      "group": "unrelated",
+      "input_index": 71
+    },
+    {
+      "source_row": 31,
+      "text": "wrench",
+      "group": "unrelated",
+      "input_index": 72
+    },
+    {
+      "source_row": 32,
+      "text": "bank",
+      "group": "ambiguous",
+      "input_index": 73
+    },
+    {
+      "source_row": 33,
+      "text": "pitch",
+      "group": "ambiguous",
+      "input_index": 74
+    },
+    {
+      "source_row": 34,
+      "text": "scale",
+      "group": "ambiguous",
+      "input_index": 75
+    },
+    {
+      "source_row": 35,
+      "text": "river bank",
+      "group": "word_final_context",
+      "input_index": 76
+    },
+    {
+      "source_row": 36,
+      "text": "savings bank",
+      "group": "word_final_context",
+      "input_index": 77
+    },
+    {
+      "source_row": 37,
+      "text": "tree bark",
+      "group": "word_final_context",
+      "input_index": 78
+    },
+    {
+      "source_row": 38,
+      "text": "dogs bark",
+      "group": "word_final_context",
+      "input_index": 79
+    },
+    {
+      "source_row": 39,
+      "text": "musical pitch",
+      "group": "word_final_context",
+      "input_index": 80
+    },
+    {
+      "source_row": 40,
+      "text": "dark pitch",
+      "group": "word_final_context",
+      "input_index": 81
+    },
+    {
+      "source_row": 41,
+      "text": "musical scale",
+      "group": "word_final_context",
+      "input_index": 82
+    },
+    {
+      "source_row": 42,
+      "text": "fish scale",
+      "group": "word_final_context",
+      "input_index": 83
+    },
+    {
+      "source_row": 43,
+      "text": "quorvex",
+      "group": "orthographic_control",
+      "input_index": 84
+    },
+    {
+      "source_row": 44,
+      "text": "zzzap",
+      "group": "orthographic_control",
+      "input_index": 85
+    },
+    {
+      "source_row": 45,
+      "text": "water quorvex",
+      "group": "synthetic_context",
+      "input_index": 86
+    },
+    {
+      "source_row": 46,
+      "text": "tree quorvex",
+      "group": "synthetic_context",
+      "input_index": 87
+    },
+    {
+      "source_row": 47,
+      "text": "light quorvex",
+      "group": "synthetic_context",
+      "input_index": 88
+    },
+    {
+      "source_row": 48,
+      "text": "music quorvex",
+      "group": "synthetic_context",
+      "input_index": 89
+    },
+    {
+      "source_row": 49,
+      "text": "stream",
+      "group": "repeat",
+      "input_index": 45
+    }
+  ],
+  "inputs": [
+    {
+      "index": 0,
+      "text": "water",
+      "seed_bound": 1,
+      "bound_glyph": 0,
+      "roles": [
+        "isolated_anchor",
+        "prototype_training",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 1,
+      "text": "tree",
+      "seed_bound": 1,
+      "bound_glyph": 4,
+      "roles": [
+        "isolated_anchor",
+        "prototype_training",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 2,
+      "text": "light",
+      "seed_bound": 1,
+      "bound_glyph": 6,
+      "roles": [
+        "isolated_anchor",
+        "prototype_training",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 3,
+      "text": "music",
+      "seed_bound": 1,
+      "bound_glyph": 82,
+      "roles": [
+        "isolated_anchor",
+        "prototype_training",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 4,
+      "text": "rain",
+      "seed_bound": 1,
+      "bound_glyph": 0,
+      "roles": [
+        "prototype_training",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 5,
+      "text": "river",
+      "seed_bound": 1,
+      "bound_glyph": 0,
+      "roles": [
+        "prototype_training",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 6,
+      "text": "sea",
+      "seed_bound": 1,
+      "bound_glyph": 0,
+      "roles": [
+        "prototype_training"
+      ]
+    },
+    {
+      "index": 7,
+      "text": "ocean",
+      "seed_bound": 1,
+      "bound_glyph": 0,
+      "roles": [
+        "prototype_training"
+      ]
+    },
+    {
+      "index": 8,
+      "text": "lake",
+      "seed_bound": 1,
+      "bound_glyph": 0,
+      "roles": [
+        "prototype_training"
+      ]
+    },
+    {
+      "index": 9,
+      "text": "forest",
+      "seed_bound": 1,
+      "bound_glyph": 4,
+      "roles": [
+        "prototype_training",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 10,
+      "text": "wood",
+      "seed_bound": 1,
+      "bound_glyph": 4,
+      "roles": [
+        "prototype_training"
+      ]
+    },
+    {
+      "index": 11,
+      "text": "leaf",
+      "seed_bound": 1,
+      "bound_glyph": 4,
+      "roles": [
+        "prototype_training",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 12,
+      "text": "sun",
+      "seed_bound": 1,
+      "bound_glyph": 6,
+      "roles": [
+        "prototype_training",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 13,
+      "text": "sunrise",
+      "seed_bound": 1,
+      "bound_glyph": 6,
+      "roles": [
+        "prototype_training"
+      ]
+    },
+    {
+      "index": 14,
+      "text": "dawn",
+      "seed_bound": 1,
+      "bound_glyph": 6,
+      "roles": [
+        "prototype_training"
+      ]
+    },
+    {
+      "index": 15,
+      "text": "bright",
+      "seed_bound": 1,
+      "bound_glyph": 6,
+      "roles": [
+        "prototype_training",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 16,
+      "text": "song",
+      "seed_bound": 1,
+      "bound_glyph": 82,
+      "roles": [
+        "prototype_training",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 17,
+      "text": "melody",
+      "seed_bound": 1,
+      "bound_glyph": 82,
+      "roles": [
+        "prototype_training"
+      ]
+    },
+    {
+      "index": 18,
+      "text": "guitar",
+      "seed_bound": 1,
+      "bound_glyph": 82,
+      "roles": [
+        "prototype_training"
+      ]
+    },
+    {
+      "index": 19,
+      "text": "piano",
+      "seed_bound": 1,
+      "bound_glyph": 82,
+      "roles": [
+        "prototype_training",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 20,
+      "text": "drum",
+      "seed_bound": 1,
+      "bound_glyph": 82,
+      "roles": [
+        "prototype_training"
+      ]
+    },
+    {
+      "index": 21,
+      "text": "brook",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 22,
+      "text": "creek",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 23,
+      "text": "pond",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 24,
+      "text": "puddle",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 25,
+      "text": "waterfall",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 26,
+      "text": "lagoon",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 27,
+      "text": "cedar",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 28,
+      "text": "willow",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 29,
+      "text": "spruce",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 30,
+      "text": "maple",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 31,
+      "text": "sapling",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 32,
+      "text": "acorn",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 33,
+      "text": "illumination",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 34,
+      "text": "luminosity",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 35,
+      "text": "sunbeam",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 36,
+      "text": "lantern",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 37,
+      "text": "glimmer",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 38,
+      "text": "gleam",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 39,
+      "text": "cello",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 40,
+      "text": "flute",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 41,
+      "text": "trumpet",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 42,
+      "text": "symphony",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 43,
+      "text": "orchestra",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 44,
+      "text": "sonata",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "primary_heldout"
+      ]
+    },
+    {
+      "index": 45,
+      "text": "stream",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 46,
+      "text": "wave",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 47,
+      "text": "tide",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 48,
+      "text": "droplet",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 49,
+      "text": "oak",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 50,
+      "text": "birch",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 51,
+      "text": "branch",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 52,
+      "text": "bark",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 53,
+      "text": "glow",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 54,
+      "text": "lamp",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 55,
+      "text": "photon",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 56,
+      "text": "radiance",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 57,
+      "text": "rhythm",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 58,
+      "text": "violin",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 59,
+      "text": "harmony",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 60,
+      "text": "concert",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "regression",
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 61,
+      "text": "receipt",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "control"
+      ]
+    },
+    {
+      "index": 62,
+      "text": "screwdriver",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "control"
+      ]
+    },
+    {
+      "index": 63,
+      "text": "omelette",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "control"
+      ]
+    },
+    {
+      "index": 64,
+      "text": "kilogram",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "control"
+      ]
+    },
+    {
+      "index": 65,
+      "text": "vexlorn",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "control"
+      ]
+    },
+    {
+      "index": 66,
+      "text": "prandek",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "control"
+      ]
+    },
+    {
+      "index": 67,
+      "text": "zuvrel",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "control"
+      ]
+    },
+    {
+      "index": 68,
+      "text": "norkesh",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "control"
+      ]
+    },
+    {
+      "index": 69,
+      "text": "invoice",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 70,
+      "text": "tax",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 71,
+      "text": "sandwich",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 72,
+      "text": "wrench",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 73,
+      "text": "bank",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 74,
+      "text": "pitch",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 75,
+      "text": "scale",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 76,
+      "text": "river bank",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 77,
+      "text": "savings bank",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 78,
+      "text": "tree bark",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 79,
+      "text": "dogs bark",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 80,
+      "text": "musical pitch",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 81,
+      "text": "dark pitch",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 82,
+      "text": "musical scale",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 83,
+      "text": "fish scale",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 84,
+      "text": "quorvex",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 85,
+      "text": "zzzap",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 86,
+      "text": "water quorvex",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 87,
+      "text": "tree quorvex",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 88,
+      "text": "light quorvex",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    },
+    {
+      "index": 89,
+      "text": "music quorvex",
+      "seed_bound": 0,
+      "bound_glyph": null,
+      "roles": [
+        "legacy_diagnostic"
+      ]
+    }
+  ],
+  "diagnostics": {
+    "legacy_rows": "Retain all original 50 row labels, including 16 regression words, 8 word-final contexts, 3 ambiguous words and 4 anchor-prefix unknown controls. Reuse cached exact-text results.",
+    "repeated_legacy_row": "Legacy row 49 is a second reference to stream. Its value comes from the separately checked exact-repeat call.",
+    "training_overlap": "Anchor and reviewed-alias diagnostics are in-sample and reported separately from primary/regression scores.",
+    "context_attribution": "Context phrases and artificial unknown-prefix strings remain complete phrase-level inputs; no word-level truth label is inferred for their final token.",
+    "control_attribution": "Controls have expected_anchor=null. Report forced top label, all four raw cosines and top-minus-runner-up margin; do not include them in four-class accuracy."
+  },
+  "metrics": {
+    "primary_space": "ab_half",
+    "primary_method": "normalized_seed_centroid",
+    "comparator": "isolated_anchor",
+    "primary_endpoint": "Number of new primary words whose four-way raw-cosine argmax equals the preassigned concept, out of 24.",
+    "tie_order_glyphs": [
+      0,
+      4,
+      6,
+      82
+    ],
+    "tie_policy": "Exact-score ties choose the first glyph in the fixed ascending ID order; no epsilon tie band.",
+    "paired_outcomes": [
+      "both_correct",
+      "centroid_only_correct",
+      "isolated_only_correct",
+      "both_incorrect"
+    ],
+    "required_reports": [
+      "Both method hit counts out of 24 and signed centroid-minus-isolated change for ab_half.",
+      "Per-concept correct counts out of 6 for both methods in ab_half.",
+      "The complete paired outcome table for the same 24 words.",
+      "The same fixed metrics for a_only and b_only, as secondary provider checks.",
+      "Regression agreement out of 16 and per-concept out of 4, separately for each method and space.",
+      "Per-input four raw cosines, selected concept and largest-minus-second-largest margin for both methods in every space.",
+      "Training diagnostics, contextual diagnostics and controls remain separate from the primary endpoint."
+    ],
+    "threshold_selection": null,
+    "binding_decision": "No production word binding, promotion threshold, acceptance rule or model-choice tuning is inferred from this heldout run."
+  },
+  "validation": {
+    "before_forward": [
+      "Verify the frozen protocol SHA-256 and source/model/tokenizer identities.",
+      "Assert the exact 21 training spellings equal the current reviewed English bindings for their four glyph IDs.",
+      "Assert primary 24 and controls 8 are distinct, unbound and absent from the legacy 50 rows and training 21.",
+      "Assert regression 16 retain their exact prior grouping and remain unbound.",
+      "Assert 90 unique exact texts, the declared spaces and token lengths within1..32."
+    ],
+    "repeat": {
+      "text": "stream",
+      "calls_per_space": 1,
+      "comparison": "All 448 hidden float32 values and exact token IDs must equal the cached initial call, before score aggregation."
+    },
+    "failure_policy": "A missing source, identity mismatch, failed forward, zero or nonfinite vector/centroid, nonfinite cosine, tokenization failure or repeat mismatch fails the complete run. Do not drop, substitute, relabel or re-run selected samples to improve an outcome.",
+    "after_forward": [
+      "Verify protocol and model hashes are unchanged.",
+      "Record actual runtime/probe/checker hashes, input token IDs and provider metadata with the measured result."
+    ]
+  },
+  "budget": {
+    "unique_texts": 90,
+    "max_unique_texts": 100,
+    "spaces": 3,
+    "cached_successful_forwards": 270,
+    "exact_repeat_forwards": 3,
+    "total_successful_forwards": 273,
+    "max_successful_forwards": 300,
+    "new_training_or_tuning_forwards": 0
+  },
+  "preflight_receipt": {
+    "static_english_bindings": 130,
+    "training_words": 21,
+    "primary_words": 24,
+    "regression_words": 16,
+    "controls": 8,
+    "legacy_rows": 50,
+    "legacy_unique_texts": 49,
+    "new_words_overlapping_bindings": [],
+    "new_words_overlapping_legacy": [],
+    "new_words_overlapping_training": [],
+    "model_forwards_during_registration": 0
+  }
+}

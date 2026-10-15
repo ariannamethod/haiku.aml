@@ -9,6 +9,70 @@ commands here, newest first. A major new capability also earns a short README
 update. The module documents hold the complete contracts; measured failures
 belong beside measured successes.
 
+## 2026-10-15 — Several known words around one concept
+
+Merged [#21](https://github.com/ariannamethod/haiku.aml/pull/21),
+`702ae6ae5098d1002b362abb01b00eaf51f6ff28`, supplies the current organism.
+The next representation experiment compares an isolated anchor with
+`unit(sum(unit(hidden(word))))` over its existing reviewed English spellings.
+The same twenty-one teachers represent water, tree, light and music in three
+separate spaces: A alone, B alone, and the physical .5 parameter mixture.
+
+The [protocol](tests/research/iceberg/concept_basis_protocol.json) was published
+before the first new model run in commit
+[`54aa7e5`](https://github.com/ariannamethod/haiku.aml/commit/54aa7e5763f05100a007adb41d859c83c7eb7fcf).
+Its SHA256 is `729a2d56ac782e7adcd06e44dc5c0ed7c43eef3faeb9f47803074bdca834c811`.
+An independent reviewer selected twenty-four new words, six per concept, and
+eight unrelated/invented controls before model access. They are absent from all
+130 English static bindings and from the preceding fifty-row probe. The old
+sixteen-word regression group remains separate. The primary endpoint is the
+.5 mixture's paired top-one agreement out of 24; methods, order, teachers,
+labels and metrics are fixed in the protocol.
+
+The primary result is **6/24 → 8/24**: four centroid-only successes, two
+isolated-only successes, four shared successes and fourteen shared failures.
+A-only moves **11/24 → 8/24**, B-only **7/24 → 8/24**. On the separate old
+sixteen-word set, the .5 mixture moves **2/16 → 5/16**, losing both previous
+successes while gaining five others. All fifty historical baseline rows match
+their original raw cosine values within `1e-6` and retain their winners.
+The new invented control `vexlorn` exceeds the correct `illumination` in both
+centroid cosine and margin. These measured differences remain explicit in
+the [full scores](tests/research/iceberg/concept_basis_probe.json).
+
+Interpreter and scalar-compiled executions each complete **273 forwards**:
+ninety exact texts and one full-hidden repeat in each space, 546 in total.
+Their complete stdout bytes agree at SHA256
+`8e91b5baf3845264aab507ef98012f84eb807c3ad857d5a7239c9e476a5b338a`.
+Measured times are 22.616s and 22.508s, with empty execution stderr. Token
+lengths range from one to seven. All 448 repeated hidden values agree in each
+space; missing/missing returns quietly without representation arrays.
+The first launcher attempt stopped on an overlong generated AML array line
+before any forward. Bounded individual assignments fixed that emission;
+the registered inputs and numerical method stayed unchanged.
+
+Review found and fixed an omitted entrypoint re-hash in the checker. The
+captured `run.aml` still matches its pre-run SHA256
+`53d389b96dde63304edcba8ae3201aea894ac0eeceda29b7eb1ae2e3096d3282`.
+The measured checker and its strict follow-up remain separate commits; the
+original result is unchanged. The [post-run verification](tests/research/iceberg/concept_basis_validation.json)
+records that sole observer-code change and zero additional forwards.
+
+The scalar build retains AML `2e17a2887449c89fdd8c066ebdcdaa1e448346cf` and
+NoTorch `f6504cf8e8799c6a01b26a75ab90f004a6a3d804`, whose complete tree equals
+the established merged `ca3e17a24852ad1db08a6e6b908fb37036011d2d` pin. Runner
+SHA256 is `5e235dd06d2aba519a2904d4dc4e5866ecd6d7304f3d3830ae55da7a6ecf5981`;
+`libnotorch.a` is `d1c786c3b0c61b6e3758aa39fb5bb355e6de6345d0b327f773b35bb32daa98d3`.
+The [concept-basis receipt](docs/research/iceberg/CONCEPT_BASIS.md) holds the
+complete protocol, measurements and reproduction commands.
+
+Oleg also specified the next form experiment: one line, two lines, a haiku, or
+a Brodsky-style tercet, chosen from the conjunction of the organism's changing
+metrics and remembered encounters. The exact direction is now in
+[TODO](TODO.md) and [FAMILY](docs/FAMILY.md#form-grows-from-lived-state).
+Subjectivity and Brodsky's remote heads still match their pinned family audit.
+The planned port includes form-aware candidate assessment and journal/restart
+state alongside generation; Brodsky contributes the ABA → BCB rhyme lineage.
+
 ## 2026-10-15 — A structure crosses the dream
 
 Iceberg v5 carries a compound's ordered parents with an actual native dream

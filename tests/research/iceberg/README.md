@@ -10,6 +10,17 @@ Python's standard library to construct its temporary C host. Commands were
 executed on Linux with GCC 13.3. Keep binaries, logs, and generated C in a
 disposable directory outside the repository.
 
+## Frozen concept bases
+
+The [concept-basis experiment](../../../docs/research/iceberg/CONCEPT_BASIS.md)
+compares four isolated anchors with normalized centres of their complete
+reviewed English word groups. Its preregistered inventory contains 24 new
+held-out words, eight new controls and the earlier word-anchor diagnostics.
+The AML probe executes A, B and the physical .5 mixture separately; the Python
+standard-library checker validates receipts and paired scores. Its source pins
+and interpreter/compiled reproduction commands are in that experiment's
+report, separately from the historical source probes below.
+
 ## Source roots and pins
 
 Run this setup from the Haiku repository root; point `iceberg_sources` at a
