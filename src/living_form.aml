@@ -1,0 +1,196 @@
+# Exact English forms for the separately enabled living-form profile.
+# Subjectivity 221157935d84d5037768f34c4661b11ca6865f91 supplies the variable
+# fragment/couplet/haiku lineage. Haiku adds one 7/7/7 ABA tercet; continuation
+# into ABA -> BCB belongs to a later stage. Rhyme here is an orthographic
+# last-vowel suffix, ignoring silent final e only when locating that vowel.
+# The returned spelling retains the e: remote/note differ from hot/pot.
+# This is explicitly orthography, not phonetics.
+IMPORT "generator.aml"
+
+def haiku_living_targets(form):
+    assert(isfinite(form) and form == floor(form) and form >= 0 and form <= 3, "Living form must be an integer in [0, 3]")
+    if form == 0:
+        return [4]
+    if form == 1:
+        return [6, 4]
+    if form == 2:
+        return [5, 7, 5]
+    return [7, 7, 7]
+
+def haiku_living_name(form):
+    haiku_living_targets(form)
+    if form == 0:
+        return "fragment"
+    if form == 1:
+        return "couplet"
+    if form == 2:
+        return "haiku"
+    return "tercet"
+
+# Only alphabetic English spellings can carry this rhyme key. An empty key
+# means unavailable, including vowel-only endings and words without a vowel.
+def haiku_living_rime(word):
+    word = text_lower(word)
+    size = text_len(word)
+    ending = size
+    assert(size <= 10000, "Living rhyme word exceeds its bound")
+    i = 0
+    while i < size:
+        cp = text_codepoint(word, i)
+        if cp < 97 or cp > 122:
+            return ""
+        i = i + 1
+    if size >= 2:
+        if text_codepoint(word, size - 1) == 101 and haiku_en_vowel(text_codepoint(word, size - 2)) == 0:
+            size = size - 1
+    last = -1
+    i = 0
+    while i < size:
+        if haiku_en_vowel(text_codepoint(word, i)):
+            last = i
+        i = i + 1
+    if last < 0 or size - last < 2:
+        return ""
+    return text_slice(word, last, ending)
+
+def haiku_living_output_check(source, form):
+    targets = haiku_living_targets(form)
+    assert(text_len(source) <= 10000, "Living output exceeds its text bound")
+    assert(haiku_line_count(source) == len(targets), "Living output line count differs")
+    endings = list_new()
+    i = 0
+    while i < len(targets):
+        words = haiku_words(haiku_line(source, i))
+        assert(list_len(words) > 0, "Living output has an empty line")
+        assert(haiku_line_syllables(words) == targets[i], "Living output syllable budget differs")
+        list_push(endings, text_lower(list_get(words, list_len(words) - 1)))
+        i = i + 1
+    if form == 3:
+        a = list_get(endings, 0)
+        b = list_get(endings, 1)
+        c = list_get(endings, 2)
+        key = haiku_living_rime(a)
+        other = haiku_living_rime(b)
+        assert(text_len(key) > 0 and text_equal(key, haiku_living_rime(c)), "Living tercet A endings must rhyme")
+        assert(text_equal(a, c) == 0, "Living tercet A endings must be distinct words")
+        assert(text_len(other) > 0 and text_equal(key, other) == 0, "Living tercet B ending needs a different rhyme")
+    return 1
+
+# Preflight every possible closer before consuming any draw. Repeated case
+# spellings represent one closing word, so distinct A endings stay distinct.
+def haiku_living_rhyme_pool(vocab, syllables, plan):
+    words = list_new()
+    keys = list_new()
+    masses = map_new()
+    seen = map_new()
+    i = 0
+    while i < list_len(vocab):
+        word = list_get(vocab, i)
+        lower = text_lower(word)
+        count = map_get(syllables, word)
+        key = haiku_living_rime(word)
+        if count <= 7 and text_len(key) > 0 and map_has(seen, lower) == 0:
+            if plan[2 + 7 - count]:
+                list_push(words, word)
+                list_push(keys, key)
+                map_set(seen, lower, 1)
+                mass = 0
+                if map_has(masses, key):
+                    mass = map_get(masses, key)
+                map_set(masses, key, mass + 1)
+        i = i + 1
+    groups = list_new()
+    names = map_keys(masses)
+    i = 0
+    while i < list_len(names):
+        key = list_get(names, i)
+        if map_get(masses, key) >= 2 and list_len(names) >= 2:
+            list_push(groups, key)
+        i = i + 1
+    assert(list_len(groups) > 0, "Living tercet needs distinct A rhymes and a different B rhyme")
+    pool = record_new()
+    record_set(pool, "words", words)
+    record_set(pool, "keys", keys)
+    record_set(pool, "groups", groups)
+    return pool
+
+# Four draws reserve the group and all three endings before line generation.
+def haiku_living_closers(pool, temperature, rng, tape):
+    words = record_get(pool, "words")
+    keys = record_get(pool, "keys")
+    groups = record_get(pool, "groups")
+    uniform = [-1]
+    key = list_get(groups, haiku_gen_pick(list_len(groups), uniform, temperature, rng, tape))
+    a = list_new()
+    b = list_new()
+    i = 0
+    while i < list_len(words):
+        if text_equal(list_get(keys, i), key):
+            list_push(a, list_get(words, i))
+        else:
+            list_push(b, list_get(words, i))
+        i = i + 1
+    first = haiku_gen_pick(list_len(a), uniform, temperature, rng, tape)
+    third = haiku_gen_pick(list_len(a) - 1, uniform, temperature, rng, tape)
+    if third >= first:
+        third = third + 1
+    middle = haiku_gen_pick(list_len(b), uniform, temperature, rng, tape)
+    result = list_new()
+    list_push(result, list_get(a, first))
+    list_push(result, list_get(b, middle))
+    list_push(result, list_get(a, third))
+    return result
+
+def haiku_living_generate(rows, counts, vocab, syllables, n, temperature, rng, tape, form):
+    targets = haiku_living_targets(form)
+    if form == 2:
+        return haiku_generate_candidates(rows, counts, vocab, syllables, n, temperature, rng, tape)
+    size = haiku_gen_check(rows, counts, vocab, syllables)
+    assert(isfinite(n) and n >= 0 and n <= 100 and n == floor(n), "Living candidate count must be an integer in [0, 100]")
+    haiku_gen_tape(tape)
+    plan = haiku_gen_plan(vocab, syllables, 7, temperature)
+    result = list_new()
+    if n == 0:
+        return result
+    assert(size > 0, "Living generator vocabulary is empty")
+    i = 0
+    while i < size:
+        word = list_get(vocab, i)
+        assert(map_get(syllables, word) == haiku_syllables(word), "Living forms require the English syllable cache")
+        i = i + 1
+    maximum = len(targets) - 1
+    i = 0
+    while i < len(targets):
+        target = targets[i]
+        assert(plan[2 + target], "Living syllable target is unreachable")
+        maximum = maximum + plan[10 + target] - 1
+        i = i + 1
+    assert(maximum <= 10000, "Living vocabulary can exceed the output text bound")
+    pool = record_new()
+    if form == 3:
+        pool = haiku_living_rhyme_pool(vocab, syllables, plan)
+    candidate = 0
+    while candidate < n:
+        closers = list_new()
+        if form == 3:
+            closers = haiku_living_closers(pool, temperature, rng, tape)
+        output = ""
+        line = 0
+        while line < len(targets):
+            plan[0] = targets[line]
+            if form == 3:
+                closer = list_get(closers, line)
+                plan[0] = plan[0] - map_get(syllables, closer)
+            text = haiku_gen_ready(rows, counts, vocab, syllables, plan, rng, tape)
+            if form == 3:
+                if text_len(text) > 0:
+                    text = text_concat(text, " ")
+                text = text_concat(text, closer)
+            if line > 0:
+                output = text_concat(output, "\n")
+            output = text_concat(output, text)
+            line = line + 1
+        haiku_living_output_check(output, form)
+        list_push(result, output)
+        candidate = candidate + 1
+    return result

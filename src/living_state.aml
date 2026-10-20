@@ -1,0 +1,157 @@
+# Subjectivity's dominant/mean resonance, carried by Haiku's own climate.
+# Source: subjectivity.c at 221157935d84d5037768f34c4661b11ca6865f91.
+IMPORT "living_form.aml"
+IMPORT "living_features.aml"
+IMPORT "phase4.aml"
+
+# Six chambers: current dissonance, novelty, bounded arousal and entropy;
+# the previous encounter's novelty and entropy. Previous dissonance contracts
+# resonance. The fourth (.82) threshold is Haiku's tercet extension.
+# Receipt: form, resonance, pressure, then the six chamber values.
+def haiku_living_decide(observation, previous):
+    assert(len(observation) == 4 and len(previous) == 4, "Haiku form needs two climates")
+    cursor = 0
+    while cursor < 4:
+        assert(isfinite(observation[cursor]) and observation[cursor] >= 0, "Haiku form climate is invalid")
+        assert(isfinite(previous[cursor]) and previous[cursor] >= 0, "Haiku previous form climate is invalid")
+        if cursor != 2:
+            assert(observation[cursor] <= 1 and previous[cursor] <= 1, "Haiku form climate exceeds one")
+        cursor = cursor + 1
+    receipt = zeros(9)
+    receipt[2] = previous[0]
+    receipt[3] = observation[0]
+    receipt[4] = observation[1]
+    receipt[5] = observation[2] / (1 + observation[2])
+    receipt[6] = observation[3]
+    receipt[7] = previous[1]
+    receipt[8] = previous[3]
+    dominant = 0
+    total = 0
+    cursor = 3
+    while cursor < 9:
+        dominant = max(dominant, receipt[cursor])
+        total = total + receipt[cursor]
+        cursor = cursor + 1
+    resonance = min(1, max(0, 0.55 * dominant + 0.9 * (dominant - total / 6)))
+    resonance = resonance * (1 - 0.4 * tanh(receipt[2]))
+    receipt[1] = resonance
+    form = 3
+    if resonance < 0.82:
+        form = 1
+    if resonance < 0.66:
+        form = 2
+    if resonance < 0.34:
+        form = 0
+    receipt[0] = form
+    return receipt
+
+# Every historical decision can be recomputed from the canonical climate
+# history. No new random stream or wall-clock input enters form selection.
+def haiku_living_climate(state, turn):
+    result = zeros(4)
+    start = record_get(state, "inner_started_turn")
+    if turn <= start:
+        return result
+    values = record_get(state, "meta_metrics")
+    at = (turn - start - 1) * 5
+    assert(at >= 0 and at + 4 < len(values), "Haiku form climate is absent")
+    cursor = 0
+    while cursor < 4:
+        result[cursor] = values[at + cursor + 1]
+        cursor = cursor + 1
+    return result
+
+def haiku_living_snapshot(state, observation):
+    previous = haiku_living_climate(state, record_get(state, "turn"))
+    return haiku_living_decide(observation, previous)
+
+def haiku_living_equal(actual, expected):
+    assert(rows(actual) == 0 and cols(actual) == 0 and len(actual) == 9, "Haiku form receipt needs nine scalars")
+    left = record_new()
+    right = record_new()
+    record_set(left, "receipt", actual)
+    record_set(right, "receipt", expected)
+    assert(record_equal(left, right), "Haiku form receipt differs from its lived climate")
+    return 1
+
+# Preserve exact earlier array bits, including signed zero. Empty histories
+# have a one-zero placeholder which is replaced by their first actual row.
+def haiku_living_prefix(old, new, count):
+    assert(count >= 0 and count == floor(count), "Haiku history prefix count is invalid")
+    assert(len(old) == max(1, count) and len(new) >= count, "Haiku history prefix length differs")
+    if count == 0:
+        return 1
+    prefix = zeros(count)
+    cursor = 0
+    while cursor < count:
+        prefix[cursor] = new[cursor]
+        cursor = cursor + 1
+    left = record_new()
+    right = record_new()
+    record_set(left, "values", old)
+    record_set(right, "values", prefix)
+    assert(record_equal(left, right), "Haiku completed tail changed earlier climate or learning")
+    return 1
+
+# Histories can exceed the runtime's one-string limit. Compare list leaves
+# directly instead of encoding a whole conversation into one composite key.
+def haiku_living_words_prefix(old, new):
+    assert(list_len(new) >= list_len(old), "Haiku completed tail lost earlier words")
+    left = record_new()
+    right = record_new()
+    record_set(left, "words", old)
+    record_set(right, "words", list_slice(new, 0, list_len(old)))
+    assert(record_equal(left, right), "Haiku completed tail changed earlier words")
+    return 1
+
+def haiku_living_get(state, turn):
+    start = record_get(state, "form_started_turn")
+    assert(turn > start and turn <= record_get(state, "turn") and turn == floor(turn), "Haiku form turn is outside its history")
+    values = record_get(state, "form_values")
+    result = zeros(9)
+    cursor = 0
+    while cursor < 9:
+        result[cursor] = values[(turn - start - 1) * 9 + cursor]
+        cursor = cursor + 1
+    return result
+
+def haiku_living_append(state, experience):
+    turn = record_get(experience, "turn")
+    count = turn - record_get(state, "form_started_turn") - 1
+    assert(count >= 0 and count < 10000, "Haiku form history is full")
+    receipt = record_get(experience, "form_receipt")
+    expected = haiku_living_snapshot(state, record_get(experience, "observation"))
+    haiku_living_equal(receipt, expected)
+    haiku_living_output_check(record_get(experience, "output"), receipt[0])
+    prior = record_get(state, "form_values")
+    assert(len(prior) == max(1, count * 9), "Haiku form append order differs")
+    values = haiku_phase4_extend(prior, count * 9, 9)
+    cursor = 0
+    while cursor < 9:
+        values[count * 9 + cursor] = receipt[cursor]
+        cursor = cursor + 1
+    record_set(state, "form_values", values)
+    return count + 1
+
+def haiku_living_check(state):
+    assert(text_equal(record_get(state, "form_policy"), "subjectivity-climate-v1"), "Haiku form policy is unsupported")
+    start = record_get(state, "form_started_turn")
+    assert(isfinite(start) and start == floor(start) and start >= record_get(state, "phase4_started_turn") and start <= record_get(state, "turn"), "Haiku form start is invalid")
+    count = record_get(state, "turn") - start
+    assert(count <= 10000, "Haiku form history exceeds its bound")
+    values = record_get(state, "form_values")
+    assert(rows(values) == 0 and cols(values) == 0 and len(values) == max(1, count * 9), "Haiku form history length differs")
+    if count == 0:
+        assert(values[0] == 0, "Haiku empty form history retains values")
+    turn = start + 1
+    while turn <= record_get(state, "turn"):
+        current = haiku_living_climate(state, turn)
+        previous = haiku_living_climate(state, turn - 1)
+        expected = haiku_living_decide(current, previous)
+        actual = haiku_living_get(state, turn)
+        haiku_living_equal(actual, expected)
+        index = (turn - record_get(state, "inner_started_turn") - 1) * 3 + 1
+        spoken = list_get(record_get(state, "meta_history"), index)
+        haiku_living_output_check(spoken, actual[0])
+        turn = turn + 1
+    return count

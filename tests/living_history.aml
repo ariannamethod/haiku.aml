@@ -1,0 +1,20 @@
+# A valid history can exceed AML's one-string limit while every utterance fits.
+IMPORT "../src/living_state.aml"
+
+word = "x"
+while text_len(word) < 10000:
+    word = text_concat(word, word)
+word = text_slice(word, 0, 10000)
+prior = list_new()
+i = 0
+while i < 110:
+    list_push(prior, word)
+    i = i + 1
+later = list_clone(prior)
+list_push(later, "the next encounter")
+assert(list_len(prior) * text_bytes(word) == 1100000, "Long-history fixture does not exceed one MiB")
+assert(haiku_living_words_prefix(prior, later), "Large valid history was rejected")
+assert(list_len(prior) == 110 and list_len(later) == 111, "Prefix check changed history lengths")
+assert(text_equal(list_get(prior, 109), word), "Prefix check changed the last retained utterance")
+assert(text_equal(list_get(later, 110), "the next encounter"), "Prefix check changed the next utterance")
+PRINT "HAIKU_LIVING_HISTORY_OK"

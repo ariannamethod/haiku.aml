@@ -1,0 +1,150 @@
+# Real foreground inputs exercise all four forms before any candidate is drawn.
+IMPORT "../src/iceberg_session.aml"
+
+def living_test_array(left, right):
+    a = record_new()
+    b = record_new()
+    record_set(a, "value", left)
+    record_set(b, "value", right)
+    assert(record_equal(a, b), "Living feature or receipt arrays differ")
+    return 1
+
+# Independent hand-computed chamber cases, including remembered contraction.
+receipt = haiku_living_decide([0, 0, 0, 0], [0, 0, 0, 0])
+assert(receipt[0] == 0 and receipt[1] == 0, "Zero climate must select a fragment")
+receipt = haiku_living_decide([0, 0, 0, 0.5], [0, 0, 0, 0])
+assert(receipt[0] == 2 and abs(receipt[1] - 0.65) < 0.000001, "Half-entropy climate must select a haiku")
+receipt = haiku_living_decide([0, 0, 0, 0.6], [0, 0, 0, 0])
+assert(receipt[0] == 1 and abs(receipt[1] - 0.78) < 0.000001, "Six-tenths entropy must select a couplet")
+receipt = haiku_living_decide([0, 0, 0, 1], [0, 0, 0, 0])
+assert(receipt[0] == 3 and receipt[1] == 1, "Full isolated entropy must select a tercet")
+receipt = haiku_living_decide([0, 0, 0, 1], [1, 0, 0, 0])
+assert(receipt[0] == 1 and abs(receipt[1] - 0.695362337617694) < 0.000001, "Remembered dissonance must contract the same present climate")
+
+# Probe both sides of every policy boundary independently of the generator.
+thresholds = [0.34, 0.66, 0.82]
+below_forms = [0, 2, 1]
+above_forms = [2, 1, 3]
+i = 0
+while i < 3:
+    entropy = (thresholds[i] - 0.0001) / 1.3
+    current = zeros(4)
+    current[3] = entropy
+    receipt = haiku_living_decide(current, [0, 0, 0, 0])
+    assert(receipt[0] == below_forms[i], "Lower side of form boundary differs")
+    assert(abs(receipt[1] - (thresholds[i] - 0.0001)) < 0.000001, "Lower form boundary resonance differs")
+    entropy = (thresholds[i] + 0.0001) / 1.3
+    current = zeros(4)
+    current[3] = entropy
+    receipt = haiku_living_decide(current, [0, 0, 0, 0])
+    assert(receipt[0] == above_forms[i], "Upper side of form boundary differs")
+    assert(abs(receipt[1] - (thresholds[i] + 0.0001)) < 0.000001, "Upper form boundary resonance differs")
+    i = i + 1
+
+inputs = list_new()
+list_push(inputs, "rain river water")
+list_push(inputs, "rain river water ocean lake tree forest wood leaf light")
+list_push(inputs, "rain river water ocean lake tree forest wood leaf light song wind")
+list_push(inputs, "rain river water ocean lake tree forest wood leaf light song wind moon star cloud sky dream home earth night")
+forms = [0, 2, 1, 3]
+i = 0
+while i < 4:
+    legacy = haiku_state_enable_dreams(haiku_state_new("regex", 0, 1, 575, 57), 0)
+    source_owner = record_clone(legacy)
+    live = haiku_state_enable_form(legacy, 0)
+    assert(record_equal(legacy, source_owner), "Form activation mutated the legacy owner")
+    assert(record_get(live, "version") == 4 and list_len(record_keys(live)) == 58, "Living voice schema differs")
+    assert(record_equal(live, haiku_state_enable_form(live, 0)), "Living form activation is not idempotent")
+    again = haiku_state_enable_form(live, 0)
+    map_set(record_get(again, "weights"), "the", 0)
+    assert(record_equal(live, haiku_state_enable_form(legacy, 0)), "Form activation returned shared leaves")
+    parallel = record_clone(live)
+    source = list_get(inputs, i)
+    first = haiku_session_turn(live, source, 0)
+    second = haiku_session_worker_turn(parallel, source, 0)
+    assert(text_equal(first, second) and record_equal(live, parallel), "Living voice differs by serial/worker schedule")
+    receipt = haiku_living_get(live, 1)
+    assert(receipt[0] == forms[i], "Real foreground did not select its expected form")
+    haiku_living_output_check(first, forms[i])
+    assert(map_get(record_get(live, "mathbrain_state"), "observations") == 1, "Living MathBrain skipped a completed turn")
+    assert(map_get(record_get(live, "rae_state"), "observations") == 1, "Living RAE skipped a completed turn")
+    experience = haiku_journal_get(live, 0)
+    assert(record_get(experience, "version") == 2, "Living exchange lacks its versioned form")
+    assert(text_equal(record_get(experience, "form"), haiku_living_name(forms[i])), "Journal form differs from the chosen form")
+    assert(text_equal(record_get(experience, "output"), first), "Journal lost the actual foreground words")
+    living_test_array(record_get(experience, "form_receipt"), receipt)
+    living_test_array(record_get(experience, "form_targets"), haiku_living_targets(forms[i]))
+    PRINT text_concat("FORM=", haiku_living_name(forms[i]))
+    PRINT first
+    i = i + 1
+
+# Enable after a genuine fixed-form encounter, retaining the earlier journal.
+legacy = haiku_state_enable_dreams(haiku_state_new("regex", 0, 1, 575, 57), 0)
+old_poem = haiku_session_turn(legacy, "rain river water ocean lake", 0)
+old_entry = haiku_journal_get(legacy, 0)
+checkpoint_save(legacy, "living-legacy.state")
+live = haiku_state_enable_form(legacy, 0)
+assert(record_get(live, "form_started_turn") == 1, "Upgrade fabricated earlier form history")
+assert(record_equal(old_entry, haiku_journal_get(live, 0)), "Upgrade rewrote the old exchange")
+assert(haiku_is_haiku(old_poem), "Legacy foreground lost its fixed form")
+record_set(live, "dream_config", [1, 1, 2])
+parallel = record_clone(live)
+first = haiku_session_turn(live, "tree forest wood leaf light", 0)
+second = haiku_session_worker_turn(parallel, "tree forest wood leaf light", 0)
+assert(text_equal(first, second) and record_equal(live, parallel), "Upgraded life differs by schedule")
+assert(haiku_dream_check(live) > 0, "Upgraded form did not cross a real dream boundary")
+checkpoint_save(live, "living-first.state")
+resumed = checkpoint_load("living-first.state")
+haiku_state_check(resumed, 0)
+assert(record_equal(live, resumed), "Living checkpoint lost an owned leaf")
+first = haiku_session_turn(live, "song wind moon star dream home", 0)
+second = haiku_session_worker_turn(resumed, "song wind moon star dream home", 0)
+assert(text_equal(first, second) and record_equal(live, resumed), "Living voice or RNG changed across restart")
+assert(record_equal(old_entry, haiku_journal_get(live, 0)), "Later adaptive turn rewrote legacy journal")
+checkpoint_save(live, "living-session.state")
+
+# Retain a real pending completion for adversarial publication tests.
+checkpoint_save(live, "living-publication-base.state")
+pending = record_clone(live)
+experience = haiku_session_prepare(pending, "rain water remember the quiet river", 0)
+result = haiku_session_tail(pending, experience, 0)
+checked = haiku_session_result_check(live, result, experience, 0)
+checkpoint_save(experience, "living-publication-experience.state")
+checkpoint_save(result, "living-publication-result.state")
+assert(record_get(live, "turn") == 3 and record_get(checked, "turn") == 4, "Detached living tail published prematurely")
+
+# Complete iceberg publication carries the same shorter voice into both private
+# external lives. Bodies are absent; the complete contact and dream paths run.
+missing = model_try_load("")
+core = haiku_state_enable_dreams(haiku_state_new("regex", 0, 1, 575, 57), 0)
+record_set(core, "dream_config", [1, 1, 2])
+legacy = haiku_iceberg_new(core, [1, 0, 0, 1])
+legacy = haiku_iceberg_enable_janus(legacy, 20746, 1, 0)
+legacy = haiku_iceberg_enable_words(legacy, 0)
+legacy = haiku_iceberg_enable_symbols(legacy, 1, 0)
+legacy = haiku_iceberg_enable_exchange(legacy, 1, 0)
+legacy = haiku_iceberg_enable_concepts(legacy, 2, 0)
+original = record_clone(legacy)
+life = haiku_iceberg_enable_form(legacy, 0)
+assert(record_equal(legacy, original), "Iceberg form upgrade changed its source")
+assert(record_get(life, "version") == 7 and list_len(record_keys(life)) == 268, "Living iceberg profile differs")
+assert(record_equal(life, haiku_iceberg_enable_form(life, 0)), "Living iceberg upgrade is not idempotent")
+assert(record_equal(life, haiku_iceberg_enable_concepts(life, 0, 0)), "Earlier upgrade downgraded the living form")
+parallel = record_clone(life)
+first = haiku_iceberg_turn_at(life, "rain river water ocean lake", 0, missing, missing, 0, 20746)
+second = haiku_iceberg_turn_at(parallel, "rain river water ocean lake", 0, missing, missing, 1, 20746)
+assert(text_equal(first, second) and record_equal(life, parallel), "Living iceberg first completion differs by schedule")
+core = haiku_iceberg_part(life, "voice")
+receipt = haiku_living_get(core, 1)
+assert(receipt[0] == 0 and haiku_line_count(first) == 1, "Iceberg did not actually speak its fragment")
+checkpoint_save(life, "living-iceberg-first.state")
+resumed = checkpoint_load("living-iceberg-first.state")
+haiku_iceberg_check(resumed, 0)
+first = haiku_iceberg_turn_at(life, "tree forest wood leaf light", 0, missing, missing, 0, 20747)
+second = haiku_iceberg_turn_at(resumed, "tree forest wood leaf light", 0, missing, missing, 1, 20747)
+assert(text_equal(first, second) and record_equal(life, resumed), "Living iceberg changed across restart")
+core = haiku_iceberg_part(life, "voice")
+assert(haiku_dream_check(core) == 1, "Living iceberg lost its actual dream")
+assert(record_get(life, "haiku_contact:version") == 5 and record_get(life, "friend_contact:version") == 5, "Form changed a private contact schema")
+checkpoint_save(life, "living-iceberg.state")
+PRINT "HAIKU_LIVING_SESSION_OK"

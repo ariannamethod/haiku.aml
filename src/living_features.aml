@@ -1,0 +1,196 @@
+# Adaptive form keeps the Python-lineage five-dimensional learners.
+# Source: harmonix/haiku at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
+# The form profile changes normalization and admits real one/two-word speech.
+IMPORT "mathbrain.aml"
+IMPORT "rae.aml"
+
+def haiku_living_feature_targets(targets):
+    assert(len(targets) >= 1 and len(targets) <= 3, "Living features need one to three target lines")
+    total = 0
+    line = 0
+    while line < len(targets):
+        target = targets[line]
+        assert(isfinite(target), "Living feature targets must be finite")
+        assert(target >= 1 and target <= 32 and target == floor(target), "Living feature targets must be integers in [1, 32]")
+        total = total + target
+        line = line + 1
+    return total
+
+# Exact line and syllable identity is checked before any learner publication.
+def haiku_living_feature_shape(source, targets):
+    total = haiku_living_feature_targets(targets)
+    assert(text_len(source) <= 10000, "Living feature source limit is 10000 codepoints")
+    assert(haiku_line_count(source) == len(targets), "Living feature line count differs from its targets")
+    line = 0
+    while line < len(targets):
+        words = haiku_words(haiku_line(source, line))
+        assert(haiku_line_syllables(words) == targets[line], "Living feature syllables differ from their target")
+        line = line + 1
+    return total
+
+# Population word-count variance over the actual number of lines. Preserve
+# the original evaluation order exactly for every three-line profile.
+def haiku_living_line_coherence(source, targets):
+    haiku_living_feature_shape(source, targets)
+    size = len(targets)
+    if size == 3:
+        return haiku_line_coherence(source)
+    lengths = zeros(size)
+    total = 0
+    line = 0
+    while line < size:
+        lengths[line] = haiku_word_count(haiku_line(source, line))
+        total = total + lengths[line]
+        line = line + 1
+    average = total / size
+    variance = 0
+    line = 0
+    while line < size:
+        difference = lengths[line] - average
+        variance = variance + difference * difference
+        line = line + 1
+    return 1 / (1 + variance / size)
+
+def haiku_living_mathbrain_features(source, rows, counts, user, targets):
+    syllable_target = haiku_living_feature_shape(source, targets)
+    assert(text_len(source) <= 10000, "Haiku MathBrain source limit is 10000 codepoints")
+    assert(list_len(user) <= 10000, "Haiku MathBrain context limit is 10000 flat tokens")
+    haiku_rows_check(rows, counts)
+    haiku_triple_keys(user)
+    words = haiku_words(source)
+    size = list_len(words)
+    transitions = 0
+    cursor = 0
+    while cursor + 2 < size:
+        count = haiku_chain_count(counts, list_get(words, cursor), list_get(words, cursor + 1), list_get(words, cursor + 2))
+        if count == 0:
+            count = 0.1
+        transitions = transitions + count
+        cursor = cursor + 1
+    unique = haiku_unique(words)
+    context = haiku_unique(user)
+    overlap = 0
+    cursor = 0
+    while cursor < list_len(context):
+        if list_find(unique, list_get(context, cursor)) >= 0:
+            overlap = overlap + 1
+        cursor = cursor + 1
+    syllables = haiku_line_syllables(words)
+    result = zeros(5)
+    result[0] = min(1, transitions / max(1, size - 2) / 10)
+    result[1] = list_len(unique) / size
+    result[2] = overlap / max(1, list_len(context))
+    result[3] = min(1, syllables / syllable_target)
+    result[4] = result[1]
+    return result
+
+# A short valid utterance publishes one normal MathBrain update.
+def haiku_living_mathbrain_observe(parameters, state, source, rows, counts, user, quality, targets):
+    haiku_living_feature_shape(source, targets)
+    last = haiku_mathbrain_check(state)
+    if isfinite(quality) == 0:
+        return last
+    assert(text_len(source) <= 10000, "Haiku MathBrain source limit is 10000 codepoints")
+    count = map_get(state, "observations")
+    assert(count < 16777216, "Haiku MathBrain observation counter is full")
+    features = haiku_living_mathbrain_features(source, rows, counts, user, targets)
+    result = haiku_learner_step(parameters, features, 5, 8, max(0, min(1, quality)), map_get(state, "lr"))
+    running = map_get(state, "running_loss")
+    running = running + (result[1] - running) * 0.05
+    assert(isfinite(running) and running >= 0, "Haiku MathBrain staged running loss is invalid")
+    count_key = "observations"
+    last_key = "last_loss"
+    running_key = "running_loss"
+    haiku_learner_publish(parameters, result)
+    map_set(state, count_key, count + 1)
+    map_set(state, last_key, result[1])
+    map_set(state, running_key, running)
+    return result[1]
+
+# RAE retains candidate lowercase/context identity and its first four features.
+def haiku_living_rae_features(source, user, targets):
+    haiku_living_feature_shape(source, targets)
+    features = haiku_rae_features(source, user)
+    features[4] = haiku_living_line_coherence(source, targets)
+    return features
+
+def haiku_living_rae_trace(params, candidates, user, steps, targets):
+    size = list_len(candidates)
+    assert(size >= 2 and size <= 100, "RAE trace needs 2..100 candidates")
+    assert(isfinite(steps), "RAE depth must be a finite integer")
+    assert(steps == floor(steps), "RAE depth must be a finite integer")
+    assert(steps >= 0 and steps <= 10, "RAE depth must be in [0, 10]")
+    haiku_learner_check(params, 5, 8)
+    features = zeros(size * 5)
+    trace = zeros(size * (steps + 1))
+    cursor = 0
+    while cursor < size:
+        feature = haiku_living_rae_features(list_get(candidates, cursor), user, targets)
+        item = 0
+        while item < 5:
+            features[cursor * 5 + item] = feature[item]
+            item = item + 1
+        trace[cursor] = haiku_learner_forward(params, feature, 5, 8)
+        cursor = cursor + 1
+    step = 1
+    while step <= steps:
+        previous = (step - 1) * size
+        low = trace[previous]
+        high = low
+        cursor = 1
+        while cursor < size:
+            low = min(low, trace[previous + cursor])
+            high = max(high, trace[previous + cursor])
+            cursor = cursor + 1
+        cursor = 0
+        while cursor < size:
+            normalized = 0.5
+            if high > low:
+                normalized = (trace[previous + cursor] - low) / (high - low)
+            feature = zeros(5)
+            item = 0
+            while item < 5:
+                feature[item] = features[cursor * 5 + item]
+                item = item + 1
+            # Python appends feedback then slices it off: keep the same 5D MLP.
+            raw = haiku_learner_forward(params, feature, 5, 8)
+            trace[step * size + cursor] = 0.7 * raw + 0.3 * normalized
+            cursor = cursor + 1
+        step = step + 1
+    return trace
+
+def haiku_living_rae_select(params, candidates, user, steps, targets):
+    size = list_len(candidates)
+    assert(size > 0, "RAE selection has no candidates")
+    haiku_living_feature_targets(targets)
+    result = zeros(2)
+    result[1] = 1
+    if size == 1:
+        haiku_living_feature_shape(list_get(candidates, 0), targets)
+        return result
+    trace = haiku_living_rae_trace(params, candidates, user, steps, targets)
+    result[1] = trace[steps * size]
+    cursor = 1
+    while cursor < size:
+        score = trace[steps * size + cursor]
+        if score > result[1]:
+            result[0] = cursor
+            result[1] = score
+        cursor = cursor + 1
+    return result
+
+def haiku_living_rae_observe(params, state, selected, user, quality, targets):
+    assert(map_len(state) == 2, "RAE learning state needs two fields")
+    assert(map_has(state, "observations") and map_has(state, "learning_rate"), "RAE learning state fields are missing")
+    observations = map_get(state, "observations")
+    assert(observations >= 0 and observations < 16777216, "RAE observation counter is outside [0, 2^24)")
+    assert(observations == floor(observations), "RAE observation counter must be an integer")
+    rate = map_get(state, "learning_rate")
+    assert(rate >= 0, "RAE learning rate must be nonnegative")
+    assert(isfinite(quality), "RAE quality must be finite")
+    features = haiku_living_rae_features(selected, user, targets)
+    step = haiku_learner_step(params, features, 5, 8, quality, rate)
+    count_key = "observations"
+    haiku_learner_publish(params, step)
+    map_set(state, count_key, observations + 1)
+    return step[1]

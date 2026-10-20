@@ -1,0 +1,138 @@
+IMPORT "../src/living_features.aml"
+
+def living_test_exact(left, right):
+    assert(len(left) == len(right), "Living feature vector lengths differ")
+    i = 0
+    while i < len(left):
+        assert(isfinite(left[i]) and left[i] == right[i], "Living feature exact parity differs")
+        i = i + 1
+    return 1
+
+def living_test_map(left, right):
+    assert(map_len(left) == map_len(right), "Living learner state lengths differ")
+    keys = map_keys(left)
+    i = 0
+    while i < list_len(keys):
+        key = list_get(keys, i)
+        assert(map_has(right, key) and map_get(left, key) == map_get(right, key), "Living learner state differs")
+        i = i + 1
+    return 1
+
+rows = list_new()
+counts = map_new()
+user = list_new()
+list_push(user, "celebration")
+list_push(user, "rain")
+list_push(user, "water")
+
+# Independent short-form references: no triple exists in either utterance.
+one = "celebration"
+targets = [4]
+assert(haiku_syllables(one) == 4, "One-word fixture has four syllables")
+x = haiku_living_mathbrain_features(one, rows, counts, user, targets)
+expected = [0, 1, 0.3333333333333333, 1, 1]
+living_test_exact(x, expected)
+x = haiku_living_rae_features(one, user, targets)
+expected = [0.5, 1, 0.3333333333333333, 1, 1]
+living_test_exact(x, expected)
+
+shorts = list_new()
+list_push(shorts, one)
+list_push(shorts, "water water")
+list_push(shorts, "water\nwater")
+item = 0
+while item < list_len(shorts):
+    source = list_get(shorts, item)
+    targets = [4]
+    if item == 2:
+        targets = [2, 2]
+    parameters = zeros(57)
+    state = haiku_mathbrain_state()
+    loss = haiku_living_mathbrain_observe(parameters, state, source, rows, counts, user, 0.75, targets)
+    assert(loss == 0.5625, "Short MathBrain loss has independent zero-model reference")
+    assert(map_get(state, "observations") == 1, "Short MathBrain observed exactly once")
+    assert(parameters[56] == 0.015, "Short MathBrain publishes one gradient update")
+    assert(list_len(rows) == 0 and map_len(counts) == 0, "Short speech fabricated transitions")
+    rae = zeros(57)
+    rae_state = haiku_rae_state()
+    loss = haiku_living_rae_observe(rae, rae_state, source, user, 0.75, targets)
+    assert(loss == 0.5625, "Short RAE loss has independent zero-model reference")
+    assert(map_get(rae_state, "observations") == 1 and rae[56] == 0.015, "Short RAE observes exactly once")
+    i = 0
+    while i < 56:
+        assert(parameters[i] == 0 and rae[i] == 0, "Zero-model short gradient changed an unrelated parameter")
+        i = i + 1
+    item = item + 1
+
+x = haiku_living_mathbrain_features("water\nwater", rows, counts, user, [2, 2])
+expected = [0, 0.5, 0.3333333333333333, 1, 0.5]
+living_test_exact(x, expected)
+assert(abs(haiku_living_line_coherence("celebration\nrain rain rain rain", [4, 4]) - 0.3076923076923077) < 0.0000001, "Two-line population variance reference")
+
+# Exact legacy 5/7/5 features, recursive selection and complete updates.
+first = "rain rain rain rain rain\nrain rain rain rain rain rain rain\nrain rain rain rain rain"
+second = "rain rain rain rain rain\nwater water rain rain rain\nwater rain rain rain"
+third = "water water rain\nrain water water water\nwater water rain"
+targets = [5, 7, 5]
+list_push(rows, "rain")
+list_push(rows, "rain")
+list_push(rows, "rain")
+map_set(counts, list_key(rows), 7)
+candidates = list_new()
+list_push(candidates, first)
+list_push(candidates, second)
+list_push(candidates, third)
+params = zeros(57)
+i = 0
+while i < 57:
+    params[i] = (i - 28) * 0.005
+    i = i + 1
+new_params = haiku_learner_part(params, 0, 57)
+legacy_params = haiku_learner_part(params, 0, 57)
+new_rae = haiku_learner_part(params, 0, 57)
+legacy_rae = haiku_learner_part(params, 0, 57)
+new_state = haiku_mathbrain_state()
+legacy_state = haiku_mathbrain_state()
+new_rae_state = haiku_rae_state()
+legacy_rae_state = haiku_rae_state()
+qualities = [0.7, -0.2, 1.2]
+item = 0
+while item < list_len(candidates):
+    source = list_get(candidates, item)
+    assert(haiku_is_haiku(source), "Legacy fixture is exact 5/7/5")
+    living_test_exact(haiku_living_mathbrain_features(source, rows, counts, user, targets), haiku_mathbrain_features(source, rows, counts, user))
+    living_test_exact(haiku_living_rae_features(source, user, targets), haiku_rae_features(source, user))
+    expected_loss = haiku_mathbrain_observe(legacy_params, legacy_state, source, qualities[item], rows, counts, user)
+    loss = haiku_living_mathbrain_observe(new_params, new_state, source, rows, counts, user, qualities[item], targets)
+    assert(loss == expected_loss, "Living MathBrain legacy loss differs")
+    living_test_exact(new_params, legacy_params)
+    living_test_map(new_state, legacy_state)
+    expected_loss = haiku_rae_observe(legacy_rae, legacy_rae_state, source, qualities[item], user)
+    loss = haiku_living_rae_observe(new_rae, new_rae_state, source, user, qualities[item], targets)
+    assert(loss == expected_loss, "Living RAE legacy loss differs")
+    living_test_exact(new_rae, legacy_rae)
+    living_test_map(new_rae_state, legacy_rae_state)
+    item = item + 1
+step = 0
+while step <= 5:
+    living_test_exact(haiku_living_rae_trace(params, candidates, user, step, targets), haiku_rae_trace(params, candidates, user, step))
+    living_test_exact(haiku_living_rae_select(params, candidates, user, step, targets), haiku_rae_select(params, candidates, user, step))
+    step = step + 1
+# A tie selects the first; a validated singleton preserves original confidence.
+zero_params = zeros(57)
+selected = haiku_living_rae_select(zero_params, candidates, user, 3, targets)
+assert(selected[0] == 0 and selected[1] == 0.15, "Living recursive tie rule differs")
+singleton = list_new()
+list_push(singleton, "celebration")
+selected = haiku_living_rae_select(zero_params, singleton, user, 3, [4])
+assert(selected[0] == 0 and selected[1] == 1, "Living singleton confidence differs")
+# Short candidates participate in the same recursion and actual model scores.
+short_candidates = list_new()
+list_push(short_candidates, "celebration")
+list_push(short_candidates, "water water")
+short_params = zeros(57)
+short_params[1] = 1
+short_params[48] = 1
+selected = haiku_living_rae_select(short_params, short_candidates, user, 3, [4])
+assert(selected[0] == 0 and selected[1] > 0.7, "Living one-word candidate did not receive a real recursive score")
+PRINT "HAIKU_LIVING_FEATURES_OK"

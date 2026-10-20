@@ -11,8 +11,9 @@ use its existing Markov generator, form, RAE, learners, reflection and dreams.
 ../ariannamethod.ai/runner/aml-notorch iceberg.aml
 ```
 
-Each accepted turn first produces the ordinary spoken haiku and its complete
-inner life. Real encounters then enter the deeper organs. A bounded pair of
+Each accepted turn first chooses its speaking form, generates five candidates
+and completes its inner life. Version 7 can speak a fragment, couplet, haiku or
+ABA tercet; older profiles retain their 5–7–5 voice. Real encounters then enter the deeper organs. A bounded pair of
 reviewed words can join the vocabulary for the next exchange. The response
 already chosen stays fixed while its history grows underneath it.
 
@@ -140,18 +141,19 @@ Its frozen learning features and original human observation retain their values.
 
 ## One publication, one checkpoint
 
-Version 6 has **265 flat fields**; versions 5/4/3/2/1 retain
+Version 7 has **268 flat fields** and version 6 has **265**; versions 5/4/3/2/1 retain
 **253/245/237/227/185**:
 
 | Component | Fields |
 |---|---:|
-| Existing version-3 voice | 55 |
+| Speaking voice | 58 in v7; 55 in v1–6 |
 | Haiku and friend lexical owners | 18 each |
-| Haiku and friend contact owners | 61 each in v6; 55 in v5; 51 in v4; 47 in v3; 42 in v1/v2 |
-| Haiku and friend Janus owners, versions 2–6 | 20 each |
-| Envelope, component key lists, settings and admission ledger | 12 in v2–6; 10 in v1 |
+| Haiku and friend contact owners | 61 each in v6/v7; 55 in v5; 51 in v4; 47 in v3; 42 in v1/v2 |
+| Haiku and friend Janus owners, versions 2–7 | 20 each |
+| Envelope, component key lists, settings and admission ledger | 12 in v2–7; 10 in v1 |
 
-The existing voice's 55-field schema is unchanged. `iceberg.state` is a separate
+The version-4 voice adds a form policy, activation turn and nine-value decision
+rows. Its inner voice and dream partners retain their three-line forms. `iceberg.state` is a separate
 complete checkpoint. It holds all four contexts, both parliaments, identities,
 prototype caches and admission history together with the original inner life.
 Version 2 adds both calendars, debts, pending complete score pools and bounded
@@ -259,6 +261,8 @@ New-life settings at the top of `iceberg.aml` are saved with the checkpoint:
 | `upgrade_exchange` | 0 | Explicitly activates exchange for an existing version-4 life |
 | `personal_concepts` | 2 | Gives a new life version-6 concepts: 0 off, 1 equal, 2 personal; symbols-off selects 0 |
 | `upgrade_concepts` | 0 | Explicitly activates concepts for an existing version-5 life |
+| `living_form` | 1 | Gives a new complete life version-7 state-driven speaking forms |
+| `upgrade_form` | 0 | Explicitly activates speaking forms for an existing version-6 life |
 
 An existing checkpoint retains its first four settings. The scheduling choice
 can change without changing the complete result. For a new control condition,
@@ -272,7 +276,7 @@ lexical preference. Mode 1 selects dynamic balance. Both modes use the same
 expectation and witness budget.
 
 `haiku_iceberg_enable_words(life, tokenizer)` returns a detached, idempotent
-version-3 upgrade from a Janus life, preserving an already-enabled v3/v4/v5/v6 profile.
+version-3 upgrade from a Janus life, preserving an already-enabled v3/v4/v5/v6/v7 profile.
 It captures the current contact clocks;
 old receipts cannot teach the new learner. An existing v1 checkpoint requires
 both `upgrade_balance=1` and `upgrade_words=1` to activate both organs together.
@@ -301,9 +305,19 @@ a model provider returns, direct callers run
 loading the resumed life's bodies. This pure audit rebuilds each available
 populated bank and checks exact vectors and teacher tokens.
 
+`haiku_iceberg_enable_form(life, tokenizer)` returns a detached, idempotent v7
+upgrade from v6. It retains every old encounter and both draw streams, recording
+the current turn as the form boundary. Set `upgrade_form=1` to activate an
+existing v6 life. Older profiles first require their preceding upgrades.
+Setting `living_form=0` starts a new fixed-form v6 comparison; saved lives retain
+their policy. The source-climate receipt travels through generation, recursive
+selection, learning, journal, worker validation and checkpoint publication.
+Every decision can be recomputed from retained climate history. The worker must
+preserve earlier words and numerical history exactly, including signed-zero bits.
+
 `haiku_iceberg_turn_at(..., worker, day)` accepts an explicit day for replay and
 controlled experiments. The ordinary turn samples AML's `utc_day()` once for
-versions 2–6; version 1 never reads the clock. The worker uses its frozen request.
+versions 2–7; version 1 never reads the clock. The worker uses its frozen request.
 
 Empty paths create explicit unavailable handles. Missing or invalid files
 remain inspectable through `model_ready` / `model_error`; they add no fallback

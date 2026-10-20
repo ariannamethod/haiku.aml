@@ -24,13 +24,27 @@ def haiku_session_prepare(pending, source, model):
     observation = haiku_observe_trigrams(user, system)
     temperatures = haiku_temperatures(observation[0])
     haiku_foreground_cache(record_get(pending, "syllables"), record_get(pending, "vocab"))
-    candidates = haiku_generate_candidates(record_get(pending, "rows"), record_get(pending, "counts"), record_get(pending, "vocab"), record_get(pending, "syllables"), 5, temperatures[0], record_get(pending, "voice_rng"), record_get(pending, "draws"))
-    choice = haiku_rae_select(record_get(pending, "rae"), candidates, user, 3)
+    living = record_get(pending, "version") == 4
+    form_receipt = zeros(9)
+    targets = zeros(1)
+    candidates = list_new()
+    choice = zeros(2)
+    if living:
+        form_receipt = haiku_living_snapshot(pending, observation)
+        targets = haiku_living_targets(form_receipt[0])
+        voice_rng = record_get(pending, "voice_rng")
+        candidates = haiku_living_generate(record_get(pending, "rows"), record_get(pending, "counts"), record_get(pending, "vocab"), record_get(pending, "syllables"), 5, temperatures[0], voice_rng, record_get(pending, "draws"), form_receipt[0])
+        choice = haiku_living_rae_select(record_get(pending, "rae"), candidates, user, 3, targets)
+    else:
+        candidates = haiku_generate_candidates(record_get(pending, "rows"), record_get(pending, "counts"), record_get(pending, "vocab"), record_get(pending, "syllables"), 5, temperatures[0], record_get(pending, "voice_rng"), record_get(pending, "draws"))
+        choice = haiku_rae_select(record_get(pending, "rae"), candidates, user, 3)
     spoken = list_get(candidates, choice[0])
 
     quality = haiku_foreground_quality(observation)
     bridge_event = haiku_foreground_bridge(observation, quality, turn, clock)
     experience = haiku_journal_capture(pending, source, spoken, user, system, temperatures, turn)
+    if living:
+        record_set(experience, "form_receipt", form_receipt)
     record_set(experience, "base_revision", turn - 1)
     record_set(experience, "observation", observation)
     record_set(experience, "quality", quality)
@@ -50,11 +64,19 @@ def haiku_session_tail(pending, experience, model):
     observation = record_get(experience, "observation")
     quality = record_get(experience, "quality")
     bridge_event = record_get(experience, "bridge_event")
-    if record_get(pending, "version") == 3:
+    if record_get(pending, "version") >= 3:
         haiku_phase4_turn(pending, bridge_event)
-    haiku_mathbrain_observe(record_get(pending, "mathbrain"), record_get(pending, "mathbrain_state"), spoken, quality, record_get(pending, "rows"), record_get(pending, "counts"), user)
-    if record_get(pending, "train_rae"):
-        haiku_rae_observe(record_get(pending, "rae"), record_get(pending, "rae_state"), spoken, quality, user)
+    if record_get(pending, "version") == 4:
+        haiku_living_append(pending, experience)
+        receipt = record_get(experience, "form_receipt")
+        targets = haiku_living_targets(receipt[0])
+        haiku_living_mathbrain_observe(record_get(pending, "mathbrain"), record_get(pending, "mathbrain_state"), spoken, record_get(pending, "rows"), record_get(pending, "counts"), user, quality, targets)
+        if record_get(pending, "train_rae"):
+            haiku_living_rae_observe(record_get(pending, "rae"), record_get(pending, "rae_state"), spoken, user, quality, targets)
+    else:
+        haiku_mathbrain_observe(record_get(pending, "mathbrain"), record_get(pending, "mathbrain_state"), spoken, quality, record_get(pending, "rows"), record_get(pending, "counts"), user)
+        if record_get(pending, "train_rae"):
+            haiku_rae_observe(record_get(pending, "rae"), record_get(pending, "rae_state"), spoken, quality, user)
     record_set(pending, "bridge_event", bridge_event)
     record_set(pending, "turn", turn)
     record_set(pending, "clock", turn)
@@ -64,7 +86,7 @@ def haiku_session_tail(pending, experience, model):
         record_set(pending, "ring_trigrams", record_get(rings, "trigrams"))
         record_set(pending, "ring_coherence", record_get(rings, "coherence"))
         record_set(pending, "ring_admission", record_get(rings, "admission"))
-    if record_get(pending, "version") == 3:
+    if record_get(pending, "version") >= 3:
         if haiku_dream_should(pending, bridge_event):
             haiku_dream_run(pending, spoken, model)
         haiku_journal_append(pending, experience)
@@ -123,6 +145,38 @@ def haiku_session_result_check(state, result, experience, model):
     assert(record_get(completed, "train_rae") == record_get(state, "train_rae"), "Haiku completed tail changed its learner mode")
     assert(text_equal(record_get(completed, "tokenizer_mode"), record_get(state, "tokenizer_mode")), "Haiku completed tail changed its tokenizer mode")
     assert(text_equal(record_get(completed, "tokenizer_identity"), record_get(state, "tokenizer_identity")), "Haiku completed tail changed its tokenizer identity")
+    if record_get(completed, "version") == 4:
+        assert(record_get(completed, "form_started_turn") == record_get(state, "form_started_turn"), "Haiku completed tail changed its form boundary")
+        assert(record_get(completed, "inner_started_turn") == record_get(state, "inner_started_turn"), "Haiku completed tail changed its inner boundary")
+        assert(record_get(completed, "phase4_started_turn") == record_get(state, "phase4_started_turn"), "Haiku completed tail changed its journal boundary")
+        names = haiku_words("meta_history journal_text")
+        field = 0
+        while field < 2:
+            name = list_get(names, field)
+            old = record_get(state, name)
+            new = record_get(completed, name)
+            haiku_living_words_prefix(old, new)
+            field = field + 1
+        names = haiku_words("meta_metrics journal_values")
+        counts = zeros(2)
+        counts[0] = record_get(state, "turn") - record_get(state, "inner_started_turn")
+        counts[1] = record_get(state, "turn") - record_get(state, "phase4_started_turn")
+        widths = [5, 13]
+        field = 0
+        while field < 2:
+            name = list_get(names, field)
+            old = record_get(state, name)
+            new = record_get(completed, name)
+            haiku_living_prefix(old, new, counts[field] * widths[field])
+            field = field + 1
+        expected_form = haiku_living_snapshot(state, record_get(experience, "observation"))
+        haiku_living_equal(record_get(experience, "form_receipt"), expected_form)
+        actual_form = haiku_living_get(completed, record_get(experience, "turn"))
+        haiku_living_equal(actual_form, expected_form)
+        prior_form = record_get(state, "form_values")
+        next_form = record_get(completed, "form_values")
+        prior_count = (record_get(state, "turn") - record_get(state, "form_started_turn")) * 9
+        haiku_living_prefix(prior_form, next_form, prior_count)
     if record_get(completed, "version") >= 2:
         history = record_get(completed, "meta_history")
         assert(text_equal(list_get(history, list_len(history) - 3), record_get(experience, "input")), "Haiku completed tail belongs to another input")

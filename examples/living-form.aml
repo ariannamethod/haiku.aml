@@ -1,0 +1,41 @@
+# Recorded example: both frozen bodies, private organs and changing form.
+# Fixed seeds/day make the encounter sequence reproducible.
+IMPORT "../src/iceberg_session.aml"
+core = haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0)
+record_set(core, "dream_config", [1, 1, 2])
+life = haiku_iceberg_new(core, [1, 1, 2, 1])
+life = haiku_iceberg_enable_janus(life, 20746, 1, 0)
+life = haiku_iceberg_enable_words(life, 0)
+life = haiku_iceberg_enable_symbols(life, 1, 0)
+life = haiku_iceberg_enable_exchange(life, 1, 0)
+life = haiku_iceberg_enable_concepts(life, 2, 0)
+life = haiku_iceberg_enable_form(life, 0)
+body_a = model_try_load("../weights/haiku1.gguf")
+body_b = model_try_load("../weights/haiku2.gguf")
+assert(model_ready(body_a) and model_ready(body_b), "This example records both frozen bodies")
+inputs = list_new()
+list_push(inputs, "rain river water")
+list_push(inputs, "rain river water ocean lake tree forest wood leaf light dark fire music song silence home road wind moon star")
+list_push(inputs, "rain river water")
+i = 0
+while i < list_len(inputs):
+    source = list_get(inputs, i)
+    PRINT text_concat("You: ", source)
+    spoken = haiku_iceberg_turn_at(life, source, 0, body_a, body_b, 1, 20746)
+    core = haiku_iceberg_part(life, "voice")
+    receipt = haiku_living_get(core, i + 1)
+    PRINT text_concat("Form: ", haiku_living_name(receipt[0]))
+    PRINT receipt
+    PRINT "HAiKU:"
+    PRINT spoken
+    PRINT ""
+    checkpoint_save(life, "living-form.state")
+    resumed = checkpoint_load("living-form.state")
+    haiku_iceberg_check(resumed, 0)
+    haiku_iceberg_concepts_audit(resumed, body_a, body_b)
+    assert(record_equal(life, resumed), "Living example lost a leaf on restart")
+    record_replace(life, resumed)
+    i = i + 1
+PRINT "Dreams:"
+PRINT haiku_dream_check(haiku_iceberg_part(life, "voice"))
+PRINT "LIVING_FORM_EXAMPLE_OK"

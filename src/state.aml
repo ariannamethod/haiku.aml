@@ -5,6 +5,7 @@ IMPORT "english_seeds.aml"
 IMPORT "overthinkg.aml"
 IMPORT "dream.aml"
 IMPORT "journal.aml"
+IMPORT "living_state.aml"
 
 def haiku_state_fields(state, names, kind):
     keys = haiku_words(names)
@@ -72,13 +73,19 @@ def haiku_state_bridge(event, turn, clock):
 def haiku_state_check(state, model):
     haiku_state_fields(state, "version", "float")
     version = record_get(state, "version")
-    assert(version == 1 or version == 2 or version == 3, "Haiku state version is unsupported")
+    assert(version == 1 or version == 2 or version == 3 or version == 4, "Haiku state version is unsupported")
     if version == 1:
         assert(list_len(record_keys(state)) == 29, "Haiku state requires exactly twenty-nine fields")
     if version == 2:
         assert(list_len(record_keys(state)) == 36, "Haiku inner state requires exactly thirty-six fields")
     if version == 3:
         assert(list_len(record_keys(state)) == 55, "Haiku dream state requires exactly fifty-five fields")
+    if version == 4:
+        assert(list_len(record_keys(state)) == 58, "Haiku living-form state requires exactly fifty-eight fields")
+        haiku_state_fields(state, "form_policy", "string")
+        haiku_state_fields(state, "form_started_turn", "float")
+        haiku_state_fields(state, "form_values", "array")
+    if version >= 3:
         haiku_state_fields(state, "phase4_started_turn dream_last_turn", "float")
         haiku_state_fields(state, "phase4_prev", "string")
         haiku_state_fields(state, "phase4_log phase4_metric_names phase4_states phase4_edges dream_fragments dream_history journal_text", "list")
@@ -99,6 +106,8 @@ def haiku_state_check(state, model):
         profile = "english-inner-v2"
     if version == 3:
         profile = "english-dream-v3"
+    if version == 4:
+        profile = "english-living-form-v4"
     assert(text_equal(record_get(state, "profile"), profile), "Haiku state profile is unsupported")
     assert(text_equal(record_get(state, "clock_kind"), "turn"), "Haiku state clock kind is unsupported")
     haiku_state_mode(record_get(state, "tokenizer_mode"), record_get(state, "tokenizer_identity"), model)
@@ -120,7 +129,7 @@ def haiku_state_check(state, model):
     vocab = record_get(state, "vocab")
     assert(haiku_gen_check(record_get(state, "rows"), counts, vocab, record_get(state, "syllables")) > 0, "Haiku foreground vocabulary is empty")
     dream_vocab = map_new()
-    if version == 3:
+    if version >= 3:
         dream_vocab = record_get(state, "dream_vocab")
     cursor = 0
     while cursor < list_len(vocab):
@@ -172,9 +181,11 @@ def haiku_state_check(state, model):
     haiku_state_bridge(record_get(state, "bridge_event"), turn, clock)
     if version >= 2:
         haiku_state_inner_check(state)
-    if version == 3:
+    if version >= 3:
         count = haiku_state_phase4_check(state)
         haiku_state_dream_check(state)
+        if version == 4:
+            haiku_living_check(state)
         assert(haiku_journal_check(state) == count, "Haiku journal and bridge histories differ")
     return 1
 
@@ -354,7 +365,7 @@ def haiku_state_enable_inner(state, model):
 # A fresh Phase4 log begins here; dreams never fabricate earlier exchanges.
 def haiku_state_enable_dreams(state, model):
     pending = haiku_state_enable_inner(state, model)
-    if record_get(pending, "version") == 3:
+    if record_get(pending, "version") >= 3:
         return pending
     record_set(pending, "version", 3)
     record_set(pending, "profile", "english-dream-v3")
@@ -381,3 +392,17 @@ def haiku_state_restore(live, path, model):
     checked = haiku_state_load(path, model)
     record_replace(live, checked)
     return 1
+
+# Begin the form history at this completed boundary; earlier poems and draw
+# streams are retained exactly. Original profiles never upgrade implicitly.
+def haiku_state_enable_form(state, model):
+    pending = haiku_state_enable_dreams(state, model)
+    if record_get(pending, "version") == 4:
+        return pending
+    record_set(pending, "version", 4)
+    record_set(pending, "profile", "english-living-form-v4")
+    record_set(pending, "form_policy", "subjectivity-climate-v1")
+    record_set(pending, "form_started_turn", record_get(pending, "turn"))
+    record_set(pending, "form_values", zeros(1))
+    haiku_state_check(pending, model)
+    return pending
