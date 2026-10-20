@@ -9,6 +9,74 @@ commands here, newest first. A major new capability also earns a short README
 update. The module documents hold the complete contracts; measured failures
 belong beside measured successes.
 
+## 2026-10-20 — Credit-weighted immune votes reach the decision
+
+Fable found the missing scalar math in AML. On Haiku
+`b9b03179166f54dc81bce64e7a0dbd11361f6530` with AML
+`9f3cc1b674b9704bc2eab84d0f033913bb7f98c6`, every
+`log(1 + exp(credit))` returned zero: both names reached the scalar parser's
+unknown-function fallback. Normalization then evaluated `0/0` as zero. The
+entire `.3 * consensus` contribution disappeared from the immune decision.
+
+The old memory test repeated the defect in its reference: scalar `tanh(0.3)`
+also returned zero. It accepted attenuation **0.366666675** where the
+independent reference is **0.6579792791182575**. Earlier recorded runs used
+this zero consensus; the old gate did not establish credit-weighted voting.
+
+The runtime correction implements scalar `exp`, `log` and `tanh`, and makes
+unresolved function calls errors. Haiku now checks each weight and the total
+live mass before division. An old AML build stops with a rebuild diagnostic
+instead of returning a verdict with its expert contribution missing. The
+credit bounds, score equation, six decisions and checkpoint schema stay the
+same; subsequent votes from existing histories now include their experts.
+
+`tests/parliament_vote.aml` fixes seven independent reference cases with four
+opposing experts. Changing only credits moves attenuation from **0.1333333333**
+to **0.2417768312** or **0.02488983543**. Reversing credits at the legal
+`+10/-10` endpoints moves **WEAKEN / 0.3307050694** to **FREEZE / 0**.
+Equal endpoint credits test normalization; inactive rows with high credits
+test exclusion. The fixture also checks individual votes and read-only owner
+identity. The existing memory test now stores its independent numeric
+reference, and the C gate rejects a zero-population vote explicitly.
+
+Before adding the production guards, both numerical fixtures failed on the
+old runtime in **interpreter and compiled** execution. After adding the
+guards, that runtime fails at the first nonpositive weight. This records both
+the wrong-answer regression and the runtime capability check.
+
+Dependency pair for this correction:
+
+- AML [PR #46](https://github.com/ariannamethod/ariannamethod.ai/pull/46),
+  `7105cb8c2ea21038f63fa11bbdf308db82241a1d`, tested tree
+  `0b22366c820043196abcbefb966f8fb9f075c259`.
+- NoTorch `e84262669b2e349c6436ed0422028107b3d166b3`, scalar archive built
+  with `BLAS_FLAGS= BLAS_LIBS= X86_SIMD=0 ARM_SIMD=0`.
+
+Merge the AML correction, rebuild `libaml.a` and `runner/aml-notorch`, and
+recompile any existing Haiku executable before using this gate. The ordinary
+interpreted launcher needs the rebuilt runner. NoTorch's code is unchanged by
+this correction.
+
+Proof on Linux x86_64 / GCC 13.3.0 with the dependency pair above:
+
+```sh
+make test-parliament test-parliament-contact test-iceberg AML_ROOT=../aml-verification
+```
+
+All three gates pass on the rebuilt runtime. Credit-vote, life and memory
+fixtures agree between interpreted and compiled execution. Contact checks
+include PEN7 prototypes, exact restart, a later observed reward/Oja update,
+seven refused calls and ten corrupt private states. Iceberg checks include
+weightless and real-model conversation, matching compiled/interpreted output
+and checkpoint bytes, eleven publication refusals, detached ownership,
+failed-save handling and one-time publication. Both GGUF SHA-256 checks pass.
+
+The upstream gate separately passes **550/550** core checks, **877** scalar
+math checks with **39** rejected calls across five execution paths, **1,201**
+expression checks with **48** rejected expressions, and all four compiler
+suites. Independent review recomputed the seven vote references and inspected
+error propagation before publication.
+
 ## 2026-10-15 — The same concept, two personal histories
 
 Merged [#22](https://github.com/ariannamethod/haiku.aml/pull/22),

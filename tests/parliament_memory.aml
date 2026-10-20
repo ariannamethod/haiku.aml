@@ -22,7 +22,9 @@ while i < 6:
     verdict = haiku_parliament_vote(state, signature)
     assert(record_get(verdict, "verdict") == i, "LoRAGrad verdict order differs")
     if i == 1:
-        expected = (0.7 * 0.3 + 0.3 * tanh(0.3) - 0.1) / 0.3
+        # Independent double-precision reference, not another AML math call:
+        # (0.7 * 0.3 + 0.3 * tanh(0.3) - 0.1) / 0.3.
+        expected = 0.6579792791182575
         assert(abs(record_get(verdict, "alpha") - expected) < 0.000001, "Weakening attenuation differs")
     i = i + 1
 

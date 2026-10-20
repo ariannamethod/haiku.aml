@@ -357,10 +357,13 @@ def haiku_parliament_vote(state, signature):
     e = 0
     while e < 16:
         if alive[e] == 1:
+            # Credits are bounded to [-10,10]; softplus must stay positive.
             weight = log(1 + exp(credits[e]))
+            assert(isfinite(weight) and weight > 0, "Parliament credit weight must be finite and positive; rebuild AML with exp/log")
             consensus = consensus + weight * votes[e]
             total = total + weight
         e = e + 1
+    assert(isfinite(total) and total > 0, "Parliament vote has no positive live weight")
     score = 0.7 * delta + 0.3 * consensus / total
     verdict = 5
     alpha = 0

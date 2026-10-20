@@ -16,7 +16,7 @@ mkdir -p "$haiku_work/prefix/lib" "$haiku_work/foreign"
 ln -s "$haiku_lib" "$haiku_work/prefix/lib/libaml.a"
 ln -s "$haiku_bridge" "$haiku_work/prefix/lib/libaml_notorch.a"
 ln -s "$haiku_notorch" "$haiku_work/prefix/lib/libnotorch.a"
-for haiku_case in life memory; do
+for haiku_case in vote life memory; do
     haiku_fixture="$haiku_root/tests/parliament_$haiku_case.aml"
     "$haiku_aml" "$haiku_fixture" > "$haiku_work/interpreted.out"
     AML_PREFIX="$haiku_work/prefix" "$haiku_amlc" "$haiku_fixture" --scalar -o "$haiku_work/check" > "$haiku_work/compile.out" 2> "$haiku_work/compile.err"
