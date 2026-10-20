@@ -1,0 +1,60 @@
+IMPORT "../src/parliament.aml"
+
+# Frozen double-precision references. The reference calculation uses Python's
+# math.tanh / math.log1p / math.exp, outside the AML runtime under test:
+# v = [tanh(0.2*d) for d in [1, -1, 0.5, -0.5]]
+# w = [log1p(exp(c)) for c in credits]
+# score = 0.7*0.2 + 0.3*sum(wi*vi)/sum(w)
+# alpha = max(0, min(1, (score-0.1)/0.3))
+# Changing only credits must change the weighted decision, including a
+# WEAKEN -> FREEZE transition. A zero consensus cannot pass these checks.
+origin = zeros(64)
+boundary = zeros(64)
+origin[0] = 1
+boundary[0] = -1
+state = haiku_parliament_new("credit-vote-fixture", 7, origin, boundary)
+directions = record_get(state, "immune_w")
+i = 0
+while i < 1024:
+    directions[i] = 0
+    i = i + 1
+directions[0] = 1
+directions[64] = -1
+directions[128] = 0.5
+directions[192] = -0.5
+signature = zeros(64)
+signature[0] = 0.2
+signature[1] = 0.9797958971132712
+credits = record_get(state, "credit")
+cases = [0, 0, 0, 0, 2, -2, 0, 0, -2, 2, 0, 0, 10, -10, -10, -10, -10, 10, -10, -10, -10, -10, -10, -10, 10, 10, 10, 10]
+expected_alpha = [0.1333333333333333, 0.241776831236828, 0.0248898354298387, 0.330705069374187, 0, 0.1333333333333333, 0.1333333333333333]
+expected_verdict = [1, 1, 1, 1, 2, 1, 1]
+expected_votes = [0.197375320224904, -0.197375320224904, 0.0996679946249558, -0.0996679946249558]
+case = 0
+while case < 7:
+    i = 0
+    while i < 4:
+        credits[i] = cases[case * 4 + i]
+        i = i + 1
+    before = record_clone(state)
+    decision = haiku_parliament_vote(state, signature)
+    assert(record_equal(before, state), "Reading a weighted vote changed its owner")
+    assert(record_get(decision, "verdict") == expected_verdict[case], "Credit-weighted verdict differs from independent reference")
+    assert(abs(record_get(decision, "alpha") - expected_alpha[case]) < 0.000001, "Credit-weighted attenuation differs from independent reference")
+    votes = record_get(decision, "votes")
+    i = 0
+    while i < 4:
+        assert(abs(votes[i] - expected_votes[i]) < 0.000001, "Expert vote differs from independent reference")
+        i = i + 1
+    # Retired rows carry large, opposing credits and directions. They must
+    # contribute neither a vote nor normalization mass while alive == 0.
+    i = 4
+    while i < 16:
+        credits[i] = 10
+        directions[i * 64] = -1
+        i = i + 1
+    retired = haiku_parliament_vote(state, signature)
+    assert(record_get(retired, "verdict") == expected_verdict[case], "Retired expert changed the verdict")
+    assert(abs(record_get(retired, "alpha") - expected_alpha[case]) < 0.000001, "Retired expert changed attenuation")
+    case = case + 1
+PRINT "HAIKU_PARLIAMENT_CREDIT_VOTE_OK"

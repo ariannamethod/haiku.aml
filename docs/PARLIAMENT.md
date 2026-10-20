@@ -100,6 +100,10 @@ Every live expert votes `tanh(immune_direction · signature)`. Softplus of its
 credit weights that vote. The score is `0.7 * axis + 0.3 * consensus`, where
 the axis is the normalized origin-minus-boundary direction.
 
+Credits stay in `[-10,10]`. Each `log(1 + exp(credit))` weight and the live
+normalization mass must be finite and positive; a failed runtime capability
+or an empty electorate stops the call before a verdict can be returned.
+
 | Code | Verdict | Effect on proposed pressure |
 |---|---|---|
 | 0 | PASS | `alpha=1` at score ≥ .4 |
@@ -189,21 +193,27 @@ or optimizer. DoE and LoRAGrad add no runtime dependency.
 
 ## Executed gates and lineage
 
-Build [AML **5.11 / PR #36**](https://github.com/ariannamethod/ariannamethod.ai/pull/36)
-with [NoTorch PR #168](https://github.com/ariannamethod/notorch/pull/168), then run:
+Build [AML PR #46](https://github.com/ariannamethod/ariannamethod.ai/pull/46)
+with scalar `exp`/`log` support and the NoTorch binding, then run:
 
 ```sh
 make test-parliament
 ```
 
 [`tests/run_parliament.sh`](../tests/run_parliament.sh) compares interpreted
-and compiled scalar output from the life and memory fixtures. The C inspection
+and compiled scalar output from the credit-vote, life and memory fixtures.
+The credit-vote fixture uses independent numerical constants for opposing
+experts, changed credits, the `[-10,10]` endpoints and retired rows. It verifies
+both attenuation and a `WEAKEN` to `FREEZE` transition. The memory fixture's
+attenuation reference is also independent of AML math. The C inspection
 gate checks whole-record ownership and exact checkpoint continuation through a
 later observed witness and Oja update. Coverage includes independent Haiku and
 friend owners, field influence, replay with unchanged RNG, birth, retirement
 and the population floor, six verdicts, smooth neighboring signatures, memory
 deduplication and replacement, unavailable-source rejection, wrong or absent
-witnesses, source-local IDs, duplicate reward and thirteen malformed states.
+witnesses, source-local IDs, duplicate reward, an empty electorate and thirteen
+malformed states. [HAIKULOG](../HAIKULOG.md) pins the verified dependency versions
+and records the zero-weight defect found in the earlier gate.
 
 The independent NoTorch gate covers the numerical equations, overflow and
 alias rejection, concurrent callers, rank coverage, unchanged legacy tape and

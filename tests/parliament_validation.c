@@ -93,6 +93,10 @@ int main(int argc, char **argv) {
     rejected("haiku_parliament_signature(negative, zeros(96), 0)", "features must be nonnegative");
     rejected("haiku_parliament_reward(live, 2, 0, 3, 5, negative)", "features must be nonnegative");
 
+    /* A malformed empty electorate cannot silently become 0/0 == 0. */
+    rejected("empty = record_clone(live)\nrecord_set(empty, \"alive\", zeros(16))\n"
+             "haiku_parliament_vote(empty, origin)", "no positive live weight");
+
     const char *corruptions[] = {
         "record_set(broken, \"extra\", 1)",
         "v = record_get(broken, \"ids\")\nv[1] = v[0]",
