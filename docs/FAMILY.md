@@ -108,17 +108,21 @@ from an unpredictable conjunction of the organism's own metrics and remembered
 encounters. Subjectivity supplies the state-driven form mechanism to examine;
 Brodsky supplies the tercet and rhyme lineage described above.
 
-The experiment will select and record the form together with the actual state
-that produced it, before generating the five candidates. The tercet branch
-carries Brodsky's ABA rhyme and possible ABA → BCB continuation. Each form owns
-its line, syllable and rhyme requirements. RAE, MathBrain and journal validation
-need corresponding shorter-output profiles; their current three-line and
-minimum-word assumptions are part of this port. Generation, candidate
-assessment and the journal carry one chosen form through the complete
-encounter. Continuation after restart must recover the same form, words and
-random-stream position.
-The existing 5–7–5 path supplies the fixed-form comparison. Implementation
-follows the current concept-field work.
+Version 7 now selects and records the form with its actual triggering climate
+before generating five candidates. Subjectivity's dominant/mean resonance reads
+six present/remembered values; previous dissonance contracts it. The four shapes
+are 4, 6/4, 5/7/5 and 7/7/7 syllables. The tercet adapts Brodsky's closing-word
+reservation into strict ABA with distinct A words and a different B rhyme.
+Its 7/7/7 meter is Haiku's extension; Brodsky's source uses 5/7/5. Rhyme currently
+uses English spelling tails. ABA → BCB continuation and phonetic rhyme remain
+future extensions.
+
+MathBrain and recursive RAE now assess and learn from the selected profile,
+including real one-word answers. The experience journal retains its profile,
+constraints and pre-learning features. Restart recovers the same form, words
+and random-stream position. `haiku.aml` supplies the fixed 5–7–5 comparison;
+existing checkpoints change profile only through explicit activation. The
+[engineering log](../HAIKULOG.md) records the formulas, source pins and gates.
 
 All experimental application logic belongs in AML. General text, collections,
 events and storage belong in the language; numerical learning stays in NoTorch.

@@ -1,0 +1,77 @@
+IMPORT "../src/living_form.aml"
+IMPORT "fixtures/generator_support.aml"
+
+rows = list_new()
+counts = map_new()
+vocab = haiku_words("night light day clay stone bone")
+syllables = haiku_syllable_cache(vocab)
+tape = [-1]
+rng = rng_new(575)
+form = 0
+while form < 4:
+    replay = map_clone(rng)
+    first = haiku_living_generate(rows, counts, vocab, syllables, 5, 0.9, rng, tape, form)
+    second = haiku_living_generate(rows, counts, vocab, syllables, 5, 0.9, replay, tape, form)
+    haiku_gen_test_lists(first, second)
+    haiku_gen_test_maps(rng, replay)
+    assert(list_len(first) == 5, "Living candidate batch size differs")
+    i = 0
+    while i < 5:
+        haiku_living_output_check(list_get(first, i), form)
+        i = i + 1
+    before = map_clone(rng)
+    empty = haiku_living_generate(rows, counts, vocab, syllables, 0, 0.9, rng, tape, form)
+    assert(list_len(empty) == 0, "Empty living candidate batch differs")
+    haiku_gen_test_maps(rng, before)
+    form = form + 1
+
+# The haiku branch calls the original implementation and preserves its stream.
+rng = rng_new(73)
+replay = map_clone(rng)
+fixed = haiku_generate_candidates(rows, counts, vocab, syllables, 5, 0.9, rng, tape)
+living = haiku_living_generate(rows, counts, vocab, syllables, 5, 0.9, replay, tape, 2)
+haiku_gen_test_lists(fixed, living)
+haiku_gen_test_maps(rng, replay)
+scripted = zeros(200)
+scripted_copy = zeros(200)
+i = 1
+while i < 200:
+    scripted[i] = 0.37
+    scripted_copy[i] = 0.37
+    i = i + 1
+fixed = haiku_generate_candidates(rows, counts, vocab, syllables, 5, 0.9, rng, scripted)
+living = haiku_living_generate(rows, counts, vocab, syllables, 5, 0.9, replay, scripted_copy, 2)
+haiku_gen_test_lists(fixed, living)
+assert(scripted[0] == scripted_copy[0], "Fixed haiku draw cursor changed")
+
+# First four zero draws reserve night / stone / light before prefix words.
+# The English estimator counts stone as two, so the three prefixes need
+# six, five and six one-syllable words: seventeen more draws, all zero.
+scripted = zeros(22)
+before = map_clone(rng)
+poems = haiku_living_generate(rows, counts, vocab, syllables, 1, 0.9, rng, scripted, 3)
+poem = list_get(poems, 0)
+assert(text_equal(poem, "night night night night night night night\nnight night night night night stone\nnight night night night night night light"), "Tercet did not reserve all endings before filling")
+assert(scripted[0] == 21, "Tercet reservation/fill draw count differs")
+haiku_gen_test_maps(rng, before)
+haiku_living_output_check(poem, 3)
+
+# Two syllable closers reserve their own budget; they cannot be appended to a
+# full seven syllable line. First rhyme group is er: water / later.
+vocab = haiku_words("water later night light")
+syllables = haiku_syllable_cache(vocab)
+scripted = zeros(200)
+poems = haiku_living_generate(rows, counts, vocab, syllables, 2, 0.9, rng, scripted, 3)
+i = 0
+while i < 2:
+    haiku_living_output_check(list_get(poems, i), 3)
+    i = i + 1
+assert(text_equal(haiku_living_rime("stone"), "one"), "Silent e spelling was lost")
+assert(text_equal(haiku_living_rime("stone"), haiku_living_rime("bone")), "Stone/bone rhyme keys differ")
+assert(text_equal(haiku_living_rime("remote"), haiku_living_rime("note")), "Remote/note rhyme keys differ")
+assert(text_equal(haiku_living_rime("remote"), haiku_living_rime("hot")) == 0, "Silent e merged remote with hot")
+assert(text_equal(haiku_living_rime("NIGHT"), "ight"), "Rhyme lowercase differs")
+assert(text_equal(haiku_living_rime("sea"), ""), "One-vowel tail became a rhyme")
+assert(text_equal(haiku_living_rime("cat!"), ""), "Punctuation became a rhyme")
+assert(text_equal(haiku_living_name(0), "fragment") and text_equal(haiku_living_name(3), "tercet"), "Living form names differ")
+PRINT "HAIKU_LIVING_FORM_OK"

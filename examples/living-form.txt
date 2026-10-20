@@ -1,0 +1,24 @@
+You: rain river water
+Form: fragment
+[0, 0.194999993, 0, 0, 0, 0, 0.150000006, 0, 0]
+HAiKU:
+align adjust
+
+You: rain river water ocean lake tree forest wood leaf light dark fire music song silence home road wind moon star
+Form: tercet
+[3, 1, 0, 0.335999995, 0.399999976, 0.307692319, 1, 0, 0.150000006]
+HAiKU:
+real actual solid fire think
+look come salty fire find five
+he you here sour sound shrink
+
+You: rain river water
+Form: couplet
+[1, 0.677010536, 0.335999995, 0.695749998, 0.785714269, 0.899999976, 0.699999988, 0.399999976, 1]
+HAiKU:
+demonstrate reveal
+behind retreat
+
+Dreams:
+1
+LIVING_FORM_EXAMPLE_OK

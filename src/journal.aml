@@ -2,6 +2,13 @@
 # Python harmonix.py/chat.py at abb878c52d763b73e5ad7a4d6a68a9ea7a248a39.
 IMPORT "phase4.aml"
 IMPORT "rae.aml"
+IMPORT "living_state.aml"
+
+# The journal also accepts its original partial owner in standalone callers.
+def haiku_journal_living(state):
+    if record_has(state, "version") == 0:
+        return 0
+    return record_get(state, "version") == 4
 
 # Inverse of AML list_key for bounded trigram contexts. Prefixes count UTF-8
 # bytes; text_slice counts codepoints. Binary search retains each exact token.
@@ -62,8 +69,17 @@ def haiku_journal_capture(state, source, spoken, user, system, temperatures, tur
     assert(len(temperatures) == 2, "Haiku journal needs two temperatures")
     assert(isfinite(temperatures[0]) and temperatures[0] >= 0.3 and temperatures[0] <= 1.5, "Haiku journal voice temperature is invalid")
     assert(temperatures[1] == 0.3, "Haiku journal observer temperature is invalid")
-    learned = haiku_mathbrain_features(spoken, record_get(state, "rows"), record_get(state, "counts"), user)
-    selected = haiku_rae_features(spoken, user)
+    learned = zeros(5)
+    selected = zeros(5)
+    if haiku_journal_living(state):
+        observation = haiku_observe_trigrams(user, system)
+        receipt = haiku_living_snapshot(state, observation)
+        targets = haiku_living_targets(receipt[0])
+        learned = haiku_living_mathbrain_features(spoken, record_get(state, "rows"), record_get(state, "counts"), user, targets)
+        selected = haiku_living_rae_features(spoken, user, targets)
+    else:
+        learned = haiku_mathbrain_features(spoken, record_get(state, "rows"), record_get(state, "counts"), user)
+        selected = haiku_rae_features(spoken, user)
     values = zeros(13)
     values[0] = temperatures[0]
     values[1] = temperatures[1]
@@ -178,6 +194,13 @@ def haiku_journal_get(state, index):
     record_set(result, "mathbrain_features", learned)
     record_set(result, "rae_features", selected)
     record_set(result, "metrics", metrics)
+    if haiku_journal_living(state):
+        if turn > record_get(state, "form_started_turn"):
+            receipt = haiku_living_get(state, turn)
+            record_set(result, "version", 2)
+            record_set(result, "form_receipt", receipt)
+            record_set(result, "form", haiku_living_name(receipt[0]))
+            record_set(result, "form_targets", haiku_living_targets(receipt[0]))
     return result
 
 # Shapes, exact context framing, frozen numerical domains and history alignment.
@@ -216,6 +239,20 @@ def haiku_journal_check(state):
             offset = offset + 1
         assert(values[slot + 8] == 0.5, "Haiku journal RAE perplexity feature differs")
         assert(text_len(record_get(item, "input")) <= 10000 and text_len(record_get(item, "output")) <= 10000, "Haiku journal text exceeds its bound")
+        if record_get(item, "version") == 2:
+            spoken = record_get(item, "output")
+            user = record_get(item, "user_trigrams")
+            targets = record_get(item, "form_targets")
+            selected = haiku_living_rae_features(spoken, user, targets)
+            # Transition strength was frozen before learning and dream feedback.
+            # The other four features depend only on retained words and targets.
+            learned = haiku_living_mathbrain_features(spoken, list_new(), map_new(), user, targets)
+            offset = 0
+            while offset < 5:
+                assert(values[slot + 8 + offset] == selected[offset], "Haiku journal RAE features differ from its form")
+                if offset > 0:
+                    assert(values[slot + 3 + offset] == learned[offset], "Haiku journal word features differ from its form")
+                offset = offset + 1
         cursor = cursor + 1
     if count > 0:
         assert(previous_cloud == map_len(record_get(state, "weights")), "Haiku latest journal cloud count differs")

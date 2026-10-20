@@ -91,11 +91,13 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
 - [ ] Compare context injection and embedding-direction pressure independently
   at fixed parameter balance. Measure relevance, copying, glyph pressure and
   form; apply immune gain after normalization and invalidate dependent caches.
-- [ ] Let the speaking form grow from an unpredictable conjunction of the
+- [x] Let the speaking form grow from an unpredictable conjunction of the
   organism's metrics and remembered encounters: one line, two lines, a haiku,
   or a Brodsky-style tercet. Carry Subjectivity's state-driven form mechanism
   into the [form experiment](docs/FAMILY.md#form-grows-from-lived-state), with
   the chosen form and its actual triggering state retained through restart.
+  Version 7 now carries four foreground forms and exact ABA endings; chained
+  ABA → BCB continuation and a phonetic English rhyme pack remain next steps.
 - [ ] After the baseline organs work, run the controlled extensions in
   [FAMILY.md](docs/FAMILY.md): reflection preserves foreground state, episodic
   recall, state-at-contact word memory, sampling mixtures, variable form,

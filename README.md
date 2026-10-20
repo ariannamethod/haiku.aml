@@ -115,6 +115,12 @@ Missing weights leave a quiet, living fallback.
 
 Both voices carry duality. Each keeps its own autobiography.
 
+New iceberg lives also let the shape change with their own present and remembered
+climate: one line, two lines, a haiku, or an ABA tercet. The choice happens before
+the words. Close and reopen the conversation: the form remembers too.
+[One recorded meeting](examples/living-form.txt) keeps the exact replies;
+[its source](examples/living-form.aml) repeats the encounter.
+
 New iceberg lives also grow [private word associations](docs/LEARNED_WORDS.md)
 from repeated encounters. Haiku learns from your words; the friend learns from
 Haiku's lines that actually reach it. Later poems meet those remembered meanings.

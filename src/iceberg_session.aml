@@ -267,11 +267,11 @@ def haiku_iceberg_check(life, tokenizer):
     haiku_state_fields(life, "settings admission_values", "array")
     haiku_state_fields(life, "admission_text", "list")
     version = record_get(life, "version")
-    assert(text_equal(record_get(life, "format"), "haiku-iceberg") and (version == 1 or version == 2 or version == 3 or version == 4 or version == 5 or version == 6), "Haiku iceberg format is unsupported")
+    assert(text_equal(record_get(life, "format"), "haiku-iceberg") and (version == 1 or version == 2 or version == 3 or version == 4 or version == 5 or version == 6 or version == 7), "Haiku iceberg format is unsupported")
     haiku_iceberg_settings(record_get(life, "settings"))
     core = haiku_iceberg_part(life, "voice")
     haiku_state_check(core, tokenizer)
-    assert(record_get(core, "version") == 3, "Haiku iceberg voice must retain its dream life")
+    assert(record_get(core, "version") == 3 + (version == 7), "Haiku iceberg voice profile differs")
     haiku_lexical = haiku_iceberg_part(life, "haiku_lexical")
     friend_lexical = haiku_iceberg_part(life, "friend_lexical")
     haiku_contact = haiku_iceberg_part(life, "haiku_contact")
@@ -1116,3 +1116,17 @@ def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, bo
                     cursor = cursor + 1
         index = index + 1
     return completed
+
+# Explicit activation after the concept profile. Both private contact lives and
+# immutable bodies retain their histories; only the speaking voice is upgraded.
+def haiku_iceberg_enable_form(life, tokenizer):
+    haiku_iceberg_check(life, tokenizer)
+    assert(record_get(life, "version") >= 6, "Haiku form requires the complete concept life")
+    result = record_clone(life)
+    if record_get(result, "version") == 7:
+        return result
+    core = haiku_state_enable_form(haiku_iceberg_part(result, "voice"), tokenizer)
+    haiku_iceberg_put(result, "voice", core)
+    record_set(result, "version", 7)
+    haiku_iceberg_check(result, tokenizer)
+    return result

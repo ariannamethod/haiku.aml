@@ -9,6 +9,105 @@ commands here, newest first. A major new capability also earns a short README
 update. The module documents hold the complete contracts; measured failures
 belong beside measured successes.
 
+## 2026-10-20 — Form grows from the remembered climate
+
+The merged scalar-math correction is now the runtime beneath this experiment:
+AML `a97abc557730737a6762faf19a4876cc584c1006`, NoTorch
+`e84262669b2e349c6436ed0422028107b3d166b3` (scalar), Haiku base
+`51fb82f4854522b9580178169e3bb8c00506fb36`. No dependency code or weights change.
+
+The foreground chooses once, **before its five candidates**. Subjectivity
+`221157935d84d5037768f34c4661b11ca6865f91`, `subjectivity.c:602–608,745–787`,
+supplies `clamp(.55 * dominant + .9 * (dominant - mean), 0, 1)` and contraction
+by `1 - .4 * tanh(pressure)`. Haiku's six chambers are current dissonance,
+novelty, `arousal/(1+arousal)`, entropy, and the previous encounter's novelty
+and entropy. Pressure is previous dissonance; an absent previous encounter
+contributes zeros. All values come from the owned climate history. The chooser
+consumes no draw; subsequent word sampling uses the existing owned voice stream.
+
+| Contracted resonance | Form | Syllables | Endings |
+|---|---|---|---|
+| `< .34` | fragment | 4 | free |
+| `.34` to `< .66` | haiku | 5/7/5 | free |
+| `.66` to `< .82` | couplet | 6/4 | free |
+| `>= .82` | tercet | 7/7/7 | distinct A words, matching rhyme key; different B key |
+
+The four-shape thresholds and climate mapping are Haiku's adaptation.
+Brodsky `501d617d5da8f9f00ff194ce6765d6749647bda8`,
+`brodsky.c:2728–2850`, supplies closing-word reservation. The tercet selects
+all three endings before filling the prefixes and subtracts each ending's
+syllables from that line's budget. Brodsky's source meter is 5/7/5; this branch
+uses 7/7/7. English rhyme keys are lowercase spelling tails from the final
+vowel, locating it before a final consonant-following e while retaining that e
+in the key. A live-model probe caught `remote`/`hot` being conflated; the corrected
+keys separate them while retaining `remote`/`note` and `stone`/`bone`. Missing rhyme groups or
+unreachable budgets fail before any draw. The present contract is one ABA
+tercet; ABA → BCB continuation and phonetic rhyme data remain future work.
+
+`src/living_form.aml` owns generation and emitted-form checks.
+`src/living_features.aml` keeps both five-dimensional learners and their
+original recursive selection. Short speech has actual zero trigram evidence
+when it contains fewer than three words, syllable normalization uses the
+chosen budget, and coherence uses the actual line count. A valid one-word
+utterance now receives one MathBrain update. Five/seven/five retains the
+original generator, draw order, features and learner updates exactly.
+
+The core's explicit v4 upgrade adds three fields to the v3 dream life:
+`form_policy`, `form_started_turn`, `form_values`. Each completed decision
+stores nine values: form, contracted resonance, pressure and six chambers.
+Every load recomputes decisions from canonical present/previous MetaHaiku
+climates and checks the actual emitted words. Adaptive journal experiences
+are version 2 and expose the receipt, form name and syllable targets. Frozen
+RAE and word-derived MathBrain features are also checked against those words;
+transition strength remains the pre-learning snapshot.
+
+Iceberg v7 contains **268 fields**, including its 58-field speaking core.
+New complete iceberg lives enable it; existing saved profiles retain their
+behavior until `upgrade_form=1`. Direct activation is
+`haiku_iceberg_enable_form(life, tokenizer)` after the v6 concept upgrade.
+`living_form=0` starts a new fixed-form v6 control. Activation preserves old
+turns and both random streams. Inner reflection and dream-generated voices
+retain their existing three-line contracts. The actual variable foreground
+is still the dream's opening and enters the same owned encounter history.
+
+Publication checks the frozen receipt, recomputed decision and all prior
+words, climates and learning history, including their float32 bits. Review
+caught and reproduced an older same-shape word substitution and a `+0` to
+`-0` substitution; the new profile rejects both. Review also caught a
+regression in the standalone partial journal owner; that original API is
+preserved. The old unsupported-version fixture now uses version 5 because
+version 4 has an implemented schema.
+
+Verification commands:
+
+```sh
+make test-living-form test-living-features test-living-session AML_ROOT=../ariannamethod.ai
+make test-generator test-mathbrain test-rae test-state test-inner test-dream-life \
+  test-owned-tail test-iceberg test-iceberg-concepts AML_ROOT=../ariannamethod.ai
+../ariannamethod.ai/runner/aml-notorch examples/living-form.aml
+```
+
+The two unit gates compare interpreter and compiled execution. Generation
+covers all four forms, exact legacy output/RNG/tape parity, reserved ending
+order, multi-syllable closers and 16 rejected operations with unchanged owners.
+A mutation removing reserved syllables fails the gate. Features cover actual
+one/two-word outputs, independent loss/update values, recursive depths 0–5,
+all 57 learner parameters and 14 rejected operations with unchanged owners.
+The integration fixture covers independent selector references and threshold
+sides, all four forms from real first encounters, serial/worker equality,
+explicit upgrade after a legacy turn, actual dreams and restart. Its eight
+checkpoints are compared byte for byte between interpreter and compiled runs.
+The publication host tests 14 rejected completions/state operations.
+
+The [recorded three-turn meeting](examples/living-form.txt), reproduced by
+[its AML source](examples/living-form.aml), loads both actual frozen PEN7 files,
+uses seeds 575/57 and fixed day 20746, and saves/loads the complete life after
+every turn. It speaks fragment → tercet → couplet and opens one actual dream.
+The corrected tercet reserves `think` / `five` / `shrink`. Both source GGUF
+SHA-256 values are unchanged after the run. Form receipts remain attached to
+the exact printed replies; quiet missing-body operation is covered separately
+by the full v7 integration fixture.
+
 ## 2026-10-20 — Credit-weighted immune votes reach the decision
 
 Fable found the missing scalar math in AML. On Haiku
