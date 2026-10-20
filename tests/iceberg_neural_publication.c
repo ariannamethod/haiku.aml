@@ -89,6 +89,15 @@ int main(int argc, char **argv) {
     saved_bytes = read_file(saved_path, &saved_size);
     unchanged(owner_before, "neural worker published before validation");
 
+    /* A well-shaped voice can still be forged independently of its spoken
+       experience. Replaying its entire tail must reject every changed leaf. */
+    reject_publish("record_set(result, \"life:voice:voice_rng\", rng_new(123))\n" CHECK_LIFE,
+                   "neural voice completion differs from its witnessed transition");
+    reject_publish("values = record_get(result, \"life:voice:mathbrain\")\nvalues[0] = values[0] + 0.001\n" CHECK_LIFE,
+                   "neural voice completion differs from its witnessed transition");
+    reject_publish("record_set(result, \"life:voice:model_rng\", rng_new(321))\n" CHECK_LIFE,
+                   "neural voice completion differs from its witnessed transition");
+
     /* These changed proofs still pass their closed structural validator. The
        full publisher independently regenerates their actual endpoint scores,
        frozen prior counts and query inputs from the predecessor and sources. */
