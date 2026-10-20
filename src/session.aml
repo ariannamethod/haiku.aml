@@ -155,9 +155,7 @@ def haiku_session_result_check(state, result, experience, model):
             name = list_get(names, field)
             old = record_get(state, name)
             new = record_get(completed, name)
-            assert(list_len(new) >= list_len(old), "Haiku completed tail lost earlier words")
-            prefix = list_slice(new, 0, list_len(old))
-            assert(text_equal(list_key(old), list_key(prefix)), "Haiku completed tail changed earlier words")
+            haiku_living_words_prefix(old, new)
             field = field + 1
         names = haiku_words("meta_metrics journal_values")
         counts = zeros(2)

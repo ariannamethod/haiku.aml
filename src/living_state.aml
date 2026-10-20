@@ -93,6 +93,17 @@ def haiku_living_prefix(old, new, count):
     assert(record_equal(left, right), "Haiku completed tail changed earlier climate or learning")
     return 1
 
+# Histories can exceed the runtime's one-string limit. Compare list leaves
+# directly instead of encoding a whole conversation into one composite key.
+def haiku_living_words_prefix(old, new):
+    assert(list_len(new) >= list_len(old), "Haiku completed tail lost earlier words")
+    left = record_new()
+    right = record_new()
+    record_set(left, "words", old)
+    record_set(right, "words", list_slice(new, 0, list_len(old)))
+    assert(record_equal(left, right), "Haiku completed tail changed earlier words")
+    return 1
+
 def haiku_living_get(state, turn):
     start = record_get(state, "form_started_turn")
     assert(turn > start and turn <= record_get(state, "turn") and turn == floor(turn), "Haiku form turn is outside its history")

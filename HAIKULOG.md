@@ -77,11 +77,15 @@ caught and reproduced an older same-shape word substitution and a `+0` to
 regression in the standalone partial journal owner; that original API is
 preserved. The old unsupported-version fixture now uses version 5 because
 version 4 has an implemented schema.
+A final capacity check found that encoding the entire old word history with
+`list_key` would hit AML's 1 MiB string bound. Publication now compares list
+leaves directly; the focused history gate covers a larger valid history and
+a changed final word, alongside the original encoding failure as a control.
 
 Verification commands:
 
 ```sh
-make test-living-form test-living-features test-living-session AML_ROOT=../ariannamethod.ai
+make test-living-form test-living-features test-living-history test-living-session AML_ROOT=../ariannamethod.ai
 make test-generator test-mathbrain test-rae test-state test-inner test-dream-life \
   test-owned-tail test-iceberg test-iceberg-concepts AML_ROOT=../ariannamethod.ai
 ../ariannamethod.ai/runner/aml-notorch examples/living-form.aml
