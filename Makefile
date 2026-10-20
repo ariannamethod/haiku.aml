@@ -8,6 +8,15 @@ NOTORCH_ROOT ?= ../notorch
 NOTORCH_LIB ?= $(NOTORCH_ROOT)/libnotorch.a
 
 .PHONY: test test-numerical test-text test-lexical test-cloud test-form test-generator test-mathbrain test-rae test-tokenizer test-tokenizer-setup test-foreground test-state
+.PHONY: test-background-pending test-background-cli test-iceberg-background
+
+test: test-background-pending test-background-cli test-iceberg-background
+
+test-background-cli:
+	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" HAIKU_AML_BRIDGE_LIB="$(abspath $(AML_BRIDGE_LIB))" HAIKU_NOTORCH_LIB="$(abspath $(NOTORCH_LIB))" python3 tests/background_cli.py
+
+test-background-pending test-iceberg-background:
+	@HAIKU_AML="$(abspath $(AML))" HAIKU_AMLC="$(abspath $(AMLC))" HAIKU_AML_LIB="$(abspath $(AML_LIB))" HAIKU_AML_BRIDGE_LIB="$(abspath $(AML_BRIDGE_LIB))" HAIKU_NOTORCH_LIB="$(abspath $(NOTORCH_LIB))" bash tests/run_$(subst -,_,$(@:test-%=%)).sh
 .PHONY: test-inner test-metahaiku test-overthinkg test-inner-state test-inner-cli
 .PHONY: test-dream-life test-phase4 test-dream test-journal test-dream-state test-dream-cli
 .PHONY: test-owned-tail test-parliament test-lexical-sources test-parliament-contact test-iceberg test-janus-balance test-iceberg-janus

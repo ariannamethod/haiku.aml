@@ -1,0 +1,63 @@
+# A spoken foreground can leave one durable exchange for its owned inner life.
+# The root entrypoint owns file paths and the save/spawn/join publication order.
+IMPORT "session.aml"
+
+def haiku_background_put(envelope, name, part):
+    keys = record_keys(part)
+    record_set(envelope, text_concat(name, ":keys"), keys)
+    cursor = 0
+    while cursor < list_len(keys):
+        key = list_get(keys, cursor)
+        record_set(envelope, text_concat(text_concat(name, ":"), key), record_get(part, key))
+        cursor = cursor + 1
+    return list_len(keys) + 1
+
+# Every extracted owner is detached before a worker or replay can change it.
+def haiku_background_part(envelope, name):
+    keys = record_get(envelope, text_concat(name, ":keys"))
+    result = record_new()
+    cursor = 0
+    while cursor < list_len(keys):
+        key = list_get(keys, cursor)
+        assert(record_has(result, key) == 0, "Haiku background namespace repeats a field")
+        record_set(result, key, record_get(envelope, text_concat(text_concat(name, ":"), key)))
+        cursor = cursor + 1
+    return record_clone(result)
+
+# Keep both the complete predecessor and the exact prepared candidate. The
+# foreground consumes its ordinary owned draws once; recovery checks those
+# draws against the predecessor instead of drawing a replacement response.
+def haiku_background_prepare(state, source, tokenizer):
+    prepared = record_clone(state)
+    experience = haiku_session_prepare(prepared, source, tokenizer)
+    job = record_new()
+    record_set(job, "format", "haiku-background-pending")
+    record_set(job, "version", 1)
+    haiku_background_put(job, "base", state)
+    haiku_background_put(job, "voice", prepared)
+    haiku_background_put(job, "experience", experience)
+    return job
+
+# Rebuilding the whole closed envelope checks source, response, every frozen
+# feature, every prepared voice leaf, field ordering and owned random state.
+def haiku_background_check(job, tokenizer):
+    haiku_state_fields(job, "format", "string")
+    haiku_state_fields(job, "version", "float")
+    assert(text_equal(record_get(job, "format"), "haiku-background-pending"), "Haiku background pending format differs")
+    assert(record_get(job, "version") == 1, "Haiku background pending version differs")
+    base = haiku_background_part(job, "base")
+    experience = haiku_background_part(job, "experience")
+    expected = haiku_background_prepare(base, record_get(experience, "input"), tokenizer)
+    assert(record_equal(expected, job), "Haiku background pending differs from its exact foreground")
+    return 1
+
+# The worker and recovery both build the same ordinary tail. The saved job and
+# its complete predecessor remain untouched until the caller publishes this
+# returned complete life with one atomic checkpoint replacement.
+def haiku_background_finish(job, tokenizer):
+    haiku_background_check(job, tokenizer)
+    base = haiku_background_part(job, "base")
+    prepared = haiku_background_part(job, "voice")
+    experience = haiku_background_part(job, "experience")
+    result = haiku_session_tail(prepared, experience, tokenizer)
+    return haiku_session_result_check(base, result, experience, tokenizer)

@@ -9,6 +9,59 @@ commands here, newest first. A major new capability also earns a short README
 update. The module documents hold the complete contracts; measured failures
 belong beside measured successes.
 
+## 2026-10-20 — The cloud continues while you write
+
+From merged `896cf2f80ca79caafca5e03a2a18dad4b24a0050`, both launchers now
+default to `background_life=1`. The foreground saves its complete predecessor,
+prepared voice and frozen experience before displaying the response. Iceberg
+also retains its request and captured day. An owned worker completes learning,
+reflection, rings, dreams and deeper contacts, runs the existing validation and
+atomically saves the completed life while main reads input. Main joins and
+adopts exactly that saved state before processing the next input, quit or EOF.
+
+The temporary pending envelope occupies the same state path. Recovery checks
+every prepared foreground leaf and finishes its original exchange before any
+requested upgrade; it adds no new response or teaching event. A source absent
+at acceptance remains absent for that exchange if it later appears. A ready
+source must retain its identity. Save status 2 remains a committed replacement.
+`background_life=0` retains the joined control; complete checkpoint schemas and
+the Python voice keep their existing order and random streams.
+
+The four stable profiles pass serial/worker/recovery comparisons in interpreter
+and compiled execution, with eight byte-identical checkpoint files and eight
+rejected pending mutations. The two actual PEN7 bodies carry the retained third
+turn through `the stream flows`, day 20747, to the exact saved fourth-turn bytes
+in both execution paths; nine provider/request/foreground mutations are refused.
+An 18-turn foreground run also matches serial/background/compiled replies and
+complete checkpoint bytes, exercising reuse beyond sixteen worker slots.
+Native SentencePiece recovery also matches the sequential second turn byte for
+byte in interpreter and compiled execution, including launch from another
+directory with the saved tokenizer overriding the launcher's regex default.
+
+The actual CLI gates use a test-only pthread barrier and filesystem faults:
+the response is already visible while its worker is held; after release the
+checkpoint completes with stdin idle. Next input, quit and EOF drain in order.
+Process termination, worker failure and failed completed save preserve a pending
+exchange that recovers to the sequential bytes; failed pending save withholds
+the response. Refused worker launch also retains pending; termination after
+completed rename and before join resumes the committed turn once. Final process
+checks use native temporary directories and recheck earlier files after later
+cases. Earlier workspace artifacts returned older contents with new inodes and
+no matching traced write, including serial controls; the final byte comparisons
+come from fresh temporary-directory runs. The gates caught an absent-provider
+mask that used numeric zero instead of an immutable absent handle.
+
+One warm compiled Iceberg v8 sample, using regex and absent model files, showed
+the full reply 2.003175 seconds after input at the ready prompt, while the worker
+remained held behind the test barrier. Startup is excluded from that sample.
+
+AML remains `a97abc557730737a6762faf19a4876cc584c1006`, scalar NoTorch
+`e84262669b2e349c6436ed0422028107b3d166b3`; both GGUF hashes remain unchanged.
+Reproduction uses `make test-background-pending test-background-cli test-iceberg-background AML_ROOT=../ariannamethod.ai`.
+The real-model runner
+also accepts an existing predecessor/reference pair through `HAIKU_BG_BASE`,
+`HAIKU_BG_EXPECTED`, `HAIKU_BG_SOURCE` and `HAIKU_BG_DAY`.
+
 ## 2026-10-20 — Audit repairs evidence and the completed voice
 
 Audit of merged `a30992f2fee5fa8396b6ef3191a7c34a58fdd23a` reproduced

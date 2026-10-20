@@ -16,17 +16,22 @@ tokenizer mode, `train_rae`, and profile; fresh settings and seeds apply only to
 a new life. Set `state_path = ""` for an unsaved session. Each path has one running
 writer; concurrent writers require a later ownership protocol.
 
-The CLI clones the live record, completes an exchange in that candidate, and
-saves it. AML writes a temporary sibling, syncs it, atomically replaces the old
-file, and syncs the directory. Only then does the CLI swap the candidate into
-the live owner and print Haiku's response. A failure before file replacement
-leaves the live owner and previous checkpoint intact. Save status `2` means the
-replacement committed but directory durability could not be confirmed; the CLI
-publishes that committed state and reports this status. The final record swap
-allocates nothing.
+The default CLI first saves a pending envelope with the complete predecessor,
+prepared foreground and frozen response, then displays that response. Its worker
+completes and validates the inner life and replaces the pending file atomically.
+Main joins and adopts that state before processing another input, quit or EOF.
+Restart completes a pending exchange once from its retained foreground. The
+[background contract](ASYNC.md#the-current-publication-rhythm) defines ownership.
 
-Blank input, quit, EOF, rejected input, and failed staged learning leave the
-published owner unchanged. Resumption loads a detached record, verifies every
+`background_life=0` retains the earlier complete/save/swap/display boundary.
+AML writes a temporary sibling, syncs it, atomically replaces the old file and
+syncs the directory. Failure before the pending save withholds the reply;
+failure before the worker's completed save preserves the pending exchange.
+Save status `2` means replacement committed but directory durability could not
+be confirmed. The final foreground record swap allocates nothing.
+
+Blank input, quit and EOF drain an already accepted exchange before returning.
+They add no new exchange. Resumption loads a detached record, verifies every
 field and cross-organ relation, then publishes it. Restoration replaces the
 whole owner; it never adds seeds or replays learned text. Restoring the same
 checkpoint twice is idempotent.

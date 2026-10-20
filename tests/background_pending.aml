@@ -1,0 +1,50 @@
+# Complete foreground/inner/dream/living profiles share one durable job shape.
+# The runner supplies background_prefix for its isolated checkpoint files.
+IMPORT "../src/background.aml"
+profile = 1
+while profile <= 4:
+    state = haiku_state_new("regex", 0, 1, 575, 57)
+    if profile >= 2:
+        state = haiku_state_enable_inner(state, 0)
+    if profile >= 3:
+        state = haiku_state_enable_dreams(state, 0)
+        record_set(state, "dream_config", [1, 1, 2])
+    if profile == 4:
+        state = haiku_state_enable_form(state, 0)
+    original = record_clone(state)
+    expected = record_clone(state)
+    source = "memory"
+    spoken = haiku_session_turn(expected, source, 0)
+    job = haiku_background_prepare(state, source, 0)
+    sealed = record_clone(job)
+    assert(record_equal(state, original), "Preparing pending work changed its predecessor")
+    assert(haiku_background_check(job, 0), "The genuine pending foreground was refused")
+    experience = haiku_background_part(job, "experience")
+    assert(text_equal(record_get(experience, "output"), spoken), "Pending work changed the foreground response")
+    path = text_concat(text_concat(background_prefix, text_fixed(profile, 0)), ".pending")
+    checkpoint_save(job, path)
+    restored = checkpoint_load(path)
+    assert(record_equal(job, restored), "Pending checkpoint changed exact foreground ownership")
+    completed = haiku_background_finish(restored, 0)
+    assert(record_equal(completed, expected), "Recovery changed the sequential complete life")
+    assert(record_equal(restored, sealed), "Completing work changed the durable pending owner")
+    # Launch-time snapshots remain independent while a worker is held back.
+    CHANNEL CREATE background_release 1
+    SPAWN pending_tail:
+        CHANNEL READ background_release release
+        return haiku_background_finish(job, 0)
+    record_set(job, "experience:quality", 0)
+    CHANNEL WRITE background_release 1
+    AWAIT pending_tail INTO parallel
+    CHANNEL CLOSE background_release
+    assert(record_equal(parallel, expected), "Parent mutation changed its launched background snapshot")
+    assert(record_equal(state, original), "Worker completion replaced its predecessor before publication")
+    base = haiku_background_part(sealed, "base")
+    map_set(record_get(base, "weights"), "the", 0)
+    assert(record_equal(restored, sealed), "Extracted pending leaves alias the checkpoint")
+    path = text_concat(text_concat(background_prefix, text_fixed(profile, 0)), ".complete")
+    checkpoint_save(completed, path)
+    if profile >= 3:
+        assert(haiku_dream_check(completed) == 1, "Background profile did not complete its actual dream")
+    profile = profile + 1
+PRINT "HAIKU_BACKGROUND_PENDING_OK"

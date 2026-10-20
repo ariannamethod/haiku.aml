@@ -23,9 +23,10 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   display; preserve serial output and checkpoint bytes under controlled
   schedules. Quit/EOF has no outstanding turn in this profile. See
   [ASYNC](docs/ASYNC.md).
-- [ ] Add early response display and overlap the next input with the owned
-  tail. First persist a pending experience, then implement exact restart replay,
-  next-input/quit/EOF drain and single publication of the completed job.
+- [x] Add early response display and overlap reading the next input with the
+  owned tail. Persist the exact pending foreground before display; let the
+  worker validate and save the complete life while input waits. Recover the
+  pending exchange exactly; drain before next-input processing, quit and EOF.
 
 ## Family experiments
 

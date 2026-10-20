@@ -3,10 +3,13 @@
 2026-10-14. Governed by the
 [Arianna Method Manifesto](../ARIANNA_METHOD_MANIFESTO.md).
 
-The current organism carries the complete learning and inner-life tail through
-an owned AML worker. One completed exchange crosses the publication boundary:
-**join → validate → save → swap → display**. The next input waits for that
-boundary. The worker preserves Python's event order, including Phase4 and dreams.
+Both launchers now persist the accepted foreground, display its reply and run
+the complete learning and inner-life tail in an owned worker. The worker
+validates and atomically saves the complete life while the foreground reads
+input. Before processing that input, quit or EOF, the foreground joins and
+adopts the saved result. Python's inner event order, including Phase4 and dreams,
+is preserved. `background_life=0` retains the earlier join-before-display path
+described below; `owned_tail=0` selects its sequential control.
 
 ## The Python path
 
@@ -112,7 +115,8 @@ and checkpoint together and withholds the response. Native checkpoint status 2
 means replacement succeeded but storage could not confirm durability; the CLI
 publishes that written state and reports the status. See [STATE](STATE.md).
 
-`owned_tail = 1` is the default. Set it to `0` for serial scheduling. This
+With `background_life=0`, `owned_tail = 1` selects the earlier joined worker.
+Set `owned_tail` to `0` for serial scheduling. This
 setting changes scheduling without changing stable v1/v2/v3 checkpoint schemas
 or their draw order. Each accepted turn is joined before display or the next
 input. Blank input, quit and EOF therefore have no outstanding turn to drain in
@@ -173,21 +177,24 @@ The language's own worker gates cover repeated jobs, typed result kinds,
 nested ownership, scope, imported source origins, shutdown, channels and
 allocation/thread-launch failures. These complement the actual Haiku schedule.
 
-## The next publication rhythm
+## The current publication rhythm
 
-Early response display, reading the next input while the tail runs, and durable
-pending intent remain [TODO](../TODO.md). Before displaying a response early,
-persist the previous complete state plus accepted input, selected response and
-base revision. Restart must replay that detached experience, check the same
-response, complete its tail and publish once. Learning and dream feedback stay
-outside the live owner until that boundary.
+`src/background.aml` and `src/iceberg_background.aml` retain the exact complete
+predecessor, prepared voice and frozen experience; iceberg also retains the
+captured day and model request. Their closed pending envelope temporarily
+occupies the same checkpoint path. The complete-life schemas stay unchanged.
+Replay checks the whole prepared foreground before continuing the ordinary tail.
 
-That profile needs explicit next-input, quit and EOF drain behavior. Its gates
-must vary worker completion around input arrival, restart from a pending intent,
-and fail launch, execution or saving while preserving the last complete state
-and the pending experience. Optional future model sources also need retained
-provider results so an accepted event can finish after an asset disappears.
+The root launcher saves pending before display. From SPAWN until AWAIT, the
+worker alone can replace that file: it computes, validates and saves completed
+state before returning its owned result. Main reads input during that interval
+and joins before any subsequent action. Saving fails before rename with the
+pending exchange still available; status 2 means the replacement committed.
+Startup finishes a pending exchange before applying requested upgrades, without
+printing or teaching its accepted response again.
 
-The current profile has a complete-turn checkpoint and no pending-intent file.
-It establishes the owned worker and deterministic publication needed for this
-next rhythm.
+Iceberg recovery uses the captured calendar and provider availability. A source
+absent at acceptance stays absent for that exchange if its asset later appears.
+A previously available source must still have its original identity; an absent
+or changed required asset leaves the pending checkpoint for later recovery.
+After completion, the next exchange uses the currently available frozen bodies.

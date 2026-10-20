@@ -1,0 +1,53 @@
+# A displayed exchange retains its exact predecessor and foreground while
+# the owned worker completes the life. The root caller owns all file paths.
+IMPORT "iceberg_session.aml"
+IMPORT "background.aml"
+
+def haiku_iceberg_bg_prepare(life, source, tokenizer, a, b, day):
+    haiku_iceberg_check(life, tokenizer)
+    core = haiku_iceberg_part(life, "voice")
+    experience = haiku_iceberg_prepare(life, core, source, tokenizer)
+    request = haiku_iceberg_request_at(life, source, a, b, day)
+    job = record_new()
+    record_set(job, "format", "haiku-iceberg-background-pending")
+    record_set(job, "version", 1)
+    if record_get(life, "version") == 1:
+        day = 0
+    record_set(job, "day", day)
+    haiku_iceberg_put(job, "base", life)
+    haiku_iceberg_put(job, "voice", core)
+    haiku_iceberg_put(job, "experience", experience)
+    haiku_iceberg_put(job, "request", request)
+    return job
+
+def haiku_iceberg_bg_check(job, tokenizer, a, b):
+    assert(text_equal(record_get(job, "format"), "haiku-iceberg-background-pending") and record_get(job, "version") == 1, "Haiku background pending format differs")
+    base = haiku_iceberg_part(job, "base")
+    request = haiku_iceberg_part(job, "request")
+    # A provider absent at acceptance remains absent for this one exchange.
+    # A previously ready immutable source must still match before recovery.
+    if record_get(request, "a_ready") == 0:
+        a = model_try_load("")
+    if record_get(request, "b_ready") == 0:
+        b = model_try_load("")
+    day = record_get(job, "day")
+    experience = haiku_iceberg_part(job, "experience")
+    expected = haiku_iceberg_bg_prepare(base, record_get(experience, "input"), tokenizer, a, b, day)
+    assert(record_equal(job, expected), "Haiku background pending differs from its accepted foreground or providers")
+    return 1
+
+def haiku_iceberg_bg_finish(job, tokenizer, a, b):
+    haiku_iceberg_bg_check(job, tokenizer, a, b)
+    base = haiku_iceberg_part(job, "base")
+    before = haiku_iceberg_part(base, "voice")
+    core = haiku_iceberg_part(job, "voice")
+    experience = haiku_iceberg_part(job, "experience")
+    request = haiku_iceberg_part(job, "request")
+    if record_get(request, "a_ready") == 0:
+        a = model_try_load("")
+    if record_get(request, "b_ready") == 0:
+        b = model_try_load("")
+    pending = record_clone(base)
+    haiku_iceberg_put(pending, "voice", core)
+    result = haiku_iceberg_tail(pending, before, experience, request, tokenizer, a, b)
+    return haiku_iceberg_check_sources(base, result, experience, request, tokenizer, a, b)

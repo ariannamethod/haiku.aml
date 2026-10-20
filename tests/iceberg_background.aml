@@ -1,0 +1,55 @@
+# The runner supplies optional complete predecessor/reference paths. Without
+# them this fixture builds its own v8 life and ordinary synchronous reference.
+IMPORT "../src/iceberg_background.aml"
+
+a = model_try_load("../weights/haiku1.gguf")
+b = model_try_load("../weights/haiku2.gguf")
+absent = model_try_load("")
+assert(model_ready(a) and model_ready(b), "Background fixture requires both immutable bodies")
+if text_len(bg_base_path):
+    base = checkpoint_load(bg_base_path)
+    expected = checkpoint_load(bg_expected_path)
+else:
+    core = haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0)
+    record_set(core, "dream_config", [1, 1, 2])
+    base = haiku_iceberg_new(core, [1, 1, 2, 1])
+    base = haiku_iceberg_enable_janus(base, bg_day, 1, 0)
+    base = haiku_iceberg_enable_words(base, 0)
+    base = haiku_iceberg_enable_symbols(base, 1, 0)
+    base = haiku_iceberg_enable_exchange(base, 1, 0)
+    base = haiku_iceberg_enable_concepts(base, 2, 0)
+    base = haiku_iceberg_enable_form(base, 0)
+    base = haiku_iceberg_enable_neural(base, 1, 0)
+    expected = record_clone(base)
+    haiku_iceberg_turn_at(expected, bg_source, 0, a, b, 0, bg_day)
+original = record_clone(base)
+job = haiku_iceberg_bg_prepare(base, bg_source, 0, a, b, bg_day)
+assert(record_equal(base, original), "Background preparation changed its complete predecessor")
+assert(haiku_iceberg_bg_check(job, 0, a, b), "Background prepared job is invalid")
+request = haiku_iceberg_part(job, "request")
+assert(record_get(request, "day") == bg_day, "Background job lost its accepted calendar")
+assert(record_get(request, "a_ready") == 1 and record_get(request, "b_ready") == 1, "Background job lost its accepted providers")
+checkpoint_save(job, text_concat(bg_prefix, "pending"))
+restored = checkpoint_load(text_concat(bg_prefix, "pending"))
+assert(record_equal(job, restored), "Background checkpoint changed its frozen request")
+
+# A body appearing after acceptance cannot enter that pending exchange.
+absent_a = haiku_iceberg_bg_prepare(base, bg_source, 0, absent, b, bg_day)
+absent_b = haiku_iceberg_bg_prepare(base, bg_source, 0, a, absent, bg_day)
+assert(haiku_iceberg_bg_check(absent_a, 0, a, b), "Newly available A changed a pending request")
+assert(haiku_iceberg_bg_check(absent_b, 0, a, b), "Newly available B changed a pending request")
+assert(record_get(absent_a, "request:a_ready") == 0 and record_get(absent_b, "request:b_ready") == 0, "Pending check unmasked an absent body")
+
+# The worker validates and publishes while its parent's predecessor and saved
+# pending owner remain untouched. AWAIT transfers precisely the saved life.
+SPAWN background_fixture_tail:
+    completed = haiku_iceberg_bg_finish(restored, 0, a, b)
+    checkpoint_save(completed, text_concat(bg_prefix, "completed"))
+    return completed
+AWAIT background_fixture_tail INTO completed
+assert(record_equal(base, original) and record_equal(job, restored), "Background worker changed a parent owner")
+assert(record_equal(completed, expected), "Background completion differs from synchronous full life")
+published = checkpoint_load(text_concat(bg_prefix, "completed"))
+assert(record_equal(published, completed), "Background join differs from its published life")
+assert(record_get(completed, "voice:turn") == record_get(base, "voice:turn") + 1, "Background completion repeated its turn")
+PRINT "HAIKU_ICEBERG_BACKGROUND_OK"

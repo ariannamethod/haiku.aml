@@ -1,5 +1,5 @@
 # Experimental life beneath Haiku's original voice. AML + NoTorch only.
-IMPORT "src/iceberg_session.aml"
+IMPORT "src/iceberg_background.aml"
 
 # One process owns this separate complete checkpoint. A saved life retains its
 # settings; use a new path to begin another experiment.
@@ -9,6 +9,7 @@ lexical_bodies = 1
 admission_budget = 2
 self_injection = 1
 owned_tail = 1
+background_life = 1
 # New lives own a dynamic Janus calendar. Existing v1 checkpoints keep their
 # profile until this explicit one-time upgrade is selected.
 janus_balance = 1
@@ -39,10 +40,15 @@ upgrade_form = 0
 neural_bindings = 1
 upgrade_neural = 0
 resuming = 0
+recovering = 0
 if text_len(state_path) > 0:
     resuming = file_exists(state_path)
 if resuming:
     life = checkpoint_load(state_path)
+    recovering = text_equal(record_get(life, "format"), "haiku-iceberg-background-pending")
+    if recovering:
+        restored_job = life
+        life = haiku_iceberg_part(restored_job, "base")
     core = haiku_iceberg_part(life, "voice")
     settings = record_get(life, "settings")
 else:
@@ -58,6 +64,22 @@ tokenizer_model = 0
 if text_equal(record_get(core, "tokenizer_mode"), "sentencepiece"):
     tokenizer_model = tokenizer_load("models/haiku_sp.model")
 haiku_iceberg_check(life, tokenizer_model)
+path_a = ""
+path_b = ""
+if settings[0] and settings[1]:
+    path_a = "weights/haiku1.gguf"
+    path_b = "weights/haiku2.gguf"
+body_a = model_try_load(path_a)
+body_b = model_try_load(path_b)
+if resuming:
+    haiku_iceberg_concepts_audit(life, body_a, body_b)
+# A saved pending exchange fixes its original calendar and providers. Finish
+# that exact exchange before applying any requested checkpoint upgrades.
+if recovering:
+    life = haiku_iceberg_bg_finish(restored_job, tokenizer_model, body_a, body_b)
+    recovered_save = checkpoint_save(life, state_path)
+    if recovered_save == 2:
+        PRINT "Memory written; storage could not confirm durability."
 if resuming == 0 and janus_balance:
     life = haiku_iceberg_enable_janus(life, utc_day(), 1, tokenizer_model)
 if resuming and upgrade_balance:
@@ -89,23 +111,22 @@ if resuming == 0 and janus_balance and word_learning and living_form:
 if resuming and upgrade_neural:
     life = haiku_iceberg_enable_neural(life, neural_bindings, tokenizer_model)
 
-path_a = ""
-path_b = ""
-if settings[0] and settings[1]:
-    path_a = "weights/haiku1.gguf"
-    path_b = "weights/haiku2.gguf"
-body_a = model_try_load(path_a)
-body_b = model_try_load(path_b)
-if resuming:
-    haiku_iceberg_concepts_audit(life, body_a, body_b)
 PRINT "HAiKU — the cloud is listening."
 if resuming:
     PRINT "The cloud remembers. Our conversation continues."
 PRINT "Write something. Type quit to leave."
 listening = 1
+tail_active = 0
 while listening:
     PRINT "You:"
     line = read_line()
+    if tail_active:
+        AWAIT iceberg_background_tail INTO background_result
+        completed = haiku_iceberg_part(background_result, "life")
+        record_swap(life, completed)
+        if record_get(background_result, "saved") == 2:
+            PRINT "Memory written; storage could not confirm durability."
+        tail_active = 0
     if list_len(line) == 0:
         listening = 0
     else:
@@ -114,16 +135,43 @@ while listening:
         if action == 2:
             listening = 0
         if action == 1:
-            pending = record_clone(life)
-            spoken = haiku_iceberg_turn(pending, source, tokenizer_model, body_a, body_b, owned_tail)
-            saved = 1
-            if text_len(state_path) > 0:
-                saved = checkpoint_save(pending, state_path)
-            record_swap(life, pending)
-            if saved == 2:
-                PRINT "Memory written; storage could not confirm durability."
-            PRINT ""
-            PRINT "HAiKU:"
-            PRINT spoken
-            PRINT ""
+            if background_life and owned_tail:
+                day = 0
+                if record_get(life, "version") >= 2:
+                    day = utc_day()
+                job = haiku_iceberg_bg_prepare(life, source, tokenizer_model, body_a, body_b, day)
+                saved = 1
+                if text_len(state_path) > 0:
+                    saved = checkpoint_save(job, state_path)
+                experience = haiku_iceberg_part(job, "experience")
+                spoken = record_get(experience, "output")
+                if saved == 2:
+                    PRINT "Memory written; storage could not confirm durability."
+                PRINT ""
+                PRINT "HAiKU:"
+                PRINT spoken
+                PRINT ""
+                SPAWN iceberg_background_tail:
+                    completed = haiku_iceberg_bg_finish(job, tokenizer_model, body_a, body_b)
+                    saved = 1
+                    if text_len(state_path) > 0:
+                        saved = checkpoint_save(completed, state_path)
+                    background_result = record_new()
+                    record_set(background_result, "saved", saved)
+                    haiku_iceberg_put(background_result, "life", completed)
+                    return background_result
+                tail_active = 1
+            else:
+                pending = record_clone(life)
+                spoken = haiku_iceberg_turn(pending, source, tokenizer_model, body_a, body_b, owned_tail)
+                saved = 1
+                if text_len(state_path) > 0:
+                    saved = checkpoint_save(pending, state_path)
+                record_swap(life, pending)
+                if saved == 2:
+                    PRINT "Memory written; storage could not confirm durability."
+                PRINT ""
+                PRINT "HAiKU:"
+                PRINT spoken
+                PRINT ""
 PRINT "The cloud goes quiet."
