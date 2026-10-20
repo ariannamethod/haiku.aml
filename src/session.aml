@@ -60,7 +60,7 @@ def haiku_session_prepare_pressure(pending, source, model, pressure):
     return experience
 
 # This exact tail serves both schedules. All mutations stay with the candidate;
-# no worker opens a checkpoint or publishes a live owner.
+# this tail performs no checkpoint publication.
 def haiku_session_tail(pending, experience, model):
     experience = record_clone(experience)
     turn = record_get(experience, "turn")

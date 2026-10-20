@@ -92,7 +92,9 @@ cd haiku.aml
 ../ariannamethod.ai/runner/aml-notorch haiku.aml
 ```
 
-Write something. Type `quit` to leave. Each completed exchange saves to
+Write something. Type `quit` to leave. The reply arrives first; learning,
+reflections and dreams continue in the background and save while you pause.
+An interrupted exchange resumes from its saved foreground. Memory lives in
 `haiku.state`; the next launch resumes its memory and settings. One running
 process owns a state file. Choose another `state_path` for another presence,
 or `""` for an unsaved conversation.

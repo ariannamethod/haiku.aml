@@ -1,5 +1,5 @@
 # HAiKU's voice and inner life. Runtime dependencies: AML + NoTorch.
-IMPORT "src/session.aml"
+IMPORT "src/background.aml"
 
 # One process owns this checkpoint. Paths follow this source, even after amlc.
 # Set state_path to "" for a fresh, unsaved conversation.
@@ -11,9 +11,10 @@ tokenizer_mode = "regex"
 train_rae = 0
 inner_life = 1
 dream_life = 1
-# Both schedules keep the same complete-turn checkpoint and random order.
-# The owned worker completes learning and inner life before save and display.
+# Save the accepted foreground before display. The owned worker then learns,
+# dreams, validates and saves while the next input is being read.
 owned_tail = 1
+background_life = 1
 
 # Existing foreground-only lives keep their exact continuation. Set this to 1
 # to grow their inner voice from the next completed exchange.
@@ -22,10 +23,15 @@ upgrade_inner = 0
 # Phase4 memory, dreams and the exchange journal from their next turn.
 upgrade_dreams = 0
 resuming = 0
+recovering = 0
 if text_len(state_path) > 0:
     resuming = file_exists(state_path)
 if resuming:
     restored = checkpoint_load(state_path)
+    recovering = text_equal(record_get(restored, "format"), "haiku-background-pending")
+    if recovering:
+        restored_job = restored
+        restored = haiku_background_part(restored_job, "base")
     tokenizer_mode = record_get(restored, "tokenizer_mode")
 
 tokenizer_model = 0
@@ -35,6 +41,11 @@ if text_equal(tokenizer_mode, "sentencepiece"):
 if resuming:
     haiku_state_check(restored, tokenizer_model)
     state = restored
+    if recovering:
+        state = haiku_background_finish(restored_job, tokenizer_model)
+        recovered_save = checkpoint_save(state, state_path)
+        if recovered_save == 2:
+            PRINT "Memory written; storage could not confirm durability."
     if upgrade_inner:
         state = haiku_state_enable_inner(state, tokenizer_model)
     if upgrade_dreams:
@@ -46,6 +57,7 @@ else:
         if dream_life:
             state = haiku_state_enable_dreams(state, tokenizer_model)
 listening = 1
+tail_active = 0
 
 PRINT "HAiKU — the cloud is listening."
 if resuming:
@@ -54,6 +66,15 @@ PRINT "Write something. Type quit to leave."
 while listening:
     PRINT "You:"
     line = read_line()
+    # The worker has already checked and saved this exact state. Joining
+    # transfers it into the foreground before any later action can write.
+    if tail_active:
+        AWAIT haiku_background_tail INTO background_result
+        completed = haiku_background_part(background_result, "state")
+        record_swap(state, completed)
+        if record_get(background_result, "saved") == 2:
+            PRINT "Memory written; storage could not confirm durability."
+        tail_active = 0
     if list_len(line) == 0:
         listening = 0
     else:
@@ -62,22 +83,44 @@ while listening:
         if action == 2:
             listening = 0
         if action == 1:
-            next_state = record_clone(state)
-            if owned_tail:
-                spoken = haiku_session_worker_turn(next_state, source, tokenizer_model)
+            if background_life and owned_tail:
+                job = haiku_background_prepare(state, source, tokenizer_model)
+                saved = 1
+                if text_len(state_path) > 0:
+                    saved = checkpoint_save(job, state_path)
+                experience = haiku_background_part(job, "experience")
+                spoken = record_get(experience, "output")
+                if saved == 2:
+                    PRINT "Memory written; storage could not confirm durability."
+                PRINT ""
+                PRINT "HAiKU:"
+                PRINT spoken
+                PRINT ""
+                SPAWN haiku_background_tail:
+                    completed = haiku_background_finish(job, tokenizer_model)
+                    saved = 1
+                    if text_len(state_path) > 0:
+                        saved = checkpoint_save(completed, state_path)
+                    background_result = record_new()
+                    record_set(background_result, "saved", saved)
+                    haiku_background_put(background_result, "state", completed)
+                    return background_result
+                tail_active = 1
             else:
-                spoken = haiku_session_turn(next_state, source, tokenizer_model)
-            saved = 1
-            if text_len(state_path) > 0:
-                saved = checkpoint_save(next_state, state_path)
-            # No allocation after file replacement: publish the same complete
-            # state in memory, then reveal its response.
-            record_swap(state, next_state)
-            if saved == 2:
-                PRINT "Memory written; storage could not confirm durability."
-            PRINT ""
-            PRINT "HAiKU:"
-            PRINT spoken
-            PRINT ""
+                next_state = record_clone(state)
+                if owned_tail:
+                    spoken = haiku_session_worker_turn(next_state, source, tokenizer_model)
+                else:
+                    spoken = haiku_session_turn(next_state, source, tokenizer_model)
+                saved = 1
+                if text_len(state_path) > 0:
+                    saved = checkpoint_save(next_state, state_path)
+                record_swap(state, next_state)
+                if saved == 2:
+                    PRINT "Memory written; storage could not confirm durability."
+                PRINT ""
+                PRINT "HAiKU:"
+                PRINT spoken
+                PRINT ""
 
 PRINT "The cloud goes quiet."

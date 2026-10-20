@@ -11,8 +11,12 @@ use its existing Markov generator, form, RAE, learners, reflection and dreams.
 ../ariannamethod.ai/runner/aml-notorch iceberg.aml
 ```
 
-Each accepted turn first chooses its speaking form, generates five candidates
-and completes its inner life. Version 7 can speak a fragment, couplet, haiku or
+Each accepted turn first chooses its speaking form and generates five candidates.
+The default launcher saves that pending foreground and displays its reply;
+inner life and source-backed publication continue in the background while input
+waits. A pending checkpoint resumes its captured calendar, models and draws.
+See the [publication rhythm](ASYNC.md#the-current-publication-rhythm).
+Version 7 can speak a fragment, couplet, haiku or
 ABA tercet; older profiles retain their 5–7–5 voice. Real encounters then enter the deeper organs. A bounded pair of
 reviewed words can join the vocabulary for the next exchange. The response
 already chosen stays fixed while its history grows underneath it.
