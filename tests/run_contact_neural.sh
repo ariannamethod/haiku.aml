@@ -40,7 +40,39 @@ PY
     cmp "$haiku_work/$haiku_mode.full" "$haiku_work/$haiku_mode.resumed"
 done
 cmp "$haiku_work/interpreted.out" "$haiku_work/compiled.out"
-for haiku_checkpoint in first bound full resumed friend conflict; do
+for haiku_checkpoint in first bound full resumed friend conflict source_a source_b source_expired; do
     cmp "$haiku_work/interpreted.$haiku_checkpoint" "$haiku_work/compiled.$haiku_checkpoint"
 done
+haiku_refusals=0
+haiku_bad_proof() {
+    local haiku_fixture=$1 haiku_diagnostic=$2 haiku_change=$3
+    cat > "$haiku_work/invalid.aml" <<AML
+IMPORT "$haiku_root/src/parliament_contact.aml"
+state = haiku_contact_load("$haiku_work/interpreted.$haiku_fixture")
+$haiku_change
+haiku_contact_check(state)
+PRINT "HAIKU_NEURAL_INVALID_ACCEPTED"
+AML
+    if "$haiku_aml" "$haiku_work/invalid.aml" > "$haiku_work/invalid.out" 2> "$haiku_work/invalid.err"; then
+        printf 'Interpreter accepted a changed neural proof: %s\n' "$haiku_diagnostic" >&2; exit 1
+    fi
+    grep -Fq "$haiku_diagnostic" "$haiku_work/invalid.err" || { cat "$haiku_work/invalid.err" >&2; exit 1; }
+    ! grep -q HAIKU_NEURAL_INVALID_ACCEPTED "$haiku_work/invalid.out"
+    AML_PREFIX="$haiku_work/prefix" "$haiku_amlc" "$haiku_work/invalid.aml" --scalar -o "$haiku_work/invalid" > "$haiku_work/invalid-build.out" 2> "$haiku_work/invalid-build.err"
+    if (cd "$haiku_work/foreign" && ../invalid) > "$haiku_work/invalid.out" 2> "$haiku_work/invalid.err"; then
+        printf 'Compiled program accepted a changed neural proof: %s\n' "$haiku_diagnostic" >&2; exit 1
+    fi
+    grep -Fq "$haiku_diagnostic" "$haiku_work/invalid.err" || { cat "$haiku_work/invalid.err" >&2; exit 1; }
+    ! grep -q HAIKU_NEURAL_INVALID_ACCEPTED "$haiku_work/invalid.out"
+    haiku_refusals=$((haiku_refusals + 1))
+}
+haiku_changed_source='list_set(record_get(state, "neural_text"), 24, "stream rain the for of to on")'
+haiku_bad_proof source_a 'Neural association published source differs' "$haiku_changed_source"
+haiku_bad_proof source_expired 'Neural association retained source differs' "$haiku_changed_source"
+haiku_bad_proof source_a 'Neural association retained source differs' "$haiku_changed_source
+list_set(record_get(state, \"contact_text\"), 19, \"stream rain the for of to on\")"
+haiku_bad_proof source_a 'Neural association absent B has evidence' $'rows = record_get(state, "neural_rows")\nrows[770] = 1e-30'
+haiku_bad_proof source_b 'Neural association absent A has evidence' $'rows = record_get(state, "neural_rows")\nrows[766] = 1e-30'
+haiku_bad_proof friend 'Neural association retained encounter is absent' $'rows = record_get(state, "neural_rows")\nrows[0] = 9\nrows[5] = 9\nrows[7] = 9'
 cat "$haiku_work/interpreted.out"
+printf 'PASS: %s source-provenance and absent-endpoint proof mutations rejected interpreted and compiled\n' "$haiku_refusals"

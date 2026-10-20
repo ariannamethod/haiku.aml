@@ -130,4 +130,31 @@ haiku_contact_bind(manual, "en", "stream", 82, 0, 3)
 known = haiku_contact_learning_lookup(manual, "en", "stream")
 assert(known[0] == 82 and known[1] == 1, "Neural association overrode reviewed binding")
 assert(record_equal(original, neural_fixture_new("haiku", 1)), "Neural upgrade mutated its input")
+
+# Keep the original whole source independently of its four-token query.
+# These real single-endpoint proofs also exercise exact absent-score zeros.
+single_a = haiku_contact_load(text_concat(neural_test_prefix, "bound"))
+single_b = record_clone(single_a)
+long_source = neural_fixture_event("haiku", "stream rain the for of to in", 4, 4)
+haiku_contact_publish(single_a, long_source)
+observed = haiku_contact_neural_observe(single_a, long_source, a, absent)
+assert(record_get(observed, "observed") == 1 and record_get(observed, "forwards") == 1, "A-only source proof differs")
+haiku_contact_concepts_finish(single_a)
+haiku_contact_publish(single_b, long_source)
+observed = haiku_contact_neural_observe(single_b, long_source, absent, b)
+assert(record_get(observed, "observed") == 1 and record_get(observed, "forwards") == 1, "B-only source proof differs")
+haiku_contact_concepts_finish(single_b)
+haiku_contact_save(single_a, text_concat(neural_test_prefix, "source_a"))
+haiku_contact_save(single_b, text_concat(neural_test_prefix, "source_b"))
+
+# Let all recent parliament receipts expire through actual internal contacts.
+# The older neural evidence remains valid, with the external ring still sealed.
+i = 1
+while i <= 32:
+    internal = haiku_contact_event("haiku", "the", "en", [0.5, 0.5, 1, 0.5], [0], 0.5, 1, i, 4)
+    haiku_contact_publish(single_a, internal)
+    i = i + 1
+haiku_contact_check(single_a)
+assert(haiku_contact_neural_audit(single_a, a, absent) == 25, "Expired parliament receipts invalidated historical neural proofs")
+haiku_contact_save(single_a, text_concat(neural_test_prefix, "source_expired"))
 PRINT "HAIKU_CONTACT_NEURAL_OK"

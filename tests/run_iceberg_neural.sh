@@ -63,6 +63,30 @@ fi
 (cd "$haiku_work/foreign" && ../foreground) > "$haiku_work/foreground-compiled.out"
 cmp "$haiku_work/foreground-interpreted.out" "$haiku_work/foreground-compiled.out"
 cat "$haiku_work/foreground-interpreted.out"
+printf 'Checking complete human/dream witnesses after bounded contact receipt expiry\n'
+for haiku_case in 0 1 2 3 4 5 6 7; do
+    printf 'witness_failure = %s\n' "$haiku_case" > "$haiku_work/witness.aml"
+    sed "s|../src/iceberg_session.aml|$haiku_root/src/iceberg_session.aml|" \
+        "$haiku_root/tests/neural_witness.aml" >> "$haiku_work/witness.aml"
+    AML_PREFIX="$haiku_work/prefix" "$haiku_amlc" "$haiku_work/witness.aml" --scalar -o "$haiku_work/witness" \
+        > "$haiku_work/witness-compile.out" 2> "$haiku_work/witness-compile.err"
+    for haiku_mode in interpreted compiled; do
+        if [[ "$haiku_mode" == interpreted ]]; then
+            haiku_command=("$haiku_aml" "$haiku_work/witness.aml")
+        else
+            haiku_command=("$haiku_work/witness")
+        fi
+        if (cd "$haiku_work/foreign" && "${haiku_command[@]}") > "$haiku_work/witness.out" 2> "$haiku_work/witness.err"; then
+            test "$haiku_case" = 0
+            grep -Fxq 'HAIKU_NEURAL_WITNESS_OK' "$haiku_work/witness.out"
+        else
+            test "$haiku_case" != 0
+            grep -Fq 'Haiku neural ' "$haiku_work/witness.err"
+            ! grep -Fq 'HAIKU_NEURAL_WITNESS_OK' "$haiku_work/witness.out"
+        fi
+    done
+done
+printf 'PASS: genuine archive and seven false human/dream witnesses interpreted and compiled\n'
 printf 'Checking exact-source neural publication and refusal ownership\n'
 "$haiku_cc" -std=c11 -O2 -Wall -Wextra -Werror -I"$haiku_include" \
     "$haiku_root/tests/iceberg_neural_publication.c" "$haiku_bridge" "$haiku_notorch" "$haiku_lib" \

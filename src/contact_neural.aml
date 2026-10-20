@@ -189,6 +189,30 @@ def haiku_contact_neural_check(state):
     events = map_new()
     event_counts = map_new()
     revisions = map_new()
+    # Compare retained proofs with independently retained accepted sources.
+    # Either receipt ring may have expired; permanent symbol-birth witnesses
+    # can still retain the same event after the recent ring has moved on.
+    published = record_get(state, "p:receipt_rows")
+    published_text = record_get(state, "contact_text")
+    published_meta = record_get(state, "contact_meta")
+    published_events = map_new()
+    symbol_rows = record_get(state, "symbol_rows")
+    symbol_text = record_get(state, "symbol_text")
+    symbol_clock = record_get(state, "symbol_clock")
+    symbol_events = map_new()
+    oldest_symbol = 1000000
+    i = 0
+    while i < 32:
+        if published[i * 9] > 0 and published[i * 9 + 2] == source:
+            map_set(published_events, text_fixed(published[i * 9], 0), i)
+        i = i + 1
+    i = 0
+    while i < 352:
+        if symbol_rows[i * 139 + 1] > 0 and symbol_rows[i * 139] == source:
+            map_set(symbol_events, text_fixed(symbol_rows[i * 139 + 1], 0), i)
+            if i < 128:
+                oldest_symbol = min(oldest_symbol, symbol_rows[i * 139 + 1])
+        i = i + 1
     slot = 0
     while slot < 32:
         language = list_get(words, slot * 2)
@@ -222,6 +246,26 @@ def haiku_contact_neural_check(state):
                     assert(text_equal(list_get(texts, tr + 3), "haiku") and text_equal(list_get(texts, tr + 4), "haiku"), "Neural association peer owner differs")
                 raw = list_get(texts, tr)
                 assert(text_len(raw) <= 10000, "Neural association source is too long")
+                event_key = text_fixed(event, 0)
+                complete_ring = symbol_clock[0] == 1 and turn > symbol_clock[1] and symbol_clock[7] < 128
+                if complete_ring or event >= oldest_symbol:
+                    assert(map_has(symbol_events, event_key), "Neural association retained encounter is absent")
+                if map_has(published_events, event_key):
+                    witness = map_get(published_events, event_key)
+                    assert(published[witness * 9 + 1] == turn, "Neural association published turn differs")
+                    assert(text_equal(list_get(published_text, witness * 6 + 1), raw) and text_equal(list_get(published_text, witness * 6 + 2), language), "Neural association published source differs")
+                    assert(text_equal(list_get(published_text, witness * 6 + 3), list_get(texts, tr + 3)) and text_equal(list_get(published_text, witness * 6 + 4), list_get(texts, tr + 4)), "Neural association published owners differ")
+                    ancestry = published_meta[witness * 8] == rows[row + 6] and published_meta[witness * 8 + 1] == rows[row + 7]
+                    ancestry = ancestry and published_meta[witness * 8 + 2] == rows[row + 4] and published_meta[witness * 8 + 3] == rows[row + 5]
+                    assert(ancestry, "Neural association published ancestry differs")
+                if map_has(symbol_events, event_key):
+                    witness = map_get(symbol_events, event_key)
+                    assert(symbol_rows[witness * 139 + 2] == turn, "Neural association retained turn differs")
+                    assert(text_equal(list_get(symbol_text, witness * 4), raw) and text_equal(list_get(symbol_text, witness * 4 + 1), language), "Neural association retained source differs")
+                    assert(text_equal(list_get(symbol_text, witness * 4 + 2), list_get(texts, tr + 3)) and text_equal(list_get(symbol_text, witness * 4 + 3), list_get(texts, tr + 4)), "Neural association retained owners differ")
+                    ancestry = symbol_rows[witness * 139 + 3] == rows[row + 4] and symbol_rows[witness * 139 + 4] == rows[row + 5]
+                    ancestry = ancestry and symbol_rows[witness * 139 + 5] == rows[row + 6] and symbol_rows[witness * 139 + 6] == rows[row + 7]
+                    assert(ancestry, "Neural association retained ancestry differs")
                 tokens = haiku_tokenize_regex(raw)
                 assert(list_len(tokens) > 0 and list_len(tokens) <= 64, "Neural association source budget differs")
                 index = haiku_contact_integer(rows[row + 8], 0, list_len(tokens) - 1)
@@ -264,11 +308,19 @@ def haiku_contact_neural_check(state):
                 haiku_parliament_vector(raw_a, 4, 1.00001)
                 haiku_parliament_vector(raw_b, 4, 1.00001)
                 if mask == 2:
-                    assert(haiku_parliament_dot(raw_b, raw_b) == 0 and text_len(list_get(texts, tr + 6)) == 0, "Neural association absent B has evidence")
+                    j = 0
+                    while j < 4:
+                        assert(raw_b[j] == 0, "Neural association absent B has evidence")
+                        j = j + 1
+                    assert(text_len(list_get(texts, tr + 6)) == 0, "Neural association absent B has evidence")
                 else:
                     assert(text_equal(list_get(texts, tr + 6), list_get(identity, 3)) and text_len(list_get(texts, tr + 6)) > 0, "Neural association B identity differs")
                 if mask == 4:
-                    assert(haiku_parliament_dot(raw_a, raw_a) == 0 and text_len(list_get(texts, tr + 5)) == 0, "Neural association absent A has evidence")
+                    j = 0
+                    while j < 4:
+                        assert(raw_a[j] == 0, "Neural association absent A has evidence")
+                        j = j + 1
+                    assert(text_len(list_get(texts, tr + 5)) == 0, "Neural association absent A has evidence")
                 else:
                     assert(text_equal(list_get(texts, tr + 5), list_get(identity, 2)) and text_len(list_get(texts, tr + 5)) > 0, "Neural association A identity differs")
                 assert(text_equal(list_get(texts, tr + 7), list_get(identity, 4)) and text_len(list_get(texts, tr + 7)) > 0, "Neural association tokenizer differs")

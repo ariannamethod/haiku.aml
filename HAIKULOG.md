@@ -9,6 +9,31 @@ commands here, newest first. A major new capability also earns a short README
 update. The module documents hold the complete contracts; measured failures
 belong beside measured successes.
 
+## 2026-10-20 — Audit repairs evidence and the completed voice
+
+Audit of merged `a30992f2fee5fa8396b6ef3191a7c34a58fdd23a` reproduced
+three defects. A neural proof could change source text outside its local query,
+or name a never-published event inside retained history. An absent endpoint
+could retain `1e-30`: its squared-norm zero check underflowed. The source-backed
+publisher also accepted a substituted voice RNG; it regenerated the experience
+but trusted the completed voice tail.
+
+`src/contact_neural.aml` now checks original text, turn and ancestry against
+retained contact/external witnesses, requires events inside the current external
+ring to exist, and checks absent endpoint scores individually against zero.
+`src/iceberg_session.aml` ties every retained neural source to the actual human
+reflection or delivered Haiku dream line. Publication reproduces the complete
+voice tail and verified word admission, then compares every completed voice leaf.
+
+The targeted gates cover source and absent-endpoint mutations in interpreter and
+compiled execution, seven false complete-life witnesses in both paths, and
+three C-host voice substitutions with exact owner/result/checkpoint preservation.
+Genuine saved third/fourth turns, missing-body dream, disabled contact work,
+prior-centre friend delivery and same-turn dedupe pass. Both source GGUF hashes
+remain unchanged. The complete publication fixture now includes 14 refusals;
+this audit reran its three new cases. Dependency pins remain AML `a97abc5` and
+scalar NoTorch `e842626`. No new documentation files or checkpoint schema.
+
 ## 2026-10-20 — Sparse encounters acquire personal meanings
 
 After merged form PR #25, `3a20a95b1e4dfbe6e0a31a548b724df7f4c2e45a`,

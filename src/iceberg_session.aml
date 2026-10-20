@@ -263,6 +263,47 @@ def haiku_iceberg_exchange_check(life, core):
         owner_index = owner_index + 1
     return 1
 
+# Retained neural proofs still name the complete external encounter after
+# bounded contact receipts rotate out. The complete life keeps that encounter
+# in its human reflection or actual alternating dream dialogue.
+def haiku_iceberg_neural_witness(core, contact):
+    proofs = record_get(contact, "neural_rows")
+    texts = record_get(contact, "neural_text")
+    human = text_equal(record_get(contact, "p:owner"), "haiku")
+    history = record_get(core, "meta_history")
+    dream = record_get(core, "dream_history")
+    dialogs = record_get(core, "dream_dialogs")
+    count = floor(len(dialogs) / 3)
+    slot = 0
+    while slot < 192:
+        row = slot * 242
+        if proofs[row] > 0:
+            event = proofs[row]
+            turn = proofs[row + 1]
+            source = list_get(texts, slot * 8)
+            if human:
+                index = (turn - record_get(core, "inner_started_turn") - 1) * 3
+                assert(event == turn and index >= 0 and index + 2 < list_len(history), "Haiku neural human witness has no actual turn")
+                assert(text_equal(source, list_get(history, index)), "Haiku neural source differs from its actual human encounter")
+            else:
+                index = event - 1
+                assert(index >= 0 and index < list_len(dream) and count > 0, "Haiku neural peer witness has no actual dream")
+                low = 0
+                high = count
+                while low < high:
+                    middle = floor((low + high) / 2)
+                    if dialogs[middle * 3 + 1] <= index:
+                        low = middle + 1
+                    else:
+                        high = middle
+                dialog = low - 1
+                assert(dialog >= 0 and dialogs[dialog * 3] == turn, "Haiku neural peer witness names another dream turn")
+                part = index - dialogs[dialog * 3 + 1]
+                assert(part >= 0 and part < dialogs[dialog * 3 + 2] and part == floor(part / 2) * 2, "Haiku neural peer witness was not a delivered Haiku line")
+                assert(text_equal(source, list_get(dream, index)), "Haiku neural source differs from its actual dream encounter")
+        slot = slot + 1
+    return 1
+
 def haiku_iceberg_check(life, tokenizer):
     haiku_state_fields(life, "format", "string")
     haiku_state_fields(life, "version", "float")
@@ -317,6 +358,9 @@ def haiku_iceberg_check(life, tokenizer):
     if version >= 6:
         haiku_contact_concepts_check(haiku_contact, 1)
         haiku_contact_concepts_check(friend_contact, 1)
+    if version >= 8:
+        haiku_iceberg_neural_witness(core, haiku_contact)
+        haiku_iceberg_neural_witness(core, friend_contact)
     expected = 10 + list_len(record_keys(core)) + list_len(record_keys(haiku_lexical)) + list_len(record_keys(friend_lexical)) + list_len(record_keys(haiku_contact)) + list_len(record_keys(friend_contact))
     if version >= 2:
         owners = haiku_words("haiku friend")
@@ -469,7 +513,7 @@ def haiku_iceberg_admit(core, contact, receipt, ledger, budget):
 # Vocabulary before lexical admission has only two accepted writers: the
 # frozen human trigrams and the actual new dream texts. Rebuild that membership
 # without regenerating the voice, then replay selection with the authentic
-# contact field. The rest of the core retains the stable publisher's boundary.
+# contact field. Version 8 additionally checks the entire reproduced voice.
 def haiku_iceberg_admit_check(life, completed, experience, contact, receipt, tokenizer):
     before = haiku_iceberg_part(life, "voice")
     core = haiku_iceberg_part(completed, "voice")
@@ -878,13 +922,15 @@ def haiku_iceberg_result_structure(life, result, experience, request, tokenizer)
 # Legacy profiles replay their private evidence. Version 6 also replays its
 # contact field, concept projection and admission from the accepted sources;
 # version 8 also reproduces foreground generation from prior word pressure.
-# Voice learning and dream generation retain their accepted-core boundary.
+# Version 8 also reproduces the entire voice tail before lexical admission.
 def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, body_a, body_b):
     completed = haiku_iceberg_result_structure(life, result, experience, request, tokenizer)
     if record_get(life, "version") >= 8:
         foreground = haiku_iceberg_part(life, "voice")
         expected_experience = haiku_iceberg_prepare(life, foreground, record_get(experience, "input"), tokenizer)
         assert(record_equal(expected_experience, experience), "Haiku neural foreground differs from its prior owned pressure")
+        voice_tail = haiku_session_tail(foreground, expected_experience, tokenizer)
+        canonical_voice = haiku_session_result_check(haiku_iceberg_part(life, "voice"), voice_tail, expected_experience, tokenizer)
     if record_get(life, "version") == 1:
         return completed
     assert(model_ready(body_a) == record_get(request, "a_ready") and model_ready(body_b) == record_get(request, "b_ready"), "Haiku Janus verification provider availability differs")
@@ -1078,6 +1124,13 @@ def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, bo
                 # This is the actual admission boundary: model publication has
                 # finished, while local birth and structural adoption have not.
                 haiku_iceberg_admit_check(life, completed, experience, contact, receipt, tokenizer)
+                if record_get(life, "version") >= 8 and settings[0]:
+                    canonical_ledger = record_new()
+                    record_set(canonical_ledger, "text", record_get(life, "admission_text"))
+                    record_set(canonical_ledger, "values", record_get(life, "admission_values"))
+                    haiku_iceberg_admit(canonical_voice, contact, receipt, canonical_ledger, settings[2])
+                    journal_values = record_get(canonical_voice, "journal_values")
+                    journal_values[len(journal_values) - 11] = map_len(record_get(canonical_voice, "weights"))
             if record_get(life, "version") >= 4 and settings[0] and dream_count > old_count:
                 haiku_contact_symbols_dream(contact, dream_count, turn)
                 if record_get(life, "version") >= 5:
@@ -1158,6 +1211,8 @@ def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, bo
                             part = part + 1
                     cursor = cursor + 1
         index = index + 1
+    if record_get(life, "version") >= 8:
+        assert(record_equal(canonical_voice, core), "Haiku neural voice completion differs from its witnessed transition")
     return completed
 
 # Explicit activation after the concept profile. Both private contact lives and

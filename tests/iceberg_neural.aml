@@ -76,4 +76,12 @@ assert(haiku_dream_check(haiku_iceberg_part(live, "voice")) == 1, "Neural fixtur
 assert(record_equal(before, neural_test_private(live)), "A weightless dream minted neural evidence")
 checkpoint_save(live, "iceberg-neural.state")
 checkpoint_save(resumed, "iceberg-neural-resumed.state")
+# The canonical voice tail must also publish with all contact work disabled.
+quiet = record_clone(live)
+record_set(quiet, "settings", [0, 0, 0, 0])
+quiet_contact = haiku_iceberg_part(quiet, "haiku_contact")
+quiet_friend = haiku_iceberg_part(quiet, "friend_contact")
+haiku_iceberg_turn_at(quiet, "rain returns", 0, missing, missing, 0, 20748)
+assert(record_equal(quiet_contact, haiku_iceberg_part(quiet, "haiku_contact")), "Disabled deeper life changed Haiku contact")
+assert(record_equal(quiet_friend, haiku_iceberg_part(quiet, "friend_contact")), "Disabled deeper life changed friend contact")
 PRINT "HAIKU_ICEBERG_NEURAL_LIFE_OK"

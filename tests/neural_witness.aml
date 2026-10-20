@@ -1,0 +1,75 @@
+# The wrapper supplies witness_failure. Minimal owners isolate the complete
+# life's archive check; the last case also exercises an actual saved life.
+IMPORT "../src/iceberg_session.aml"
+core = record_new()
+record_set(core, "inner_started_turn", 0)
+record_set(core, "meta_history", haiku_words("rain reply inner"))
+record_set(core, "dream_history", haiku_words("old prior older rain friend"))
+record_set(core, "dream_dialogs", [1, 0, 3, 3, 3, 2])
+contact = record_new()
+record_set(contact, "p:owner", "haiku")
+proofs = zeros(46464)
+proofs[0] = 1
+proofs[1] = 1
+record_set(contact, "neural_rows", proofs)
+texts = list_new()
+i = 0
+while i < 1536:
+    list_push(texts, "")
+    i = i + 1
+list_set(texts, 0, "rain")
+record_set(contact, "neural_text", texts)
+if witness_failure == 1:
+    list_set(texts, 0, "rain!")
+    record_set(contact, "neural_text", texts)
+if witness_failure == 2:
+    proofs[0] = 2
+record_set(contact, "neural_rows", proofs)
+haiku_iceberg_neural_witness(core, contact)
+record_set(contact, "p:owner", "friend")
+proofs[0] = 4
+proofs[1] = 3
+if witness_failure == 3:
+    list_set(texts, 0, "rain!")
+    record_set(contact, "neural_text", texts)
+if witness_failure == 4:
+    proofs[1] = 1
+if witness_failure == 5:
+    proofs[0] = 5
+    list_set(texts, 0, "friend")
+    record_set(contact, "neural_text", texts)
+if witness_failure == 6:
+    proofs[0] = 6
+record_set(contact, "neural_rows", proofs)
+haiku_iceberg_neural_witness(core, contact)
+
+# Matching false copies inside a contact must not override the full life's
+# actual human encounter, even when its local model query is unchanged.
+life = checkpoint_load("iceberg-neural-models-third.state")
+original = record_clone(life)
+haiku_iceberg_check(life, 0)
+assert(record_equal(life, original), "Witness validation changed its live owner")
+if witness_failure == 7:
+    contact = haiku_iceberg_part(life, "haiku_contact")
+    names = haiku_words("neural_text contact_text symbol_text")
+    i = 0
+    while i < 3:
+        name = list_get(names, i)
+        texts = record_get(contact, name)
+        stride = 8
+        j = 0
+        if i == 1:
+            stride = 6
+            j = 1
+        if i == 2:
+            stride = 4
+        while j < list_len(texts):
+            if text_equal(list_get(texts, j), "the stream rain"):
+                list_set(texts, j, "the stream rain!")
+            j = j + stride
+        record_set(contact, name, texts)
+        i = i + 1
+    haiku_contact_check(contact)
+    haiku_iceberg_put(life, "haiku_contact", contact)
+    haiku_iceberg_check(life, 0)
+PRINT "HAIKU_NEURAL_WITNESS_OK"
