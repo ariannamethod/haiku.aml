@@ -130,6 +130,9 @@ Those structures can [cross a spoken dream](docs/SYMBOL_EXCHANGE.md). Each
 listener keeps the meeting, then grows new connections through its own life.
 Even a familiar concept gains a [personal centre](docs/PERSONAL_CONCEPTS.md):
 rain and sea leave different traces, and those traces reach later word choices.
+Sparse encounters can also teach a [private word meaning](docs/NEURAL_WORDS.md)
+when context and the frozen bodies agree. Later replies feel that remembered
+attraction, through the same five candidates and the presence's own parliament.
 
 [The iceberg contract](docs/ICEBERG_SESSION.md) explains the controls,
 checkpoint upgrades and tested dependency revisions. The original `haiku.aml`

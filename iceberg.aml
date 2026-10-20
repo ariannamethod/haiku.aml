@@ -34,6 +34,10 @@ upgrade_concepts = 0
 # Saved v1-v6 lives retain their profile until explicitly upgraded.
 living_form = 1
 upgrade_form = 0
+# Sparse external contexts can acquire private, model-backed word bindings.
+# Existing v7 lives opt in explicitly; missing bodies keep their quiet path.
+neural_bindings = 1
+upgrade_neural = 0
 resuming = 0
 if text_len(state_path) > 0:
     resuming = file_exists(state_path)
@@ -79,6 +83,11 @@ if resuming == 0 and janus_balance and word_learning and living_form:
     life = haiku_iceberg_enable_form(life, tokenizer_model)
 if resuming and upgrade_form:
     life = haiku_iceberg_enable_form(life, tokenizer_model)
+
+if resuming == 0 and janus_balance and word_learning and living_form:
+    life = haiku_iceberg_enable_neural(life, neural_bindings * dream_symbols * (personal_concepts > 0), tokenizer_model)
+if resuming and upgrade_neural:
+    life = haiku_iceberg_enable_neural(life, neural_bindings, tokenizer_model)
 
 path_a = ""
 path_b = ""

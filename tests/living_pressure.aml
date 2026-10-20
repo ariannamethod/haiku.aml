@@ -1,0 +1,106 @@
+IMPORT "../src/session.aml"
+
+def pressure_exact(left, right):
+    first = record_new()
+    second = record_new()
+    record_set(first, "values", left)
+    record_set(second, "values", right)
+    assert(record_equal(first, second), "Living pressure changed exact array bits")
+    return 1
+
+pressure = map_new()
+map_set(pressure, "rain", 0.1875)
+map_set(pressure, "water", -0.125)
+map_set(pressure, "sun", 0.0625)
+assert(haiku_living_word_pressure("rain rain RAIN\nrain", pressure) == 0.1875, "Repeated spelling amplified pressure")
+assert(haiku_living_word_pressure("water water", pressure) == -0.125, "Negative pressure changed its bound")
+assert(haiku_living_word_pressure("rain unknown", pressure) == 0.09375, "Unbound unique word did not retain its denominator")
+assert(haiku_living_word_pressure("rain water", pressure) == 0.03125, "Opposed attractions did not average")
+assert(abs(haiku_living_word_pressure("RAIN water\nsun rain", pressure) - 0.0416666666666667) < 0.00000001, "Multiline unique-word mean differs")
+assert(haiku_living_word_pressure("", pressure) == 0 and haiku_living_word_pressure("unknown", pressure) == 0, "Absent words acquired pressure")
+
+candidates = list_new()
+list_push(candidates, "rain rain rain rain")
+list_push(candidates, "water water")
+list_push(candidates, "sun sun sun sun")
+user = haiku_words("rain water sun")
+params = zeros(57)
+empty = map_new()
+steps = 0
+while steps <= 3:
+    base = haiku_living_rae_select(params, candidates, user, steps, [4])
+    same = haiku_living_rae_pressure(params, candidates, user, steps, [4], empty)
+    pressure_exact(base, same)
+    # Zero MLP gives 0 initially, then the tied recursion contributes .3*.5.
+    expected_base = 0
+    if steps > 0:
+        expected_base = 0.15
+    choice = haiku_living_rae_pressure(params, candidates, user, steps, [4], pressure)
+    assert(choice[0] == 0 and choice[1] == expected_base + 0.1875, "Independent zero-MLP pressure score differs")
+    steps = steps + 1
+
+opposed = map_new()
+map_set(opposed, "rain", -0.1875)
+map_set(opposed, "water", 0.1875)
+choice = haiku_living_rae_pressure(params, candidates, user, 3, [4], opposed)
+assert(choice[0] == 1 and choice[1] == 0.15 + 0.1875, "Remembered pressure did not change the selected actual candidate")
+equal = map_new()
+map_set(equal, "rain", 0.0625)
+map_set(equal, "water", 0.0625)
+map_set(equal, "sun", 0.0625)
+choice = haiku_living_rae_pressure(params, candidates, user, 3, [4], equal)
+assert(choice[0] == 0 and choice[1] == 0.15 + 0.0625, "Equal pressure changed stable first-candidate tie order")
+
+# Nonzero network: reference uses the original recursion and explicit known
+# additions for these three words; no new recursion receives the pressure.
+i = 0
+while i < 57:
+    params[i] = (i - 28) * 0.005
+    i = i + 1
+trace = haiku_living_rae_trace(params, candidates, user, 3, [4])
+additions = [0.1875, -0.125, 0.0625]
+expected = zeros(2)
+expected[1] = trace[9] + additions[0]
+i = 1
+while i < 3:
+    value = trace[9 + i] + additions[i]
+    if value > expected[1]:
+        expected[0] = i
+        expected[1] = value
+    i = i + 1
+pressure_exact(expected, haiku_living_rae_pressure(params, candidates, user, 3, [4], pressure))
+unmatched = map_new()
+map_set(unmatched, "unheard", 0.1875)
+pressure_exact(haiku_living_rae_select(params, candidates, user, 3, [4]), haiku_living_rae_pressure(params, candidates, user, 3, [4], unmatched))
+single = list_new()
+list_push(single, "water water")
+pressure_exact([0, 1], haiku_living_rae_pressure(params, single, user, 3, [4], pressure))
+
+# All four real foreground forms retain the candidate draws and pending core.
+# Pressure is consulted only after generation, before the immutable experience.
+sources = list_new()
+list_push(sources, "rain river water")
+list_push(sources, "rain river water ocean lake tree forest wood leaf light")
+list_push(sources, "rain river water ocean lake tree forest wood leaf light song wind")
+list_push(sources, "rain river water ocean lake tree forest wood leaf light song wind moon star cloud sky dream home earth night")
+forms = [0, 2, 1, 3]
+i = 0
+while i < 4:
+    owner = haiku_state_enable_form(haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0), 0)
+    before = record_clone(owner)
+    old = record_clone(owner)
+    zero = record_clone(owner)
+    weighted = record_clone(owner)
+    source = list_get(sources, i)
+    original = haiku_session_prepare(old, source, 0)
+    neutral = haiku_session_prepare_pressure(zero, source, 0, empty)
+    changed = haiku_session_prepare_pressure(weighted, source, 0, pressure)
+    assert(record_equal(original, neutral) and record_equal(old, zero), "Empty pressure changed the original foreground or pending state")
+    assert(record_equal(old, weighted), "Pressure changed candidate draws, input learning or a pending core leaf")
+    assert(record_equal(owner, before), "Preparing detached candidates changed the live owner")
+    receipt = record_get(original, "form_receipt")
+    assert(receipt[0] == forms[i], "Pressure fixture did not reach its prescribed real form")
+    pressure_exact(receipt, record_get(changed, "form_receipt"))
+    haiku_living_output_check(record_get(changed, "output"), forms[i])
+    i = i + 1
+PRINT "HAIKU_LIVING_PRESSURE_OK"

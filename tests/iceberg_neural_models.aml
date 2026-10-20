@@ -1,0 +1,88 @@
+# Three actual sparse external encounters precede the first private binding.
+# Identical input, owners, providers and draws supply the saved off control.
+IMPORT "../src/iceberg_session.aml"
+
+def neural_models_turn(life, source, a, b, worker, day):
+    before = haiku_iceberg_part(life, "voice")
+    core = record_clone(before)
+    experience = haiku_iceberg_prepare(life, core, source, 0)
+    request = haiku_iceberg_request_at(life, source, a, b, day)
+    pending = record_clone(life)
+    haiku_iceberg_put(pending, "voice", core)
+    if worker:
+        SPAWN neural_tail:
+            return haiku_iceberg_tail(pending, before, experience, request, 0, a, b)
+        AWAIT neural_tail INTO result
+    else:
+        result = haiku_iceberg_tail(pending, before, experience, request, 0, a, b)
+    checked = haiku_iceberg_check_sources(life, result, experience, request, 0, a, b)
+    record_replace(life, checked)
+    return result
+
+a = model_try_load("../weights/haiku1.gguf")
+b = model_try_load("../weights/haiku2.gguf")
+assert(model_ready(a) and model_ready(b), "Neural life fixture requires both immutable PEN7 bodies")
+core = haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0)
+record_set(core, "dream_config", [1, 1, 2])
+base = haiku_iceberg_new(core, [1, 1, 2, 1])
+base = haiku_iceberg_enable_janus(base, 20746, 1, 0)
+base = haiku_iceberg_enable_words(base, 0)
+base = haiku_iceberg_enable_symbols(base, 1, 0)
+base = haiku_iceberg_enable_exchange(base, 1, 0)
+base = haiku_iceberg_enable_concepts(base, 2, 0)
+base = haiku_iceberg_enable_form(base, 0)
+live = haiku_iceberg_enable_neural(base, 1, 0)
+off = haiku_iceberg_enable_neural(base, 0, 0)
+sources = list_new()
+list_push(sources, "the stream rain")
+list_push(sources, "the stream river")
+list_push(sources, "the stream ocean")
+i = 0
+while i < 3:
+    source = list_get(sources, i)
+    prior = record_clone(live)
+    result = neural_models_turn(live, source, a, b, 0, 20746)
+    control = neural_models_turn(off, source, a, b, 0, 20746)
+    experience = haiku_iceberg_part(result, "experience")
+    off_experience = haiku_iceberg_part(control, "experience")
+    assert(record_equal(experience, off_experience), "An unconfirmed association changed its current foreground")
+    contact = haiku_iceberg_part(live, "haiku_contact")
+    known = haiku_contact_neural_lookup(contact, "en", "stream")
+    if i < 2:
+        assert(known[0] < 0, "A neural association resolved before three external contexts")
+    else:
+        assert(known[0] == 0 and known[1] > 0 and known[1] <= 0.25, "Three actual sparse water contexts did not teach stream")
+    PRINT text_concat("You: ", source)
+    PRINT record_get(experience, "output")
+    PRINT text_concat("stream glyph=", text_fixed(known[0], 0))
+    PRINT text_concat("stream strength=", text_fixed(known[1], 9))
+    i = i + 1
+
+# Retain the real promotion before the remaining schema/resume gates.
+checkpoint_save(prior, "iceberg-neural-publication-base.state")
+checkpoint_save(result, "iceberg-neural-publication-result.state")
+checkpoint_save(live, "iceberg-neural-models-third.state")
+checkpoint_save(off, "iceberg-neural-models-off.state")
+assert(list_len(record_keys(live)) == 276 and list_len(record_keys(result)) == 578, "Neural life or publication schema differs")
+assert(record_get(live, "voice:turn") == 3, "Neural fixture lost an actual exchange")
+assert(list_find(record_get(live, "voice:vocab"), "stream") >= 0, "The three real inputs did not admit stream to the speaking cloud")
+off_contact = haiku_iceberg_part(off, "haiku_contact")
+off_known = haiku_contact_learning_lookup(off_contact, "en", "stream")
+assert(off_known[0] < 0, "The sparse teacher control accidentally resolved through the original learner")
+
+# These exact predecessor/completion files carry a real promotion into the
+# adversarial host. Publication has not changed the retained predecessor.
+resumed = checkpoint_load("iceberg-neural-models-third.state")
+haiku_iceberg_check(resumed, 0)
+audit_before = record_clone(resumed)
+assert(haiku_iceberg_neural_audit(resumed, a, b) > 0, "Neural resume did not audit its actual model evidence")
+assert(record_equal(audit_before, resumed), "Neural source audit changed its checkpoint")
+source = "the stream flows"
+result = neural_models_turn(live, source, a, b, 0, 20747)
+parallel = neural_models_turn(resumed, source, a, b, 1, 20747)
+assert(record_equal(result, parallel) and record_equal(live, resumed), "Neural model continuation changed across restart or worker schedule")
+PRINT text_concat("You: ", source)
+PRINT record_get(haiku_iceberg_part(result, "experience"), "output")
+checkpoint_save(live, "iceberg-neural-models.state")
+checkpoint_save(resumed, "iceberg-neural-models-resumed.state")
+PRINT "HAIKU_ICEBERG_NEURAL_MODELS_OK"

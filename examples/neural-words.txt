@@ -1,0 +1,44 @@
+Recorded AML dialogue, both frozen PEN7 bodies, personal concept mode 2.
+Initial voice/model seeds: 575 / 57. Day: 20746; next-turn restart: 20747.
+Source: tests/iceberg_neural_models.aml.
+Reproduce: make test-iceberg-neural AML_ROOT=../ariannamethod.ai
+
+You: the stream rain
+good could emit
+stream glyph=-1
+stream strength=0.000000000
+You: the stream river
+total full shelter
+usually frequently year
+progress without front
+stream glyph=-1
+stream strength=0.000000000
+You: the stream ocean
+sweet sour we good rhythm
+search lose prove morning loud
+adapt react silent
+stream glyph=0
+stream strength=0.250000000
+You: the stream flows
+when can grasp harsh depth
+detect identify join
+transfer share dead
+HAIKU_ICEBERG_NEURAL_MODELS_OK
+
+Controlled selection from the same three-encounter checkpoint.
+Only the foreground RNG is set to the declared seed 67 in both branches;
+word pressure is the sole difference between their selection paths.
+Source: tests/neural_foreground.aml. Interpreter and compiled output match.
+
+Same learned history, input rain, foreground seed 67:
+Actual prior stream pressure:
+1.32726582e-05
+Pressure disabled:
+balance tune at
+validate visible
+configure flow
+Pressure enabled:
+any give pursue
+demonstrate reveal stream
+yes maybe that fake
+HAIKU_NEURAL_FOREGROUND_OK

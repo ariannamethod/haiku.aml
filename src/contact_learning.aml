@@ -153,7 +153,7 @@ def haiku_contact_learning_lookup(state, language, word):
             slot = i
         i = i + 1
     if slot < 0:
-        return result
+        return haiku_contact_neural_lookup(state, language, word)
     counts = record_get(state, "learn_counts")
     rows = record_get(state, "learn_rows")
     best = 0
@@ -178,6 +178,8 @@ def haiku_contact_learning_lookup(state, language, word):
     if best >= 3 and best - runner >= 2 and best / max(1, total) >= 0.75:
         result[0] = glyph
         result[1] = 0.5 * best / total
+    if result[0] < 0:
+        return haiku_contact_neural_lookup(state, language, word)
     return result
 
 # Counts are an index of the retained receipts, not an independent claim.

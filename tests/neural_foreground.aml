@@ -1,0 +1,29 @@
+# Controlled foreground comparison after three genuine two-body encounters.
+# Seed 67 is a declared generation control; both branches retain identical
+# learned history, input, five candidates and draws. Only word pressure differs.
+IMPORT "../src/iceberg_session.aml"
+life = checkpoint_load("iceberg-neural-models-third.state")
+original = record_clone(life)
+contact = haiku_iceberg_part(life, "haiku_contact")
+known = haiku_contact_learning_lookup(contact, "en", "stream")
+assert(known[0] == 0 and known[1] == 0.25, "Foreground comparison needs the real learned stream association")
+pressure = haiku_iceberg_neural_pressure(life)
+assert(map_has(pressure, "stream") and map_get(pressure, "stream") > 0, "Actual parliament did not supply learned word pressure")
+core = haiku_iceberg_part(life, "voice")
+record_set(core, "voice_rng", rng_new(67))
+first = record_clone(core)
+second = record_clone(core)
+plain = haiku_session_prepare(first, "rain", 0)
+influenced = haiku_iceberg_prepare(life, second, "rain", 0)
+assert(record_equal(first, second), "Neural foreground changed generation, candidates or draws")
+assert(record_equal(life, original), "Neural foreground changed its source life")
+assert(text_equal(record_get(plain, "output"), "balance tune at\nvalidate visible\nconfigure flow"), "Controlled plain reply differs")
+assert(text_equal(record_get(influenced, "output"), "any give pursue\ndemonstrate reveal stream\nyes maybe that fake"), "Controlled learned reply differs")
+PRINT "Same learned history, input rain, foreground seed 67:"
+PRINT "Actual prior stream pressure:"
+PRINT map_get(pressure, "stream")
+PRINT "Pressure disabled:"
+PRINT record_get(plain, "output")
+PRINT "Pressure enabled:"
+PRINT record_get(influenced, "output")
+PRINT "HAIKU_NEURAL_FOREGROUND_OK"

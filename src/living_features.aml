@@ -194,3 +194,35 @@ def haiku_living_rae_observe(params, state, selected, user, quality, targets):
     haiku_learner_publish(params, step)
     map_set(state, count_key, observations + 1)
     return step[1]
+
+# A remembered attraction reaches the foreground through the same five
+# candidates and recursive scores. Unique-word averaging prevents repetition
+# from amplifying one binding. The caller supplies only prior owned evidence.
+def haiku_living_word_pressure(source, pressure):
+    words = haiku_unique(haiku_words(text_lower(source)))
+    total = 0
+    i = 0
+    while i < list_len(words):
+        word = list_get(words, i)
+        if map_has(pressure, word):
+            value = map_get(pressure, word)
+            assert(isfinite(value) and abs(value) <= 0.187501, "Living word pressure exceeds its bound")
+            total = total + value
+        i = i + 1
+    return total / max(1, list_len(words))
+
+def haiku_living_rae_pressure(params, candidates, user, steps, targets, pressure):
+    if map_len(pressure) == 0 or list_len(candidates) == 1:
+        return haiku_living_rae_select(params, candidates, user, steps, targets)
+    size = list_len(candidates)
+    trace = haiku_living_rae_trace(params, candidates, user, steps, targets)
+    result = zeros(2)
+    result[1] = trace[steps * size] + haiku_living_word_pressure(list_get(candidates, 0), pressure)
+    cursor = 1
+    while cursor < size:
+        score = trace[steps * size + cursor] + haiku_living_word_pressure(list_get(candidates, cursor), pressure)
+        if score > result[1]:
+            result[0] = cursor
+            result[1] = score
+        cursor = cursor + 1
+    return result
