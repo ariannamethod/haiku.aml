@@ -141,16 +141,16 @@ Its frozen learning features and original human observation retain their values.
 
 ## One publication, one checkpoint
 
-Version 7 has **268 flat fields** and version 6 has **265**; versions 5/4/3/2/1 retain
+Version 8 has **276 flat fields**, version 7 has **268**, and version 6 has **265**; versions 5/4/3/2/1 retain
 **253/245/237/227/185**:
 
 | Component | Fields |
 |---|---:|
-| Speaking voice | 58 in v7; 55 in v1–6 |
+| Speaking voice | 58 in v7/v8; 55 in v1–6 |
 | Haiku and friend lexical owners | 18 each |
-| Haiku and friend contact owners | 61 each in v6/v7; 55 in v5; 51 in v4; 47 in v3; 42 in v1/v2 |
-| Haiku and friend Janus owners, versions 2–7 | 20 each |
-| Envelope, component key lists, settings and admission ledger | 12 in v2–7; 10 in v1 |
+| Haiku and friend contact owners | 65 each in v8; 61 in v6/v7; 55 in v5; 51 in v4; 47 in v3; 42 in v1/v2 |
+| Haiku and friend Janus owners, versions 2–8 | 20 each |
+| Envelope, component key lists, settings and admission ledger | 12 in v2–8; 10 in v1 |
 
 The version-4 voice adds a form policy, activation turn and nine-value decision
 rows. Its inner voice and dream partners retain their three-line forms. `iceberg.state` is a separate
@@ -263,6 +263,8 @@ New-life settings at the top of `iceberg.aml` are saved with the checkpoint:
 | `upgrade_concepts` | 0 | Explicitly activates concepts for an existing version-5 life |
 | `living_form` | 1 | Gives a new complete life version-7 state-driven speaking forms |
 | `upgrade_form` | 0 | Explicitly activates speaking forms for an existing version-6 life |
+| `neural_bindings` | 1 | Gives a new complete life v8 model-corroborated private word bindings; zero selects an inert control |
+| `upgrade_neural` | 0 | Explicitly activates neural bindings for an existing v7 life |
 
 An existing checkpoint retains its first four settings. The scheduling choice
 can change without changing the complete result. For a new control condition,
@@ -314,6 +316,14 @@ their policy. The source-climate receipt travels through generation, recursive
 selection, learning, journal, worker validation and checkpoint publication.
 Every decision can be recomputed from retained climate history. The worker must
 preserve earlier words and numerical history exactly, including signed-zero bits.
+
+`haiku_iceberg_enable_neural(life, enabled, tokenizer)` returns a detached,
+idempotent v8 upgrade from v7. Four new leaves per contact retain the private
+words and their exact external/model proofs. In v8 the existing concept audit
+also rechecks retained neural query scores. [Neural words](NEURAL_WORDS.md)
+defines sparse-context eligibility, source policy, work budgets and the bounded
+foreground pressure. Direct foreground callers use `haiku_iceberg_prepare`;
+the publisher reproduces its choice from the frozen predecessor.
 
 `haiku_iceberg_turn_at(..., worker, day)` accepts an explicit day for replay and
 controlled experiments. The ordinary turn samples AML's `utc_day()` once for

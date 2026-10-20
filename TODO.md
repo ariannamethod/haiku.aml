@@ -71,8 +71,12 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   from each presence's retained external encounters. Compare their later word
   ranking with equal word weights and representation-off controls; preserve
   frozen source bodies, exact publication and restart.
-- [ ] Let model representations contribute to glyph formation and learned
-  concept bindings; let that field influence later parameter mixing and words.
+- [x] Let model representations corroborate private word/concept bindings from
+  repeated sparse external contexts. Carry those bindings into later contact,
+  symbol paths and foreground candidate selection, with exact source-backed
+  publication and restart. See [neural words](docs/NEURAL_WORDS.md).
+- [ ] Extend model-attributed formation to recurring representation structure
+  beyond the four named centres; let that field influence later parameter mixing.
   Use NoTorch for numerical work, retain shared concept identities and each
   presence's own experience, and compare with the working weightless field.
   The [four-anchor PEN7 probe](docs/research/iceberg/WORD_ANCHOR_PROBE.md)
@@ -81,8 +85,9 @@ The implementation order is in [MIGRATION.md](docs/MIGRATION.md).
   [concept-basis comparison](docs/research/iceberg/CONCEPT_BASIS.md) moves the
   .5 mixture from 6/24 to 8/24 with reviewed-word centroids, while A moves
   11/24 to 8/24. The live profile now adds each presence's accepted experience
-  to those word weights. New binding votes, glyph formation and their contribution
-  to later parameter balance remain separate experiments.
+  to those word weights. Version 8 adds context-corroborated binding votes and
+  their later symbol paths; representation-driven compound formation and its
+  contribution to later parameter balance remain separate experiments.
 - [x] Let each presence send a selected human/self/friend fragment into
   its owned lexical trajectory and receive word/glyph proposals at a declared
   boundary. Preserve source ancestry, frozen bodies, private histories and

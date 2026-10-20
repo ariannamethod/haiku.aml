@@ -1,0 +1,555 @@
+# A sparse external context can acquire a private neural association. One
+# reviewed local teacher and the frozen bodies must agree. The retained query,
+# prior personal centres and endpoint scores keep every vote reproducible.
+
+def haiku_contact_enable_neural(state, enabled):
+    haiku_contact_check(state)
+    haiku_contact_integer(enabled, 0, 1)
+    assert(record_get(state, "version") >= 5, "Neural associations require personal concepts")
+    pending = record_clone(state)
+    if record_get(state, "version") >= 6:
+        return pending
+    concept = record_get(state, "concept_clock")
+    assert(enabled == 0 or concept[0] > 0, "Neural associations require enabled concept centres")
+    source = 0
+    if text_equal(record_get(state, "p:owner"), "friend"):
+        source = 6
+    seen = record_get(state, "p:seen")
+    clock = zeros(6)
+    clock[0] = enabled
+    clock[1] = seen[source]
+    clock[2] = record_get(state, "p:clock")
+    clock[3] = clock[1]
+    clock[4] = clock[2]
+    words = list_new()
+    texts = list_new()
+    i = 0
+    while i < 64:
+        list_push(words, "")
+        i = i + 1
+    i = 0
+    while i < 1536:
+        list_push(texts, "")
+        i = i + 1
+    record_set(pending, "version", 6)
+    record_set(pending, "neural_clock", clock)
+    record_set(pending, "neural_words", words)
+    record_set(pending, "neural_rows", zeros(46464))
+    record_set(pending, "neural_text", texts)
+    haiku_contact_check(pending)
+    return pending
+
+# A target must occur exactly once in the whole bounded encounter. This keeps
+# one complete query per candidate and never hides a second conflicting use.
+# All reviewed teachers count, including anchors outside the four model centres.
+def haiku_contact_neural_window(tokens, index):
+    result = record_new()
+    record_set(result, "eligible", 0)
+    record_set(result, "teacher", -1)
+    record_set(result, "query", "")
+    record_set(result, "signature", "")
+    if list_len(tokens) == 0 or list_len(tokens) > 64:
+        return result
+    word = list_get(tokens, index)
+    if haiku_contact_learning_word("en", word) == 0:
+        return result
+    teachers = haiku_contact_bindings()
+    if map_has(teachers, haiku_contact_key("en", word)):
+        return result
+    occurrences = 0
+    i = 0
+    while i < list_len(tokens):
+        if text_equal(list_get(tokens, i), word):
+            occurrences = occurrences + 1
+        i = i + 1
+    if occurrences != 1:
+        return result
+    spellings = list_new()
+    local = list_new()
+    query = ""
+    teacher = -1
+    i = max(0, index - 3)
+    while i < min(list_len(tokens), index + 4):
+        token = list_get(tokens, i)
+        if text_len(query) > 0:
+            query = text_concat(query, " ")
+        query = text_concat(query, token)
+        if list_find(local, token) < 0:
+            list_push(local, token)
+        key = haiku_contact_key("en", token)
+        if map_has(teachers, key) and list_find(spellings, token) < 0:
+            list_push(spellings, token)
+            teacher = map_get(teachers, key)
+        i = i + 1
+    if list_len(spellings) != 1 or text_len(query) > 1024:
+        return result
+    if teacher != 0 and teacher != 4 and teacher != 6 and teacher != 82:
+        return result
+    record_set(result, "eligible", 1)
+    record_set(result, "teacher", teacher)
+    record_set(result, "query", query)
+    record_set(result, "signature", list_key(list_sorted(local)))
+    return result
+
+# Explicit fixed numerical gate. A non-supporting available projection stays
+# as an ambiguous retained context and can revoke an earlier association.
+def haiku_contact_neural_verdict(raw_a, raw_b, alpha, teacher):
+    ids = [0, 4, 6, 82]
+    best = -2
+    runner = -2
+    glyph = -1
+    i = 0
+    while i < 4:
+        value = alpha * raw_a[i] + (1 - alpha) * raw_b[i]
+        if value > best:
+            runner = best
+            best = value
+            glyph = ids[i]
+        else:
+            runner = max(runner, value)
+        i = i + 1
+    return 1 + (glyph != teacher or best <= 0 or best - runner < 0.01)
+
+def haiku_contact_neural_lookup(state, language, word):
+    result = [-1, 0]
+    if record_get(state, "version") < 6 or text_equal(language, "en") == 0:
+        return result
+    clock = record_get(state, "neural_clock")
+    if clock[0] == 0:
+        return result
+    words = record_get(state, "neural_words")
+    rows = record_get(state, "neural_rows")
+    slot = -1
+    i = 0
+    while i < 32:
+        if text_equal(list_get(words, i * 2), language) and text_equal(list_get(words, i * 2 + 1), text_lower(word)):
+            slot = i
+        i = i + 1
+    if slot < 0:
+        return result
+    counts = zeros(88)
+    total = 0
+    i = 0
+    while i < 6:
+        row = (slot * 6 + i) * 242
+        if rows[row] > 0:
+            total = total + 1
+            if rows[row + 10] == 1:
+                counts[rows[row + 9]] = counts[rows[row + 9]] + 1
+        i = i + 1
+    best = 0
+    runner = 0
+    glyph = -1
+    i = 0
+    while i < 88:
+        if counts[i] > best:
+            runner = best
+            best = counts[i]
+            glyph = i
+        else:
+            runner = max(runner, counts[i])
+        i = i + 1
+    if best >= 3 and best - runner >= 2 and best / max(1, total) >= 0.75:
+        result[0] = glyph
+        result[1] = 0.25 * best / total
+    return result
+
+# The structural validator reproduces spelling, local teacher, scalar verdict,
+# ancestry and dedupe. Source audit additionally proves every endpoint score.
+def haiku_contact_neural_check(state):
+    clock = record_get(state, "neural_clock")
+    words = record_get(state, "neural_words")
+    rows = record_get(state, "neural_rows")
+    texts = record_get(state, "neural_text")
+    haiku_parliament_vector(clock, 6, 999999)
+    assert(len(rows) == 46464 and rows(rows) == 0 and cols(rows) == 0, "Neural association proof shape differs")
+    assert(list_len(words) == 64 and list_len(texts) == 1536, "Neural association text shape differs")
+    i = 0
+    while i < 6:
+        haiku_contact_integer(clock[i], 0, 999999)
+        i = i + 1
+    assert(clock[0] == 0 or clock[0] == 1, "Neural association mode differs")
+    assert(clock[3] >= clock[1] and clock[4] >= clock[2] and clock[5] <= clock[3] - clock[1], "Neural association clock differs")
+    if clock[5] == 0:
+        assert(clock[3] == clock[1] and clock[4] == clock[2], "Neural association empty clock differs")
+    else:
+        assert(clock[0] == 1 and clock[3] > clock[1] and clock[4] > clock[2], "Neural association lived clock differs")
+    owner = record_get(state, "p:owner")
+    assert(text_equal(owner, "haiku") or text_equal(owner, "friend"), "Neural association owner differs")
+    source = 0
+    if text_equal(owner, "friend"):
+        source = 6
+    seen = record_get(state, "p:seen")
+    assert(clock[3] <= seen[source] and clock[4] <= record_get(state, "p:clock"), "Neural association exceeds publication")
+    concept = record_get(state, "concept_clock")
+    assert(clock[0] == 0 or concept[0] > 0, "Neural association centres are disabled")
+    identity = record_get(state, "concept_identity")
+    keys = list_new()
+    empty = 0
+    events = map_new()
+    event_counts = map_new()
+    revisions = map_new()
+    slot = 0
+    while slot < 32:
+        language = list_get(words, slot * 2)
+        word = list_get(words, slot * 2 + 1)
+        occupied = text_len(language) > 0
+        if occupied:
+            assert(clock[0] == 1 and empty == 0 and text_equal(language, "en") and haiku_contact_learning_word(language, word), "Neural association candidate differs")
+            key = haiku_contact_key(language, word)
+            assert(map_has(haiku_contact_bindings(), key) == 0 and list_find(keys, key) < 0, "Neural association repeats a reviewed word")
+            list_push(keys, key)
+        else:
+            empty = 1
+            assert(text_len(word) == 0, "Neural association empty candidate has a word")
+        used = 0
+        history = 0
+        while history < 6:
+            row = (slot * 6 + history) * 242
+            tr = (slot * 6 + history) * 8
+            if rows[row] > 0:
+                used = used + 1
+                assert(occupied, "Neural association proof has no candidate")
+                event = haiku_contact_integer(rows[row], clock[1] + 1, clock[3])
+                turn = haiku_contact_integer(rows[row + 1], clock[2] + 1, clock[4])
+                revision = haiku_contact_integer(rows[row + 2], 1, clock[5])
+                assert(revision <= event - clock[1] and rows[row + 3] == source, "Neural association proof clock differs")
+                if source == 0:
+                    assert(rows[row + 4] == 0 and rows[row + 5] == event and rows[row + 6] == -1 and rows[row + 7] == 0, "Neural association human ancestry differs")
+                    assert(text_equal(list_get(texts, tr + 3), "human") and text_len(list_get(texts, tr + 4)) == 0, "Neural association human owner differs")
+                else:
+                    assert(rows[row + 4] == 7 and rows[row + 5] == event and rows[row + 6] == 7 and rows[row + 7] == event, "Neural association peer ancestry differs")
+                    assert(text_equal(list_get(texts, tr + 3), "haiku") and text_equal(list_get(texts, tr + 4), "haiku"), "Neural association peer owner differs")
+                raw = list_get(texts, tr)
+                assert(text_len(raw) <= 10000, "Neural association source is too long")
+                tokens = haiku_tokenize_regex(raw)
+                assert(list_len(tokens) > 0 and list_len(tokens) <= 64, "Neural association source budget differs")
+                index = haiku_contact_integer(rows[row + 8], 0, list_len(tokens) - 1)
+                assert(text_equal(list_get(tokens, index), word), "Neural association source lost its word")
+                window = haiku_contact_neural_window(tokens, index)
+                assert(record_get(window, "eligible") and rows[row + 9] == record_get(window, "teacher"), "Neural association local teacher differs")
+                assert(text_equal(list_get(texts, tr + 1), record_get(window, "signature")) and text_equal(list_get(texts, tr + 2), record_get(window, "query")), "Neural association local query differs")
+                mask = rows[row + 11]
+                assert(mask == 2 or mask == 4 or mask == 6, "Neural association provider mask differs")
+                alpha = 0.5
+                if mask == 2:
+                    alpha = 1
+                if mask == 4:
+                    alpha = 0
+                assert(rows[row + 12] == alpha, "Neural association scalar mixture differs")
+                assert(rows[row + 13] == concept[0], "Neural association concept mode differs")
+                haiku_contact_integer(rows[row + 14], 0, concept[1])
+                haiku_contact_integer(rows[row + 15], 0, min(concept[2], event - 1))
+                haiku_contact_integer(rows[row + 16], 0, min(concept[3], turn - 1))
+                haiku_contact_integer(rows[row + 17], 0, concept[4])
+                if rows[row + 14] == 0:
+                    assert(rows[row + 15] == 0 and rows[row + 16] == 0 and rows[row + 17] == 0, "Neural association empty concept snapshot differs")
+                else:
+                    assert(rows[row + 15] > 0 and rows[row + 16] > 0 and rows[row + 17] > 0, "Neural association concept snapshot has no witness")
+                j = 0
+                while j < 21:
+                    haiku_contact_integer(rows[row + 19 + j], 0, 128)
+                    if rows[row + 13] == 1 or rows[row + 14] == 0:
+                        assert(rows[row + 19 + j] == 0, "Neural association equal or empty centre has counts")
+                    j = j + 1
+                count = haiku_contact_integer(rows[row + 18], 1, 194)
+                j = 0
+                while j < 194:
+                    haiku_contact_integer(rows[row + 48 + j], 0, 2047)
+                    if j >= count:
+                        assert(rows[row + 48 + j] == 0, "Neural association query padding differs")
+                    j = j + 1
+                raw_a = haiku_parliament_part(rows, row + 40, 4)
+                raw_b = haiku_parliament_part(rows, row + 44, 4)
+                haiku_parliament_vector(raw_a, 4, 1.00001)
+                haiku_parliament_vector(raw_b, 4, 1.00001)
+                if mask == 2:
+                    assert(haiku_parliament_dot(raw_b, raw_b) == 0 and text_len(list_get(texts, tr + 6)) == 0, "Neural association absent B has evidence")
+                else:
+                    assert(text_equal(list_get(texts, tr + 6), list_get(identity, 3)) and text_len(list_get(texts, tr + 6)) > 0, "Neural association B identity differs")
+                if mask == 4:
+                    assert(haiku_parliament_dot(raw_a, raw_a) == 0 and text_len(list_get(texts, tr + 5)) == 0, "Neural association absent A has evidence")
+                else:
+                    assert(text_equal(list_get(texts, tr + 5), list_get(identity, 2)) and text_len(list_get(texts, tr + 5)) > 0, "Neural association A identity differs")
+                assert(text_equal(list_get(texts, tr + 7), list_get(identity, 4)) and text_len(list_get(texts, tr + 7)) > 0, "Neural association tokenizer differs")
+                assert(rows[row + 10] == haiku_contact_neural_verdict(raw_a, raw_b, alpha, rows[row + 9]), "Neural association numerical verdict differs")
+                event_key = text_fixed(event, 0)
+                event_count = 1
+                if map_has(event_counts, event_key):
+                    event_count = map_get(event_counts, event_key) + 1
+                assert(event_count <= 4, "Neural association event exceeds candidate budget")
+                map_set(event_counts, event_key, event_count)
+                if map_has(events, event_key):
+                    prior = map_get(events, event_key)
+                    assert(rows[prior * 242 + 1] == turn and rows[prior * 242 + 2] == revision, "Neural association shared event clock differs")
+                    assert(text_equal(list_get(texts, prior * 8), raw), "Neural association shared source differs")
+                    j = 11
+                    while j < 18:
+                        assert(rows[prior * 242 + j] == rows[row + j], "Neural association shared provider or snapshot differs")
+                        j = j + 1
+                    j = 19
+                    while j < 40:
+                        assert(rows[prior * 242 + j] == rows[row + j], "Neural association shared centre counts differ")
+                        j = j + 1
+                else:
+                    map_set(events, event_key, slot * 6 + history)
+                revision_key = text_fixed(revision, 0)
+                if map_has(revisions, revision_key):
+                    assert(map_get(revisions, revision_key) == event, "Neural association revision repeats")
+                else:
+                    map_set(revisions, revision_key, event)
+                earlier = 0
+                while earlier < history:
+                    old = (slot * 6 + earlier) * 242
+                    if rows[old] > 0:
+                        assert(rows[old] != event and rows[old + 1] != turn, "Neural association repeats an encounter")
+                        assert(text_equal(list_get(texts, (slot * 6 + earlier) * 8 + 1), list_get(texts, tr + 1)) == 0, "Neural association repeats a context")
+                    earlier = earlier + 1
+            else:
+                j = 0
+                while j < 242:
+                    assert(rows[row + j] == 0, "Neural association empty proof has values")
+                    j = j + 1
+                j = 0
+                while j < 8:
+                    assert(text_len(list_get(texts, tr + j)) == 0, "Neural association empty proof has text")
+                    j = j + 1
+            history = history + 1
+        assert(occupied == (used > 0), "Neural association candidate has no proofs")
+        slot = slot + 1
+    return 1
+
+# Called immediately after accepted external publication. The ordinary learner
+# has already run, so the sealed source is checked without recomputing features.
+def haiku_contact_neural_observe(state, event, a, b):
+    result = record_new()
+    record_set(result, "committed", 0)
+    record_set(result, "observed", 0)
+    record_set(result, "duplicates", 0)
+    record_set(result, "refused", 0)
+    record_set(result, "forwards", 0)
+    haiku_contact_event_check(event)
+    if record_get(state, "version") < 6:
+        return result
+    clock = record_get(state, "neural_clock")
+    if clock[0] == 0 or record_get(event, "replay") or record_get(event, "event") <= clock[3] or record_get(event, "turn") <= clock[2]:
+        return result
+    owner = record_get(state, "p:owner")
+    source = record_get(event, "source")
+    number = record_get(event, "event")
+    legitimate = text_equal(owner, "haiku") and source == 0 and text_equal(record_get(event, "owner"), "human")
+    if text_equal(owner, "friend") and source == 6:
+        legitimate = text_equal(record_get(event, "owner"), "friend") and text_equal(record_get(event, "origin_owner"), "haiku") and text_equal(record_get(event, "parent_owner"), "haiku")
+        legitimate = legitimate and record_get(event, "origin_source") == 7 and record_get(event, "parent_source") == 7 and record_get(event, "origin_event") == number and record_get(event, "parent_event") == number
+    if legitimate == 0 or haiku_lexical_availability(a, b) == 0:
+        return result
+    haiku_contact_check(state)
+    latest = record_get(state, "p:receipt_cursor") - 1
+    if latest < 0:
+        latest = 31
+    published = record_get(state, "p:receipt_rows")
+    assert(published[latest * 9] == number and published[latest * 9 + 2] == source and published[latest * 9 + 1] == record_get(event, "turn"), "Neural association needs the latest published encounter")
+    names = haiku_words("owner text language origin_owner parent_owner identity")
+    texts = record_get(state, "contact_text")
+    i = 0
+    while i < 6:
+        assert(text_equal(list_get(texts, latest * 6 + i), record_get(event, list_get(names, i))), "Neural association published source differs")
+        i = i + 1
+    names = haiku_words("parent_source parent_event origin_source origin_event alpha representation_gain representation_available availability")
+    meta = record_get(state, "contact_meta")
+    i = 0
+    while i < 8:
+        assert(meta[latest * 8 + i] == record_get(event, list_get(names, i)), "Neural association published ancestry differs")
+        i = i + 1
+    turn = record_get(event, "turn")
+    assert(turn >= clock[4] and clock[5] < 999999, "Neural association encounter moved backward")
+    concept = record_get(state, "concept_clock")
+    assert(concept[3] < turn, "Neural association centre is not from an earlier turn")
+    pending = record_clone(state)
+    clock = record_get(pending, "neural_clock")
+    clock[3] = number
+    clock[4] = turn
+    clock[5] = clock[5] + 1
+    words = record_get(pending, "neural_words")
+    rows = record_get(pending, "neural_rows")
+    texts = record_get(pending, "neural_text")
+    tokens = haiku_tokenize_regex(record_get(event, "text"))
+    tokenizer = haiku_lexical_model(a, b)
+    cache = record_new()
+    counts = record_get(state, "concept_counts")
+    if concept[0] == 1:
+        counts = zeros(21)
+    processed = 0
+    index = 0
+    if text_equal(record_get(event, "language"), "en") == 0 or list_len(tokens) > 64:
+        index = list_len(tokens)
+    while index < list_len(tokens) and processed < 4:
+        word = list_get(tokens, index)
+        window = haiku_contact_neural_window(tokens, index)
+        if record_get(window, "eligible") and map_has(record_get(state, "bindings"), haiku_contact_key("en", word)) == 0:
+            processed = processed + 1
+            slot = -1
+            free = -1
+            i = 0
+            while i < 32:
+                if text_len(list_get(words, i * 2)) == 0 and free < 0:
+                    free = i
+                if text_equal(list_get(words, i * 2 + 1), word):
+                    slot = i
+                i = i + 1
+            if slot < 0:
+                slot = free
+            if slot < 0:
+                record_set(result, "refused", record_get(result, "refused") + 1)
+            else:
+                duplicate = 0
+                oldest = 0
+                smallest = 1000000
+                i = 0
+                while i < 6:
+                    row = (slot * 6 + i) * 242
+                    if rows[row] > 0 and (rows[row + 1] == turn or text_equal(list_get(texts, (slot * 6 + i) * 8 + 1), record_get(window, "signature"))):
+                        duplicate = 1
+                    if rows[row + 2] < smallest:
+                        smallest = rows[row + 2]
+                        oldest = i
+                    i = i + 1
+                if duplicate:
+                    record_set(result, "duplicates", record_get(result, "duplicates") + 1)
+                else:
+                    # The extra token exposes truncation at the 194-token cap.
+                    query = model_encode(tokenizer, record_get(window, "query"), 195)
+                    if len(query) < 1 or len(query) > 194:
+                        record_set(result, "refused", record_get(result, "refused") + 1)
+                    else:
+                        if list_len(record_keys(cache)) == 0:
+                            cache = haiku_concept_cache(a, b, haiku_contact_concept_cache(state))
+                            record_set(result, "forwards", record_get(result, "forwards") + record_get(cache, "forwards"))
+                            if record_get(cache, "ok") == 0:
+                                return result
+                        projection = haiku_concept_project(cache, counts, query, a, b, 0.5)
+                        record_set(result, "forwards", record_get(result, "forwards") + record_get(projection, "forwards"))
+                        if record_get(projection, "ok") == 0:
+                            return result
+                        row = (slot * 6 + oldest) * 242
+                        tr = (slot * 6 + oldest) * 8
+                        i = 0
+                        while i < 242:
+                            rows[row + i] = 0
+                            i = i + 1
+                        list_set(words, slot * 2, "en")
+                        list_set(words, slot * 2 + 1, word)
+                        rows[row] = number
+                        rows[row + 1] = turn
+                        rows[row + 2] = clock[5]
+                        rows[row + 3] = source
+                        rows[row + 4] = record_get(event, "origin_source")
+                        rows[row + 5] = record_get(event, "origin_event")
+                        rows[row + 6] = record_get(event, "parent_source")
+                        rows[row + 7] = record_get(event, "parent_event")
+                        rows[row + 8] = index
+                        rows[row + 9] = record_get(window, "teacher")
+                        rows[row + 11] = record_get(projection, "availability")
+                        rows[row + 12] = record_get(projection, "alpha")
+                        i = 0
+                        while i < 5:
+                            rows[row + 13 + i] = concept[i]
+                            i = i + 1
+                        rows[row + 18] = len(query)
+                        i = 0
+                        while i < 21:
+                            rows[row + 19 + i] = counts[i]
+                            i = i + 1
+                        raw_a = zeros(4)
+                        raw_b = zeros(4)
+                        projected_a = record_get(projection, "raw_a")
+                        projected_b = record_get(projection, "raw_b")
+                        ids = [0, 4, 6, 82]
+                        i = 0
+                        while i < 4:
+                            raw_a[i] = projected_a[ids[i]]
+                            raw_b[i] = projected_b[ids[i]]
+                            rows[row + 40 + i] = raw_a[i]
+                            rows[row + 44 + i] = raw_b[i]
+                            i = i + 1
+                        rows[row + 10] = haiku_contact_neural_verdict(raw_a, raw_b, rows[row + 12], rows[row + 9])
+                        i = 0
+                        while i < len(query):
+                            rows[row + 48 + i] = query[i]
+                            i = i + 1
+                        list_set(texts, tr, record_get(event, "text"))
+                        list_set(texts, tr + 1, record_get(window, "signature"))
+                        list_set(texts, tr + 2, record_get(window, "query"))
+                        list_set(texts, tr + 3, record_get(event, "origin_owner"))
+                        list_set(texts, tr + 4, record_get(event, "parent_owner"))
+                        list_set(texts, tr + 5, "")
+                        list_set(texts, tr + 6, "")
+                        if model_ready(a):
+                            list_set(texts, tr + 5, model_identity(a))
+                        if model_ready(b):
+                            list_set(texts, tr + 6, model_identity(b))
+                        list_set(texts, tr + 7, model_tokenizer_identity(tokenizer))
+                        record_set(result, "observed", record_get(result, "observed") + 1)
+        index = index + 1
+    if list_len(record_keys(cache)) > 0:
+        names = haiku_words("identity units_a units_b tokens")
+        i = 0
+        while i < 4:
+            name = list_get(names, i)
+            record_set(pending, text_concat("concept_", name), record_get(cache, name))
+            i = i + 1
+    record_set(pending, "neural_words", words)
+    record_set(pending, "neural_text", texts)
+    haiku_contact_check(pending)
+    record_replace(state, pending)
+    record_set(result, "committed", 1)
+    return result
+
+# Resume/body-return audit: rebuild available bank endpoints, then verify each
+# retained query against its own recorded counts. Availability today does not
+# rewrite yesterday's mask, mixture, endpoint scores or decision.
+def haiku_contact_neural_audit(state, a, b):
+    haiku_contact_check(state)
+    if record_get(state, "version") < 6:
+        return 0
+    cache = haiku_contact_concept_cache(state)
+    audit = haiku_concept_audit(cache, a, b)
+    assert(record_get(audit, "ok"), "Neural association bank audit failed")
+    calls = record_get(audit, "forwards")
+    rows = record_get(state, "neural_rows")
+    texts = record_get(state, "neural_text")
+    ids = [0, 4, 6, 82]
+    slot = 0
+    while slot < 192:
+        row = slot * 242
+        tr = slot * 8
+        if rows[row] > 0:
+            side = 0
+            while side < 2:
+                model = a
+                key = "units_a"
+                present = rows[row + 11] == 2 or rows[row + 11] == 6
+                if side == 1:
+                    model = b
+                    key = "units_b"
+                    present = rows[row + 11] == 4 or rows[row + 11] == 6
+                if present and model_ready(model):
+                    assert(text_equal(model_identity(model), list_get(texts, tr + 5 + side)) and text_equal(model_tokenizer_identity(model), list_get(texts, tr + 7)), "Neural association audited provider differs")
+                    tokens = model_encode(model, list_get(texts, tr + 2), 195)
+                    assert(len(tokens) == rows[row + 18], "Neural association audited token length differs")
+                    j = 0
+                    while j < len(tokens):
+                        assert(tokens[j] == rows[row + 48 + j], "Neural association audited tokens differ")
+                        j = j + 1
+                    output = model_forward(model, tokens)
+                    calls = calls + 1
+                    assert(record_get(output, "ok"), "Neural association audited forward failed")
+                    counts = haiku_parliament_part(rows, row + 19, 21)
+                    scores = haiku_concept_scores(record_get(cache, key), counts, record_get(output, "hidden"))
+                    j = 0
+                    while j < 4:
+                        assert(scores[ids[j]] == rows[row + 40 + side * 4 + j], "Neural association audited endpoint score differs")
+                        j = j + 1
+                side = side + 1
+        slot = slot + 1
+    return calls

@@ -10,6 +10,7 @@ IMPORT "contact_learning.aml"
 IMPORT "contact_symbols.aml"
 IMPORT "contact_exchange.aml"
 IMPORT "contact_concepts.aml"
+IMPORT "contact_neural.aml"
 
 def haiku_contact_anchors():
     names = "water fire earth stone tree sky light dark cold person man woman child old spirit AI animal body food sleep pain strength "
@@ -136,12 +137,14 @@ def haiku_contact_check(state):
             expected = 51
         if version >= 4:
             expected = 55
-        if version == 5:
+        if version >= 5:
             expected = 61
+        if version >= 6:
+            expected = 65
         assert(list_len(record_keys(state)) == expected, "Contact learning field count differs")
     else:
         assert(list_len(record_keys(state)) == 42, "Contact needs exactly forty-two fields")
-    assert(text_equal(record_get(state, "format"), "haiku-contact") and (version == 1 or version == 2 or version == 3 or version == 4 or version == 5), "Contact format is invalid")
+    assert(text_equal(record_get(state, "format"), "haiku-contact") and (version == 1 or version == 2 or version == 3 or version == 4 or version == 5 or version == 6), "Contact format is invalid")
     parliament = haiku_contact_parliament(state)
     haiku_parliament_check(parliament)
     assert(text_equal(list_key(record_keys(parliament)), list_key(record_get(state, "parliament_keys"))), "Contact parliament namespace differs")
@@ -267,8 +270,10 @@ def haiku_contact_check(state):
         exchange_clock = record_get(state, "exchange_clock")
         seen = record_get(state, "p:seen")
         assert(exchange_clock[4] <= seen[6], "Contact exchange exceeds published deliveries")
-    if version == 5:
+    if version >= 5:
         haiku_contact_concepts_check(state, 0)
+    if version >= 6:
+        haiku_contact_neural_check(state)
     return 1
 
 def haiku_contact_event(owner, text, language, climate, rings, quality, source, event, turn):
@@ -792,7 +797,7 @@ def haiku_contact_enrich(state, event, receipt, a, b):
     assert(text_equal(record_get(receipt, "owner"), record_get(event, "owner")), "Contact lexical owner differs")
     assert(record_get(receipt, "origin_source") == record_get(event, "origin_source") and record_get(receipt, "origin_event") == record_get(event, "origin_event"), "Contact lexical origin differs")
     assert(record_get(receipt, "parent_source") == record_get(event, "parent_source") and record_get(receipt, "parent_event") == record_get(event, "parent_event"), "Contact lexical parent differs")
-    if record_get(state, "version") == 5:
+    if record_get(state, "version") >= 5:
         return haiku_contact_concepts_apply(state, event, receipt, a, b)
     result = record_clone(event)
     source = record_get(receipt, "source")

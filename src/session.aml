@@ -5,6 +5,11 @@ IMPORT "state.aml"
 # experience record travels beside that candidate; runtime model handles stay
 # outside both records. The caller handles blank/quit/EOF before accepting it.
 def haiku_session_prepare(pending, source, model):
+    return haiku_session_prepare_pressure(pending, source, model, map_new())
+
+# A complete iceberg can supply bounded pressure earned before this input.
+# Empty pressure preserves the original candidate generation and RAE path.
+def haiku_session_prepare_pressure(pending, source, model, pressure):
     haiku_state_check(pending, model)
     assert(haiku_input_action(source) == 1, "Haiku session needs an accepted input")
     if record_get(pending, "version") >= 2:
@@ -34,7 +39,10 @@ def haiku_session_prepare(pending, source, model):
         targets = haiku_living_targets(form_receipt[0])
         voice_rng = record_get(pending, "voice_rng")
         candidates = haiku_living_generate(record_get(pending, "rows"), record_get(pending, "counts"), record_get(pending, "vocab"), record_get(pending, "syllables"), 5, temperatures[0], voice_rng, record_get(pending, "draws"), form_receipt[0])
-        choice = haiku_living_rae_select(record_get(pending, "rae"), candidates, user, 3, targets)
+        if map_len(pressure) > 0:
+            choice = haiku_living_rae_pressure(record_get(pending, "rae"), candidates, user, 3, targets, pressure)
+        else:
+            choice = haiku_living_rae_select(record_get(pending, "rae"), candidates, user, 3, targets)
     else:
         candidates = haiku_generate_candidates(record_get(pending, "rows"), record_get(pending, "counts"), record_get(pending, "vocab"), record_get(pending, "syllables"), 5, temperatures[0], record_get(pending, "voice_rng"), record_get(pending, "draws"))
         choice = haiku_rae_select(record_get(pending, "rae"), candidates, user, 3)

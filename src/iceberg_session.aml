@@ -165,6 +165,8 @@ def haiku_iceberg_enable_concepts(life, mode, tokenizer):
 # Ready, populated endpoints are rebuilt from their immutable bodies once;
 # ordinary publication subsequently trusts this exact predecessor cache.
 def haiku_iceberg_concepts_audit(life, body_a, body_b):
+    if record_get(life, "version") >= 8:
+        return haiku_iceberg_neural_audit(life, body_a, body_b)
     if record_get(life, "version") < 6:
         return 0
     owners = haiku_words("haiku_contact friend_contact")
@@ -267,11 +269,11 @@ def haiku_iceberg_check(life, tokenizer):
     haiku_state_fields(life, "settings admission_values", "array")
     haiku_state_fields(life, "admission_text", "list")
     version = record_get(life, "version")
-    assert(text_equal(record_get(life, "format"), "haiku-iceberg") and (version == 1 or version == 2 or version == 3 or version == 4 or version == 5 or version == 6 or version == 7), "Haiku iceberg format is unsupported")
+    assert(text_equal(record_get(life, "format"), "haiku-iceberg") and (version == 1 or version == 2 or version == 3 or version == 4 or version == 5 or version == 6 or version == 7 or version == 8), "Haiku iceberg format is unsupported")
     haiku_iceberg_settings(record_get(life, "settings"))
     core = haiku_iceberg_part(life, "voice")
     haiku_state_check(core, tokenizer)
-    assert(record_get(core, "version") == 3 + (version == 7), "Haiku iceberg voice profile differs")
+    assert(record_get(core, "version") == 3 + (version >= 7), "Haiku iceberg voice profile differs")
     haiku_lexical = haiku_iceberg_part(life, "haiku_lexical")
     friend_lexical = haiku_iceberg_part(life, "friend_lexical")
     haiku_contact = haiku_iceberg_part(life, "haiku_contact")
@@ -280,7 +282,7 @@ def haiku_iceberg_check(life, tokenizer):
     haiku_lexical_check(friend_lexical)
     haiku_contact_check(haiku_contact)
     haiku_contact_check(friend_contact)
-    contact_version = 1 + (version >= 3) + (version >= 4) + (version >= 5) + (version >= 6)
+    contact_version = 1 + (version >= 3) + (version >= 4) + (version >= 5) + (version >= 6) + (version >= 8)
     assert(record_get(haiku_contact, "version") == contact_version and record_get(friend_contact, "version") == contact_version, "Haiku iceberg contact profile differs")
     assert(text_equal(record_get(haiku_lexical, "owner"), "haiku") and text_equal(record_get(friend_lexical, "owner"), "friend"), "Haiku iceberg lexical owners differ")
     assert(record_get(haiku_lexical, "clock") <= record_get(core, "turn") and record_get(friend_lexical, "clock") <= record_get(core, "turn"), "Haiku iceberg lexical history is ahead of its voice")
@@ -595,6 +597,8 @@ def haiku_iceberg_tail(pending, before, experience, request, tokenizer, body_a, 
         quality = record_get(experience, "quality")
         human = haiku_contact_event("human", record_get(experience, "input"), "en", climate, rings, quality, 0, turn, turn)
         haiku_contact_publish(haiku_contact, human)
+        if version >= 8 and settings[1]:
+            haiku_contact_neural_observe(haiku_contact, human, body_a, body_b)
         if version >= 2:
             haiku_janus_witness(haiku_janus, human, day)
         # The cloud event carries the actual remembered recent triples, capped
@@ -629,6 +633,8 @@ def haiku_iceberg_tail(pending, before, experience, request, tokenizer, body_a, 
                 haiku_contact_publish(haiku_contact, native)
                 delivered = haiku_contact_derive(native, "friend", line, 6, cursor + 1, turn)
                 haiku_contact_publish(friend_contact, delivered)
+                if version >= 8 and settings[1]:
+                    haiku_contact_neural_observe(friend_contact, delivered, body_a, body_b)
                 if version >= 2:
                     haiku_janus_witness(friend_janus, delivered, day)
             else:
@@ -725,8 +731,38 @@ def haiku_iceberg_tail(pending, before, experience, request, tokenizer, body_a, 
     haiku_iceberg_put(result, "experience", experience)
     return result
 
-# The caller prepares the same foreground as stable chat. Its immutable
-# experience is captured alongside the model identities and all private lives.
+# Only an effective neural fallback contributes this new foreground pressure.
+# Reviewed/manual and resolved ordinary associations keep their authority.
+def haiku_iceberg_neural_pressure(life):
+    pressure = map_new()
+    if record_get(life, "version") < 8:
+        return pressure
+    settings = record_get(life, "settings")
+    if settings[0] == 0:
+        return pressure
+    contact = haiku_iceberg_part(life, "haiku_contact")
+    words = record_get(contact, "neural_words")
+    field = record_get(contact, "p:field")
+    slot = 0
+    while slot < 32:
+        language = list_get(words, slot * 2)
+        word = list_get(words, slot * 2 + 1)
+        if text_equal(language, "en") and text_len(word) > 0:
+            neural = haiku_contact_neural_lookup(contact, language, word)
+            effective = haiku_contact_learning_lookup(contact, language, word)
+            if neural[0] >= 0 and neural[0] == effective[0] and neural[1] == effective[1]:
+                value = 0.15 * neural[1] * field[neural[0]]
+                if value != 0:
+                    map_set(pressure, word, value)
+        slot = slot + 1
+    return pressure
+
+# The previous contact is frozen before this input teaches any new binding.
+# No model call or random draw is added to candidate generation.
+def haiku_iceberg_prepare(life, core, source, tokenizer):
+    return haiku_session_prepare_pressure(core, source, tokenizer, haiku_iceberg_neural_pressure(life))
+
+# The immutable experience travels beside model identities and private lives.
 def haiku_iceberg_turn(life, source, tokenizer, body_a, body_b, worker):
     day = 0
     if record_get(life, "version") >= 2:
@@ -738,7 +774,7 @@ def haiku_iceberg_turn_at(life, source, tokenizer, body_a, body_b, worker, day):
     haiku_state_integer(worker, 0, 1)
     before = haiku_iceberg_part(life, "voice")
     core = record_clone(before)
-    experience = haiku_session_prepare(core, source, tokenizer)
+    experience = haiku_iceberg_prepare(life, core, source, tokenizer)
     request = haiku_iceberg_request_at(life, source, body_a, body_b, day)
     pending = record_clone(life)
     haiku_iceberg_put(pending, "voice", core)
@@ -841,9 +877,14 @@ def haiku_iceberg_result_structure(life, result, experience, request, tokenizer)
 # again against its immutable sources; worker-provided scores are never proof.
 # Legacy profiles replay their private evidence. Version 6 also replays its
 # contact field, concept projection and admission from the accepted sources;
-# voice generation, voice learners and dream generation are never repeated.
+# version 8 also reproduces foreground generation from prior word pressure.
+# Voice learning and dream generation retain their accepted-core boundary.
 def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, body_a, body_b):
     completed = haiku_iceberg_result_structure(life, result, experience, request, tokenizer)
+    if record_get(life, "version") >= 8:
+        foreground = haiku_iceberg_part(life, "voice")
+        expected_experience = haiku_iceberg_prepare(life, foreground, record_get(experience, "input"), tokenizer)
+        assert(record_equal(expected_experience, experience), "Haiku neural foreground differs from its prior owned pressure")
     if record_get(life, "version") == 1:
         return completed
     assert(model_ready(body_a) == record_get(request, "a_ready") and model_ready(body_b) == record_get(request, "b_ready"), "Haiku Janus verification provider availability differs")
@@ -995,6 +1036,8 @@ def haiku_iceberg_check_sources(life, result, experience, request, tokenizer, bo
                     # Replay the complete bounded contact transition, including
                     # its owned field and random stream, before ranking words.
                     haiku_contact_publish(contact, event)
+                    if record_get(life, "version") >= 8 and settings[1]:
+                        haiku_contact_neural_observe(contact, event, body_a, body_b)
                 if record_get(life, "version") < 6 and number > seen[source] and record_get(event, "replay") == 0:
                     # Source membership is independent of the parliament's
                     # arithmetic. The deterministic learner receives only
@@ -1123,10 +1166,45 @@ def haiku_iceberg_enable_form(life, tokenizer):
     haiku_iceberg_check(life, tokenizer)
     assert(record_get(life, "version") >= 6, "Haiku form requires the complete concept life")
     result = record_clone(life)
-    if record_get(result, "version") == 7:
+    if record_get(result, "version") >= 7:
         return result
     core = haiku_state_enable_form(haiku_iceberg_part(result, "voice"), tokenizer)
     haiku_iceberg_put(result, "voice", core)
     record_set(result, "version", 7)
     haiku_iceberg_check(result, tokenizer)
     return result
+
+# A separate saved profile lets sparse external contexts acquire model-backed
+# private bindings. Existing concepts, words and foreground form keep their
+# history; newly heard contexts begin after this explicit activation boundary.
+def haiku_iceberg_enable_neural(life, enabled, tokenizer):
+    haiku_iceberg_check(life, tokenizer)
+    haiku_contact_integer(enabled, 0, 1)
+    assert(record_get(life, "version") >= 7, "Haiku neural bindings require the complete living-form profile")
+    result = record_clone(life)
+    if record_get(result, "version") >= 8:
+        return result
+    owners = haiku_words("haiku_contact friend_contact")
+    i = 0
+    while i < 2:
+        name = list_get(owners, i)
+        contact = haiku_contact_enable_neural(haiku_iceberg_part(result, name), enabled)
+        haiku_iceberg_put(result, name, contact)
+        i = i + 1
+    record_set(result, "version", 8)
+    haiku_iceberg_check(result, tokenizer)
+    return result
+
+# Model-backed retained observations are checked against their exact frozen
+# inputs and personal snapshots whenever immutable providers return.
+def haiku_iceberg_neural_audit(life, body_a, body_b):
+    if record_get(life, "version") < 8:
+        return 0
+    calls = 0
+    owners = haiku_words("haiku_contact friend_contact")
+    i = 0
+    while i < 2:
+        contact = haiku_iceberg_part(life, list_get(owners, i))
+        calls = calls + haiku_contact_neural_audit(contact, body_a, body_b)
+        i = i + 1
+    return calls

@@ -17,12 +17,14 @@ The new [iceberg conversation](ICEBERG_SESSION.md) connects immutable AML
 handles, four private lexical contexts, parameter mixing and two private
 parliaments to actual encounters. Bounded text-context returns provide word
 scores and representations; concept pressure joins lexical admission. Its
-version-7 checkpoint retains 268 fields across the voice, both lexical/contact
+version-8 checkpoint retains 276 fields across the voice, both lexical/contact
 lives and both Janus organs. Private [word associations](LEARNED_WORDS.md) grow
 from repeated accepted encounters; [recursive symbols](DREAM_SYMBOLS.md) can be
 born at an actual dream boundary and [cross a spoken dream](SYMBOL_EXCHANGE.md).
 The four reviewed model concepts now acquire [personal centres](PERSONAL_CONCEPTS.md)
 from each presence's retained encounters and contribute to later word ranking.
+Their representations also corroborate [private word bindings](NEURAL_WORDS.md)
+from sparse external contexts, reaching later symbol paths and foreground speech.
 The [engineering log](../HAIKULOG.md)
 records each stage and its evidence. The speaking form now grows from present
 and remembered climate: fragment, couplet, haiku or an ABA tercet. Python Haiku remains
@@ -330,8 +332,10 @@ The experimental [contact bridge](PARLIAMENT_CONTACT.md) now derives features
 from actual human, cloud, inner and dream encounters. Reviewed word aliases and
 four model prototypes contribute to the 88 coordinates; private pressure adjusts
 later vocabulary admission. Each presence has its own complete owner. Private
-word associations and dream-born recursive symbols extend these features;
-model-attributed concept formation remains a later experiment.
+word associations and dream-born recursive symbols extend these features.
+Model-corroborated private word associations now grow from repeated sparse
+contexts and reach later symbol paths. Representation-driven compound formation
+and its feedback into parameter balance remain next steps.
 
 ## A thought can travel down and return
 

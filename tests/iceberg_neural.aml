@@ -1,0 +1,79 @@
+# The new personal association organ preserves the existing life when its
+# immutable providers are absent or its saved policy is disabled.
+IMPORT "../src/iceberg_session.aml"
+
+def neural_test_old_leaves(old, current):
+    expected = record_new()
+    actual = record_new()
+    keys = record_keys(old)
+    wrappers = haiku_words("version haiku_contact:version friend_contact:version haiku_contact:keys friend_contact:keys")
+    i = 0
+    while i < list_len(keys):
+        key = list_get(keys, i)
+        if list_find(wrappers, key) < 0:
+            record_set(expected, key, record_get(old, key))
+            record_set(actual, key, record_get(current, key))
+        i = i + 1
+    assert(record_equal(expected, actual), "Absent or disabled neural associations changed an existing life leaf")
+    return 1
+
+def neural_test_private(life):
+    result = record_new()
+    keys = record_keys(life)
+    i = 0
+    while i < list_len(keys):
+        key = list_get(keys, i)
+        if text_find(key, "_contact:neural_") >= 0:
+            record_set(result, key, record_get(life, key))
+        i = i + 1
+    assert(list_len(record_keys(result)) > 0, "Neural private-state fixture found no owned leaves")
+    return record_clone(result)
+
+missing = model_try_load("")
+core = haiku_state_enable_dreams(haiku_state_new("regex", 0, 0, 575, 57), 0)
+record_set(core, "dream_config", [1, 1, 2])
+legacy = haiku_iceberg_new(core, [1, 1, 0, 1])
+legacy = haiku_iceberg_enable_janus(legacy, 20746, 1, 0)
+legacy = haiku_iceberg_enable_words(legacy, 0)
+legacy = haiku_iceberg_enable_symbols(legacy, 1, 0)
+legacy = haiku_iceberg_enable_exchange(legacy, 1, 0)
+legacy = haiku_iceberg_enable_concepts(legacy, 2, 0)
+legacy = haiku_iceberg_enable_form(legacy, 0)
+original = record_clone(legacy)
+live = haiku_iceberg_enable_neural(legacy, 1, 0)
+disabled = haiku_iceberg_enable_neural(legacy, 0, 0)
+assert(record_equal(legacy, original), "Neural activation changed its predecessor")
+assert(record_get(live, "version") == 8, "Neural life version differs")
+assert(record_get(live, "haiku_contact:version") == 6 and record_get(live, "friend_contact:version") == 6, "Neural private contact versions differ")
+assert(record_equal(live, haiku_iceberg_enable_neural(live, 0, 0)), "Repeated activation changed the saved neural policy")
+assert(record_equal(live, haiku_iceberg_enable_form(live, 0)), "Form activation downgraded the neural profile")
+assert(record_equal(live, haiku_iceberg_enable_concepts(live, 0, 0)), "Concept activation downgraded the neural profile")
+assert(haiku_iceberg_neural_audit(live, missing, missing) == 0, "Missing bodies caused a neural audit forward")
+before = neural_test_private(live)
+off_before = neural_test_private(disabled)
+parallel = record_clone(live)
+source = "rain river water ocean lake"
+first = haiku_iceberg_turn_at(legacy, source, 0, missing, missing, 0, 20746)
+second = haiku_iceberg_turn_at(disabled, source, 0, missing, missing, 1, 20746)
+third = haiku_iceberg_turn_at(live, source, 0, missing, missing, 0, 20746)
+fourth = haiku_iceberg_turn_at(parallel, source, 0, missing, missing, 1, 20746)
+assert(text_equal(first, second) and text_equal(first, third) and text_equal(third, fourth), "Absent neural bodies changed the actual foreground")
+assert(record_equal(live, parallel), "Neural life differs by serial/worker scheduling")
+neural_test_old_leaves(legacy, disabled)
+neural_test_old_leaves(legacy, live)
+assert(record_equal(before, neural_test_private(live)), "Missing bodies changed neural evidence")
+assert(record_equal(off_before, neural_test_private(disabled)), "Disabled neural policy changed its evidence")
+checkpoint_save(live, "iceberg-neural-first.state")
+resumed = checkpoint_load("iceberg-neural-first.state")
+haiku_iceberg_check(resumed, 0)
+assert(record_equal(live, resumed), "Neural checkpoint lost an owned leaf")
+assert(haiku_iceberg_neural_audit(resumed, missing, missing) == 0, "Weightless resume performed a neural forward")
+source = "tree forest wood leaf light"
+first = haiku_iceberg_turn_at(live, source, 0, missing, missing, 0, 20747)
+second = haiku_iceberg_turn_at(resumed, source, 0, missing, missing, 1, 20747)
+assert(text_equal(first, second) and record_equal(live, resumed), "Neural continuation changed after restart")
+assert(haiku_dream_check(haiku_iceberg_part(live, "voice")) == 1, "Neural fixture lost its actual dream")
+assert(record_equal(before, neural_test_private(live)), "A weightless dream minted neural evidence")
+checkpoint_save(live, "iceberg-neural.state")
+checkpoint_save(resumed, "iceberg-neural-resumed.state")
+PRINT "HAIKU_ICEBERG_NEURAL_LIFE_OK"
